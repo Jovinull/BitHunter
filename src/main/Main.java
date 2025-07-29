@@ -30,5 +30,8 @@ public class Main {
 
         // Torna a janela visível na tela
         window.setVisible(true);
+
+        // Inicia a thread do jogo (começa o loop do jogo)
+        gamePanel.startGameThread();
     }
 }
