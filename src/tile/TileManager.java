@@ -14,8 +14,8 @@ import main.GamePanel;
 public class TileManager {
 
     GamePanel gp; // Referência ao painel principal do jogo
-    Tile[] tile; // Vetor que armazena os tipos de tiles disponíveis (grama, parede, etc.)
-    int mapTileNum[][]; // Matriz que representa o mapa (cada número corresponde a um tile)
+    public Tile[] tile; // Vetor que armazena os tipos de tiles disponíveis (grama, parede, etc.)
+    public int mapTileNum[][]; // Matriz que representa o mapa (cada número corresponde a um tile)
 
     // Construtor: carrega as imagens dos tiles e o mapa a partir de um arquivo .txt
     public TileManager(GamePanel gp) {
@@ -28,7 +28,7 @@ public class TileManager {
         loadMap("/resource/maps/world01.txt"); // Carrega o layout do mapa do arquivo
     }
 
-    // Carrega as imagens correspondentes a cada tipo de tile
+    // Carrega as imagens e solidez correspondentes a cada tipo de tile
     public void getTileImage() {
         try {
             tile[0] = new Tile();
@@ -36,15 +36,18 @@ public class TileManager {
 
             tile[1] = new Tile();
             tile[1].image = ImageIO.read(getClass().getResourceAsStream("/resource/tiles/wall.png"));
+            tile[1].collision = true;
 
             tile[2] = new Tile();
             tile[2].image = ImageIO.read(getClass().getResourceAsStream("/resource/tiles/water.png"));
+            tile[2].collision = true;
 
             tile[3] = new Tile();
             tile[3].image = ImageIO.read(getClass().getResourceAsStream("/resource/tiles/earth.png"));
 
             tile[4] = new Tile();
             tile[4].image = ImageIO.read(getClass().getResourceAsStream("/resource/tiles/tree.png"));
+            tile[4].collision = true;
 
             tile[5] = new Tile();
             tile[5].image = ImageIO.read(getClass().getResourceAsStream("/resource/tiles/sand.png"));

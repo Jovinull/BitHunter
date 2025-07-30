@@ -37,6 +37,7 @@ public class GamePanel extends JPanel implements Runnable {
     TileManager tileM = new TileManager(this); // Gerencia o carregamento e desenho dos tiles
     KeyHandler keyH = new KeyHandler(); // Captura entrada de teclado
     Thread gameThread; // Thread para rodar o loop do jogo
+    public CollisionChecker cChecker = new CollisionChecker(this); // Verifica colisões entre entidades e tiles
     public Player player = new Player(this, keyH); // Jogador principal do jogo
 
     // ==== CONSTRUTOR ====

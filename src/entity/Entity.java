@@ -1,5 +1,6 @@
 package entity;
 
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 // Classe base para todas as entidades do jogo (ex: jogador, NPCs, inimigos, objetos)
@@ -23,4 +24,7 @@ public class Entity {
     // Controle da animação dos sprites
     public int spriteCounter = 0; // Conta os frames até alternar entre sprite 1 e 2
     public int spriteNum = 1; // Número do sprite atual (1 ou 2)
+
+    public Rectangle solidArea; // Área sólida para colisão (usada para detectar interações com o mundo)
+    public boolean collisionOn = false; // Flag para indicar se a entidade está colidindo com algo
 }

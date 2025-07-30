@@ -1,6 +1,7 @@
 package entity;
 
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -26,6 +27,12 @@ public class Player extends Entity {
         // Define o ponto fixo do jogador na tela (centro da tela)
         screenX = gp.screenWidth / 2;
         screenY = gp.screenHeight / 2;
+
+        solidArea = new Rectangle();
+        solidArea.x = 8; // Posição X da área sólida (colisão)
+        solidArea.y = 16; // Posição Y da área sólida
+        solidArea.width = 32; // Largura da área sólida
+        solidArea.height = 32; // Altura da área sólida
 
         setDefaultValues(); // Define a posição inicial no mundo e outras propriedades
         getPlayerImage(); // Carrega os sprites do personagem
@@ -67,16 +74,35 @@ public class Player extends Entity {
             // Atualiza a direção e a posição no mundo
             if (keyH.upPressed) {
                 direction = "up";
-                worldY -= speed;
             } else if (keyH.downPressed) {
                 direction = "down";
-                worldY += speed;
             } else if (keyH.leftPressed) {
                 direction = "left";
-                worldX -= speed;
             } else if (keyH.rightPressed) {
                 direction = "right";
-                worldX += speed;
+            }
+
+            // CHECK TILE COLLISION
+            collisionOn = false;
+            gp.cChecker.checkTile(this); // Verifica colisão com tiles do mapa
+
+            // IF COLLISION IS FALSE, PLAYER CAN MOVE
+            if (collisionOn == false) {
+                // Atualiza a posição do jogador com base na direção
+                switch (direction) {
+                    case "up":
+                        worldY -= speed;
+                        break;
+                    case "down":
+                        worldY += speed;
+                        break;
+                    case "left":
+                        worldX -= speed;
+                        break;
+                    case "right":
+                        worldX += speed;
+                        break;
+                }
             }
 
             // Troca de sprite a cada 12 frames (animação)
