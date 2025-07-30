@@ -13,26 +13,33 @@ import main.KeyHandler;
 public class Player extends Entity {
 
     GamePanel gp; // Referência ao painel principal do jogo
-    KeyHandler keyH; // Referência ao manipulador de teclas
+    KeyHandler keyH; // Referência ao manipulador de teclado
+
+    public final int screenX; // Posição fixa do jogador na tela no eixo X (centro da tela)
+    public final int screenY; // Posição fixa do jogador na tela no eixo Y (centro da tela)
 
     // Construtor: recebe o painel e o handler de teclado
     public Player(GamePanel gp, KeyHandler keyH) {
         this.gp = gp;
         this.keyH = keyH;
 
-        setDefaultValues(); // Define posição e direção inicial
+        // Define o ponto fixo do jogador na tela (centro da tela)
+        screenX = gp.screenWidth / 2;
+        screenY = gp.screenHeight / 2;
+
+        setDefaultValues(); // Define a posição inicial no mundo e outras propriedades
         getPlayerImage(); // Carrega os sprites do personagem
     }
 
-    // Define valores padrão de início do jogador
+    // Define valores iniciais do jogador no mundo
     public void setDefaultValues() {
-        x = 100;
-        y = 100;
-        speed = 4;
-        direction = "down";
+        worldX = gp.tileSize * 23; // Posição inicial em X no mundo (tile 23)
+        worldY = gp.tileSize * 21; // Posição inicial em Y no mundo (tile 21)
+        speed = 4; // Velocidade do jogador
+        direction = "down"; // Direção inicial
     }
 
-    // Carrega as imagens dos sprites do personagem
+    // Carrega os sprites de animação para cada direção
     public void getPlayerImage() {
         try {
             up1 = ImageIO.read(getClass().getResourceAsStream("/resource/player/boy_up_1.png"));
@@ -47,32 +54,32 @@ public class Player extends Entity {
             right1 = ImageIO.read(getClass().getResourceAsStream("/resource/player/boy_right_1.png"));
             right2 = ImageIO.read(getClass().getResourceAsStream("/resource/player/boy_right_2.png"));
         } catch (IOException e) {
-            e.printStackTrace(); // Em caso de erro ao carregar imagens
+            e.printStackTrace(); // Mostra erro se as imagens não forem carregadas
         }
     }
 
-    // Atualiza a lógica do jogador (movimento + animação)
+    // Atualiza a lógica do jogador: movimentação e animação
     public void update() {
 
-        // Verifica se alguma tecla de movimento está pressionada
+        // Só atualiza se alguma tecla de movimento estiver pressionada
         if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
 
-            // Atualiza a direção e posição com base nas teclas
+            // Atualiza a direção e a posição no mundo
             if (keyH.upPressed) {
                 direction = "up";
-                y -= speed;
+                worldY -= speed;
             } else if (keyH.downPressed) {
                 direction = "down";
-                y += speed;
+                worldY += speed;
             } else if (keyH.leftPressed) {
                 direction = "left";
-                x -= speed;
+                worldX -= speed;
             } else if (keyH.rightPressed) {
                 direction = "right";
-                x += speed;
+                worldX += speed;
             }
 
-            // Lógica de troca de sprite (animação simples)
+            // Troca de sprite a cada 12 frames (animação)
             spriteCounter++;
             if (spriteCounter > 12) {
                 spriteNum = (spriteNum == 1) ? 2 : 1;
@@ -81,7 +88,7 @@ public class Player extends Entity {
         }
     }
 
-    // Desenha o jogador na tela com o sprite correto
+    // Desenha o jogador na tela
     public void draw(Graphics2D g2) {
         BufferedImage image = null;
 
@@ -101,7 +108,8 @@ public class Player extends Entity {
                 break;
         }
 
-        // Desenha a imagem na posição atual do jogador com o tamanho do tile
-        g2.drawImage(image, x, y, gp.tileSize, gp.tileSize, null);
+        // Desenha o sprite na posição fixa do centro da tela, com o tamanho padrão do
+        // tile
+        g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
     }
 }
