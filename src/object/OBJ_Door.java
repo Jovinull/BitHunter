@@ -18,5 +18,7 @@ public class OBJ_Door extends SuperObject {
             // Em caso de falha no carregamento, imprime informações de erro
             e.printStackTrace();
         }
+
+        collision = true; // Define que a porta deve bloquear colisões
     }
 }

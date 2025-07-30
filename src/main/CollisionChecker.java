@@ -72,4 +72,73 @@ public class CollisionChecker {
                 break;
         }
     }
+
+    public int checkObject(Entity entity, boolean player) {
+        int index = 999; // Índice padrão (999 = nenhum objeto relevante colidido)
+
+        for (int i = 0; i < gp.obj.length; i++) {
+            if (gp.obj[i] != null) {
+
+                // Calcula a posição real da área de colisão da entidade no mundo
+                entity.solidArea.x = entity.worldX + entity.solidArea.x;
+                entity.solidArea.y = entity.worldY + entity.solidArea.y;
+
+                // Calcula a posição real da área de colisão do objeto no mundo
+                gp.obj[i].solidArea.x = gp.obj[i].worldX + gp.obj[i].solidArea.x;
+                gp.obj[i].solidArea.y = gp.obj[i].worldY + gp.obj[i].solidArea.y;
+
+                // Simula o movimento da entidade conforme a direção atual para verificar
+                // colisão
+                switch (entity.direction) {
+                    case "up":
+                        entity.solidArea.y -= entity.speed;
+                        if (entity.solidArea.intersects(gp.obj[i].solidArea)) {
+                            if (gp.obj[i].collision)
+                                entity.collisionOn = true;
+                            if (player)
+                                index = i; // Retorna índice do objeto se for o jogador
+                        }
+                        break;
+
+                    case "down":
+                        entity.solidArea.y += entity.speed;
+                        if (entity.solidArea.intersects(gp.obj[i].solidArea)) {
+                            if (gp.obj[i].collision)
+                                entity.collisionOn = true;
+                            if (player)
+                                index = i;
+                        }
+                        break;
+
+                    case "left":
+                        entity.solidArea.x -= entity.speed;
+                        if (entity.solidArea.intersects(gp.obj[i].solidArea)) {
+                            if (gp.obj[i].collision)
+                                entity.collisionOn = true;
+                            if (player)
+                                index = i;
+                        }
+                        break;
+
+                    case "right":
+                        entity.solidArea.x += entity.speed;
+                        if (entity.solidArea.intersects(gp.obj[i].solidArea)) {
+                            if (gp.obj[i].collision)
+                                entity.collisionOn = true;
+                            if (player)
+                                index = i;
+                        }
+                        break;
+                }
+
+                // Restaura as posições originais das áreas sólidas
+                entity.solidArea.x = entity.solidAreaDefaultX;
+                entity.solidArea.y = entity.solidAreaDefaultY;
+                gp.obj[i].solidArea.x = gp.obj[i].solidAreaDefaultX;
+                gp.obj[i].solidArea.y = gp.obj[i].solidAreaDefaultY;
+            }
+        }
+
+        return index; // Retorna o índice do objeto colidido (ou 999 se nenhum)
+    }
 }

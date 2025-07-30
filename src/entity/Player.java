@@ -18,6 +18,7 @@ public class Player extends Entity {
 
     public final int screenX; // Posição fixa do jogador na tela no eixo X (centro da tela)
     public final int screenY; // Posição fixa do jogador na tela no eixo Y (centro da tela)
+    int hasKey = 0; // Contador de chaves coletadas
 
     // Construtor: recebe o painel e o handler de teclado
     public Player(GamePanel gp, KeyHandler keyH) {
@@ -31,6 +32,8 @@ public class Player extends Entity {
         solidArea = new Rectangle();
         solidArea.x = 8; // Posição X da área sólida (colisão)
         solidArea.y = 16; // Posição Y da área sólida
+        solidAreaDefaultX = solidArea.x; // Posição padrão X da área sólida
+        solidAreaDefaultY = solidArea.y; // Posição padrão Y da área sólida
         solidArea.width = 32; // Largura da área sólida
         solidArea.height = 32; // Altura da área sólida
 
@@ -86,6 +89,10 @@ public class Player extends Entity {
             collisionOn = false;
             gp.cChecker.checkTile(this); // Verifica colisão com tiles do mapa
 
+            // CHECK OBJECT COLLISION
+            int objIndex = gp.cChecker.checkObject(this, true);
+            pickUpObject(objIndex); // Tenta pegar o objeto se houver colisão
+
             // IF COLLISION IS FALSE, PLAYER CAN MOVE
             if (collisionOn == false) {
                 // Atualiza a posição do jogador com base na direção
@@ -110,6 +117,32 @@ public class Player extends Entity {
             if (spriteCounter > 12) {
                 spriteNum = (spriteNum == 1) ? 2 : 1;
                 spriteCounter = 0;
+            }
+        }
+    }
+
+    public void pickUpObject(int index) {
+
+        if (index != 999) {
+
+            String objectName = gp.obj[index].name;
+            switch (objectName) {
+                case "Key":
+                    hasKey++; // Incrementa contador de chaves
+                    gp.obj[index] = null; // Remove o objeto do jogo
+                    System.out.println("Chave coletada! Total de chaves: " + hasKey);
+                    break;
+                case "Door":
+                    if (hasKey > 0) {
+                        hasKey--; // Usa uma chave
+                        gp.obj[index] = null; // Remove a porta do jogo
+                        System.out.println("Porta aberta! Chaves restantes: " + hasKey);
+                    } else {
+                        System.out.println("Você precisa de uma chave para abrir esta porta!");
+                    }
+                    break;
+                default:
+                    System.out.println("Objeto desconhecido: " + objectName);
             }
         }
     }

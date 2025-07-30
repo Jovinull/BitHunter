@@ -26,5 +26,6 @@ public class Entity {
     public int spriteNum = 1; // Número do sprite atual (1 ou 2)
 
     public Rectangle solidArea; // Área sólida para colisão (usada para detectar interações com o mundo)
+    public int solidAreaDefaultX, solidAreaDefaultY; // Posições padrão da área sólida (para resetar após colisões)
     public boolean collisionOn = false; // Flag para indicar se a entidade está colidindo com algo
 }

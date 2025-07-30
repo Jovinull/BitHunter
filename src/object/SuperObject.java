@@ -1,6 +1,7 @@
 package object;
 
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import main.GamePanel;
@@ -12,6 +13,9 @@ public class SuperObject {
     public String name; // Nome/descritivo do objeto
     public boolean collision = false; // Define se o objeto bloqueia movimento
     public int worldX, worldY; // Posição no mundo (coordenadas em pixels)
+    public Rectangle solidArea = new Rectangle(0, 0, 48, 48); // Área sólida para colisão
+    public int solidAreaDefaultX = 0; // Posição padrão X da área sólida
+    public int solidAreaDefaultY = 0; // Posição padrão Y da área sólida
 
     /**
      * Desenha o objeto na tela considerando a posição do jogador (câmera)
