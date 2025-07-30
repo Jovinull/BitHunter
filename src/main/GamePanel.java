@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import javax.swing.JPanel;
 
 import entity.Player;
+import tile.TileManager;
 
 // A classe GamePanel é o painel principal do jogo. Ela herda de JPanel e implementa Runnable para rodar em uma thread separada.
 public class GamePanel extends JPanel implements Runnable {
@@ -17,12 +18,14 @@ public class GamePanel extends JPanel implements Runnable {
     final int scale = 3; // Fator de escala dos tiles (aumenta o tamanho visual)
 
     public final int tileSize = originalTileSize * scale; // Tamanho final de cada tile (48x48 pixels)
-    final int maxScreenCol = 16; // Número máximo de colunas na tela
-    final int maxScreenRow = 12; // Número máximo de linhas na tela
-    final int screenWidth = tileSize * maxScreenCol; // Largura total da tela do jogo (768 pixels)
-    final int screenHeight = tileSize * maxScreenRow; // Altura total da tela do jogo (576 pixels)
+    public final int maxScreenCol = 16; // Número máximo de colunas na tela
+    public final int maxScreenRow = 12; // Número máximo de linhas na tela
+    public final int screenWidth = tileSize * maxScreenCol; // Largura total da tela do jogo (768 pixels)
+    public final int screenHeight = tileSize * maxScreenRow; // Altura total da tela do jogo (576 pixels)
 
     int FPS = 60; // Taxa de quadros por segundo (frames per second)
+
+    TileManager tileM = new TileManager(this); // Gerenciador de tiles responsável por carregar e desenhar o mapa
 
     KeyHandler keyH = new KeyHandler(); // Objeto que escuta os eventos de teclado
 
@@ -94,6 +97,8 @@ public class GamePanel extends JPanel implements Runnable {
         super.paintComponent(g); // Limpa o painel antes de desenhar novamente
 
         Graphics2D g2 = (Graphics2D) g; // Conversão para Graphics2D (mais recursos)
+
+        tileM.draw(g2); // Desenha o mapa de tiles antes de desenhar o jogador
 
         player.draw(g2); // Desenha o jogador na tela
 
