@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import javax.swing.JPanel;
 
 import entity.Player;
+import object.SuperObject;
 import tile.TileManager;
 
 // Painel principal do jogo. Responsável por configurar, atualizar e desenhar o jogo.
@@ -38,7 +39,9 @@ public class GamePanel extends JPanel implements Runnable {
     KeyHandler keyH = new KeyHandler(); // Captura entrada de teclado
     Thread gameThread; // Thread para rodar o loop do jogo
     public CollisionChecker cChecker = new CollisionChecker(this); // Verifica colisões entre entidades e tiles
+    public AssetSetter aSetter = new AssetSetter(this); // Configura os objetos do jogo (itens, inimigos, etc.)
     public Player player = new Player(this, keyH); // Jogador principal do jogo
+    public SuperObject obj[] = new SuperObject[10]; // Array para armazenar objetos do jogo
 
     // ==== CONSTRUTOR ====
     public GamePanel() {
@@ -48,6 +51,12 @@ public class GamePanel extends JPanel implements Runnable {
 
         this.addKeyListener(keyH); // Liga o controle de teclado ao painel
         this.setFocusable(true); // Permite que o painel receba foco do teclado
+    }
+
+    // Prepara e inicializa elementos principais do jogo antes de começar o loop
+    public void setupGame() {
+        // Instancia e posiciona todos os objetos (chaves, portas, baús)
+        aSetter.setObject();
     }
 
     // ==== INICIALIZA A THREAD DO JOGO ====
@@ -97,15 +106,28 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     // ==== DESENHA NA TELA ====
+    // Método responsável por desenhar todo o frame do jogo
     @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g); // Limpa o fundo antes de desenhar
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g); // Limpa o painel (fundo) antes de desenhar novos elementos
 
-        Graphics2D g2 = (Graphics2D) g; // Usa Graphics2D para mais controle
+        // Converte para Graphics2D para aproveitar recursos avançados de renderização
+        Graphics2D g2 = (Graphics2D) g;
 
-        tileM.draw(g2); // Desenha os tiles visíveis do mundo
-        player.draw(g2); // Desenha o jogador centralizado na tela
+        // Desenha o mapa: tiles visíveis de acordo com a câmera/jogador
+        tileM.draw(g2);
 
-        g2.dispose(); // Libera os recursos gráficos
+        // Percorre todos os objetos do mundo e desenha os que estiverem instanciados
+        for (int i = 0; i < obj.length; i++) {
+            if (obj[i] != null) {
+                obj[i].draw(g2, this);
+            }
+        }
+
+        // Desenha o jogador no centro da tela (posição relativa à câmera)
+        player.draw(g2);
+
+        // Libera recursos do contexto gráfico após o desenho
+        g2.dispose();
     }
 }
