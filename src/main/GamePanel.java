@@ -28,8 +28,6 @@ public class GamePanel extends JPanel implements Runnable {
     // ==== CONFIGURAÇÕES DO MUNDO ====
     public final int maxWorldCol = 50; // Quantidade total de colunas no mundo
     public final int maxWorldRow = 50; // Quantidade total de linhas no mundo
-    public final int worldWidth = tileSize * maxWorldCol; // Largura total do mundo
-    public final int worldHeight = tileSize * maxWorldRow; // Altura total do mundo
 
     // ==== CONFIGURAÇÃO DE FPS ====
     int FPS = 60; // Quadros por segundo
@@ -37,9 +35,12 @@ public class GamePanel extends JPanel implements Runnable {
     // ==== COMPONENTES DO JOGO ====
     TileManager tileM = new TileManager(this); // Gerencia o carregamento e desenho dos tiles
     KeyHandler keyH = new KeyHandler(); // Captura entrada de teclado
-    Thread gameThread; // Thread para rodar o loop do jogo
+    Sound sound = new Sound(); // Gerencia sons do jogo
     public CollisionChecker cChecker = new CollisionChecker(this); // Verifica colisões entre entidades e tiles
     public AssetSetter aSetter = new AssetSetter(this); // Configura os objetos do jogo (itens, inimigos, etc.)
+    Thread gameThread; // Thread para rodar o loop do jogo
+
+    // ENTITY AND OBJECTS
     public Player player = new Player(this, keyH); // Jogador principal do jogo
     public SuperObject obj[] = new SuperObject[10]; // Array para armazenar objetos do jogo
 
@@ -57,6 +58,9 @@ public class GamePanel extends JPanel implements Runnable {
     public void setupGame() {
         // Instancia e posiciona todos os objetos (chaves, portas, baús)
         aSetter.setObject();
+
+        // Inicia a música de fundo
+        playMusic(0);
     }
 
     // ==== INICIALIZA A THREAD DO JOGO ====
@@ -129,5 +133,23 @@ public class GamePanel extends JPanel implements Runnable {
 
         // Libera recursos do contexto gráfico após o desenho
         g2.dispose();
+    }
+
+    public void playMusic(int index) {
+
+        sound.setFile(index); // Define o arquivo de som a ser tocado
+        sound.play(); // Toca o som
+        sound.loop(); // Reproduz em loop até ser parado
+    }
+
+    public void stopMusic() {
+
+        sound.stop(); // Para a música atual
+    }
+
+    public void playSE(int index) {
+
+        sound.setFile(index); // Define o arquivo de efeito sonoro
+        sound.play(); // Toca o efeito sonoro
     }
 }

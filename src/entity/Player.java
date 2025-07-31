@@ -128,18 +128,26 @@ public class Player extends Entity {
             String objectName = gp.obj[index].name;
             switch (objectName) {
                 case "Key":
+                    gp.playSE(1); // Toca o som de coleta de chave
                     hasKey++; // Incrementa contador de chaves
                     gp.obj[index] = null; // Remove o objeto do jogo
                     System.out.println("Chave coletada! Total de chaves: " + hasKey);
                     break;
                 case "Door":
                     if (hasKey > 0) {
+                        gp.playSE(3); // Toca o som de abertura de porta
                         hasKey--; // Usa uma chave
                         gp.obj[index] = null; // Remove a porta do jogo
                         System.out.println("Porta aberta! Chaves restantes: " + hasKey);
                     } else {
                         System.out.println("Você precisa de uma chave para abrir esta porta!");
                     }
+                    break;
+                case "Boots":
+                    gp.playSE(2); // Toca o som de coleta de botas
+                    speed += 1; // Aumenta a velocidade do jogador
+                    gp.obj[index] = null; // Remove as botas do jogo
+                    System.out.println("Botas coletadas! Velocidade aumentada para: " + speed);
                     break;
                 default:
                     System.out.println("Objeto desconhecido: " + objectName);
