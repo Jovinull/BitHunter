@@ -35,7 +35,8 @@ public class GamePanel extends JPanel implements Runnable {
     // ==== COMPONENTES DO JOGO ====
     TileManager tileM = new TileManager(this); // Gerencia o carregamento e desenho dos tiles
     KeyHandler keyH = new KeyHandler(); // Captura entrada de teclado
-    Sound sound = new Sound(); // Gerencia sons do jogo
+    Sound music = new Sound(); // Gerencia a música do jogo
+    Sound se = new Sound(); // Gerencia os efeitos sonoros do jogo
     public CollisionChecker cChecker = new CollisionChecker(this); // Verifica colisões entre entidades e tiles
     public AssetSetter aSetter = new AssetSetter(this); // Configura os objetos do jogo (itens, inimigos, etc.)
     Thread gameThread; // Thread para rodar o loop do jogo
@@ -137,19 +138,19 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void playMusic(int index) {
 
-        sound.setFile(index); // Define o arquivo de som a ser tocado
-        sound.play(); // Toca o som
-        sound.loop(); // Reproduz em loop até ser parado
+        music.setFile(index); // Define o arquivo de som a ser tocado
+        music.play(); // Toca o som
+        music.loop(); // Reproduz em loop até ser parado
     }
 
     public void stopMusic() {
 
-        sound.stop(); // Para a música atual
+        music.stop(); // Para a música atual
     }
 
     public void playSE(int index) {
 
-        sound.setFile(index); // Define o arquivo de efeito sonoro
-        sound.play(); // Toca o efeito sonoro
+        se.setFile(index); // Define o arquivo de efeito sonoro
+        se.play(); // Toca o efeito sonoro
     }
 }
