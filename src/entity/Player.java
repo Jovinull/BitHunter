@@ -18,7 +18,7 @@ public class Player extends Entity {
 
     public final int screenX; // Posição fixa do jogador na tela no eixo X (centro da tela)
     public final int screenY; // Posição fixa do jogador na tela no eixo Y (centro da tela)
-    int hasKey = 0; // Contador de chaves coletadas
+    public int hasKey = 0; // Contador de chaves coletadas
 
     // Construtor: recebe o painel e o handler de teclado
     public Player(GamePanel gp, KeyHandler keyH) {
@@ -121,35 +121,51 @@ public class Player extends Entity {
         }
     }
 
+    // Método responsável por tratar a coleta/interação com um objeto baseado no
+    // índice passado
     public void pickUpObject(int index) {
 
+        // Se o índice for válido (999 significa "nenhum objeto")
         if (index != 999) {
 
+            // Obtém o nome do objeto a partir da referência no array
             String objectName = gp.obj[index].name;
+
             switch (objectName) {
                 case "Key":
-                    gp.playSE(1); // Toca o som de coleta de chave
-                    hasKey++; // Incrementa contador de chaves
-                    gp.obj[index] = null; // Remove o objeto do jogo
-                    System.out.println("Chave coletada! Total de chaves: " + hasKey);
+                    gp.playSE(1); // Toca o efeito sonoro de coleta de chave
+                    hasKey++; // Aumenta o número de chaves do jogador
+                    gp.obj[index] = null; // Remove a chave do mundo (objeto foi "pegado")
+                    gp.ui.showMessage("Você obteve uma chave!"); // Exibe mensagem temporária
                     break;
+
                 case "Door":
                     if (hasKey > 0) {
-                        gp.playSE(3); // Toca o som de abertura de porta
-                        hasKey--; // Usa uma chave
-                        gp.obj[index] = null; // Remove a porta do jogo
-                        System.out.println("Porta aberta! Chaves restantes: " + hasKey);
+                        gp.playSE(3); // Toca som de destrancar/abrir porta
+                        hasKey--; // Consome uma chave
+                        gp.obj[index] = null; // Remove a porta do mundo (aberta)
+                        gp.ui.showMessage("Porta aberta!");
                     } else {
-                        System.out.println("Você precisa de uma chave para abrir esta porta!");
+                        gp.ui.showMessage("Chave necessária!"); // Jogador não tem chave suficiente
                     }
                     break;
+
                 case "Boots":
-                    gp.playSE(2); // Toca o som de coleta de botas
+                    gp.playSE(2); // Toca som de "power-up"
                     speed += 1; // Aumenta a velocidade do jogador
-                    gp.obj[index] = null; // Remove as botas do jogo
-                    System.out.println("Botas coletadas! Velocidade aumentada para: " + speed);
+                    gp.obj[index] = null; // Remove as botas do mundo
+                    gp.ui.showMessage("Velocidade aumentada!");
                     break;
+
+                case "Chest":
+                    // O baú marca o fim do jogo
+                    gp.ui.gameFinished = true; // Ativa a flag de fim de jogo
+                    gp.stopMusic(); // Para a música de fundo
+                    gp.playSE(4); // Toca som de "vitória" ou "evento final"
+                    break;
+
                 default:
+                    // Segurança: caso um objeto inesperado tenha sido colocado no mapa
                     System.out.println("Objeto desconhecido: " + objectName);
             }
         }

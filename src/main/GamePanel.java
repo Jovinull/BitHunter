@@ -39,6 +39,7 @@ public class GamePanel extends JPanel implements Runnable {
     Sound se = new Sound(); // Gerencia os efeitos sonoros do jogo
     public CollisionChecker cChecker = new CollisionChecker(this); // Verifica colisões entre entidades e tiles
     public AssetSetter aSetter = new AssetSetter(this); // Configura os objetos do jogo (itens, inimigos, etc.)
+    public UI ui = new UI(this); // Interface do usuário (HUD, mensagens, etc.)
     Thread gameThread; // Thread para rodar o loop do jogo
 
     // ENTITY AND OBJECTS
@@ -131,6 +132,9 @@ public class GamePanel extends JPanel implements Runnable {
 
         // Desenha o jogador no centro da tela (posição relativa à câmera)
         player.draw(g2);
+
+        // UI
+        ui.draw(g2);
 
         // Libera recursos do contexto gráfico após o desenho
         g2.dispose();
