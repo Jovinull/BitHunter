@@ -20,6 +20,7 @@ public class Player extends Entity {
     public final int screenX; // Posição fixa do jogador na tela no eixo X (centro da tela)
     public final int screenY; // Posição fixa do jogador na tela no eixo Y (centro da tela)
     public int hasKey = 0; // Contador de chaves coletadas
+    int standCounter = 0; // Contador para animação de parada
 
     public boolean debugCollision = false; // Flag para depuração de colisão
 
@@ -120,6 +121,15 @@ public class Player extends Entity {
             if (spriteCounter > 12) {
                 spriteNum = (spriteNum == 1) ? 2 : 1;
                 spriteCounter = 0;
+            }
+        } else {
+
+            standCounter++;
+
+            // Se nenhuma tecla de movimento estiver pressionada, o jogador fica parado
+            if (standCounter >= 20) {
+                spriteNum = 1; // Define o sprite de parada
+                standCounter = 0; // Reseta o contador de parada
             }
         }
     }
