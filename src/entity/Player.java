@@ -1,5 +1,6 @@
 package entity;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -19,6 +20,8 @@ public class Player extends Entity {
     public final int screenX; // Posição fixa do jogador na tela no eixo X (centro da tela)
     public final int screenY; // Posição fixa do jogador na tela no eixo Y (centro da tela)
     public int hasKey = 0; // Contador de chaves coletadas
+
+    public boolean debugCollision = false; // Flag para depuração de colisão
 
     // Construtor: recebe o painel e o handler de teclado
     public Player(GamePanel gp, KeyHandler keyH) {
@@ -194,5 +197,11 @@ public class Player extends Entity {
         // Desenha o sprite na posição fixa do centro da tela, com o tamanho padrão do
         // tile
         g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+
+        // Se a depuração de colisão estiver ativada, desenha a área sólida do jogador
+        if (debugCollision) {
+            g2.setColor(Color.red);
+            g2.drawRect(screenX + solidArea.x, screenY + solidArea.y, solidArea.width, solidArea.height);
+        }
     }
 }
