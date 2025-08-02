@@ -120,6 +120,12 @@ public class GamePanel extends JPanel implements Runnable {
         // Converte para Graphics2D para aproveitar recursos avançados de renderização
         Graphics2D g2 = (Graphics2D) g;
 
+        // DEBUG
+        long drawStart = 0;
+        if (keyH.checkDrawTime == true) {
+            drawStart = System.nanoTime();
+        }
+
         // Desenha o mapa: tiles visíveis de acordo com a câmera/jogador
         tileM.draw(g2);
 
@@ -135,6 +141,15 @@ public class GamePanel extends JPanel implements Runnable {
 
         // UI
         ui.draw(g2);
+
+        // DEBUG
+        if (keyH.checkDrawTime == true) {
+            long drawEnd = System.nanoTime(); // Marca o fim do desenho
+            long passed = drawEnd - drawStart; // Calcula o tempo gasto para desenhar
+            g2.setColor(Color.white); // Define a cor do texto de debug
+            g2.drawString("Draw Time: " + passed + " ns", 10, 400); // Exibe o tempo de desenho no canto da tela
+            System.out.println("Draw Time: " + passed + " ns"); // Log no console
+        }
 
         // Libera recursos do contexto gráfico após o desenho
         g2.dispose();

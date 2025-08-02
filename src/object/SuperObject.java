@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import main.GamePanel;
+import main.UtilityTool;
 
 // Classe base para todos os objetos do jogo (chave, porta, baú, etc.)
 public class SuperObject {
@@ -16,6 +17,7 @@ public class SuperObject {
     public Rectangle solidArea = new Rectangle(0, 0, 48, 48); // Área sólida para colisão
     public int solidAreaDefaultX = 0; // Posição padrão X da área sólida
     public int solidAreaDefaultY = 0; // Posição padrão Y da área sólida
+    UtilityTool uTool = new UtilityTool(); // Ferramenta utilitária para manipulação de imagens
 
     /**
      * Desenha o objeto na tela considerando a posição do jogador (câmera)

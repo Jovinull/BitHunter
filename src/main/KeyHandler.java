@@ -8,10 +8,13 @@ public class KeyHandler implements KeyListener {
 
     // Flags para verificar se as teclas estão pressionadas
     public boolean upPressed, downPressed, leftPressed, rightPressed;
+    // DEBUG
+    boolean checkDrawTime = false;
 
     // Não utilizaremos esse método por enquanto (usado para entrada de caracteres)
     @Override
-    public void keyTyped(KeyEvent e) {}
+    public void keyTyped(KeyEvent e) {
+    }
 
     // Executado quando uma tecla é pressionada
     @Override
@@ -30,6 +33,16 @@ public class KeyHandler implements KeyListener {
         }
         if (code == KeyEvent.VK_D) {
             rightPressed = true;
+        }
+        // DEBUG
+        if (code == KeyEvent.VK_T) {
+            if(checkDrawTime == false) {
+                checkDrawTime = true; // Ativa o modo de debug para tempo de desenho
+                System.out.println("DEBUG: Tempo de desenho ativado");
+            } else {
+                checkDrawTime = false; // Desativa o modo de debug
+                System.out.println("DEBUG: Tempo de desenho desativado");
+            }
         }
     }
 
