@@ -182,10 +182,8 @@ public class Player extends Entity {
                     break;
 
                 case "Chest":
-                    // O baú marca o fim do jogo
-                    gp.ui.gameFinished = true; // Ativa a flag de fim de jogo
-                    gp.stopMusic(); // Para a música de fundo
                     gp.playSE(4); // Toca som de "vitória" ou "evento final"
+                    gp.ui.showMessage("Baú aberto!");
                     break;
 
                 default:
