@@ -6,10 +6,15 @@ import java.awt.event.KeyListener;
 // Classe que lida com os eventos de teclado
 public class KeyHandler implements KeyListener {
 
+    GamePanel gp; // Referência ao GamePanel para acessar seus métodos e atributos
     // Flags para verificar se as teclas estão pressionadas
     public boolean upPressed, downPressed, leftPressed, rightPressed;
     // DEBUG
     boolean checkDrawTime = false;
+
+    public KeyHandler(GamePanel gp) {
+        this.gp = gp;
+    }
 
     // Não utilizaremos esse método por enquanto (usado para entrada de caracteres)
     @Override
@@ -34,9 +39,12 @@ public class KeyHandler implements KeyListener {
         if (code == KeyEvent.VK_D) {
             rightPressed = true;
         }
+        if (code == KeyEvent.VK_P) {
+            gp.gameState = (gp.gameState == gp.playState) ? gp.pauseState : gp.playState;
+        }
         // DEBUG
         if (code == KeyEvent.VK_T) {
-            if(checkDrawTime == false) {
+            if (checkDrawTime == false) {
                 checkDrawTime = true; // Ativa o modo de debug para tempo de desenho
                 System.out.println("DEBUG: Tempo de desenho ativado");
             } else {

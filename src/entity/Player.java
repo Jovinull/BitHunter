@@ -20,7 +20,6 @@ public class Player extends Entity {
 
     public final int screenX; // Posição fixa do jogador na tela no eixo X (centro da tela)
     public final int screenY; // Posição fixa do jogador na tela no eixo Y (centro da tela)
-    public int hasKey = 0; // Contador de chaves coletadas
     int standCounter = 0; // Contador para animação de parada
 
     public boolean debugCollision = false; // Flag para depuração de colisão
@@ -151,45 +150,7 @@ public class Player extends Entity {
 
         // Se o índice for válido (999 significa "nenhum objeto")
         if (index != 999) {
-
-            // Obtém o nome do objeto a partir da referência no array
-            String objectName = gp.obj[index].name;
-
-            switch (objectName) {
-                case "Key":
-                    gp.playSE(1); // Toca o efeito sonoro de coleta de chave
-                    hasKey++; // Aumenta o número de chaves do jogador
-                    gp.obj[index] = null; // Remove a chave do mundo (objeto foi "pegado")
-                    gp.ui.showMessage("Você obteve uma chave!"); // Exibe mensagem temporária
-                    break;
-
-                case "Door":
-                    if (hasKey > 0) {
-                        gp.playSE(3); // Toca som de destrancar/abrir porta
-                        hasKey--; // Consome uma chave
-                        gp.obj[index] = null; // Remove a porta do mundo (aberta)
-                        gp.ui.showMessage("Porta aberta!");
-                    } else {
-                        gp.ui.showMessage("Chave necessária!"); // Jogador não tem chave suficiente
-                    }
-                    break;
-
-                case "Boots":
-                    gp.playSE(2); // Toca som de "power-up"
-                    speed += 1; // Aumenta a velocidade do jogador
-                    gp.obj[index] = null; // Remove as botas do mundo
-                    gp.ui.showMessage("Velocidade aumentada!");
-                    break;
-
-                case "Chest":
-                    gp.playSE(4); // Toca som de "vitória" ou "evento final"
-                    gp.ui.showMessage("Baú aberto!");
-                    break;
-
-                default:
-                    // Segurança: caso um objeto inesperado tenha sido colocado no mapa
-                    System.out.println("Objeto desconhecido: " + objectName);
-            }
+            
         }
     }
 

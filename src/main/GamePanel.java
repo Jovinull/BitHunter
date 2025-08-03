@@ -34,7 +34,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     // ==== COMPONENTES DO JOGO ====
     TileManager tileM = new TileManager(this); // Gerencia o carregamento e desenho dos tiles
-    KeyHandler keyH = new KeyHandler(); // Captura entrada de teclado
+    KeyHandler keyH = new KeyHandler(this); // Captura entrada de teclado
     Sound music = new Sound(); // Gerencia a música do jogo
     Sound se = new Sound(); // Gerencia os efeitos sonoros do jogo
     public CollisionChecker cChecker = new CollisionChecker(this); // Verifica colisões entre entidades e tiles
@@ -45,6 +45,11 @@ public class GamePanel extends JPanel implements Runnable {
     // ENTITY AND OBJECTS
     public Player player = new Player(this, keyH); // Jogador principal do jogo
     public SuperObject obj[] = new SuperObject[10]; // Array para armazenar objetos do jogo
+
+    // ==== GAME STATE ====
+    public int gameState; // Estado atual do jogo
+    public final int playState = 1; // Estado do título (menu inicial)
+    public final int pauseState = 2; // Estado de pausa
 
     // ==== CONSTRUTOR ====
     public GamePanel() {
@@ -63,6 +68,8 @@ public class GamePanel extends JPanel implements Runnable {
 
         // Inicia a música de fundo
         playMusic(0);
+
+        gameState = playState; // Define o estado inicial do jogo como "jogando"
     }
 
     // ==== INICIALIZA A THREAD DO JOGO ====
@@ -108,7 +115,14 @@ public class GamePanel extends JPanel implements Runnable {
 
     // ==== ATUALIZA A LÓGICA DO JOGO ====
     public void update() {
-        player.update(); // Atualiza o jogador (movimentação e animação)
+        
+        if(gameState == playState) {
+            player.update(); // Atualiza a lógica do jogador (movimento, ações, etc.)
+        }
+
+        if(gameState == pauseState) {
+            // Aqui você pode adicionar lógica específica para o estado de pausa, se necessário
+        }
     }
 
     // ==== DESENHA NA TELA ====
