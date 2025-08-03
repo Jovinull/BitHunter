@@ -22,7 +22,7 @@ public class TileManager {
     public TileManager(GamePanel gp) {
         this.gp = gp;
 
-        tile = new Tile[10]; // Inicializa o array com espaço para até 10 tipos de tiles
+        tile = new Tile[50]; // Inicializa o array com espaço para até 10 tipos de tiles
         mapTileNum = new int[gp.maxWorldCol][gp.maxWorldRow]; // Matriz do mapa com base no mundo total
 
         getTileImage(); // Carrega as imagens dos tiles
@@ -32,12 +32,68 @@ public class TileManager {
     // Carrega as imagens e solidez correspondentes a cada tipo de tile
     public void getTileImage() {
 
-        setup(0, "grass", false);
-        setup(1, "wall", true);
-        setup(2, "water", true);
-        setup(3, "earth", false);
-        setup(4, "tree", true);
-        setup(5, "sand", false);
+        // PLACEHOLDER
+        setup(0, "000", true);
+        setup(1, "000", true);
+        setup(2, "000", true);
+        setup(3, "000", true);
+        setup(4, "000", true);
+        setup(5, "000", true);
+        setup(6, "000", true);
+        setup(7, "000", true);
+        setup(8, "000", true);
+        setup(9, "000", true);
+
+        // GRASS TILES
+        setup(10, "001", false);
+        setup(11, "002", false);
+
+        // WATER TILES
+        setup(12, "018", true);
+        setup(13, "019", true);
+        setup(14, "020", true);
+        setup(15, "021", true);
+        setup(16, "022", true);
+        setup(17, "023", true);
+        setup(18, "024", true);
+        setup(19, "025", true);
+        setup(20, "026", true);
+        setup(21, "027", true);
+        setup(22, "028", true);
+        setup(23, "029", true);
+        setup(24, "030", true);
+        setup(25, "031", true);
+
+        // ROAD TILES
+        setup(26, "003", false);
+        setup(27, "004", false);
+        setup(28, "005", false);
+        setup(29, "006", false);
+        setup(30, "007", false);
+        setup(31, "008", false);
+        setup(32, "009", false);
+        setup(33, "010", false);
+        setup(34, "011", false);
+        setup(35, "012", false);
+        setup(36, "013", false);
+        setup(37, "014", false);
+        setup(38, "015", false);
+
+        // EARTH TILES
+        setup(39, "017", false);
+
+        // WALL TILES
+        setup(40, "032", true);
+
+        // TREE TILES
+        setup(41, "016", true);
+
+        // TILES SEM USO
+        setup(42, "033", false);
+        setup(43, "034", false);
+        setup(44, "035", false);
+        setup(45, "036", false);
+        setup(46, "037", false);
     }
 
     public void setup(int index, String imageName, boolean collision) {

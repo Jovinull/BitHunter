@@ -91,7 +91,7 @@ public class UI {
 
             // Atualiza e exibe o tempo de jogo
             playTime += (double) 1 / 60; // Como o jogo roda a 60 FPS, cada frame equivale a ~1/60s
-            g2.drawString("Tempo: " + dFormat.format(playTime), gp.tileSize * 11, 65); // Exibe na superior direita
+            g2.drawString("Tempo: " + dFormat.format(playTime), gp.tileSize * 10, 65); // Exibe na superior direita
 
             // Exibe mensagens temporárias, como "Porta destrancada"
             if (messageOn == true) {
