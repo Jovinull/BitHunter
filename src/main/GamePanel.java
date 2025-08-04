@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 
 import javax.swing.JPanel;
 
+import entity.Entity;
 import entity.Player;
 import object.SuperObject;
 import tile.TileManager;
@@ -45,6 +46,7 @@ public class GamePanel extends JPanel implements Runnable {
     // ENTITY AND OBJECTS
     public Player player = new Player(this, keyH); // Jogador principal do jogo
     public SuperObject obj[] = new SuperObject[10]; // Array para armazenar objetos do jogo
+    public Entity npc[] = new Entity[10]; // Array para armazenar NPCs (personagens não jogáveis)
 
     // ==== GAME STATE ====
     public int gameState; // Estado atual do jogo
@@ -65,6 +67,7 @@ public class GamePanel extends JPanel implements Runnable {
     public void setupGame() {
         // Instancia e posiciona todos os objetos (chaves, portas, baús)
         aSetter.setObject();
+        aSetter.setNPC();
 
         // Inicia a música de fundo
         playMusic(0);
@@ -115,13 +118,25 @@ public class GamePanel extends JPanel implements Runnable {
 
     // ==== ATUALIZA A LÓGICA DO JOGO ====
     public void update() {
-        
-        if(gameState == playState) {
-            player.update(); // Atualiza a lógica do jogador (movimento, ações, etc.)
+
+        // Verifica se o jogo está em estado de "jogando" (ativo)
+        if (gameState == playState) {
+
+            player.update(); // Atualiza o jogador: movimentação, colisões, animações etc.
+
+            // Atualiza todos os NPCs que estão ativos no mapa
+            for (int i = 0; i < npc.length; i++) {
+                if (npc[i] != null) {
+                    npc[i].update(); // Executa a lógica do NPC (movimento aleatório, animação, ações)
+                }
+            }
         }
 
-        if(gameState == pauseState) {
-            // Aqui você pode adicionar lógica específica para o estado de pausa, se necessário
+        // Se o jogo estiver pausado, essa parte é executada
+        if (gameState == pauseState) {
+            // Lógica para quando o jogo estiver em pausa
+            // Ex: animações leves, música ambiente, overlays de menu — se desejar
+            // implementar
         }
     }
 
@@ -147,6 +162,13 @@ public class GamePanel extends JPanel implements Runnable {
         for (int i = 0; i < obj.length; i++) {
             if (obj[i] != null) {
                 obj[i].draw(g2, this);
+            }
+        }
+
+        // Desenha todos os NPCs (personagens não jogáveis) no mundo
+        for (int i = 0; i < npc.length; i++) {
+            if (npc[i] != null) {
+                npc[i].draw(g2);
             }
         }
 

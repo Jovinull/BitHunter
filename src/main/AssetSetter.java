@@ -1,20 +1,23 @@
 package main;
 
-// Classe responsável por posicionar os objetos do jogo no mundo
+import entity.NPC_OldMan;
+
 public class AssetSetter {
 
-    GamePanel gp; // Referência ao painel principal, usado para acessar tileSize e o array de
-                  // objetos
+    GamePanel gp;
 
-    // Construtor: captura a instância do GamePanel para configurar posição dos
-    // objetos
     public AssetSetter(GamePanel gp) {
         this.gp = gp;
     }
 
-    // Método que instancia e define a posição (em coordenadas de mundo) de cada
-    // objeto
     public void setObject() {
 
+    }
+
+    // Método responsável por definir os NPCs no jogo
+    public void setNPC() {
+        gp.npc[0] = new NPC_OldMan(gp);
+        gp.npc[0].worldX = gp.tileSize * 21;
+        gp.npc[0].worldY = gp.tileSize * 21;
     }
 }

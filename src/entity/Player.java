@@ -4,18 +4,13 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
 
 import main.GamePanel;
 import main.KeyHandler;
-import main.UtilityTool;
 
 // Classe Player representa o personagem controlado pelo jogador
 public class Player extends Entity {
 
-    GamePanel gp; // Referência ao painel principal do jogo
     KeyHandler keyH; // Referência ao manipulador de teclado
 
     public final int screenX; // Posição fixa do jogador na tela no eixo X (centro da tela)
@@ -26,7 +21,7 @@ public class Player extends Entity {
 
     // Construtor: recebe o painel e o handler de teclado
     public Player(GamePanel gp, KeyHandler keyH) {
-        this.gp = gp;
+        super(gp); // Chama o construtor da classe base Entity
         this.keyH = keyH;
 
         // Define o ponto fixo do jogador na tela (centro da tela)
@@ -56,30 +51,14 @@ public class Player extends Entity {
     // Carrega os sprites de animação para cada direção
     public void getPlayerImage() {
 
-        up1 = setup("boy_up_1");
-        up2 = setup("boy_up_2");
-        down1 = setup("boy_down_1");
-        down2 = setup("boy_down_2");
-        left1 = setup("boy_left_1");
-        left2 = setup("boy_left_2");
-        right1 = setup("boy_right_1");
-        right2 = setup("boy_right_2");
-    }
-
-    public BufferedImage setup(String imageName) {
-
-        UtilityTool uTool = new UtilityTool();
-        BufferedImage image = null;
-
-        try {
-            image = ImageIO.read(getClass().getResourceAsStream("/resource/player/" + imageName + ".png"));
-            image = uTool.scaleImage(image, gp.tileSize, gp.tileSize);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return image;
+        up1 = setup("/resource/player/boy_up_1");
+        up2 = setup("/resource/player/boy_up_2");
+        down1 = setup("/resource/player/boy_down_1");
+        down2 = setup("/resource/player/boy_down_2");
+        left1 = setup("/resource/player/boy_left_1");
+        left2 = setup("/resource/player/boy_left_2");
+        right1 = setup("/resource/player/boy_right_1");
+        right2 = setup("/resource/player/boy_right_2");
     }
 
     // Atualiza a lógica do jogador: movimentação e animação
@@ -106,6 +85,10 @@ public class Player extends Entity {
             // CHECK OBJECT COLLISION
             int objIndex = gp.cChecker.checkObject(this, true);
             pickUpObject(objIndex); // Tenta pegar o objeto se houver colisão
+
+            // CHECK NPC COLLISION
+            int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
+            interactNPC(npcIndex); // Interage com NPC se houver colisão
 
             // IF COLLISION IS FALSE, PLAYER CAN MOVE
             if (collisionOn == false) {
@@ -150,7 +133,15 @@ public class Player extends Entity {
 
         // Se o índice for válido (999 significa "nenhum objeto")
         if (index != 999) {
-            
+
+        }
+    }
+
+    // Método responsável por interagir com um NPC baseado no índice passado
+    public void interactNPC(int index) {
+
+        if (index != 999) {
+            System.out.println("Interagindo com NPC: " + index);
         }
     }
 
