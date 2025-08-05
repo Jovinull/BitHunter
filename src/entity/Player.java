@@ -141,8 +141,13 @@ public class Player extends Entity {
     public void interactNPC(int index) {
 
         if (index != 999) {
-            System.out.println("Interagindo com NPC: " + index);
+
+            if (gp.keyH.enterPressed == true) {
+                gp.gameState = gp.dialogueState; // Muda o estado do jogo para diálogo
+                gp.npc[index].speak(); // Chama o método de fala do NPC
+            }
         }
+        gp.keyH.enterPressed = false; // Reseta a flag de enter após a interação
     }
 
     // Desenha o jogador na tela

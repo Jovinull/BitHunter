@@ -8,7 +8,7 @@ public class KeyHandler implements KeyListener {
 
     GamePanel gp; // Referência ao GamePanel para acessar seus métodos e atributos
     // Flags para verificar se as teclas estão pressionadas
-    public boolean upPressed, downPressed, leftPressed, rightPressed;
+    public boolean upPressed, downPressed, leftPressed, rightPressed, enterPressed;
     // DEBUG
     boolean checkDrawTime = false;
 
@@ -21,35 +21,49 @@ public class KeyHandler implements KeyListener {
     public void keyTyped(KeyEvent e) {
     }
 
-    // Executado quando uma tecla é pressionada
+    // Chamado sempre que uma tecla é pressionada
     @Override
     public void keyPressed(KeyEvent e) {
-        int code = e.getKeyCode(); // Obtém o código da tecla pressionada
+        int code = e.getKeyCode(); // Código da tecla
 
-        // Define a flag da tecla pressionada como true
-        if (code == KeyEvent.VK_W) {
-            upPressed = true;
-        }
-        if (code == KeyEvent.VK_S) {
-            downPressed = true;
-        }
-        if (code == KeyEvent.VK_A) {
-            leftPressed = true;
-        }
-        if (code == KeyEvent.VK_D) {
-            rightPressed = true;
-        }
-        if (code == KeyEvent.VK_P) {
-            gp.gameState = (gp.gameState == gp.playState) ? gp.pauseState : gp.playState;
-        }
-        // DEBUG
-        if (code == KeyEvent.VK_T) {
-            if (checkDrawTime == false) {
-                checkDrawTime = true; // Ativa o modo de debug para tempo de desenho
-                System.out.println("DEBUG: Tempo de desenho ativado");
-            } else {
-                checkDrawTime = false; // Desativa o modo de debug
-                System.out.println("DEBUG: Tempo de desenho desativado");
+        // Só responde a controles durante o jogo ativo
+        if (gp.gameState == gp.playState) {
+            // Movimento: W/A/S/D
+            if (code == KeyEvent.VK_W)
+                upPressed = true;
+            if (code == KeyEvent.VK_S)
+                downPressed = true;
+            if (code == KeyEvent.VK_A)
+                leftPressed = true;
+            if (code == KeyEvent.VK_D)
+                rightPressed = true;
+
+            // Pausa
+            if (code == KeyEvent.VK_P) {
+                gp.gameState = gp.pauseState;
+            }
+            // Confirmação de diálogo ou seleção
+            if (code == KeyEvent.VK_ENTER) {
+                enterPressed = true;
+            }
+
+            // Modo DEBUG: alterna exibição do tempo de renderização
+            if (code == KeyEvent.VK_T) {
+                checkDrawTime = !checkDrawTime;
+                System.out.println("DEBUG: Tempo de desenho "
+                        + (checkDrawTime ? "ativado" : "desativado"));
+            }
+
+        } else if (gp.gameState == gp.pauseState) {
+            // Despausar com P
+            if (code == KeyEvent.VK_P) {
+                gp.gameState = gp.playState;
+            }
+
+        } else if (gp.gameState == gp.dialogueState) {
+            // Fechar diálogo com Enter
+            if (code == KeyEvent.VK_ENTER) {
+                gp.gameState = gp.playState;
             }
         }
     }

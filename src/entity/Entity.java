@@ -18,39 +18,59 @@ public class Entity {
 
     // Posição da entidade no mundo (em coordenadas absolutas no mapa)
     public int worldX, worldY;
-
     // Velocidade de movimentação em pixels por atualização
     public int speed;
-
     // Sprites usados para animar a entidade em cada direção (dois quadros por
     // direção)
     public BufferedImage up1, up2;
     public BufferedImage down1, down2;
     public BufferedImage left1, left2;
     public BufferedImage right1, right2;
-
     // Direção atual em que a entidade está se movendo
     public String direction;
-
     // Controle de animação: alterna entre os sprites a cada X quadros
     public int spriteCounter = 0;
     public int spriteNum = 1;
-
     // Área de colisão (bounding box) usada para detectar interações e bloqueios
     public Rectangle solidArea = new Rectangle(0, 0, 48, 48);
     public int solidAreaDefaultX, solidAreaDefaultY; // Usado para restaurar a posição da área após verificação
-
     public boolean collisionOn = false; // Indica se houve colisão na verificação atual
-
     public int actionLockCounter = 0; // Controla frequência de ações automáticas (ex: movimento aleatório de NPC)
+    String dialogues[] = new String[20]; // Array para armazenar diálogos de NPCs
+    int dialogueIndex = 0; // Índice atual do diálogo sendo exibido
 
     public Entity(GamePanel gp) {
         this.gp = gp;
     }
 
-    // Método genérico para definir ações (sobrescrito por NPCs ou inimigos, por
-    // exemplo)
     public void setAction() {
+        // Implementação padrão vazia, deve ser sobrescrita por subclasses
+    }
+
+    public void speak() {
+        // Se não há mais diálogos, volta ao início
+        if (dialogues[dialogueIndex] == null) {
+            dialogueIndex = 0;
+        }
+        // Atualiza a UI com o diálogo atual e avança o índice
+        gp.ui.currentDialogue = dialogues[dialogueIndex];
+        dialogueIndex++;
+
+        // Faz o NPC olhar para o jogador, invertendo sua direção
+        switch (gp.player.direction) {
+            case "up":
+                direction = "down";
+                break;
+            case "down":
+                direction = "up";
+                break;
+            case "left":
+                direction = "right";
+                break;
+            case "right":
+                direction = "left";
+                break;
+        }
     }
 
     // Atualiza a lógica da entidade a cada frame

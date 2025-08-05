@@ -35,7 +35,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     // ==== COMPONENTES DO JOGO ====
     TileManager tileM = new TileManager(this); // Gerencia o carregamento e desenho dos tiles
-    KeyHandler keyH = new KeyHandler(this); // Captura entrada de teclado
+    public KeyHandler keyH = new KeyHandler(this); // Captura entrada de teclado
     Sound music = new Sound(); // Gerencia a música do jogo
     Sound se = new Sound(); // Gerencia os efeitos sonoros do jogo
     public CollisionChecker cChecker = new CollisionChecker(this); // Verifica colisões entre entidades e tiles
@@ -52,6 +52,7 @@ public class GamePanel extends JPanel implements Runnable {
     public int gameState; // Estado atual do jogo
     public final int playState = 1; // Estado do título (menu inicial)
     public final int pauseState = 2; // Estado de pausa
+    public final int dialogueState = 3; // Estado de diálogo (interações com NPCs)
 
     // ==== CONSTRUTOR ====
     public GamePanel() {
