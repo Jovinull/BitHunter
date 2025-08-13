@@ -3,7 +3,11 @@ package main;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class UI {
 
@@ -12,7 +16,7 @@ public class UI {
 
     Graphics2D g2; // Usado para desenhar na tela
 
-    Font arial_20, arial80B; // Fontes utilizadas na renderização dos textos
+    Font maruMonica, purisaB; // Fontes utilizadas na renderização dos textos
 
     public boolean messageOn = false; // Define se uma mensagem temporária será exibida
     public String message = ""; // Mensagem a ser exibida
@@ -23,9 +27,16 @@ public class UI {
     public UI(GamePanel gp) {
         this.gp = gp;
 
-        // Inicializa as fontes
-        arial_20 = new Font("Arial", Font.PLAIN, 20);
-        arial80B = new Font("Arial", Font.BOLD, 80);
+        try {
+            InputStream is = getClass().getResourceAsStream("/resource/font/x12y16pxMaruMonica.ttf");
+            maruMonica = Font.createFont(Font.TRUETYPE_FONT, is);
+            is = getClass().getResourceAsStream("/resource/font/Purisa Bold.ttf");
+            purisaB = Font.createFont(Font.TRUETYPE_FONT, is);
+        } catch (FontFormatException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     // Exibe uma mensagem temporária na tela (por ex: "Porta destrancada!")
@@ -40,7 +51,8 @@ public class UI {
         this.g2 = g2; // Recebe o contexto gráfico para desenhar
 
         // Define a fonte e cor do texto
-        g2.setFont(arial_20);
+        g2.setFont(purisaB);
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g2.setColor(Color.white);
 
         if (gp.gameState == gp.playState) {
@@ -57,7 +69,7 @@ public class UI {
     }
 
     public void drawPauseScreen() {
-        g2.setFont(arial80B);
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 80F));
         String text = "PAUSED";
         int x = getXforCenteredText(text);
         int y = gp.screenHeight / 2;
@@ -76,7 +88,7 @@ public class UI {
         drawSubWindow(x, y, width, height);
 
         // Ajusta fonte e deslocamento interno
-        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 22F));
+        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 17F));
         x += gp.tileSize;
         y += gp.tileSize;
 
