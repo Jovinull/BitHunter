@@ -26,6 +26,80 @@ public class KeyHandler implements KeyListener {
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode(); // Código da tecla
 
+        // Estagio do jogo: título/menu
+        if (gp.gameState == gp.titleState) {
+            if (gp.ui.titleScreenState == 0) {
+                if (code == KeyEvent.VK_W) {
+                    gp.ui.commandNum--; // Navega para cima no menu^
+                    if (gp.ui.commandNum < 0) {
+                        gp.ui.commandNum = 2; // Volta para a última opção se ultrapassar o limite
+                    }
+                }
+
+                if (code == KeyEvent.VK_S) {
+                    gp.ui.commandNum++; // Navega para baixo no menu
+                    if (gp.ui.commandNum > 2) {
+                        gp.ui.commandNum = 0; // Volta para a primeira opção se ultrapassar o limite
+                    }
+                }
+
+                if (code == KeyEvent.VK_ENTER) {
+                    if (gp.ui.commandNum == 0) {
+                        gp.ui.titleScreenState = 1; // Inicia o jogo
+                    }
+
+                    if (gp.ui.commandNum == 1) {
+                        // Exibe créditos ou informações do jogo
+                        System.out.println("Exibindo créditos...");
+                    }
+
+                    if (gp.ui.commandNum == 2) {
+                        System.exit(0); // Sai do jogo
+                    }
+                }
+            }
+
+            else if (gp.ui.titleScreenState == 1) {
+                if (code == KeyEvent.VK_W) {
+                    gp.ui.commandNum--; // Navega para cima no menu
+                    if (gp.ui.commandNum < 0) {
+                        gp.ui.commandNum = 3; // Volta para a última opção se ultrapassar o limite
+                    }
+                }
+
+                if (code == KeyEvent.VK_S) {
+                    gp.ui.commandNum++; // Navega para baixo no menu
+                    if (gp.ui.commandNum > 3) {
+                        gp.ui.commandNum = 0; // Volta para a primeira opção se ultrapassar o limite
+                    }
+                }
+
+                if (code == KeyEvent.VK_ENTER) {
+                    if (gp.ui.commandNum == 0) {
+                        System.out.println("Executar ações específicas do Guerreiro");
+                        gp.gameState = gp.playState;
+                        gp.playMusic(0);
+                    }
+
+                    if (gp.ui.commandNum == 1) {
+                        System.out.println("Executar ações específicas do Ladrão");
+                        gp.gameState = gp.playState;
+                        gp.playMusic(0);
+                    }
+
+                    if (gp.ui.commandNum == 2) {
+                        System.out.println("Executar ações específicas do Feiticeiro");
+                        gp.gameState = gp.playState;
+                        gp.playMusic(0);
+                    }
+
+                    if (gp.ui.commandNum == 3) {
+                        gp.ui.titleScreenState = 0; // Volta para o menu principal
+                    }
+                }
+            }
+        }
+
         // Só responde a controles durante o jogo ativo
         if (gp.gameState == gp.playState) {
             // Movimento: W/A/S/D

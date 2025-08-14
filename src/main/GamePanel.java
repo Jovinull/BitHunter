@@ -50,7 +50,8 @@ public class GamePanel extends JPanel implements Runnable {
 
     // ==== GAME STATE ====
     public int gameState; // Estado atual do jogo
-    public final int playState = 1; // Estado do título (menu inicial)
+    public final int titleState = 0; // Estado do título (menu inicial)
+    public final int playState = 1; // Estado de jogo (jogando)
     public final int pauseState = 2; // Estado de pausa
     public final int dialogueState = 3; // Estado de diálogo (interações com NPCs)
 
@@ -71,9 +72,9 @@ public class GamePanel extends JPanel implements Runnable {
         aSetter.setNPC();
 
         // Inicia a música de fundo
-        playMusic(0);
+        // playMusic(0);
 
-        gameState = playState; // Define o estado inicial do jogo como "jogando"
+        gameState = titleState; // Define o estado inicial do jogo como "menu de título"
     }
 
     // ==== INICIALIZA A THREAD DO JOGO ====
@@ -156,28 +157,35 @@ public class GamePanel extends JPanel implements Runnable {
             drawStart = System.nanoTime();
         }
 
-        // Desenha o mapa: tiles visíveis de acordo com a câmera/jogador
-        tileM.draw(g2);
-
-        // Percorre todos os objetos do mundo e desenha os que estiverem instanciados
-        for (int i = 0; i < obj.length; i++) {
-            if (obj[i] != null) {
-                obj[i].draw(g2, this);
-            }
+        // Tela de título (menu inicial)
+        if (gameState == titleState) {
+            ui.draw(g2);
         }
 
-        // Desenha todos os NPCs (personagens não jogáveis) no mundo
-        for (int i = 0; i < npc.length; i++) {
-            if (npc[i] != null) {
-                npc[i].draw(g2);
+        else {
+            // Desenha o mapa: tiles visíveis de acordo com a câmera/jogador
+            tileM.draw(g2);
+
+            // Percorre todos os objetos do mundo e desenha os que estiverem instanciados
+            for (int i = 0; i < obj.length; i++) {
+                if (obj[i] != null) {
+                    obj[i].draw(g2, this);
+                }
             }
+
+            // Desenha todos os NPCs (personagens não jogáveis) no mundo
+            for (int i = 0; i < npc.length; i++) {
+                if (npc[i] != null) {
+                    npc[i].draw(g2);
+                }
+            }
+
+            // Desenha o jogador no centro da tela (posição relativa à câmera)
+            player.draw(g2);
+
+            // UI
+            ui.draw(g2);
         }
-
-        // Desenha o jogador no centro da tela (posição relativa à câmera)
-        player.draw(g2);
-
-        // UI
-        ui.draw(g2);
 
         // DEBUG
         if (keyH.checkDrawTime == true) {
