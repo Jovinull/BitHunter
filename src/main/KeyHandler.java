@@ -95,6 +95,7 @@ public class KeyHandler implements KeyListener {
 
                     if (gp.ui.commandNum == 3) {
                         gp.ui.titleScreenState = 0; // Volta para o menu principal
+                        gp.ui.commandNum = 0; // Reseta a seleção do menu
                     }
                 }
             }
