@@ -46,6 +46,10 @@ public class Player extends Entity {
         worldY = gp.tileSize * 21; // Posição inicial em Y no mundo (tile 21)
         speed = 4; // Velocidade do jogador
         direction = "down"; // Direção inicial
+
+        // Jogador Status
+        maxLife = 6;
+        life = maxLife;
     }
 
     // Carrega os sprites de animação para cada direção

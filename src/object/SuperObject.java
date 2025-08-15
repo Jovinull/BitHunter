@@ -10,7 +10,7 @@ import main.UtilityTool;
 // Classe base para todos os objetos do jogo (chave, porta, baú, etc.)
 public class SuperObject {
 
-    public BufferedImage image; // Imagem que representa o objeto
+    public BufferedImage image, image2, image3; // Imagem que representa o objeto
     public String name; // Nome/descritivo do objeto
     public boolean collision = false; // Define se o objeto bloqueia movimento
     public int worldX, worldY; // Posição no mundo (coordenadas em pixels)

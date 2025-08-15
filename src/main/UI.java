@@ -13,17 +13,19 @@ import java.awt.AlphaComposite;
 import java.awt.Shape;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+
+import object.OBJ_Heart;
+import object.SuperObject;
 
 public class UI {
 
     GamePanel gp; // Referência ao painel principal do jogo
-
     Graphics2D g2; // Contexto gráfico
-
     Font maruMonica, purisaB; // Fontes
-
+    BufferedImage heart_full, heart_half, heart_blank; // Imagens de coração
     public boolean messageOn = false;
     public String message = "";
     int messageCounter = 0;
@@ -58,6 +60,12 @@ public class UI {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        // Criando HUD
+        SuperObject heart = new OBJ_Heart(gp);
+        heart_full = heart.image;
+        heart_half = heart.image2;
+        heart_blank = heart.image3;
     }
 
     // Exibe uma mensagem temporária (ex.: "Porta destrancada!")
@@ -85,15 +93,47 @@ public class UI {
         }
 
         if (gp.gameState == gp.playState) {
-            drawFloatingMessage(); // opcional: mensagem temporária no play
+            drawPlayerLife();
         }
 
         if (gp.gameState == gp.pauseState) {
+            drawPlayerLife();
             drawPauseScreen();
         }
 
         if (gp.gameState == gp.dialogueState) {
+            drawPlayerLife();
             drawDialogueScreen();
+        }
+    }
+
+    public void drawPlayerLife() {
+
+        int x = gp.tileSize / 2;
+        int y = gp.tileSize / 2;
+        int i = 0;
+
+        // DRAW MAX LIFE
+        while (i < gp.player.maxLife / 2) {
+            g2.drawImage(heart_blank, x, y, null);
+            i++;
+            x += gp.tileSize;
+        }
+
+        // RESET
+        x = gp.tileSize / 2;
+        y = gp.tileSize / 2;
+        i = 0;
+
+        // DRAW CURRENT LIFE
+        while (i < gp.player.life) {
+            g2.drawImage(heart_half, x, y, null);
+            i++;
+            if (i < gp.player.life) {
+                g2.drawImage(heart_full, x, y, null);
+            }
+            i++;
+            x += gp.tileSize;
         }
     }
 
@@ -348,43 +388,6 @@ public class UI {
         g2.setStroke(new BasicStroke(outlineW));
         g2.setColor(outline);
         g2.draw(shape);
-    }
-
-    // Mensagem flutuante simples no modo play (não mexe na tua lógica principal)
-    private void drawFloatingMessage() {
-        if (!messageOn)
-            return;
-
-        g2.setFont((maruMonica != null ? maruMonica : g2.getFont()).deriveFont(Font.BOLD, 22F));
-        String text = message;
-
-        int padding = 12;
-        int x = gp.tileSize;
-        int y = gp.tileSize;
-        int w = (int) g2.getFontMetrics().getStringBounds(text, g2).getWidth() + padding * 2;
-        int h = gp.tileSize + 8;
-
-        // Fundo translucido
-        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));
-        g2.setColor(Color.black);
-        g2.fillRoundRect(x, y, w, h, 16, 16);
-        g2.setComposite(AlphaComposite.SrcOver);
-
-        // Borda
-        g2.setColor(new Color(255, 255, 255, 180));
-        g2.setStroke(new BasicStroke(2f));
-        g2.drawRoundRect(x, y, w, h, 16, 16);
-
-        // Texto
-        drawTextWithShadow(text, x + padding, y + (int) (h * 0.65), new Color(250, 250, 250), new Color(0, 0, 0, 180),
-                1);
-
-        // Tempo na tela
-        messageCounter++;
-        if (messageCounter > 120) { // ~2s a 60fps
-            messageCounter = 0;
-            messageOn = false;
-        }
     }
 
     // ---------- UTIL ----------
