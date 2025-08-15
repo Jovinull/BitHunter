@@ -94,6 +94,11 @@ public class Player extends Entity {
             int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
             interactNPC(npcIndex); // Interage com NPC se houver colisão
 
+            // CHECK EVENT
+            gp.eHandler.checkEvent(); // Verifica eventos no mapa
+
+            gp.keyH.enterPressed = false; // Reseta a flag de enter após a interação
+
             // IF COLLISION IS FALSE, PLAYER CAN MOVE
             if (collisionOn == false) {
                 // Atualiza a posição do jogador com base na direção
@@ -151,7 +156,6 @@ public class Player extends Entity {
                 gp.npc[index].speak(); // Chama o método de fala do NPC
             }
         }
-        gp.keyH.enterPressed = false; // Reseta a flag de enter após a interação
     }
 
     // Desenha o jogador na tela
