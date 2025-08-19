@@ -13,6 +13,14 @@ public class NPC_OldMan extends Entity {
         direction = "down"; // Direção inicial
         speed = 1; // Velocidade fixa para o NPC
 
+        // Hitbox voltada para os pés (consistente com player/objetos)
+        solidArea.x = 8;
+        solidArea.y = 24;
+        solidArea.width = 36;
+        solidArea.height = 24;
+        solidAreaDefaultX = solidArea.x;
+        solidAreaDefaultY = solidArea.y;
+
         getImage(); // Carrega as imagens de sprite para animação
         setDialogue(); // Define os diálogos do NPC
     }

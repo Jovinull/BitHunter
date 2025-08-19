@@ -22,12 +22,9 @@ public class Entity {
     public int speed;
     // Sprites usados para animar a entidade em cada direção (dois quadros por
     // direção)
-    public BufferedImage up1, up2;
-    public BufferedImage down1, down2;
-    public BufferedImage left1, left2;
-    public BufferedImage right1, right2;
+    public BufferedImage up1, up2, down1, down2, left1, left2, right1, right2;
     // Direção atual em que a entidade está se movendo
-    public String direction;
+    public String direction = "down"; // Pode ser "up", "down", "left", "right"
     // Controle de animação: alterna entre os sprites a cada X quadros
     public int spriteCounter = 0;
     public int spriteNum = 1;
@@ -38,6 +35,9 @@ public class Entity {
     public int actionLockCounter = 0; // Controla frequência de ações automáticas (ex: movimento aleatório de NPC)
     String dialogues[] = new String[20]; // Array para armazenar diálogos de NPCs
     int dialogueIndex = 0; // Índice atual do diálogo sendo exibido
+    public BufferedImage image, image2, image3; // Imagem que representa o objeto
+    public String name; // Nome/descritivo do objeto
+    public boolean collision = false; // Define se o objeto bloqueia movimento
 
     // Personagem Status
     public int maxLife;
