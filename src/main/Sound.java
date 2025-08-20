@@ -18,6 +18,9 @@ public class Sound {
         soundURL[2] = getClass().getResource("/resource/sounds/powerup.wav");
         soundURL[3] = getClass().getResource("/resource/sounds/unlock.wav");
         soundURL[4] = getClass().getResource("/resource/sounds/fanfare.wav");
+        soundURL[5] = getClass().getResource("/resource/sounds/hitmonster.wav");
+        soundURL[6] = getClass().getResource("/resource/sounds/receivedamage.wav");
+        soundURL[7] = getClass().getResource("/resource/sounds/swingweapon.wav");
     }
 
     // Prepara o áudio correspondente ao índice informado

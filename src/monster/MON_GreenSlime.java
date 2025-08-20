@@ -17,7 +17,7 @@ public class MON_GreenSlime extends Entity {
         type = 2;
         name = "Green Slime";
         speed = 1;
-        maxLife = 4;
+        maxLife = 20;
         life = maxLife;
 
         solidArea.x = 3;
@@ -69,5 +69,11 @@ public class MON_GreenSlime extends Entity {
 
             actionLockCounter = 0; // Reinicia o contador para o próximo intervalo
         }
+    }
+
+    public void damageReaction() {
+
+        actionLockCounter = 0; // Reseta o contador de ações
+        direction = gp.player.direction; // O monstro reage na direção do jogador
     }
 }
