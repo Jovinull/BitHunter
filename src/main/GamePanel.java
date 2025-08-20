@@ -50,6 +50,7 @@ public class GamePanel extends JPanel implements Runnable {
     public Player player = new Player(this, keyH); // Jogador principal do jogo
     public Entity obj[] = new Entity[10]; // Array para armazenar objetos do jogo
     public Entity npc[] = new Entity[10]; // Array para armazenar NPCs (personagens não jogáveis)
+    public Entity monster[] = new Entity[20];
     ArrayList<Entity> entityList = new ArrayList<>(); // Lista dinâmica para armazenar entidades
 
     // ==== GAME STATE ====
@@ -74,9 +75,7 @@ public class GamePanel extends JPanel implements Runnable {
         // Instancia e posiciona todos os objetos (chaves, portas, baús)
         aSetter.setObject();
         aSetter.setNPC();
-
-        // Inicia a música de fundo
-        // playMusic(0);
+        aSetter.setMonster();
 
         gameState = titleState; // Define o estado inicial do jogo como "menu de título"
     }
@@ -136,6 +135,12 @@ public class GamePanel extends JPanel implements Runnable {
                     npc[i].update(); // Executa a lógica do NPC (movimento aleatório, animação, ações)
                 }
             }
+
+            for (int i = 0; i < monster.length; i++) {
+                if (monster[i] != null) {
+                    monster[i].update();
+                }
+            }
         }
 
         // Se o jogo estiver pausado, essa parte é executada
@@ -183,6 +188,12 @@ public class GamePanel extends JPanel implements Runnable {
             for (int i = 0; i < obj.length; i++) {
                 if (obj[i] != null) {
                     entityList.add(obj[i]);
+                }
+            }
+
+            for (int i = 0; i < monster.length; i++) {
+                if (monster[i] != null) {
+                    entityList.add(monster[i]);
                 }
             }
 

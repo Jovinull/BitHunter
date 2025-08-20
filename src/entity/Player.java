@@ -1,6 +1,8 @@
 package entity;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -94,6 +96,10 @@ public class Player extends Entity {
             int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
             interactNPC(npcIndex); // Interage com NPC se houver colisão
 
+            // CHECK MONSTER COLLISION
+            int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
+            contactMonster(monsterIndex);
+
             // CHECK EVENT
             gp.eHandler.checkEvent(); // Verifica eventos no mapa
 
@@ -134,6 +140,14 @@ public class Player extends Entity {
                 standCounter = 0; // Reseta o contador de parada
             }
         }
+
+        if (invincible == true) {
+            invincibleCounter++;
+            if (invincibleCounter > 60) {
+                invincible = false;
+                invincibleCounter = 0;
+            }
+        }
     }
 
     // Método responsável por tratar a coleta/interação com um objeto baseado no
@@ -158,6 +172,17 @@ public class Player extends Entity {
         }
     }
 
+    public void contactMonster(int i) {
+
+        if (i != 999) {
+
+            if (invincible == false) {
+                life -= 1;
+                invincible = true;
+            }
+        }
+    }
+
     // Desenha o jogador na tela
     public void draw(Graphics2D g2) {
         BufferedImage image = null;
@@ -178,9 +203,17 @@ public class Player extends Entity {
                 break;
         }
 
+        if (invincible == true) {
+
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f)); // Aplica transparência
+        }
+
         // Desenha o sprite na posição fixa do centro da tela, com o tamanho padrão do
         // tile
         g2.drawImage(image, screenX, screenY, null);
+
+        // Reset alpha
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 
         // Se a depuração de colisão estiver ativada, desenha a área sólida do jogador
         if (debugCollision) {

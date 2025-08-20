@@ -90,45 +90,19 @@ public class CollisionChecker {
                 // Simula o movimento da entidade conforme a direção atual para verificar
                 // colisão
                 switch (entity.direction) {
-                    case "up":
-                        entity.solidArea.y -= entity.speed;
-                        if (entity.solidArea.intersects(gp.obj[i].solidArea)) {
-                            if (gp.obj[i].collision)
-                                entity.collisionOn = true;
-                            if (player)
-                                index = i; // Retorna índice do objeto se for o jogador
-                        }
-                        break;
+                    case "up" -> entity.solidArea.y -= entity.speed;
+                    case "down" -> entity.solidArea.y += entity.speed;
+                    case "left" -> entity.solidArea.x -= entity.speed;
+                    case "right" -> entity.solidArea.x += entity.speed;
+                    default -> {
+                        // Caso não haja direção definida, não faz nada
+                    }
+                }
 
-                    case "down":
-                        entity.solidArea.y += entity.speed;
-                        if (entity.solidArea.intersects(gp.obj[i].solidArea)) {
-                            if (gp.obj[i].collision)
-                                entity.collisionOn = true;
-                            if (player)
-                                index = i;
-                        }
-                        break;
-
-                    case "left":
-                        entity.solidArea.x -= entity.speed;
-                        if (entity.solidArea.intersects(gp.obj[i].solidArea)) {
-                            if (gp.obj[i].collision)
-                                entity.collisionOn = true;
-                            if (player)
-                                index = i;
-                        }
-                        break;
-
-                    case "right":
-                        entity.solidArea.x += entity.speed;
-                        if (entity.solidArea.intersects(gp.obj[i].solidArea)) {
-                            if (gp.obj[i].collision)
-                                entity.collisionOn = true;
-                            if (player)
-                                index = i;
-                        }
-                        break;
+                if (entity.solidArea.intersects(gp.obj[i].solidArea)) {
+                    if (gp.obj[i].collision)
+                        entity.collisionOn = true;
+                    index = i;
                 }
 
                 // Restaura as posições originais das áreas sólidas
@@ -146,54 +120,44 @@ public class CollisionChecker {
     // Retorna o índice da entidade-alvo com a qual houve colisão (ou 999 se
     // nenhuma)
     public int checkEntity(Entity entity, Entity[] target) {
-        int index = 999; // Valor padrão indicando "sem colisão detectada"
+
+        int index = 999;
 
         for (int i = 0; i < target.length; i++) {
+
             if (target[i] != null) {
 
-                // Posiciona temporariamente as áreas de colisão no mundo real
+                // Get entity's solid area position
                 entity.solidArea.x = entity.worldX + entity.solidArea.x;
                 entity.solidArea.y = entity.worldY + entity.solidArea.y;
 
+                // Get the object's solid area position
                 target[i].solidArea.x = target[i].worldX + target[i].solidArea.x;
                 target[i].solidArea.y = target[i].worldY + target[i].solidArea.y;
 
-                // Simula o deslocamento da entidade em direção ao alvo para testar colisão
                 switch (entity.direction) {
                     case "up":
                         entity.solidArea.y -= entity.speed;
-                        if (entity.solidArea.intersects(target[i].solidArea)) {
-                            entity.collisionOn = true;
-                            index = i;
-                        }
                         break;
-
                     case "down":
                         entity.solidArea.y += entity.speed;
-                        if (entity.solidArea.intersects(target[i].solidArea)) {
-                            entity.collisionOn = true;
-                            index = i;
-                        }
                         break;
-
                     case "left":
                         entity.solidArea.x -= entity.speed;
-                        if (entity.solidArea.intersects(target[i].solidArea)) {
-                            entity.collisionOn = true;
-                            index = i;
-                        }
                         break;
-
                     case "right":
                         entity.solidArea.x += entity.speed;
-                        if (entity.solidArea.intersects(target[i].solidArea)) {
-                            entity.collisionOn = true;
-                            index = i;
-                        }
                         break;
                 }
 
-                // Após o teste, as áreas sólidas são restauradas às posições padrão
+                if (entity.solidArea.intersects(target[i].solidArea)) {
+                    if (target[i] != entity) {
+                        entity.collisionOn = true;
+                        index = i;
+                    }
+                }
+
+                // Reset solid area positions after checking
                 entity.solidArea.x = entity.solidAreaDefaultX;
                 entity.solidArea.y = entity.solidAreaDefaultY;
                 target[i].solidArea.x = target[i].solidAreaDefaultX;
@@ -206,7 +170,9 @@ public class CollisionChecker {
 
     // Verifica se a entidade colidiu com o jogador
     // Define a flag de colisão `collisionOn = true` caso haja interseção
-    public void checKPlayer(Entity entity) {
+    public boolean checKPlayer(Entity entity) {
+
+        boolean contactPlayer = false;
 
         // Posiciona temporariamente as áreas de colisão da entidade e do jogador no
         // mundo real
@@ -220,31 +186,24 @@ public class CollisionChecker {
         switch (entity.direction) {
             case "up":
                 entity.solidArea.y -= entity.speed;
-                if (entity.solidArea.intersects(gp.player.solidArea)) {
-                    entity.collisionOn = true;
-                }
                 break;
 
             case "down":
                 entity.solidArea.y += entity.speed;
-                if (entity.solidArea.intersects(gp.player.solidArea)) {
-                    entity.collisionOn = true;
-                }
                 break;
 
             case "left":
                 entity.solidArea.x -= entity.speed;
-                if (entity.solidArea.intersects(gp.player.solidArea)) {
-                    entity.collisionOn = true;
-                }
                 break;
 
             case "right":
                 entity.solidArea.x += entity.speed;
-                if (entity.solidArea.intersects(gp.player.solidArea)) {
-                    entity.collisionOn = true;
-                }
                 break;
+        }
+
+        if (entity.solidArea.intersects(gp.player.solidArea)) {
+            entity.collisionOn = true;
+            contactPlayer = true;
         }
 
         // Restaura as áreas sólidas para evitar efeitos colaterais
@@ -252,5 +211,7 @@ public class CollisionChecker {
         entity.solidArea.y = entity.solidAreaDefaultY;
         gp.player.solidArea.x = gp.player.solidAreaDefaultX;
         gp.player.solidArea.y = gp.player.solidAreaDefaultY;
+
+        return contactPlayer;
     }
 }

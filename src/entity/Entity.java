@@ -33,11 +33,14 @@ public class Entity {
     public int solidAreaDefaultX, solidAreaDefaultY; // Usado para restaurar a posição da área após verificação
     public boolean collisionOn = false; // Indica se houve colisão na verificação atual
     public int actionLockCounter = 0; // Controla frequência de ações automáticas (ex: movimento aleatório de NPC)
+    public boolean invincible = false;
+    public int invincibleCounter = 0;
     String dialogues[] = new String[20]; // Array para armazenar diálogos de NPCs
     int dialogueIndex = 0; // Índice atual do diálogo sendo exibido
     public BufferedImage image, image2, image3; // Imagem que representa o objeto
     public String name; // Nome/descritivo do objeto
     public boolean collision = false; // Define se o objeto bloqueia movimento
+    public int type; // 0 = player. 1 = npc, 2 = monster
 
     // Personagem Status
     public int maxLife;
@@ -85,7 +88,18 @@ public class Entity {
         collisionOn = false;
         gp.cChecker.checkTile(this);
         gp.cChecker.checkObject(this, false);
-        gp.cChecker.checKPlayer(this);
+        gp.cChecker.checkEntity(this, gp.npc);
+        gp.cChecker.checkEntity(this, gp.monster);
+        boolean contactPlayer = gp.cChecker.checKPlayer(this);
+
+        if (this.type == 2 && contactPlayer == true) {
+            if (gp.player.invincible == false) {
+                // we can give damage
+                gp.player.life -= 1; // Diminui a vida do jogador
+                gp.player.invincible = true; // Ativa invencibilidade temporária
+
+            }
+        }
 
         // Se não houve colisão, move a entidade conforme a direção
         if (!collisionOn) {
