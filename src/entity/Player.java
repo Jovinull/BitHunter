@@ -2,7 +2,6 @@ package entity;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -38,8 +37,12 @@ public class Player extends Entity {
         solidArea.width = 32; // Largura da área sólida
         solidArea.height = 32; // Altura da área sólida
 
+        attackArea.width = 36;
+        attackArea.height = 36;
+
         setDefaultValues(); // Define a posição inicial no mundo e outras propriedades
         getPlayerImage(); // Carrega os sprites do personagem
+        getPlayerAttackImage(); // Carrega os sprites de ataque do personagem
     }
 
     // Define valores iniciais do jogador no mundo
@@ -57,21 +60,36 @@ public class Player extends Entity {
     // Carrega os sprites de animação para cada direção
     public void getPlayerImage() {
 
-        up1 = setup("/resource/player/boy_up_1");
-        up2 = setup("/resource/player/boy_up_2");
-        down1 = setup("/resource/player/boy_down_1");
-        down2 = setup("/resource/player/boy_down_2");
-        left1 = setup("/resource/player/boy_left_1");
-        left2 = setup("/resource/player/boy_left_2");
-        right1 = setup("/resource/player/boy_right_1");
-        right2 = setup("/resource/player/boy_right_2");
+        up1 = setup("/resource/player/boy_up_1", gp.tileSize, gp.tileSize);
+        up2 = setup("/resource/player/boy_up_2", gp.tileSize, gp.tileSize);
+        down1 = setup("/resource/player/boy_down_1", gp.tileSize, gp.tileSize);
+        down2 = setup("/resource/player/boy_down_2", gp.tileSize, gp.tileSize);
+        left1 = setup("/resource/player/boy_left_1", gp.tileSize, gp.tileSize);
+        left2 = setup("/resource/player/boy_left_2", gp.tileSize, gp.tileSize);
+        right1 = setup("/resource/player/boy_right_1", gp.tileSize, gp.tileSize);
+        right2 = setup("/resource/player/boy_right_2", gp.tileSize, gp.tileSize);
+    }
+
+    public void getPlayerAttackImage() {
+        attackUp1 = setup("/resource/player/boy_attack_up_1", gp.tileSize, gp.tileSize * 2);
+        attackUp2 = setup("/resource/player/boy_attack_up_2", gp.tileSize, gp.tileSize * 2);
+        attackDown1 = setup("/resource/player/boy_attack_down_1", gp.tileSize, gp.tileSize * 2);
+        attackDown2 = setup("/resource/player/boy_attack_down_2", gp.tileSize, gp.tileSize * 2);
+        attackLeft1 = setup("/resource/player/boy_attack_left_1", gp.tileSize * 2, gp.tileSize);
+        attackLeft2 = setup("/resource/player/boy_attack_left_2", gp.tileSize * 2, gp.tileSize);
+        attackRight1 = setup("/resource/player/boy_attack_right_1", gp.tileSize * 2, gp.tileSize);
+        attackRight2 = setup("/resource/player/boy_attack_right_2", gp.tileSize * 2, gp.tileSize);
     }
 
     // Atualiza a lógica do jogador: movimentação e animação
     public void update() {
 
+        if (attacking == true) {
+            attacking();
+        }
+
         // Só atualiza se alguma tecla de movimento estiver pressionada
-        if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
+        else if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed || keyH.enterPressed) {
 
             // Atualiza a direção e a posição no mundo
             if (keyH.upPressed) {
@@ -103,10 +121,7 @@ public class Player extends Entity {
             // CHECK EVENT
             gp.eHandler.checkEvent(); // Verifica eventos no mapa
 
-            gp.keyH.enterPressed = false; // Reseta a flag de enter após a interação
-
-            // IF COLLISION IS FALSE, PLAYER CAN MOVE
-            if (collisionOn == false) {
+            if (collisionOn == false && keyH.enterPressed == false) {
                 // Atualiza a posição do jogador com base na direção
                 switch (direction) {
                     case "up":
@@ -123,6 +138,8 @@ public class Player extends Entity {
                         break;
                 }
             }
+
+            gp.keyH.enterPressed = false; // Reseta a flag de enter após a interação
 
             // Troca de sprite a cada 12 frames (animação)
             spriteCounter++;
@@ -150,6 +167,61 @@ public class Player extends Entity {
         }
     }
 
+    public void attacking() {
+
+        spriteCounter++;
+
+        if (spriteCounter <= 5) {
+            spriteNum = 1;
+        }
+
+        if (spriteCounter > 5 && spriteCounter <= 25) {
+            spriteNum = 2;
+
+            // Save the current worldX, worldY, solidArea
+            int currentWorldX = worldX;
+            int currentWorldY = worldY;
+            int solidAreaWidth = solidArea.width;
+            int solidAreaHeight = solidArea.height;
+
+            // Adjust player's worldX/Y for the attackArea
+            switch (direction) {
+                case "up":
+                    worldY -= attackArea.height;
+                    break;
+                case "down":
+                    worldY += attackArea.height;
+                    break;
+                case "left":
+                    worldX -= attackArea.width;
+                    break;
+                case "right":
+                    worldX += attackArea.width;
+                    break;
+            }
+
+            // attackArea becomes solidArea
+            solidArea.width = attackArea.width;
+            solidArea.height = attackArea.height;
+
+            // Check monster collision with the updated worldX, worldY and solidArea
+            int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
+            damageMonster(monsterIndex);
+
+            // After checking collision, restore the original data
+            worldX = currentWorldX;
+            worldY = currentWorldY;
+            solidArea.width = solidAreaWidth;
+            solidArea.height = solidAreaHeight;
+        }
+
+        if (spriteCounter > 25) {
+            spriteNum = 1;
+            spriteCounter = 0;
+            attacking = false;
+        }
+    }
+
     // Método responsável por tratar a coleta/interação com um objeto baseado no
     // índice passado
     public void pickUpObject(int index) {
@@ -161,13 +233,14 @@ public class Player extends Entity {
     }
 
     // Método responsável por interagir com um NPC baseado no índice passado
-    public void interactNPC(int index) {
+    public void interactNPC(int i) {
+        if (gp.keyH.enterPressed == true) {
 
-        if (index != 999) {
-
-            if (gp.keyH.enterPressed == true) {
-                gp.gameState = gp.dialogueState; // Muda o estado do jogo para diálogo
-                gp.npc[index].speak(); // Chama o método de fala do NPC
+            if (i != 999) {
+                gp.gameState = gp.dialogueState;
+                gp.npc[i].speak();
+            } else {
+                attacking = true;
             }
         }
     }
@@ -183,34 +256,71 @@ public class Player extends Entity {
         }
     }
 
+    public void damageMonster(int i) {
+
+        if (i != 999) {
+            if (gp.monster[i].invincible == false) {
+
+                gp.monster[i].life -= 1;
+                gp.monster[i].invincible = true;
+
+                if (gp.monster[i].life <= 0) {
+                    gp.monster[i] = null;
+                }
+            }
+        }
+    }
+
     // Desenha o jogador na tela
     public void draw(Graphics2D g2) {
         BufferedImage image = null;
+        int tempScreenX = screenX;
+        int tempScreenY = screenY;
 
         // Escolhe o sprite correto com base na direção e no frame da animação
         switch (direction) {
             case "up":
-                image = (spriteNum == 1) ? up1 : up2;
+                if (attacking) {
+                    tempScreenY = screenY - gp.tileSize;
+                    image = (spriteNum == 1) ? attackUp1 : attackUp2;
+                } else {
+                    image = (spriteNum == 1) ? up1 : up2;
+                }
                 break;
+
             case "down":
-                image = (spriteNum == 1) ? down1 : down2;
+                if (attacking) {
+                    image = (spriteNum == 1) ? attackDown1 : attackDown2;
+                } else {
+                    image = (spriteNum == 1) ? down1 : down2;
+                }
                 break;
+
             case "left":
-                image = (spriteNum == 1) ? left1 : left2;
+                if (attacking) {
+                    tempScreenX = screenX - gp.tileSize;
+                    image = (spriteNum == 1) ? attackLeft1 : attackLeft2;
+                } else {
+                    image = (spriteNum == 1) ? left1 : left2;
+                }
                 break;
+
             case "right":
-                image = (spriteNum == 1) ? right1 : right2;
+                if (attacking) {
+                    image = (spriteNum == 1) ? attackRight1 : attackRight2;
+                } else {
+                    image = (spriteNum == 1) ? right1 : right2;
+                }
                 break;
         }
 
         if (invincible == true) {
-
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f)); // Aplica transparência
         }
 
         // Desenha o sprite na posição fixa do centro da tela, com o tamanho padrão do
         // tile
-        g2.drawImage(image, screenX, screenY, null);
+        g2.drawImage(image, tempScreenX, tempScreenY, null);
 
         // Reset alpha
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));

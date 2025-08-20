@@ -11,6 +11,6 @@ public class OBJ_Boots extends Entity {
         super(gp);
 
         name = "Boots"; // Nome interno do objeto (usado para identificação lógica)
-        down1 = setup("/resource/objects/boots");
+        down1 = setup("/resource/objects/boots", gp.tileSize, gp.tileSize);
     }
 }

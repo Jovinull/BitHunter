@@ -16,10 +16,10 @@ public class NPC_OldMan extends Entity {
         // Hitbox voltada para os pés (consistente com player/objetos)
         solidArea.x = 8;
         solidArea.y = 24;
-        solidArea.width = 36;
-        solidArea.height = 24;
         solidAreaDefaultX = solidArea.x;
         solidAreaDefaultY = solidArea.y;
+        solidArea.width = 32;
+        solidArea.height = 32;
 
         getImage(); // Carrega as imagens de sprite para animação
         setDialogue(); // Define os diálogos do NPC
@@ -27,14 +27,14 @@ public class NPC_OldMan extends Entity {
 
     // Carrega as imagens do NPC em todas as direções (2 frames por direção)
     public void getImage() {
-        up1 = setup("/resource/npc/oldman/oldman_up_1");
-        up2 = setup("/resource/npc/oldman/oldman_up_2");
-        down1 = setup("/resource/npc/oldman/oldman_down_1");
-        down2 = setup("/resource/npc/oldman/oldman_down_2");
-        left1 = setup("/resource/npc/oldman/oldman_left_1");
-        left2 = setup("/resource/npc/oldman/oldman_left_2");
-        right1 = setup("/resource/npc/oldman/oldman_right_1");
-        right2 = setup("/resource/npc/oldman/oldman_right_2");
+        up1 = setup("/resource/npc/oldman/oldman_up_1", gp.tileSize, gp.tileSize);
+        up2 = setup("/resource/npc/oldman/oldman_up_2", gp.tileSize, gp.tileSize);
+        down1 = setup("/resource/npc/oldman/oldman_down_1", gp.tileSize, gp.tileSize);
+        down2 = setup("/resource/npc/oldman/oldman_down_2", gp.tileSize, gp.tileSize);
+        left1 = setup("/resource/npc/oldman/oldman_left_1", gp.tileSize, gp.tileSize);
+        left2 = setup("/resource/npc/oldman/oldman_left_2", gp.tileSize, gp.tileSize);
+        right1 = setup("/resource/npc/oldman/oldman_right_1", gp.tileSize, gp.tileSize);
+        right2 = setup("/resource/npc/oldman/oldman_right_2", gp.tileSize, gp.tileSize);
     }
 
     public void setDialogue() {

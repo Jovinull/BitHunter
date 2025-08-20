@@ -11,7 +11,7 @@ public class OBJ_Key extends Entity {
         super(gp);
 
         name = "Key"; // Identificador do objeto
-        down1 = setup("/resource/objects/key");
+        down1 = setup("/resource/objects/key", gp.tileSize, gp.tileSize);
 
     }
 }

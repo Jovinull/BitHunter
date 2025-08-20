@@ -102,7 +102,7 @@ public class KeyHandler implements KeyListener {
         }
 
         // Só responde a controles durante o jogo ativo
-        if (gp.gameState == gp.playState) {
+        else if (gp.gameState == gp.playState) {
             // Movimento: W/A/S/D
             if (code == KeyEvent.VK_W)
                 upPressed = true;
