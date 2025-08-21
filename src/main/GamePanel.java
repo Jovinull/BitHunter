@@ -59,6 +59,7 @@ public class GamePanel extends JPanel implements Runnable {
     public final int playState = 1; // Estado de jogo (jogando)
     public final int pauseState = 2; // Estado de pausa
     public final int dialogueState = 3; // Estado de diálogo (interações com NPCs)
+    public final int characterState = 4; // Estado de status do personagem
 
     // ==== CONSTRUTOR ====
     public GamePanel() {

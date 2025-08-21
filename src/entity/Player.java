@@ -8,6 +8,8 @@ import java.awt.image.BufferedImage;
 
 import main.GamePanel;
 import main.KeyHandler;
+import object.OBJ_Shield_Wood;
+import object.OBJ_Sword_Normal;
 
 // Classe Player representa o personagem controlado pelo jogador
 public class Player extends Entity {
@@ -17,6 +19,7 @@ public class Player extends Entity {
     public final int screenX; // Posição fixa do jogador na tela no eixo X (centro da tela)
     public final int screenY; // Posição fixa do jogador na tela no eixo Y (centro da tela)
     int standCounter = 0; // Contador para animação de parada
+    public boolean attackCanceled = false; // Flag para indicar se o jogador está atacando
 
     public boolean debugCollision = false; // Flag para depuração de colisão
 
@@ -52,9 +55,27 @@ public class Player extends Entity {
         speed = 4; // Velocidade do jogador
         direction = "down"; // Direção inicial
 
-        // Jogador Status
+        // PLAYER STATUS
+        level = 1;
         maxLife = 6;
         life = maxLife;
+        strength = 1;
+        dexterity = 1;
+        exp = 0;
+        nextLevelExp = 5;
+        coin = 0;
+        currentWeapon = new OBJ_Sword_Normal(gp);
+        currentShield = new OBJ_Shield_Wood(gp);
+        attack = getAttack();
+        defense = getDefense();
+    }
+
+    public int getAttack() {
+        return attack = strength * currentWeapon.attackValue;
+    }
+
+    public int getDefense() {
+        return defense = dexterity * currentShield.defenseValue;
     }
 
     // Carrega os sprites de animação para cada direção
@@ -139,6 +160,13 @@ public class Player extends Entity {
                 }
             }
 
+            if (keyH.enterPressed == true && attackCanceled == false) {
+                gp.playSE(7);
+                attacking = true;
+                spriteCounter = 0;
+            }
+
+            attackCanceled = false;
             gp.keyH.enterPressed = false; // Reseta a flag de enter após a interação
 
             // Troca de sprite a cada 12 frames (animação)
@@ -237,11 +265,9 @@ public class Player extends Entity {
         if (gp.keyH.enterPressed == true) {
 
             if (i != 999) {
+                attackCanceled = true;
                 gp.gameState = gp.dialogueState;
                 gp.npc[i].speak();
-            } else {
-                gp.playSE(7);
-                attacking = true;
             }
         }
     }

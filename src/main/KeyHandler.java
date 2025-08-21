@@ -3,163 +3,238 @@ package main;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-// Classe que lida com os eventos de teclado
+/**
+ * Lida com eventos de teclado e delega o comportamento conforme o estado atual
+ * do jogo.
+ * Mantém flags de input para o loop principal (GamePanel) consumir.
+ */
 public class KeyHandler implements KeyListener {
 
-    GamePanel gp; // Referência ao GamePanel para acessar seus métodos e atributos
-    // Flags para verificar se as teclas estão pressionadas
+    // Referência ao painel do jogo para ler/alterar estados
+    private final GamePanel gp;
+
+    // Flags de input contínuo (consumidas no update do jogo)
     public boolean upPressed, downPressed, leftPressed, rightPressed, enterPressed;
-    // DEBUG
+
+    // DEBUG: exibir/ocultar tempo de desenho
     boolean checkDrawTime = false;
+
+    // Limites de índices dos menus de título (evita "números mágicos")
+    private static final int MENU_MAIN_MAX_INDEX = 2; // [Iniciar, Créditos, Sair]
+    private static final int MENU_CLASS_MAX_INDEX = 3; // [Guerreiro, Ladrão, Feiticeiro, Voltar]
 
     public KeyHandler(GamePanel gp) {
         this.gp = gp;
     }
 
-    // Não utilizaremos esse método por enquanto (usado para entrada de caracteres)
+    /** Não utilizado (entrada de caracteres). */
     @Override
     public void keyTyped(KeyEvent e) {
+        // Intencionalmente vazio
     }
 
-    // Chamado sempre que uma tecla é pressionada
+    /**
+     * Dispara ao pressionar uma tecla. Encaminha para o "estado" atual do jogo.
+     */
     @Override
     public void keyPressed(KeyEvent e) {
-        int code = e.getKeyCode(); // Código da tecla
+        final int key = e.getKeyCode();
 
-        // Estagio do jogo: título/menu
         if (gp.gameState == gp.titleState) {
-            if (gp.ui.titleScreenState == 0) {
-                if (code == KeyEvent.VK_W) {
-                    gp.ui.commandNum--; // Navega para cima no menu^
-                    if (gp.ui.commandNum < 0) {
-                        gp.ui.commandNum = 2; // Volta para a última opção se ultrapassar o limite
-                    }
-                }
+            titleState(key);
+            return;
+        }
+        if (gp.gameState == gp.playState) {
+            playState(key);
+            return;
+        }
+        if (gp.gameState == gp.pauseState) {
+            pauseState(key);
+            return;
+        }
+        if (gp.gameState == gp.dialogueState) {
+            dialogueState(key);
+            return;
+        }
+        if (gp.gameState == gp.characterState) {
+            characterState(key);
+        }
+    }
 
-                if (code == KeyEvent.VK_S) {
-                    gp.ui.commandNum++; // Navega para baixo no menu
-                    if (gp.ui.commandNum > 2) {
-                        gp.ui.commandNum = 0; // Volta para a primeira opção se ultrapassar o limite
-                    }
-                }
-
-                if (code == KeyEvent.VK_ENTER) {
-                    if (gp.ui.commandNum == 0) {
-                        gp.ui.titleScreenState = 1; // Inicia o jogo
-                    }
-
-                    if (gp.ui.commandNum == 1) {
-                        // Exibe créditos ou informações do jogo
-                        System.out.println("Exibindo créditos...");
-                    }
-
-                    if (gp.ui.commandNum == 2) {
-                        System.exit(0); // Sai do jogo
-                    }
-                }
+    /**
+     * Estado: Tela de título (menus iniciais).
+     * titleScreenState 0 = menu principal; 1 = seleção de classe/personagem.
+     */
+    public void titleState(int key) {
+        if (gp.ui.titleScreenState == 0) {
+            // MENU PRINCIPAL
+            if (key == KeyEvent.VK_W) {
+                navigateUp(MENU_MAIN_MAX_INDEX);
+            } else if (key == KeyEvent.VK_S) {
+                navigateDown(MENU_MAIN_MAX_INDEX);
+            } else if (key == KeyEvent.VK_ENTER) {
+                handleTitleScreen0Enter();
             }
-
-            else if (gp.ui.titleScreenState == 1) {
-                if (code == KeyEvent.VK_W) {
-                    gp.ui.commandNum--; // Navega para cima no menu
-                    if (gp.ui.commandNum < 0) {
-                        gp.ui.commandNum = 3; // Volta para a última opção se ultrapassar o limite
-                    }
-                }
-
-                if (code == KeyEvent.VK_S) {
-                    gp.ui.commandNum++; // Navega para baixo no menu
-                    if (gp.ui.commandNum > 3) {
-                        gp.ui.commandNum = 0; // Volta para a primeira opção se ultrapassar o limite
-                    }
-                }
-
-                if (code == KeyEvent.VK_ENTER) {
-                    if (gp.ui.commandNum == 0) {
-                        System.out.println("Executar ações específicas do Guerreiro");
-                        gp.gameState = gp.playState;
-                        gp.playMusic(0);
-                    }
-
-                    if (gp.ui.commandNum == 1) {
-                        System.out.println("Executar ações específicas do Ladrão");
-                        gp.gameState = gp.playState;
-                        gp.playMusic(0);
-                    }
-
-                    if (gp.ui.commandNum == 2) {
-                        System.out.println("Executar ações específicas do Feiticeiro");
-                        gp.gameState = gp.playState;
-                        gp.playMusic(0);
-                    }
-
-                    if (gp.ui.commandNum == 3) {
-                        gp.ui.titleScreenState = 0; // Volta para o menu principal
-                        gp.ui.commandNum = 0; // Reseta a seleção do menu
-                    }
-                }
-            }
+            return;
         }
 
-        // Só responde a controles durante o jogo ativo
-        else if (gp.gameState == gp.playState) {
-            // Movimento: W/A/S/D
-            if (code == KeyEvent.VK_W)
-                upPressed = true;
-            if (code == KeyEvent.VK_S)
-                downPressed = true;
-            if (code == KeyEvent.VK_A)
-                leftPressed = true;
-            if (code == KeyEvent.VK_D)
-                rightPressed = true;
-
-            // Pausa
-            if (code == KeyEvent.VK_P) {
-                gp.gameState = gp.pauseState;
-            }
-            // Confirmação de diálogo ou seleção
-            if (code == KeyEvent.VK_ENTER) {
-                enterPressed = true;
-            }
-
-            // Modo DEBUG: alterna exibição do tempo de renderização
-            if (code == KeyEvent.VK_T) {
-                checkDrawTime = !checkDrawTime;
-                System.out.println("DEBUG: Tempo de desenho "
-                        + (checkDrawTime ? "ativado" : "desativado"));
-            }
-
-        } else if (gp.gameState == gp.pauseState) {
-            // Despausar com P
-            if (code == KeyEvent.VK_P) {
-                gp.gameState = gp.playState;
-            }
-
-        } else if (gp.gameState == gp.dialogueState) {
-            // Fechar diálogo com Enter
-            if (code == KeyEvent.VK_ENTER) {
-                gp.gameState = gp.playState;
+        if (gp.ui.titleScreenState == 1) {
+            // SELEÇÃO DE CLASSE
+            if (key == KeyEvent.VK_W) {
+                navigateUp(MENU_CLASS_MAX_INDEX);
+            } else if (key == KeyEvent.VK_S) {
+                navigateDown(MENU_CLASS_MAX_INDEX);
+            } else if (key == KeyEvent.VK_ENTER) {
+                handleTitleScreen1Enter();
             }
         }
     }
 
-    // Executado quando uma tecla é solta
+    /**
+     * Estado: Jogando (movimento, pausa, status, debug, etc).
+     */
+    public void playState(int key) {
+        // Movimento (WASD)
+        if (key == KeyEvent.VK_W)
+            upPressed = true;
+        if (key == KeyEvent.VK_S)
+            downPressed = true;
+        if (key == KeyEvent.VK_A)
+            leftPressed = true;
+        if (key == KeyEvent.VK_D)
+            rightPressed = true;
+
+        // Pausa
+        if (key == KeyEvent.VK_P) {
+            gp.gameState = gp.pauseState;
+        }
+
+        // Status do personagem
+        if (key == KeyEvent.VK_C) {
+            gp.gameState = gp.characterState;
+        }
+
+        // Confirmação (diálogo/ação)
+        if (key == KeyEvent.VK_ENTER) {
+            enterPressed = true;
+        }
+
+        // DEBUG: alternar exibição do tempo de renderização
+        if (key == KeyEvent.VK_T) {
+            checkDrawTime = !checkDrawTime;
+            System.out.println("DEBUG: Tempo de desenho " + (checkDrawTime ? "ativado" : "desativado"));
+        }
+    }
+
+    /**
+     * Estado: Pausado.
+     */
+    public void pauseState(int key) {
+        if (key == KeyEvent.VK_P) {
+            gp.gameState = gp.playState;
+        }
+    }
+
+    /**
+     * Estado: Diálogo aberto.
+     */
+    public void dialogueState(int key) {
+        if (key == KeyEvent.VK_ENTER) {
+            gp.gameState = gp.playState;
+        }
+    }
+
+    /**
+     * Estado: Tela de status do personagem.
+     */
+    public void characterState(int key) {
+        if (key == KeyEvent.VK_C) {
+            gp.gameState = gp.playState;
+        }
+    }
+
+    /**
+     * Dispara ao SOLTAR uma tecla. Zera flags de movimento correspondentes.
+     */
     @Override
     public void keyReleased(KeyEvent e) {
-        int code = e.getKeyCode(); // Obtém o código da tecla liberada
+        final int key = e.getKeyCode();
 
-        // Define a flag da tecla como false
-        if (code == KeyEvent.VK_W) {
+        if (key == KeyEvent.VK_W)
             upPressed = false;
-        }
-        if (code == KeyEvent.VK_S) {
+        if (key == KeyEvent.VK_S)
             downPressed = false;
-        }
-        if (code == KeyEvent.VK_A) {
+        if (key == KeyEvent.VK_A)
             leftPressed = false;
-        }
-        if (code == KeyEvent.VK_D) {
+        if (key == KeyEvent.VK_D)
             rightPressed = false;
+    }
+
+    // -----------------------
+    // Helpers privados
+    // -----------------------
+
+    /** Move seleção para cima no menu com wrap-around. */
+    private void navigateUp(int maxIndex) {
+        gp.ui.commandNum--;
+        if (gp.ui.commandNum < 0) {
+            gp.ui.commandNum = maxIndex;
         }
+    }
+
+    /** Move seleção para baixo no menu com wrap-around. */
+    private void navigateDown(int maxIndex) {
+        gp.ui.commandNum++;
+        if (gp.ui.commandNum > maxIndex) {
+            gp.ui.commandNum = 0;
+        }
+    }
+
+    /** Ações do Enter no menu principal (titleScreenState == 0). */
+    private void handleTitleScreen0Enter() {
+        if (gp.ui.commandNum == 0) {
+            // Ir para seleção de classe
+            gp.ui.titleScreenState = 1;
+            return;
+        }
+        if (gp.ui.commandNum == 1) {
+            // Créditos / informações
+            System.out.println("Exibindo créditos...");
+            return;
+        }
+        if (gp.ui.commandNum == 2) {
+            // Sair
+            System.exit(0);
+        }
+    }
+
+    /** Ações do Enter na seleção de classe (titleScreenState == 1). */
+    private void handleTitleScreen1Enter() {
+        if (gp.ui.commandNum == 0) {
+            System.out.println("Executar ações específicas do Guerreiro");
+            startGameFromTitle();
+            return;
+        }
+        if (gp.ui.commandNum == 1) {
+            System.out.println("Executar ações específicas do Ladrão");
+            startGameFromTitle();
+            return;
+        }
+        if (gp.ui.commandNum == 2) {
+            System.out.println("Executar ações específicas do Feiticeiro");
+            startGameFromTitle();
+            return;
+        }
+        if (gp.ui.commandNum == 3) {
+            // Voltar ao menu principal
+            gp.ui.titleScreenState = 0;
+            gp.ui.commandNum = 0; // reset seleção
+        }
+    }
+
+    /** Inicia o jogo a partir do título, mantendo o comportamento original. */
+    private void startGameFromTitle() {
+        gp.gameState = gp.playState;
+        gp.playMusic(0);
     }
 }
