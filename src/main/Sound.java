@@ -21,6 +21,7 @@ public class Sound {
         soundURL[5] = getClass().getResource("/resource/sounds/hitmonster.wav");
         soundURL[6] = getClass().getResource("/resource/sounds/receivedamage.wav");
         soundURL[7] = getClass().getResource("/resource/sounds/swingweapon.wav");
+        soundURL[8] = getClass().getResource("/resource/sounds/levelup.wav");
     }
 
     // Prepara o áudio correspondente ao índice informado
