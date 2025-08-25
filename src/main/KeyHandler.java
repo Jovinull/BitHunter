@@ -17,7 +17,7 @@ public class KeyHandler implements KeyListener {
     public boolean upPressed, downPressed, leftPressed, rightPressed, enterPressed;
 
     // DEBUG: exibir/ocultar tempo de desenho
-    boolean checkDrawTime = false;
+    boolean showDebugText = false;
 
     // Limites de índices dos menus de título (evita "números mágicos")
     private static final int MENU_MAIN_MAX_INDEX = 2; // [Iniciar, Créditos, Sair]
@@ -121,9 +121,17 @@ public class KeyHandler implements KeyListener {
 
         // DEBUG: alternar exibição do tempo de renderização
         if (key == KeyEvent.VK_T) {
-            checkDrawTime = !checkDrawTime;
-            System.out.println("DEBUG: Tempo de desenho " + (checkDrawTime ? "ativado" : "desativado"));
+            if (showDebugText == false) {
+                showDebugText = true;
+            } else if (showDebugText == true) {
+                showDebugText = false;
+            }
         }
+
+        if (key == KeyEvent.VK_R) {
+            gp.tileM.loadMap("/maps/worldV2.txt");
+        }
+
     }
 
     /**
