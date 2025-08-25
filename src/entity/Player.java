@@ -5,9 +5,11 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import main.GamePanel;
 import main.KeyHandler;
+import object.OBJ_Key;
 import object.OBJ_Shield_Wood;
 import object.OBJ_Sword_Normal;
 
@@ -20,6 +22,8 @@ public class Player extends Entity {
     public final int screenY; // Posição fixa do jogador na tela no eixo Y (centro da tela)
     int standCounter = 0; // Contador para animação de parada
     public boolean attackCanceled = false; // Flag para indicar se o jogador está atacando
+    public ArrayList<Entity> inventory = new ArrayList<>(); // Inventário do jogador
+    public final int maxInventorySize = 20; // Tamanho máximo do inventário
 
     public boolean debugCollision = false; // Flag para depuração de colisão
 
@@ -46,6 +50,7 @@ public class Player extends Entity {
         setDefaultValues(); // Define a posição inicial no mundo e outras propriedades
         getPlayerImage(); // Carrega os sprites do personagem
         getPlayerAttackImage(); // Carrega os sprites de ataque do personagem
+        setItems(); // Adiciona itens iniciais ao inventário
     }
 
     // Define valores iniciais do jogador no mundo
@@ -68,6 +73,13 @@ public class Player extends Entity {
         currentShield = new OBJ_Shield_Wood(gp);
         attack = getAttack();
         defense = getDefense();
+    }
+
+    public void setItems() {
+
+        inventory.add(currentWeapon);
+        inventory.add(currentShield);
+        inventory.add(new OBJ_Key(gp));
     }
 
     public int getAttack() {
