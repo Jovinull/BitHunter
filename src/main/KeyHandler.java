@@ -14,7 +14,7 @@ public class KeyHandler implements KeyListener {
     private final GamePanel gp;
 
     // Flags de input contínuo (consumidas no update do jogo)
-    public boolean upPressed, downPressed, leftPressed, rightPressed, enterPressed;
+    public boolean upPressed, downPressed, leftPressed, rightPressed, enterPressed, shotKeyPressed;
 
     // DEBUG: exibir/ocultar tempo de desenho
     boolean showDebugText = false;
@@ -119,6 +119,11 @@ public class KeyHandler implements KeyListener {
             enterPressed = true;
         }
 
+        // Tecla para soltar mágia
+        if (key == KeyEvent.VK_F) {
+            shotKeyPressed = true;
+        }
+
         // DEBUG: alternar exibição do tempo de renderização
         if (key == KeyEvent.VK_T) {
             if (showDebugText == false) {
@@ -209,6 +214,8 @@ public class KeyHandler implements KeyListener {
             leftPressed = false;
         if (key == KeyEvent.VK_D)
             rightPressed = false;
+        if (key == KeyEvent.VK_F)
+            shotKeyPressed = false;
     }
 
     // -----------------------
