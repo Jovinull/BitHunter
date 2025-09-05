@@ -161,8 +161,8 @@ public class UI {
         }
 
         // DRAW MANA
-        x = gp.tileSize / 2;
-        y = gp.tileSize * 2;
+        x = (gp.tileSize / 2) - 5;
+        y = (int) (gp.tileSize * 1.5);
         i = 0;
         while (i < gp.player.mana) {
             g2.drawImage(crystal_full, x, y, null);

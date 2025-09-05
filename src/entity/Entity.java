@@ -68,6 +68,7 @@ public class Entity {
     public Projectile projectile;
 
     // ITEM ATTRIBUTES
+    public int value;
     public int attackValue;
     public int defenseValue;
     public String description = "";
@@ -82,6 +83,7 @@ public class Entity {
     public final int type_axe = 4;
     public final int type_shield = 5;
     public final int type_consumable = 6;
+    public final int type_pickupOnly = 7;
 
     public Entity(GamePanel gp) {
         this.gp = gp;
@@ -122,6 +124,27 @@ public class Entity {
     }
 
     public void use(Entity entity) {
+    }
+
+    public void checkDrop() {
+    }
+
+    public void dropItem(Entity droppedItem) {
+
+        for (int i = 0; i < gp.obj.length; i++) {
+            // Verifica se o espaço no array de objetos está vazio
+            if (gp.obj[i] == null) {
+                // Atribui o item dropado à posição disponível
+                gp.obj[i] = droppedItem;
+
+                // Define a posição do item no mundo, usando as coordenadas do monstro morto
+                gp.obj[i].worldX = worldX; // Posição X do item
+                gp.obj[i].worldY = worldY; // Posição Y do item
+
+                // Sai do loop para evitar sobrescrever outros slots
+                break;
+            }
+        }
     }
 
     // Atualiza a lógica da entidade a cada frame
@@ -260,7 +283,7 @@ public class Entity {
             }
 
             // Desenha a sprite ajustada ao tamanho do tile (em pixels)
-            g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+            g2.drawImage(image, screenX, screenY, null);
 
             changeAlpha(g2, 1f);
         }

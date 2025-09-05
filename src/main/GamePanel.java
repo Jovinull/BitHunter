@@ -49,7 +49,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     // ENTITY AND OBJECTS
     public Player player = new Player(this, keyH); // Jogador principal do jogo
-    public Entity obj[] = new Entity[10]; // Array para armazenar objetos do jogo
+    public Entity obj[] = new Entity[20]; // Array para armazenar objetos do jogo
     public Entity npc[] = new Entity[10]; // Array para armazenar NPCs (personagens não jogáveis)
     public Entity monster[] = new Entity[20];
     public ArrayList<Entity> projectileList = new ArrayList<>();
@@ -139,6 +139,19 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
 
+            for (int i = 0; i < monster.length; i++) {
+                if (monster[i] != null) {
+                    if (monster[i].alive == true && monster[i].dying == false) {
+                        monster[i].update();
+                    }
+
+                    if (monster[i].alive == false) {
+                        monster[i].checkDrop();
+                        monster[i] = null;
+                    }
+                }
+            }
+
             for (int i = 0; i < projectileList.size(); i++) {
                 if (projectileList.get(i) != null) {
                     if (projectileList.get(i).alive == true) {
@@ -147,18 +160,6 @@ public class GamePanel extends JPanel implements Runnable {
 
                     if (projectileList.get(i).alive == false) {
                         projectileList.remove(i);
-                    }
-                }
-            }
-
-            for (int i = 0; i < monster.length; i++) {
-                if (monster[i] != null) {
-                    if (monster[i].alive == true && monster[i].dying == false) {
-                        monster[i].update();
-                    }
-
-                    if (monster[i].alive == false) {
-                        monster[i] = null;
                     }
                 }
             }
