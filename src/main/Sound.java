@@ -24,6 +24,7 @@ public class Sound {
         soundURL[8] = getClass().getResource("/resource/sounds/levelup.wav");
         soundURL[9] = getClass().getResource("/resource/sounds/cursor.wav");
         soundURL[10] = getClass().getResource("/resource/sounds/burning.wav");
+        soundURL[11] = getClass().getResource("/resource/sounds/cuttree.wav");
     }
 
     // Prepara o áudio correspondente ao índice informado

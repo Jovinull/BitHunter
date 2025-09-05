@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import entity.Entity;
 import entity.Player;
 import tile.TileManager;
+import tile_interactive.InteractiveTile;
 
 // Painel principal do jogo. Responsável por configurar, atualizar e desenhar o jogo.
 // Implementa Runnable para rodar o loop de jogo em uma thread separada.
@@ -52,6 +53,7 @@ public class GamePanel extends JPanel implements Runnable {
     public Entity obj[] = new Entity[20]; // Array para armazenar objetos do jogo
     public Entity npc[] = new Entity[10]; // Array para armazenar NPCs (personagens não jogáveis)
     public Entity monster[] = new Entity[20];
+    public InteractiveTile iTile[] = new InteractiveTile[50];
     public ArrayList<Entity> projectileList = new ArrayList<>();
     ArrayList<Entity> entityList = new ArrayList<>(); // Lista dinâmica para armazenar entidades
 
@@ -79,6 +81,7 @@ public class GamePanel extends JPanel implements Runnable {
         aSetter.setObject();
         aSetter.setNPC();
         aSetter.setMonster();
+        aSetter.setInteractiveTile();
 
         gameState = titleState; // Define o estado inicial do jogo como "menu de título"
     }
@@ -163,6 +166,12 @@ public class GamePanel extends JPanel implements Runnable {
                     }
                 }
             }
+
+            for (int i = 0; i < iTile.length; i++) {
+                if (iTile[i] != null) {
+                    iTile[i].update();
+                }
+            }
         }
 
         // Se o jogo estiver pausado, essa parte é executada
@@ -197,6 +206,13 @@ public class GamePanel extends JPanel implements Runnable {
         else {
             // TILE
             tileM.draw(g2);
+
+            // INTERACTIVE TILES
+            for (int i = 0; i < iTile.length; i++) {
+                if (iTile[i] != null) {
+                    iTile[i].draw(g2);
+                }
+            }
 
             // ADD ENTITIES TO THE LIST
             entityList.add(player);
