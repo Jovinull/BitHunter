@@ -5,9 +5,11 @@ import javax.swing.JFrame;
 // Classe principal que inicia o jogo
 public class Main {
 
+    public static JFrame window; // Janela principal do jogo
+
     public static void main(String[] args) {
         // Criação da janela principal do jogo
-        JFrame window = new JFrame();
+        window = new JFrame();
 
         // Define o comportamento ao fechar a janela: termina o programa
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -17,6 +19,9 @@ public class Main {
 
         // Define o título da janela
         window.setTitle("Bit Hunter");
+
+        // Remove bordas e barra de título da janela
+        window.setUndecorated(true);
 
         // Cria o painel do jogo e adiciona à janela
         GamePanel gamePanel = new GamePanel();

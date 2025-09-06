@@ -5,6 +5,9 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,10 +28,16 @@ public class GamePanel extends JPanel implements Runnable {
     final int scale = 3; // Fator de escala aplicado ao tile
 
     public final int tileSize = originalTileSize * scale; // Tile final com escala (48x48 pixels)
-    public final int maxScreenCol = 16; // Número de colunas visíveis na tela
+    public final int maxScreenCol = 20; // Número de colunas visíveis na tela
     public final int maxScreenRow = 12; // Número de linhas visíveis na tela
-    public final int screenWidth = tileSize * maxScreenCol; // Largura total da tela (768 px)
+    public final int screenWidth = tileSize * maxScreenCol; // Largura total da tela (960 px)
     public final int screenHeight = tileSize * maxScreenRow; // Altura total da tela (576 px)
+
+    // FOR FULL SCREEN
+    int screenWidth2 = screenWidth;
+    int screenHeight2 = screenHeight;
+    BufferedImage tempScreen;
+    Graphics2D g2;
 
     // ==== CONFIGURAÇÕES DO MUNDO ====
     public final int maxWorldCol = 50; // Quantidade total de colunas no mundo
@@ -85,6 +94,23 @@ public class GamePanel extends JPanel implements Runnable {
         aSetter.setInteractiveTile();
 
         gameState = titleState; // Define o estado inicial do jogo como "menu de título"
+
+        tempScreen = new BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_ARGB);
+        g2 = (Graphics2D) tempScreen.getGraphics();
+
+        setFullScreen();
+    }
+
+    public void setFullScreen() {
+
+        // GET LOCAL SCREEN DEVICE
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice gd = ge.getDefaultScreenDevice();
+        gd.setFullScreenWindow(Main.window);
+
+        // GET FULL SCREEN WIDTH AND HEIGHT
+        screenWidth2 = Main.window.getWidth();
+        screenHeight2 = Main.window.getHeight();
     }
 
     // ==== INICIALIZA A THREAD DO JOGO ====
@@ -114,7 +140,8 @@ public class GamePanel extends JPanel implements Runnable {
 
             if (delta >= 1) {
                 update(); // Atualiza lógica do jogo (movimento, eventos, etc.)
-                repaint(); // Redesenha a tela (chama paintComponent)
+                drawToTempScreen(); // Desenha o jogo na tela temporária
+                drawToScreen(); // Desenha a tela temporária na tela real
                 delta--;
                 drawCount++;
             }
@@ -195,14 +222,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    // ==== DESENHA NA TELA ====
-    // Método responsável por desenhar todo o frame do jogo
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g); // Limpa o painel (fundo) antes de desenhar novos elementos
-
-        // Converte para Graphics2D para aproveitar recursos avançados de renderização
-        Graphics2D g2 = (Graphics2D) g;
+    public void drawToTempScreen() {
 
         // DEBUG
         long drawStart = 0;
@@ -302,9 +322,13 @@ public class GamePanel extends JPanel implements Runnable {
             y += lineHeight;
             g2.drawString("Draw Time: " + passed, x, y);
         }
+    }
 
-        // Libera recursos do contexto gráfico após o desenho
-        g2.dispose();
+    public void drawToScreen() {
+
+        Graphics g = getGraphics();
+        g.drawImage(tempScreen, 0, 0, screenWidth2, screenHeight2, null);
+        g.dispose();
     }
 
     public void playMusic(int index) {
