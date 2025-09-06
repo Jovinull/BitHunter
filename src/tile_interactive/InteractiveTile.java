@@ -1,5 +1,7 @@
 package tile_interactive;
 
+import java.awt.Graphics2D;
+
 import entity.Entity;
 import main.GamePanel;
 
@@ -34,6 +36,24 @@ public class InteractiveTile extends Entity {
                 invincible = false;
                 invincibleCounter = 0;
             }
+        }
+    }
+
+    public void draw(Graphics2D g2) {
+
+        // Calcula a posição relativa à tela, com base na posição do jogador (scroll)
+        int screenX = worldX - gp.player.worldX + gp.player.screenX;
+        int screenY = worldY - gp.player.worldY + gp.player.screenY;
+
+        // Otimização: desenha apenas se a entidade estiver dentro da área visível da
+        // tela
+        if (worldX + gp.tileSize > gp.player.worldX - gp.player.screenX &&
+                worldX - gp.tileSize < gp.player.worldX + gp.player.screenX &&
+                worldY + gp.tileSize > gp.player.worldY - gp.player.screenY &&
+                worldY - gp.tileSize < gp.player.worldY + gp.player.screenY) {
+
+            // Desenha a sprite ajustada ao tamanho do tile (em pixels)
+            g2.drawImage(down1, screenX, screenY, null);
         }
     }
 }
