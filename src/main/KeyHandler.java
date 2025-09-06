@@ -23,6 +23,10 @@ public class KeyHandler implements KeyListener {
     private static final int MENU_MAIN_MAX_INDEX = 2; // [Iniciar, Créditos, Sair]
     private static final int MENU_CLASS_MAX_INDEX = 3; // [Guerreiro, Ladrão, Feiticeiro, Voltar]
 
+    // Limites do grid de slots na tela de personagem
+    private static final int SLOT_ROW_MAX = 3;
+    private static final int SLOT_COL_MAX = 4;
+
     public KeyHandler(GamePanel gp) {
         this.gp = gp;
     }
@@ -68,24 +72,24 @@ public class KeyHandler implements KeyListener {
     public void titleState(int key) {
         if (gp.ui.titleScreenState == 0) {
             // MENU PRINCIPAL
-            if (key == KeyEvent.VK_W) {
-                navigateUp(MENU_MAIN_MAX_INDEX);
-            } else if (key == KeyEvent.VK_S) {
-                navigateDown(MENU_MAIN_MAX_INDEX);
-            } else if (key == KeyEvent.VK_ENTER) {
-                handleTitleScreen0Enter();
+            switch (key) {
+                case KeyEvent.VK_W -> navigateUp(MENU_MAIN_MAX_INDEX);
+                case KeyEvent.VK_S -> navigateDown(MENU_MAIN_MAX_INDEX);
+                case KeyEvent.VK_ENTER -> handleTitleScreen0Enter();
+                default -> {
+                    /* noop */ }
             }
             return;
         }
 
         if (gp.ui.titleScreenState == 1) {
             // SELEÇÃO DE CLASSE
-            if (key == KeyEvent.VK_W) {
-                navigateUp(MENU_CLASS_MAX_INDEX);
-            } else if (key == KeyEvent.VK_S) {
-                navigateDown(MENU_CLASS_MAX_INDEX);
-            } else if (key == KeyEvent.VK_ENTER) {
-                handleTitleScreen1Enter();
+            switch (key) {
+                case KeyEvent.VK_W -> navigateUp(MENU_CLASS_MAX_INDEX);
+                case KeyEvent.VK_S -> navigateDown(MENU_CLASS_MAX_INDEX);
+                case KeyEvent.VK_ENTER -> handleTitleScreen1Enter();
+                default -> {
+                    /* noop */ }
             }
         }
     }
@@ -94,49 +98,34 @@ public class KeyHandler implements KeyListener {
      * Estado: Jogando (movimento, pausa, status, debug, etc).
      */
     public void playState(int key) {
-        // Movimento (WASD)
-        if (key == KeyEvent.VK_W)
-            upPressed = true;
-        if (key == KeyEvent.VK_S)
-            downPressed = true;
-        if (key == KeyEvent.VK_A)
-            leftPressed = true;
-        if (key == KeyEvent.VK_D)
-            rightPressed = true;
+        switch (key) {
+            // Movimento (WASD)
+            case KeyEvent.VK_W -> upPressed = true;
+            case KeyEvent.VK_S -> downPressed = true;
+            case KeyEvent.VK_A -> leftPressed = true;
+            case KeyEvent.VK_D -> rightPressed = true;
 
-        // Pausa
-        if (key == KeyEvent.VK_P) {
-            gp.gameState = gp.pauseState;
+            // Pausa
+            case KeyEvent.VK_P -> gp.gameState = gp.pauseState;
+
+            // Status do personagem
+            case KeyEvent.VK_C -> gp.gameState = gp.characterState;
+
+            // Confirmação (diálogo/ação)
+            case KeyEvent.VK_ENTER -> enterPressed = true;
+
+            // Tecla para soltar magia
+            case KeyEvent.VK_F -> shotKeyPressed = true;
+
+            // DEBUG: alternar exibição do tempo de renderização
+            case KeyEvent.VK_T -> showDebugText = !showDebugText;
+
+            // Recarregar mapa (atalho de dev)
+            case KeyEvent.VK_R -> gp.tileM.loadMap("/maps/worldV2.txt");
+
+            default -> {
+                /* noop */ }
         }
-
-        // Status do personagem
-        if (key == KeyEvent.VK_C) {
-            gp.gameState = gp.characterState;
-        }
-
-        // Confirmação (diálogo/ação)
-        if (key == KeyEvent.VK_ENTER) {
-            enterPressed = true;
-        }
-
-        // Tecla para soltar mágia
-        if (key == KeyEvent.VK_F) {
-            shotKeyPressed = true;
-        }
-
-        // DEBUG: alternar exibição do tempo de renderização
-        if (key == KeyEvent.VK_T) {
-            if (showDebugText == false) {
-                showDebugText = true;
-            } else if (showDebugText == true) {
-                showDebugText = false;
-            }
-        }
-
-        if (key == KeyEvent.VK_R) {
-            gp.tileM.loadMap("/maps/worldV2.txt");
-        }
-
     }
 
     /**
@@ -161,41 +150,37 @@ public class KeyHandler implements KeyListener {
      * Estado: Tela de status do personagem.
      */
     public void characterState(int code) {
+        switch (code) {
+            case KeyEvent.VK_C -> gp.gameState = gp.playState;
 
-        if (code == KeyEvent.VK_C) {
-            gp.gameState = gp.playState;
-        }
-
-        if (code == KeyEvent.VK_W) {
-            if (gp.ui.slotRow != 0) {
-                gp.ui.slotRow--;
-                gp.playSE(9);
+            case KeyEvent.VK_W -> {
+                if (gp.ui.slotRow != 0) {
+                    gp.ui.slotRow--;
+                    gp.playSE(9);
+                }
             }
-        }
-
-        if (code == KeyEvent.VK_A) {
-            if (gp.ui.slotCol != 0) {
-                gp.ui.slotCol--;
-                gp.playSE(9);
+            case KeyEvent.VK_A -> {
+                if (gp.ui.slotCol != 0) {
+                    gp.ui.slotCol--;
+                    gp.playSE(9);
+                }
             }
-        }
-
-        if (code == KeyEvent.VK_S) {
-            if (gp.ui.slotRow != 3) {
-                gp.ui.slotRow++;
-                gp.playSE(9);
+            case KeyEvent.VK_S -> {
+                if (gp.ui.slotRow != SLOT_ROW_MAX) {
+                    gp.ui.slotRow++;
+                    gp.playSE(9);
+                }
             }
-        }
-
-        if (code == KeyEvent.VK_D) {
-            if (gp.ui.slotCol != 4) {
-                gp.ui.slotCol++;
-                gp.playSE(9);
+            case KeyEvent.VK_D -> {
+                if (gp.ui.slotCol != SLOT_COL_MAX) {
+                    gp.ui.slotCol++;
+                    gp.playSE(9);
+                }
             }
-        }
+            case KeyEvent.VK_ENTER -> gp.player.selectItem();
 
-        if (code == KeyEvent.VK_ENTER) {
-            gp.player.selectItem();
+            default -> {
+                /* noop */ }
         }
     }
 
@@ -206,16 +191,15 @@ public class KeyHandler implements KeyListener {
     public void keyReleased(KeyEvent e) {
         final int key = e.getKeyCode();
 
-        if (key == KeyEvent.VK_W)
-            upPressed = false;
-        if (key == KeyEvent.VK_S)
-            downPressed = false;
-        if (key == KeyEvent.VK_A)
-            leftPressed = false;
-        if (key == KeyEvent.VK_D)
-            rightPressed = false;
-        if (key == KeyEvent.VK_F)
-            shotKeyPressed = false;
+        switch (key) {
+            case KeyEvent.VK_W -> upPressed = false;
+            case KeyEvent.VK_S -> downPressed = false;
+            case KeyEvent.VK_A -> leftPressed = false;
+            case KeyEvent.VK_D -> rightPressed = false;
+            case KeyEvent.VK_F -> shotKeyPressed = false;
+            default -> {
+                /* noop */ }
+        }
     }
 
     // -----------------------
