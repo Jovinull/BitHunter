@@ -38,15 +38,18 @@ public class UI {
     public int slotCol = 0;
     public int slotRow = 0;
 
-    // Paleta temática (antiga/épica)
-    private final Color COL_BG_DARK_1 = new Color(10, 8, 22);
-    private final Color COL_BG_DARK_2 = new Color(36, 18, 8);
-    private final Color COL_GOLD_LIGHT = new Color(245, 230, 161);
-    private final Color COL_GOLD = new Color(212, 169, 71);
-    private final Color COL_GOLD_DARK = new Color(138, 107, 42);
-    private final Color COL_BORDER_SOFT = new Color(255, 255, 255, 220);
-    private final Color COL_PARCHMENT_1 = new Color(240, 225, 195, 235);
-    private final Color COL_PARCHMENT_2 = new Color(215, 195, 150, 235);
+    // Paleta temática (escura/épica)
+    private final Color COL_BG_DARK_1 = new Color(16, 18, 26); // #10121A (base fria, quase azul-grafite)
+    private final Color COL_BG_DARK_2 = new Color(28, 20, 18); // #1C1412 (base quente, marrom-âmbar profundo)
+
+    private final Color COL_GOLD_LIGHT = new Color(196, 168, 112); // #C4A870 (ouro claro mais “envelhecido”)
+    private final Color COL_GOLD = new Color(170, 128, 64); // #AA8040 (bronze/ouro fosco)
+    private final Color COL_GOLD_DARK = new Color(112, 84, 36); // #705424 (bronze escuro)
+
+    private final Color COL_BORDER_SOFT = new Color(210, 190, 150, 200); // #D2BE96 CC (borda clara, menos gritante que
+                                                                         // branco)
+    private final Color COL_PARCHMENT_1 = new Color(210, 198, 170, 220); // #D2C6AA DC (pergaminho mais escuro)
+    private final Color COL_PARCHMENT_2 = new Color(185, 170, 135, 220); // #B9AA87 DC (pergaminho de contraste)
 
     // Ajuste fino: subir o fundo da seleção (sem mudar tamanho)
     private static final float MENU_PILL_TOP_FACTOR = 0.90f; // antes 0.75f
