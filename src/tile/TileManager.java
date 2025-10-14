@@ -26,7 +26,7 @@ public class TileManager {
         mapTileNum = new int[gp.maxWorldCol][gp.maxWorldRow]; // Matriz do mapa com base no mundo total
 
         getTileImage(); // Carrega as imagens dos tiles
-        loadMap("/resource/maps/world01.txt"); // Carrega o layout do mapa do arquivo
+        loadMap("/maps/world01.txt"); // Carrega o layout do mapa do arquivo
     }
 
     // Carrega as imagens e solidez correspondentes a cada tipo de tile
@@ -102,7 +102,7 @@ public class TileManager {
 
         try {
             tile[index] = new Tile();
-            tile[index].image = ImageIO.read(getClass().getResourceAsStream("/resource/tiles/" + imageName + ".png"));
+            tile[index].image = ImageIO.read(getClass().getResourceAsStream("/tiles/" + imageName + ".png"));
             tile[index].image = uTool.scaleImage(tile[index].image, gp.tileSize, gp.tileSize);
             tile[index].collision = collision;
 

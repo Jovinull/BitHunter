@@ -11,6 +11,6 @@ public class OBJ_Chest extends Entity {
         super(gp);
 
         name = "Chest"; // Identificador usado em lógica de jogo
-        down1 = setup("/resource/objects/chest", gp.tileSize, gp.tileSize);
+        down1 = setup("/objects/chest", gp.tileSize, gp.tileSize);
     }
 }

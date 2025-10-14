@@ -27,14 +27,14 @@ public class NPC_OldMan extends Entity {
 
     // Carrega as imagens do NPC em todas as direções (2 frames por direção)
     public void getImage() {
-        up1 = setup("/resource/npc/oldman/oldman_up_1", gp.tileSize, gp.tileSize);
-        up2 = setup("/resource/npc/oldman/oldman_up_2", gp.tileSize, gp.tileSize);
-        down1 = setup("/resource/npc/oldman/oldman_down_1", gp.tileSize, gp.tileSize);
-        down2 = setup("/resource/npc/oldman/oldman_down_2", gp.tileSize, gp.tileSize);
-        left1 = setup("/resource/npc/oldman/oldman_left_1", gp.tileSize, gp.tileSize);
-        left2 = setup("/resource/npc/oldman/oldman_left_2", gp.tileSize, gp.tileSize);
-        right1 = setup("/resource/npc/oldman/oldman_right_1", gp.tileSize, gp.tileSize);
-        right2 = setup("/resource/npc/oldman/oldman_right_2", gp.tileSize, gp.tileSize);
+        up1 = setup("/npc/oldman/oldman_up_1", gp.tileSize, gp.tileSize);
+        up2 = setup("/npc/oldman/oldman_up_2", gp.tileSize, gp.tileSize);
+        down1 = setup("/npc/oldman/oldman_down_1", gp.tileSize, gp.tileSize);
+        down2 = setup("/npc/oldman/oldman_down_2", gp.tileSize, gp.tileSize);
+        left1 = setup("/npc/oldman/oldman_left_1", gp.tileSize, gp.tileSize);
+        left2 = setup("/npc/oldman/oldman_left_2", gp.tileSize, gp.tileSize);
+        right1 = setup("/npc/oldman/oldman_right_1", gp.tileSize, gp.tileSize);
+        right2 = setup("/npc/oldman/oldman_right_2", gp.tileSize, gp.tileSize);
     }
 
     public void setDialogue() {

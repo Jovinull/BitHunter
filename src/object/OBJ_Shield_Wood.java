@@ -10,7 +10,7 @@ public class OBJ_Shield_Wood extends Entity {
 
         type = type_shield;
         name = "Wood Shield";
-        down1 = setup("/resource/objects/shield_wood", gp.tileSize, gp.tileSize);
+        down1 = setup("/objects/shield_wood", gp.tileSize, gp.tileSize);
         defenseValue = 1;
         description = "[" + name + "]\nFeito de madeira.";
     }
