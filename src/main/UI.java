@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import javax.swing.plaf.multi.MultiScrollBarUI;
+
 import entity.Entity;
 import object.OBJ_Heart;
 import object.OBJ_ManaCrystal;
@@ -37,6 +39,7 @@ public class UI {
     public int titleScreenState = 0;
     public int slotCol = 0;
     public int slotRow = 0;
+    int subState = 0;
 
     // Paleta temática (escura/épica)
     private final Color COL_BG_DARK_1 = new Color(16, 18, 26); // #10121A (base fria, quase azul-grafite)
@@ -120,6 +123,10 @@ public class UI {
         if (gp.gameState == gp.characterState) {
             drawCharacterScreen();
             drawInventory();
+        }
+
+        if (gp.gameState == gp.optionsState) {
+            drawOptionsScreen();
         }
     }
 
@@ -366,6 +373,256 @@ public class UI {
         }
     }
 
+    public void drawOptionsScreen() {
+
+        g2.setColor(Color.white);
+        g2.setFont(g2.getFont().deriveFont(32F));
+
+        // SUB WINDOW
+        int frameX = gp.tileSize * 6;
+        int frameY = gp.tileSize;
+        int frameWidth = gp.tileSize * 8;
+        int frameHeight = gp.tileSize * 10;
+        drawSubWindow(frameX, frameY, frameWidth, frameHeight);
+
+        switch (subState) {
+            case 0:
+                options_top(frameX, frameY);
+                break;
+            case 1:
+                options_fullScreenNotification(frameX, frameY);
+                break;
+            case 2:
+                options_control(frameX, frameY);
+                break;
+            case 3:
+                options_endGameConfirmation(frameX, frameY);
+                break;
+        }
+
+        gp.keyH.enterPressed = false;
+    }
+
+    public void options_top(int frameX, int frameY) {
+
+        int textX;
+        int textY;
+
+        // TITLE
+        String text = "Options";
+        textX = getXforCenteredText(text);
+        textY = frameY + gp.tileSize;
+        g2.drawString(text, textX, textY);
+
+        // FULL SCREEN ON/OFF
+        textX = frameX + gp.tileSize;
+        textY = frameY + gp.tileSize * 2;
+        g2.drawString("Full Screen", textX, textY);
+        if (commandNum == 0) {
+            g2.drawString(">", textX - 25, textY);
+            if (gp.keyH.enterPressed == true) {
+                if (gp.fullScreenOn == false) {
+                    gp.fullScreenOn = true;
+                } else if (gp.fullScreenOn == true) {
+                    gp.fullScreenOn = false;
+                }
+                subState = 1;
+            }
+        }
+
+        // MUSIC
+        textY += gp.tileSize;
+        g2.drawString("Music", textX, textY);
+        if (commandNum == 1) {
+            g2.drawString(">", textX - 25, textY);
+        }
+
+        // SE
+        textY += gp.tileSize;
+        g2.drawString("SE", textX, textY);
+        if (commandNum == 2) {
+            g2.drawString(">", textX - 25, textY);
+        }
+
+        // CONTROL
+        textY += gp.tileSize;
+        g2.drawString("Control", textX, textY);
+        if (commandNum == 3) {
+            g2.drawString(">", textX - 25, textY);
+            if (gp.keyH.enterPressed == true) {
+                subState = 2;
+                commandNum = 0;
+            }
+        }
+
+        // END GAME
+        textY += gp.tileSize;
+        g2.drawString("End Game", textX, textY);
+        if (commandNum == 4) {
+            g2.drawString(">", textX - 25, textY);
+            if (gp.keyH.enterPressed == true) {
+                subState = 3;
+                commandNum = 0;
+            }
+        }
+
+        // Back
+        textY += gp.tileSize * 3;
+        g2.drawString("Back", textX, textY);
+        if (commandNum == 5) {
+            g2.drawString(">", textX - 25, textY);
+            if (gp.keyH.enterPressed == true) {
+                gp.gameState = gp.playState;
+                commandNum = 0;
+            }
+        }
+
+        // FULL SCREEN CHECK BOX
+        textX = frameX + (int) (gp.tileSize * 4.5);
+        textY = frameY + gp.tileSize * 2 - 22;
+        g2.setStroke(new BasicStroke(3));
+        g2.drawRect(textX, textY, 24, 24);
+        if (gp.fullScreenOn == true) {
+            g2.fillRect(textX, textY, 24, 24);
+        }
+
+        // MUSIC VOLUME
+        textY += gp.tileSize;
+        g2.drawRect(textX, textY, 120, 24);
+        int volumeWidth = 24 * gp.music.volumeScale;
+        g2.fillRect(textX, textY, volumeWidth, 24);
+
+        // SE VOLUME
+        textY += gp.tileSize;
+        g2.drawRect(textX, textY, 120, 24);
+        volumeWidth = 24 * gp.se.volumeScale;
+        g2.fillRect(textX, textY, volumeWidth, 24);
+    }
+
+    public void options_fullScreenNotification(int frameX, int frameY) {
+
+        int textX = frameX + gp.tileSize;
+        int textY = frameY + gp.tileSize * 3;
+
+        currentDialogue = "The change will take \neffect after restarting \nthe game.";
+
+        for (String line : currentDialogue.split("\n")) {
+            g2.drawString(line, textX, textY);
+            textY += 40;
+        }
+
+        textY = frameY + gp.tileSize * 9;
+        g2.drawString("Back", textX, textY);
+        if (commandNum == 0) {
+            g2.drawString(">", textX - 25, textY);
+            if (gp.keyH.enterPressed == true) {
+                subState = 0;
+            }
+        }
+    }
+
+    public void options_control(int frameX, int frameY) {
+
+        int textX;
+        int textY;
+
+        // TITLE
+        String text = "Control";
+        textX = getXforCenteredText(text);
+        textY = frameY + gp.tileSize;
+        g2.drawString(text, textX, textY);
+
+        textX = frameX + gp.tileSize;
+        textY += gp.tileSize;
+        g2.drawString("Move", textX, textY);
+        textY += gp.tileSize;
+        g2.drawString("Confirm/Attack", textX, textY);
+        textY += gp.tileSize;
+        g2.drawString("Shoot/Cast", textX, textY);
+        textY += gp.tileSize;
+        g2.drawString("Character Screen", textX, textY);
+        textY += gp.tileSize;
+        g2.drawString("Pause", textX, textY);
+        textY += gp.tileSize;
+        g2.drawString("Options", textX, textY);
+        textY += gp.tileSize;
+
+        textX = frameX + gp.tileSize * 6;
+        textY = frameY + gp.tileSize * 2;
+        g2.drawString("WASD", textX, textY);
+        textY += gp.tileSize;
+        g2.drawString("ENTER", textX, textY);
+        textY += gp.tileSize;
+        g2.drawString("F", textX, textY);
+        textY += gp.tileSize;
+        g2.drawString("C", textX, textY);
+        textY += gp.tileSize;
+        g2.drawString("P", textX, textY);
+        textY += gp.tileSize;
+        g2.drawString("ESC", textX, textY);
+        textY += gp.tileSize;
+
+        // BACK
+        textX = frameX + gp.tileSize;
+        textY = frameY + gp.tileSize * 9;
+        g2.drawString("Back", textX, textY);
+        if (commandNum == 0) {
+            g2.drawString(">", textX - 25, textY);
+            if (gp.keyH.enterPressed == true) {
+                subState = 0;
+                commandNum = 3;
+            }
+        }
+    }
+
+    public void options_endGameConfirmation(int frameX, int frameY) {
+
+        int textX = frameX + gp.tileSize;
+        int textY = frameY + gp.tileSize * 3;
+
+        currentDialogue = "Quit the game and \nreturn to the title screen?";
+
+        for (String line : currentDialogue.split("\n")) {
+            g2.drawString(line, textX, textY);
+            textY += 40;
+        }
+
+        // YES
+        String text = "Yes";
+        textX = getXforCenteredText(text);
+        textY += gp.tileSize * 3;
+        g2.drawString(text, textX, textY);
+        if (commandNum == 0) {
+            g2.drawString(">", textX - 25, textY);
+            if (gp.keyH.enterPressed == true) {
+                subState = 0;
+                commandNum = 0;
+                titleScreenState = 0;
+
+                if (gp.music != null) {
+                    gp.music.stop();
+                }
+
+                gp.gameState = gp.titleState;
+                gp.keyH.enterPressed = false;
+            }
+        }
+
+        // NO
+        text = "No";
+        textX = getXforCenteredText(text);
+        textY += gp.tileSize;
+        g2.drawString(text, textX, textY);
+        if (commandNum == 1) {
+            g2.drawString(">", textX - 25, textY);
+            if (gp.keyH.enterPressed == true) {
+                subState = 0;
+                commandNum = 4;
+                gp.keyH.enterPressed = false;
+            }
+        }
+    }
+
     public int getItemIndexOnSlot() {
         int itemIndex = slotCol + (slotRow * 5);
         return itemIndex;
@@ -373,32 +630,44 @@ public class UI {
 
     // ---------- SUBWINDOW ESTILIZADA (pergaminho + moldura) ----------
     public void drawSubWindow(int x, int y, int width, int height) {
-        // Fundo pergaminho com leve gradiente
-        LinearGradientPaint parchment = new LinearGradientPaint(
-                x, y, x, y + height,
-                new float[] { 0f, 1f },
-                new Color[] { COL_PARCHMENT_1, COL_PARCHMENT_2 },
-                CycleMethod.NO_CYCLE);
-        g2.setPaint(parchment);
-        g2.fillRoundRect(x, y, width, height, 28, 28);
+        // Salva o estado gráfico atual
+        java.awt.Paint oldPaint = g2.getPaint();
+        java.awt.Stroke oldStroke = g2.getStroke();
+        java.awt.Color oldColor = g2.getColor();
 
-        // Borda dupla (ouro + branco suave)
-        g2.setStroke(new BasicStroke(4f));
-        g2.setColor(COL_GOLD);
-        g2.drawRoundRect(x + 2, y + 2, width - 4, height - 4, 24, 24);
+        try {
+            // Fundo pergaminho com leve gradiente
+            LinearGradientPaint parchment = new LinearGradientPaint(
+                    x, y, x, y + height,
+                    new float[] { 0f, 1f },
+                    new Color[] { COL_PARCHMENT_1, COL_PARCHMENT_2 },
+                    CycleMethod.NO_CYCLE);
+            g2.setPaint(parchment);
+            g2.fillRoundRect(x, y, width, height, 28, 28);
 
-        g2.setStroke(new BasicStroke(2f));
-        g2.setColor(COL_BORDER_SOFT);
-        g2.drawRoundRect(x + 6, y + 6, width - 12, height - 12, 18, 18);
+            // Borda dupla (ouro + branco suave)
+            g2.setStroke(new BasicStroke(4f));
+            g2.setColor(COL_GOLD);
+            g2.drawRoundRect(x + 2, y + 2, width - 4, height - 4, 24, 24);
 
-        // Sombra interna leve (vinheta interna)
-        RadialGradientPaint innerShade = new RadialGradientPaint(
-                x + width / 2f, y + height / 2f, Math.max(width, height) / 1.2f,
-                new float[] { 0.7f, 1f },
-                new Color[] { new Color(0, 0, 0, 0), new Color(0, 0, 0, 50) },
-                CycleMethod.NO_CYCLE);
-        g2.setPaint(innerShade);
-        g2.fillRoundRect(x + 4, y + 4, width - 8, height - 8, 24, 24);
+            g2.setStroke(new BasicStroke(2f));
+            g2.setColor(COL_BORDER_SOFT);
+            g2.drawRoundRect(x + 6, y + 6, width - 12, height - 12, 18, 18);
+
+            // Sombra interna leve (vinheta interna)
+            RadialGradientPaint innerShade = new RadialGradientPaint(
+                    x + width / 2f, y + height / 2f, Math.max(width, height) / 1.2f,
+                    new float[] { 0.7f, 1f },
+                    new Color[] { new Color(0, 0, 0, 0), new Color(0, 0, 0, 50) },
+                    CycleMethod.NO_CYCLE);
+            g2.setPaint(innerShade);
+            g2.fillRoundRect(x + 4, y + 4, width - 8, height - 8, 24, 24);
+        } finally {
+            // Restaura o estado gráfico original
+            g2.setPaint(oldPaint);
+            g2.setStroke(oldStroke);
+            g2.setColor(oldColor);
+        }
     }
 
     // ---------- HELPERS VISUAIS ----------

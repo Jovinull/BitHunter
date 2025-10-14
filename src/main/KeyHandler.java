@@ -63,33 +63,80 @@ public class KeyHandler implements KeyListener {
         if (gp.gameState == gp.characterState) {
             characterState(key);
         }
+        if (gp.gameState == gp.optionsState) {
+            optionsState(key);
+        }
     }
 
     /**
      * Estado: Tela de título (menus iniciais).
      * titleScreenState 0 = menu principal; 1 = seleção de classe/personagem.
      */
-    public void titleState(int key) {
+    public void titleState(int code) {
+
+        // ===== Configurações de limites =====
+        final int MAIN_MENU_MAX = 2; // 0..2 (ex.: Novo Jogo, (Add later), Sair)
+        final int CLASS_MENU_MAX = 3; // 0..3 (ex.: Guerreiro, Mago, Arqueiro) — ajuste ao seu caso
+
+        // ===== TELA 0: MENU PRINCIPAL =====
         if (gp.ui.titleScreenState == 0) {
-            // MENU PRINCIPAL
-            switch (key) {
-                case KeyEvent.VK_W -> navigateUp(MENU_MAIN_MAX_INDEX);
-                case KeyEvent.VK_S -> navigateDown(MENU_MAIN_MAX_INDEX);
-                case KeyEvent.VK_ENTER -> handleTitleScreen0Enter();
-                default -> {
-                    /* noop */ }
+
+            if (code == KeyEvent.VK_W) {
+                gp.ui.commandNum--;
+                if (gp.ui.commandNum < 0)
+                    gp.ui.commandNum = MAIN_MENU_MAX;
             }
-            return;
+
+            if (code == KeyEvent.VK_S) {
+                gp.ui.commandNum++;
+                if (gp.ui.commandNum > MAIN_MENU_MAX)
+                    gp.ui.commandNum = 0;
+            }
+
+            if (code == KeyEvent.VK_ENTER) {
+                if (gp.ui.commandNum == 0) {
+                    // Ir para a seleção de personagem (tela 1)
+                    gp.ui.titleScreenState = 1;
+                    gp.ui.commandNum = 0; // reset para o primeiro item da lista de classes
+                }
+                if (gp.ui.commandNum == 1) {
+                    // add later (ex.: Continue/Opções)
+                }
+                if (gp.ui.commandNum == 2) {
+                    System.exit(0);
+                }
+            }
+            return; // importante: não cair na lógica da tela 1
         }
 
+        // ===== TELA 1: SELEÇÃO DE PERSONAGEM =====
         if (gp.ui.titleScreenState == 1) {
-            // SELEÇÃO DE CLASSE
-            switch (key) {
-                case KeyEvent.VK_W -> navigateUp(MENU_CLASS_MAX_INDEX);
-                case KeyEvent.VK_S -> navigateDown(MENU_CLASS_MAX_INDEX);
-                case KeyEvent.VK_ENTER -> handleTitleScreen1Enter();
-                default -> {
-                    /* noop */ }
+
+            if (code == KeyEvent.VK_W) {
+                gp.ui.commandNum--;
+                if (gp.ui.commandNum < 0)
+                    gp.ui.commandNum = CLASS_MENU_MAX;
+            }
+
+            if (code == KeyEvent.VK_S) {
+                gp.ui.commandNum++;
+                if (gp.ui.commandNum > CLASS_MENU_MAX)
+                    gp.ui.commandNum = 0;
+            }
+
+            if (code == KeyEvent.VK_ENTER) {
+                // Aqui você confirma a classe selecionada e inicia o jogo
+                // Ex.: setar classe no player antes de iniciar
+                // gp.player.setClazzByIndex(gp.ui.commandNum);
+
+                gp.gameState = gp.playState;
+                gp.playMusic(0);
+            }
+
+            // (Opcional) Voltar para o menu principal
+            if (code == KeyEvent.VK_ESCAPE) {
+                gp.ui.titleScreenState = 0;
+                gp.ui.commandNum = 0;
             }
         }
     }
@@ -116,6 +163,8 @@ public class KeyHandler implements KeyListener {
 
             // Tecla para soltar magia
             case KeyEvent.VK_F -> shotKeyPressed = true;
+
+            case KeyEvent.VK_ESCAPE -> gp.gameState = gp.optionsState;
 
             // DEBUG: alternar exibição do tempo de renderização
             case KeyEvent.VK_T -> showDebugText = !showDebugText;
@@ -181,6 +230,69 @@ public class KeyHandler implements KeyListener {
 
             default -> {
                 /* noop */ }
+        }
+    }
+
+    public void optionsState(int code) {
+
+        if (code == KeyEvent.VK_ESCAPE) {
+            gp.gameState = gp.playState;
+        }
+        if (code == KeyEvent.VK_ENTER) {
+            enterPressed = true;
+        }
+
+        int maxCommandNum = 0;
+        switch (gp.ui.subState) {
+            case 0:
+                maxCommandNum = 5;
+                break;
+            case 3:
+                maxCommandNum = 1;
+                break;
+        }
+
+        if (code == KeyEvent.VK_W) {
+            gp.ui.commandNum--;
+            if (gp.ui.commandNum < 0) {
+                gp.ui.commandNum = maxCommandNum;
+            }
+            gp.playSE(9);
+        }
+        if (code == KeyEvent.VK_S) {
+            gp.ui.commandNum++;
+            if (gp.ui.commandNum > maxCommandNum) {
+                gp.ui.commandNum = 0;
+            }
+            gp.playSE(9);
+        }
+
+        if (code == KeyEvent.VK_A) {
+            if (gp.ui.subState == 0) {
+                if (gp.ui.commandNum == 1 && gp.music.volumeScale > 0) {
+                    gp.music.volumeScale--;
+                    gp.music.checkVolume();
+                    gp.playSE(9);
+                }
+                if (gp.ui.commandNum == 2 && gp.se.volumeScale > 0) {
+                    gp.se.volumeScale--;
+                    gp.playSE(9);
+                }
+            }
+        }
+
+        if (code == KeyEvent.VK_D) {
+            if (gp.ui.subState == 0) {
+                if (gp.ui.commandNum == 1 && gp.music.volumeScale < 5) {
+                    gp.music.volumeScale++;
+                    gp.music.checkVolume();
+                    gp.playSE(9);
+                }
+                if (gp.ui.commandNum == 2 && gp.se.volumeScale < 5) {
+                    gp.se.volumeScale++;
+                    gp.playSE(9);
+                }
+            }
         }
     }
 

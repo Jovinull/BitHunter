@@ -38,6 +38,7 @@ public class GamePanel extends JPanel implements Runnable {
     int screenHeight2 = screenHeight;
     BufferedImage tempScreen;
     Graphics2D g2;
+    public boolean fullScreenOn = false;
 
     // ==== CONFIGURAÇÕES DO MUNDO ====
     public final int maxWorldCol = 50; // Quantidade total de colunas no mundo
@@ -74,6 +75,7 @@ public class GamePanel extends JPanel implements Runnable {
     public final int pauseState = 2; // Estado de pausa
     public final int dialogueState = 3; // Estado de diálogo (interações com NPCs)
     public final int characterState = 4; // Estado de status do personagem
+    public final int optionsState = 5; // Estado de opções (configurações do jogo)
 
     // ==== CONSTRUTOR ====
     public GamePanel() {
