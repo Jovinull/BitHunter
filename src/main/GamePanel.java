@@ -56,6 +56,7 @@ public class GamePanel extends JPanel implements Runnable {
   public AssetSetter aSetter = new AssetSetter(this); // Configura os objetos do jogo (itens, inimigos, etc.)
   public UI ui = new UI(this); // Interface do usuário (HUD, mensagens, etc.)
   public EventHandler eHandler = new EventHandler(this);
+  Config config = new Config(this);
   Thread gameThread; // Thread para rodar o loop do jogo
 
   // ENTITY AND OBJECTS
@@ -100,7 +101,9 @@ public class GamePanel extends JPanel implements Runnable {
     tempScreen = new BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_ARGB);
     g2 = (Graphics2D) tempScreen.getGraphics();
 
-    setFullScreen();
+    if (fullScreenOn == true) {
+      setFullScreen();
+    }
   }
 
   public void setFullScreen() {

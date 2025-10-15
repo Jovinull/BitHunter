@@ -20,12 +20,14 @@ public class Main {
     // Define o título da janela
     window.setTitle("Bit Hunter");
 
-    // Remove bordas e barra de título da janela
-    window.setUndecorated(true);
-
     // Cria o painel do jogo e adiciona à janela
     GamePanel gamePanel = new GamePanel();
     window.add(gamePanel);
+
+    gamePanel.config.loadConfig(); // Carrega as configurações do jogo
+    if (gamePanel.fullScreenOn == true) {
+      window.setUndecorated(true);
+    }
 
     // Ajusta o tamanho da janela com base no tamanho preferido do GamePanel
     window.pack();
