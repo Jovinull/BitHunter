@@ -8,64 +8,64 @@ import main.GamePanel;
 
 public class OBJ_Rock extends Projectile {
 
-    GamePanel gp;
+  GamePanel gp;
 
-    public OBJ_Rock(GamePanel gp) {
-        super(gp);
-        this.gp = gp;
+  public OBJ_Rock(GamePanel gp) {
+    super(gp);
+    this.gp = gp;
 
-        name = "Rock";
-        speed = 8;
-        maxLife = 80;
-        life = maxLife;
-        attack = 2;
-        useCost = 1;
-        alive = false;
-        getImage();
+    name = "Rock";
+    speed = 8;
+    maxLife = 80;
+    life = maxLife;
+    attack = 2;
+    useCost = 1;
+    alive = false;
+    getImage();
+  }
+
+  public void getImage() {
+    up1 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
+    up2 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
+    down1 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
+    down2 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
+    left1 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
+    left2 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
+    right1 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
+    right2 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
+  }
+
+  public boolean haveResource(Entity user) {
+
+    boolean haveResource = false;
+    if (user.ammo >= useCost) {
+      haveResource = true;
     }
+    return haveResource;
+  }
 
-    public void getImage() {
-        up1 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
-        up2 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
-        down1 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
-        down2 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
-        left1 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
-        left2 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
-        right1 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
-        right2 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
-    }
+  public void subtractResource(Entity user) {
 
-    public boolean haveResource(Entity user) {
+    user.ammo -= useCost;
+  }
 
-        boolean haveResource = false;
-        if (user.ammo >= useCost) {
-            haveResource = true;
-        }
-        return haveResource;
-    }
+  public Color getParticleColor() {
+    Color color = new Color(40, 50, 0);
+    return color;
+  }
 
-    public void subtractResource(Entity user) {
+  public int getParticleSize() {
+    int size = 10;
+    return size;
+  }
 
-        user.ammo -= useCost;
-    }
+  public int getParticleSpeed() {
+    int speed = 1;
+    return speed;
+  }
 
-    public Color getParticleColor() {
-        Color color = new Color(40, 50, 0);
-        return color;
-    }
-
-    public int getParticleSize() {
-        int size = 10;
-        return size;
-    }
-
-    public int getParticleSpeed() {
-        int speed = 1;
-        return speed;
-    }
-
-    public int getParticleMaxLife() {
-        int maxLife = 20;
-        return maxLife;
-    }
+  public int getParticleMaxLife() {
+    int maxLife = 20;
+    return maxLife;
+  }
 }

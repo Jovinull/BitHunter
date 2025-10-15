@@ -4,27 +4,27 @@ import main.GamePanel;
 
 public class IT_Trunk extends InteractiveTile {
 
-    GamePanel gp;
+  GamePanel gp;
 
-    public IT_Trunk(GamePanel gp, int col, int row) {
-        super(gp, col, row);
-        this.gp = gp;
+  public IT_Trunk(GamePanel gp, int col, int row) {
+    super(gp, col, row);
+    this.gp = gp;
 
-        this.worldX = gp.tileSize * col;
-        this.worldY = gp.tileSize * row;
+    this.worldX = gp.tileSize * col;
+    this.worldY = gp.tileSize * row;
 
-        down1 = setup("/tiles_interactive/trunk", gp.tileSize, gp.tileSize);
+    down1 = setup("/tiles_interactive/trunk", gp.tileSize, gp.tileSize);
 
-        // colisão conforme precisar
-        solidArea.x = 0;
-        solidArea.y = 0;
-        solidArea.width = 0;
-        solidArea.height = 0;
-        solidAreaDefaultX = solidArea.x;
-        solidAreaDefaultY = solidArea.y;
-    }
+    // colisão conforme precisar
+    solidArea.x = 0;
+    solidArea.y = 0;
+    solidArea.width = 0;
+    solidArea.height = 0;
+    solidAreaDefaultX = solidArea.x;
+    solidAreaDefaultY = solidArea.y;
+  }
 
-    public void playSE() {
-        gp.playSE(11);
-    }
+  public void playSE() {
+    gp.playSE(11);
+  }
 }

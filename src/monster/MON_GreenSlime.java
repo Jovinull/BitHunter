@@ -11,105 +11,105 @@ import object.OBJ_Rock;
 
 public class MON_GreenSlime extends Entity {
 
-    GamePanel gp;
+  GamePanel gp;
 
-    public MON_GreenSlime(GamePanel gp) {
-        super(gp);
+  public MON_GreenSlime(GamePanel gp) {
+    super(gp);
 
-        this.gp = gp;
+    this.gp = gp;
 
-        type = type_monster;
-        name = "Green Slime";
-        speed = 1;
-        maxLife = 6;
-        life = maxLife;
-        attack = 5;
-        defense = 0;
-        exp = 2;
-        projectile = new OBJ_Rock(gp);
+    type = type_monster;
+    name = "Green Slime";
+    speed = 1;
+    maxLife = 6;
+    life = maxLife;
+    attack = 5;
+    defense = 0;
+    exp = 2;
+    projectile = new OBJ_Rock(gp);
 
-        solidArea.x = 3;
-        solidArea.y = 18;
-        solidArea.width = 42;
-        solidArea.height = 30;
-        solidAreaDefaultX = solidArea.x;
-        solidAreaDefaultY = solidArea.y;
+    solidArea.x = 3;
+    solidArea.y = 18;
+    solidArea.width = 42;
+    solidArea.height = 30;
+    solidAreaDefaultX = solidArea.x;
+    solidAreaDefaultY = solidArea.y;
 
-        getImage();
+    getImage();
+  }
+
+  public void getImage() {
+    up1 = setup("/monster/greenslime_down_1", gp.tileSize, gp.tileSize);
+    up2 = setup("/monster/greenslime_down_2", gp.tileSize, gp.tileSize);
+    down1 = setup("/monster/greenslime_down_1", gp.tileSize, gp.tileSize);
+    down2 = setup("/monster/greenslime_down_2", gp.tileSize, gp.tileSize);
+    left1 = setup("/monster/greenslime_down_1", gp.tileSize, gp.tileSize);
+    left2 = setup("/monster/greenslime_down_2", gp.tileSize, gp.tileSize);
+    right1 = setup("/monster/greenslime_down_1", gp.tileSize, gp.tileSize);
+    right2 = setup("/monster/greenslime_down_2", gp.tileSize, gp.tileSize);
+  }
+
+  public void setAction() {
+
+    actionLockCounter++;
+
+    // A cada 120 frames (2 segundos em 60 FPS), o NPC escolhe uma nova direção
+    if (actionLockCounter == 120) {
+
+      Random random = new Random();
+      int i = random.nextInt(4); // Gera um número de 0 a 3
+
+      // Altera a direção com base no número gerado
+      switch (i) {
+        case 0:
+          direction = "up";
+          break;
+        case 1:
+          direction = "down";
+          break;
+        case 2:
+          direction = "left";
+          break;
+        case 3:
+          direction = "right";
+          break;
+      }
+
+      actionLockCounter = 0; // Reinicia o contador para o próximo intervalo
     }
 
-    public void getImage() {
-        up1 = setup("/monster/greenslime_down_1", gp.tileSize, gp.tileSize);
-        up2 = setup("/monster/greenslime_down_2", gp.tileSize, gp.tileSize);
-        down1 = setup("/monster/greenslime_down_1", gp.tileSize, gp.tileSize);
-        down2 = setup("/monster/greenslime_down_2", gp.tileSize, gp.tileSize);
-        left1 = setup("/monster/greenslime_down_1", gp.tileSize, gp.tileSize);
-        left2 = setup("/monster/greenslime_down_2", gp.tileSize, gp.tileSize);
-        right1 = setup("/monster/greenslime_down_1", gp.tileSize, gp.tileSize);
-        right2 = setup("/monster/greenslime_down_2", gp.tileSize, gp.tileSize);
+    int i = new Random().nextInt(100) + 1;
+
+    if (i > 99 && projectile.alive == false && shotAvailableCounter == 30) {
+
+      projectile.set(worldX, worldY, direction, true, this);
+      gp.projectileList.add(projectile);
+      shotAvailableCounter = 0;
+    }
+  }
+
+  public void damageReaction() {
+
+    actionLockCounter = 0; // Reseta o contador de ações
+    direction = gp.player.direction; // O monstro reage na direção do jogador
+  }
+
+  public void checkDrop() {
+
+    // CAST A DIE (sorteia um número de 1 a 100)
+    int i = new Random().nextInt(100) + 1;
+
+    // SET THE MONSTER DROP (define o item que o monstro irá dropar)
+    if (i < 50) {
+      dropItem(new OBJ_Coin_Bronze(gp));
     }
 
-    public void setAction() {
-
-        actionLockCounter++;
-
-        // A cada 120 frames (2 segundos em 60 FPS), o NPC escolhe uma nova direção
-        if (actionLockCounter == 120) {
-
-            Random random = new Random();
-            int i = random.nextInt(4); // Gera um número de 0 a 3
-
-            // Altera a direção com base no número gerado
-            switch (i) {
-                case 0:
-                    direction = "up";
-                    break;
-                case 1:
-                    direction = "down";
-                    break;
-                case 2:
-                    direction = "left";
-                    break;
-                case 3:
-                    direction = "right";
-                    break;
-            }
-
-            actionLockCounter = 0; // Reinicia o contador para o próximo intervalo
-        }
-
-        int i = new Random().nextInt(100) + 1;
-
-        if (i > 99 && projectile.alive == false && shotAvailableCounter == 30) {
-
-            projectile.set(worldX, worldY, direction, true, this);
-            gp.projectileList.add(projectile);
-            shotAvailableCounter = 0;
-        }
+    if (i >= 50 && i < 75) {
+      dropItem(new OBJ_Heart(gp));
     }
 
-    public void damageReaction() {
-
-        actionLockCounter = 0; // Reseta o contador de ações
-        direction = gp.player.direction; // O monstro reage na direção do jogador
+    if (i >= 75 && i <= 100) {
+      dropItem(new OBJ_ManaCrystal(gp));
     }
-
-    public void checkDrop() {
-
-        // CAST A DIE (sorteia um número de 1 a 100)
-        int i = new Random().nextInt(100) + 1;
-
-        // SET THE MONSTER DROP (define o item que o monstro irá dropar)
-        if (i < 50) {
-            dropItem(new OBJ_Coin_Bronze(gp));
-        }
-
-        if (i >= 50 && i < 75) {
-            dropItem(new OBJ_Heart(gp));
-        }
-
-        if (i >= 75 && i <= 100) {
-            dropItem(new OBJ_ManaCrystal(gp));
-        }
-    }
+  }
 }

@@ -1,17 +1,34 @@
 {
-    // Java
-    "java.project.sourcePaths": [
-        "src",
-        "resource"
-    ],
-    "java.configuration.updateBuildConfiguration": "automatic",
-    // Formatação/arquivos (boas práticas multiplataforma)
-    "files.encoding": "utf8",
-    "files.eol": "\n",
+  // Java
+  "java.project.sourcePaths": [
+    "src",
+    "resource"
+  ],
+  "java.configuration.updateBuildConfiguration": "automatic",
+  // Formatter Java (padroniza para todo mundo)
+  // Coloque o arquivo .vscode/eclipse-java-google-style.xml no repo
+  "java.format.settings.url": "${workspaceFolder}/.vscode/eclipse-java-google-style.xml",
+  "java.format.settings.profile": "GoogleStyle",
+  // Organiza imports ao salvar
+  "java.saveActions.organizeImports": true,
+  // Formatação/arquivos (boas práticas multiplataforma)
+  "files.encoding": "utf8",
+  "files.eol": "\n",
+  "editor.insertSpaces": true,
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false, // não herdar 4 espaços de arquivos antigos
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  // (Opcional) Remover espaços à direita/linha final via VS Code
+  // (já está coberto pelo .editorconfig, mas não atrapalha)
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  // Git (coerente com o que você já usa)
+  "git.enableSmartCommit": true,
+  "git.confirmSync": false,
+  // Garante 2 espaços especificamente para .java (reforço)
+  "[java]": {
     "editor.insertSpaces": true,
-    "editor.tabSize": 2,
-    "editor.formatOnSave": true,
-    // Git (coerente com o que você já usa)
-    "git.enableSmartCommit": true,
-    "git.confirmSync": false
+    "editor.tabSize": 2
+  }
 }

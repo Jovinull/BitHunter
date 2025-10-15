@@ -23,331 +23,331 @@ import tile_interactive.InteractiveTile;
 // Implementa Runnable para rodar o loop de jogo em uma thread separada.
 public class GamePanel extends JPanel implements Runnable {
 
-    // ==== CONFIGURAÇÕES DE TELA (visível) ====
-    final int originalTileSize = 16; // Tamanho base de um tile (16x16 pixels)
-    final int scale = 3; // Fator de escala aplicado ao tile
+  // ==== CONFIGURAÇÕES DE TELA (visível) ====
+  final int originalTileSize = 16; // Tamanho base de um tile (16x16 pixels)
+  final int scale = 3; // Fator de escala aplicado ao tile
 
-    public final int tileSize = originalTileSize * scale; // Tile final com escala (48x48 pixels)
-    public final int maxScreenCol = 20; // Número de colunas visíveis na tela
-    public final int maxScreenRow = 12; // Número de linhas visíveis na tela
-    public final int screenWidth = tileSize * maxScreenCol; // Largura total da tela (960 px)
-    public final int screenHeight = tileSize * maxScreenRow; // Altura total da tela (576 px)
+  public final int tileSize = originalTileSize * scale; // Tile final com escala (48x48 pixels)
+  public final int maxScreenCol = 20; // Número de colunas visíveis na tela
+  public final int maxScreenRow = 12; // Número de linhas visíveis na tela
+  public final int screenWidth = tileSize * maxScreenCol; // Largura total da tela (960 px)
+  public final int screenHeight = tileSize * maxScreenRow; // Altura total da tela (576 px)
 
-    // FOR FULL SCREEN
-    int screenWidth2 = screenWidth;
-    int screenHeight2 = screenHeight;
-    BufferedImage tempScreen;
-    Graphics2D g2;
-    public boolean fullScreenOn = false;
+  // FOR FULL SCREEN
+  int screenWidth2 = screenWidth;
+  int screenHeight2 = screenHeight;
+  BufferedImage tempScreen;
+  Graphics2D g2;
+  public boolean fullScreenOn = false;
 
-    // ==== CONFIGURAÇÕES DO MUNDO ====
-    public final int maxWorldCol = 50; // Quantidade total de colunas no mundo
-    public final int maxWorldRow = 50; // Quantidade total de linhas no mundo
+  // ==== CONFIGURAÇÕES DO MUNDO ====
+  public final int maxWorldCol = 50; // Quantidade total de colunas no mundo
+  public final int maxWorldRow = 50; // Quantidade total de linhas no mundo
 
-    // ==== CONFIGURAÇÃO DE FPS ====
-    int FPS = 60; // Quadros por segundo
+  // ==== CONFIGURAÇÃO DE FPS ====
+  int FPS = 60; // Quadros por segundo
 
-    // ==== COMPONENTES DO JOGO ====
-    TileManager tileM = new TileManager(this); // Gerencia o carregamento e desenho dos tiles
-    public KeyHandler keyH = new KeyHandler(this); // Captura entrada de teclado
-    Sound music = new Sound(); // Gerencia a música do jogo
-    Sound se = new Sound(); // Gerencia os efeitos sonoros do jogo
-    public CollisionChecker cChecker = new CollisionChecker(this); // Verifica colisões entre entidades e tiles
-    public AssetSetter aSetter = new AssetSetter(this); // Configura os objetos do jogo (itens, inimigos, etc.)
-    public UI ui = new UI(this); // Interface do usuário (HUD, mensagens, etc.)
-    public EventHandler eHandler = new EventHandler(this);
-    Thread gameThread; // Thread para rodar o loop do jogo
+  // ==== COMPONENTES DO JOGO ====
+  TileManager tileM = new TileManager(this); // Gerencia o carregamento e desenho dos tiles
+  public KeyHandler keyH = new KeyHandler(this); // Captura entrada de teclado
+  Sound music = new Sound(); // Gerencia a música do jogo
+  Sound se = new Sound(); // Gerencia os efeitos sonoros do jogo
+  public CollisionChecker cChecker = new CollisionChecker(this); // Verifica colisões entre entidades e tiles
+  public AssetSetter aSetter = new AssetSetter(this); // Configura os objetos do jogo (itens, inimigos, etc.)
+  public UI ui = new UI(this); // Interface do usuário (HUD, mensagens, etc.)
+  public EventHandler eHandler = new EventHandler(this);
+  Thread gameThread; // Thread para rodar o loop do jogo
 
-    // ENTITY AND OBJECTS
-    public Player player = new Player(this, keyH); // Jogador principal do jogo
-    public Entity obj[] = new Entity[20]; // Array para armazenar objetos do jogo
-    public Entity npc[] = new Entity[10]; // Array para armazenar NPCs (personagens não jogáveis)
-    public Entity monster[] = new Entity[20];
-    public InteractiveTile iTile[] = new InteractiveTile[50];
-    public ArrayList<Entity> projectileList = new ArrayList<>();
-    public ArrayList<Entity> particleList = new ArrayList<>();
-    ArrayList<Entity> entityList = new ArrayList<>(); // Lista dinâmica para armazenar entidades
+  // ENTITY AND OBJECTS
+  public Player player = new Player(this, keyH); // Jogador principal do jogo
+  public Entity obj[] = new Entity[20]; // Array para armazenar objetos do jogo
+  public Entity npc[] = new Entity[10]; // Array para armazenar NPCs (personagens não jogáveis)
+  public Entity monster[] = new Entity[20];
+  public InteractiveTile iTile[] = new InteractiveTile[50];
+  public ArrayList<Entity> projectileList = new ArrayList<>();
+  public ArrayList<Entity> particleList = new ArrayList<>();
+  ArrayList<Entity> entityList = new ArrayList<>(); // Lista dinâmica para armazenar entidades
 
-    // ==== GAME STATE ====
-    public int gameState; // Estado atual do jogo
-    public final int titleState = 0; // Estado do título (menu inicial)
-    public final int playState = 1; // Estado de jogo (jogando)
-    public final int pauseState = 2; // Estado de pausa
-    public final int dialogueState = 3; // Estado de diálogo (interações com NPCs)
-    public final int characterState = 4; // Estado de status do personagem
-    public final int optionsState = 5; // Estado de opções (configurações do jogo)
+  // ==== GAME STATE ====
+  public int gameState; // Estado atual do jogo
+  public final int titleState = 0; // Estado do título (menu inicial)
+  public final int playState = 1; // Estado de jogo (jogando)
+  public final int pauseState = 2; // Estado de pausa
+  public final int dialogueState = 3; // Estado de diálogo (interações com NPCs)
+  public final int characterState = 4; // Estado de status do personagem
+  public final int optionsState = 5; // Estado de opções (configurações do jogo)
 
-    // ==== CONSTRUTOR ====
-    public GamePanel() {
-        this.setPreferredSize(new Dimension(screenWidth, screenHeight)); // Define tamanho da tela
-        this.setBackground(Color.black); // Cor de fundo
-        this.setDoubleBuffered(true); // Habilita buffer duplo para evitar flickering
+  // ==== CONSTRUTOR ====
+  public GamePanel() {
+    this.setPreferredSize(new Dimension(screenWidth, screenHeight)); // Define tamanho da tela
+    this.setBackground(Color.black); // Cor de fundo
+    this.setDoubleBuffered(true); // Habilita buffer duplo para evitar flickering
 
-        this.addKeyListener(keyH); // Liga o controle de teclado ao painel
-        this.setFocusable(true); // Permite que o painel receba foco do teclado
+    this.addKeyListener(keyH); // Liga o controle de teclado ao painel
+    this.setFocusable(true); // Permite que o painel receba foco do teclado
+  }
+
+  // Prepara e inicializa elementos principais do jogo antes de começar o loop
+  public void setupGame() {
+    // Instancia e posiciona todos os objetos (chaves, portas, baús)
+    aSetter.setObject();
+    aSetter.setNPC();
+    aSetter.setMonster();
+    aSetter.setInteractiveTile();
+
+    gameState = titleState; // Define o estado inicial do jogo como "menu de título"
+
+    tempScreen = new BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_ARGB);
+    g2 = (Graphics2D) tempScreen.getGraphics();
+
+    setFullScreen();
+  }
+
+  public void setFullScreen() {
+
+    // GET LOCAL SCREEN DEVICE
+    GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    GraphicsDevice gd = ge.getDefaultScreenDevice();
+    gd.setFullScreenWindow(Main.window);
+
+    // GET FULL SCREEN WIDTH AND HEIGHT
+    screenWidth2 = Main.window.getWidth();
+    screenHeight2 = Main.window.getHeight();
+  }
+
+  // ==== INICIALIZA A THREAD DO JOGO ====
+  public void startGameThread() {
+    gameThread = new Thread(this); // Cria a thread com o próprio painel como Runnable
+    gameThread.start(); // Inicia o método run() na thread
+  }
+
+  // ==== LOOP PRINCIPAL DO JOGO ====
+  @Override
+  public void run() {
+
+    // Controla o tempo entre os frames com base no FPS
+    double drawInterval = 1000000000.0 / FPS; // Tempo alvo entre cada frame (em nanossegundos)
+    double delta = 0;
+    long lastTime = System.nanoTime(); // Marca o tempo do frame anterior
+    long currentTime;
+    long timer = 0;
+    int drawCount = 0;
+
+    while (gameThread != null) {
+      currentTime = System.nanoTime();
+
+      delta += (currentTime - lastTime) / drawInterval;
+      timer += (currentTime - lastTime);
+      lastTime = currentTime;
+
+      if (delta >= 1) {
+        update(); // Atualiza lógica do jogo (movimento, eventos, etc.)
+        drawToTempScreen(); // Desenha o jogo na tela temporária
+        drawToScreen(); // Desenha a tela temporária na tela real
+        delta--;
+        drawCount++;
+      }
+
+      // A cada segundo, mostra o FPS no console e reinicia o contador
+      if (timer >= 1000000000) {
+        System.out.println("FPS: " + drawCount);
+        drawCount = 0;
+        timer = 0;
+      }
     }
+  }
 
-    // Prepara e inicializa elementos principais do jogo antes de começar o loop
-    public void setupGame() {
-        // Instancia e posiciona todos os objetos (chaves, portas, baús)
-        aSetter.setObject();
-        aSetter.setNPC();
-        aSetter.setMonster();
-        aSetter.setInteractiveTile();
+  // ==== ATUALIZA A LÓGICA DO JOGO ====
+  public void update() {
 
-        gameState = titleState; // Define o estado inicial do jogo como "menu de título"
+    // Verifica se o jogo está em estado de "jogando" (ativo)
+    if (gameState == playState) {
 
-        tempScreen = new BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_ARGB);
-        g2 = (Graphics2D) tempScreen.getGraphics();
+      player.update(); // Atualiza o jogador: movimentação, colisões, animações etc.
 
-        setFullScreen();
-    }
-
-    public void setFullScreen() {
-
-        // GET LOCAL SCREEN DEVICE
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice gd = ge.getDefaultScreenDevice();
-        gd.setFullScreenWindow(Main.window);
-
-        // GET FULL SCREEN WIDTH AND HEIGHT
-        screenWidth2 = Main.window.getWidth();
-        screenHeight2 = Main.window.getHeight();
-    }
-
-    // ==== INICIALIZA A THREAD DO JOGO ====
-    public void startGameThread() {
-        gameThread = new Thread(this); // Cria a thread com o próprio painel como Runnable
-        gameThread.start(); // Inicia o método run() na thread
-    }
-
-    // ==== LOOP PRINCIPAL DO JOGO ====
-    @Override
-    public void run() {
-
-        // Controla o tempo entre os frames com base no FPS
-        double drawInterval = 1000000000.0 / FPS; // Tempo alvo entre cada frame (em nanossegundos)
-        double delta = 0;
-        long lastTime = System.nanoTime(); // Marca o tempo do frame anterior
-        long currentTime;
-        long timer = 0;
-        int drawCount = 0;
-
-        while (gameThread != null) {
-            currentTime = System.nanoTime();
-
-            delta += (currentTime - lastTime) / drawInterval;
-            timer += (currentTime - lastTime);
-            lastTime = currentTime;
-
-            if (delta >= 1) {
-                update(); // Atualiza lógica do jogo (movimento, eventos, etc.)
-                drawToTempScreen(); // Desenha o jogo na tela temporária
-                drawToScreen(); // Desenha a tela temporária na tela real
-                delta--;
-                drawCount++;
-            }
-
-            // A cada segundo, mostra o FPS no console e reinicia o contador
-            if (timer >= 1000000000) {
-                System.out.println("FPS: " + drawCount);
-                drawCount = 0;
-                timer = 0;
-            }
+      // Atualiza todos os NPCs que estão ativos no mapa
+      for (int i = 0; i < npc.length; i++) {
+        if (npc[i] != null) {
+          npc[i].update(); // Executa a lógica do NPC (movimento aleatório, animação, ações)
         }
-    }
+      }
 
-    // ==== ATUALIZA A LÓGICA DO JOGO ====
-    public void update() {
+      for (int i = 0; i < monster.length; i++) {
+        if (monster[i] != null) {
+          if (monster[i].alive == true && monster[i].dying == false) {
+            monster[i].update();
+          }
 
-        // Verifica se o jogo está em estado de "jogando" (ativo)
-        if (gameState == playState) {
-
-            player.update(); // Atualiza o jogador: movimentação, colisões, animações etc.
-
-            // Atualiza todos os NPCs que estão ativos no mapa
-            for (int i = 0; i < npc.length; i++) {
-                if (npc[i] != null) {
-                    npc[i].update(); // Executa a lógica do NPC (movimento aleatório, animação, ações)
-                }
-            }
-
-            for (int i = 0; i < monster.length; i++) {
-                if (monster[i] != null) {
-                    if (monster[i].alive == true && monster[i].dying == false) {
-                        monster[i].update();
-                    }
-
-                    if (monster[i].alive == false) {
-                        monster[i].checkDrop();
-                        monster[i] = null;
-                    }
-                }
-            }
-
-            for (int i = 0; i < projectileList.size(); i++) {
-                if (projectileList.get(i) != null) {
-                    if (projectileList.get(i).alive == true) {
-                        projectileList.get(i).update();
-                    }
-
-                    if (projectileList.get(i).alive == false) {
-                        projectileList.remove(i);
-                    }
-                }
-            }
-
-            for (int i = 0; i < particleList.size(); i++) {
-                if (particleList.get(i) != null) {
-                    if (particleList.get(i).alive == true) {
-                        particleList.get(i).update();
-                    }
-
-                    if (particleList.get(i).alive == false) {
-                        particleList.remove(i);
-                    }
-                }
-            }
-
-            for (int i = 0; i < iTile.length; i++) {
-                if (iTile[i] != null) {
-                    iTile[i].update();
-                }
-            }
+          if (monster[i].alive == false) {
+            monster[i].checkDrop();
+            monster[i] = null;
+          }
         }
+      }
 
-        // Se o jogo estiver pausado, essa parte é executada
-        if (gameState == pauseState) {
-            // Lógica para quando o jogo estiver em pausa
-            // Ex: animações leves, música ambiente, overlays de menu — se desejar
-            // implementar
+      for (int i = 0; i < projectileList.size(); i++) {
+        if (projectileList.get(i) != null) {
+          if (projectileList.get(i).alive == true) {
+            projectileList.get(i).update();
+          }
+
+          if (projectileList.get(i).alive == false) {
+            projectileList.remove(i);
+          }
         }
-    }
+      }
 
-    public void drawToTempScreen() {
+      for (int i = 0; i < particleList.size(); i++) {
+        if (particleList.get(i) != null) {
+          if (particleList.get(i).alive == true) {
+            particleList.get(i).update();
+          }
 
-        // DEBUG
-        long drawStart = 0;
-        if (keyH.showDebugText == true) {
-            drawStart = System.nanoTime();
+          if (particleList.get(i).alive == false) {
+            particleList.remove(i);
+          }
         }
+      }
 
-        // Tela de título (menu inicial)
-        if (gameState == titleState) {
-            ui.draw(g2);
+      for (int i = 0; i < iTile.length; i++) {
+        if (iTile[i] != null) {
+          iTile[i].update();
         }
+      }
+    }
 
-        // OTHERS
-        else {
-            // TILE
-            tileM.draw(g2);
+    // Se o jogo estiver pausado, essa parte é executada
+    if (gameState == pauseState) {
+      // Lógica para quando o jogo estiver em pausa
+      // Ex: animações leves, música ambiente, overlays de menu — se desejar
+      // implementar
+    }
+  }
 
-            // INTERACTIVE TILES
-            for (int i = 0; i < iTile.length; i++) {
-                if (iTile[i] != null) {
-                    iTile[i].draw(g2);
-                }
-            }
+  public void drawToTempScreen() {
 
-            // ADD ENTITIES TO THE LIST
-            entityList.add(player);
+    // DEBUG
+    long drawStart = 0;
+    if (keyH.showDebugText == true) {
+      drawStart = System.nanoTime();
+    }
 
-            for (int i = 0; i < npc.length; i++) {
-                if (npc[i] != null) {
-                    entityList.add(npc[i]);
-                }
-            }
+    // Tela de título (menu inicial)
+    if (gameState == titleState) {
+      ui.draw(g2);
+    }
 
-            for (int i = 0; i < obj.length; i++) {
-                if (obj[i] != null) {
-                    entityList.add(obj[i]);
-                }
-            }
+    // OTHERS
+    else {
+      // TILE
+      tileM.draw(g2);
 
-            for (int i = 0; i < monster.length; i++) {
-                if (monster[i] != null) {
-                    entityList.add(monster[i]);
-                }
-            }
-
-            for (int i = 0; i < projectileList.size(); i++) {
-                if (projectileList.get(i) != null) {
-                    entityList.add(projectileList.get(i));
-                }
-            }
-
-            for (int i = 0; i < particleList.size(); i++) {
-                if (particleList.get(i) != null) {
-                    entityList.add(particleList.get(i));
-                }
-            }
-
-            // SORT
-            Collections.sort(entityList, new Comparator<Entity>() {
-
-                @Override
-                public int compare(Entity e1, Entity e2) {
-
-                    int result = Integer.compare(e1.worldY, e2.worldY);
-                    return result;
-                }
-            });
-
-            for (int i = 0; i < entityList.size(); i++) {
-                entityList.get(i).draw(g2); // Desenha cada entidade na lista
-            }
-
-            entityList.clear();
-
-            // UI
-            ui.draw(g2);
+      // INTERACTIVE TILES
+      for (int i = 0; i < iTile.length; i++) {
+        if (iTile[i] != null) {
+          iTile[i].draw(g2);
         }
+      }
 
-        // DEBUG
-        if (keyH.showDebugText == true) {
-            long drawEnd = System.nanoTime();
-            long passed = drawEnd - drawStart;
+      // ADD ENTITIES TO THE LIST
+      entityList.add(player);
 
-            g2.setFont(new Font("Arial", Font.PLAIN, 20));
-            g2.setColor(Color.white);
-            int x = 10;
-            int y = 400;
-            int lineHeight = 20;
-
-            g2.drawString("WorldX " + player.worldX, x, y);
-            y += lineHeight;
-            g2.drawString("WorldY " + player.worldY, x, y);
-            y += lineHeight;
-            g2.drawString("Col " + (player.worldX + player.solidArea.x) / tileSize, x, y);
-            y += lineHeight;
-            g2.drawString("Row " + (player.worldY + player.solidArea.y) / tileSize, x, y);
-            y += lineHeight;
-            g2.drawString("Draw Time: " + passed, x, y);
+      for (int i = 0; i < npc.length; i++) {
+        if (npc[i] != null) {
+          entityList.add(npc[i]);
         }
+      }
+
+      for (int i = 0; i < obj.length; i++) {
+        if (obj[i] != null) {
+          entityList.add(obj[i]);
+        }
+      }
+
+      for (int i = 0; i < monster.length; i++) {
+        if (monster[i] != null) {
+          entityList.add(monster[i]);
+        }
+      }
+
+      for (int i = 0; i < projectileList.size(); i++) {
+        if (projectileList.get(i) != null) {
+          entityList.add(projectileList.get(i));
+        }
+      }
+
+      for (int i = 0; i < particleList.size(); i++) {
+        if (particleList.get(i) != null) {
+          entityList.add(particleList.get(i));
+        }
+      }
+
+      // SORT
+      Collections.sort(entityList, new Comparator<Entity>() {
+
+        @Override
+        public int compare(Entity e1, Entity e2) {
+
+          int result = Integer.compare(e1.worldY, e2.worldY);
+          return result;
+        }
+      });
+
+      for (int i = 0; i < entityList.size(); i++) {
+        entityList.get(i).draw(g2); // Desenha cada entidade na lista
+      }
+
+      entityList.clear();
+
+      // UI
+      ui.draw(g2);
     }
 
-    public void drawToScreen() {
+    // DEBUG
+    if (keyH.showDebugText == true) {
+      long drawEnd = System.nanoTime();
+      long passed = drawEnd - drawStart;
 
-        Graphics g = getGraphics();
-        g.drawImage(tempScreen, 0, 0, screenWidth2, screenHeight2, null);
-        g.dispose();
+      g2.setFont(new Font("Arial", Font.PLAIN, 20));
+      g2.setColor(Color.white);
+      int x = 10;
+      int y = 400;
+      int lineHeight = 20;
+
+      g2.drawString("WorldX " + player.worldX, x, y);
+      y += lineHeight;
+      g2.drawString("WorldY " + player.worldY, x, y);
+      y += lineHeight;
+      g2.drawString("Col " + (player.worldX + player.solidArea.x) / tileSize, x, y);
+      y += lineHeight;
+      g2.drawString("Row " + (player.worldY + player.solidArea.y) / tileSize, x, y);
+      y += lineHeight;
+      g2.drawString("Draw Time: " + passed, x, y);
     }
+  }
 
-    public void playMusic(int index) {
+  public void drawToScreen() {
 
-        music.setFile(index); // Define o arquivo de som a ser tocado
-        music.play(); // Toca o som
-        music.loop(); // Reproduz em loop até ser parado
-    }
+    Graphics g = getGraphics();
+    g.drawImage(tempScreen, 0, 0, screenWidth2, screenHeight2, null);
+    g.dispose();
+  }
 
-    public void stopMusic() {
+  public void playMusic(int index) {
 
-        music.stop(); // Para a música atual
-    }
+    music.setFile(index); // Define o arquivo de som a ser tocado
+    music.play(); // Toca o som
+    music.loop(); // Reproduz em loop até ser parado
+  }
 
-    public void playSE(int index) {
+  public void stopMusic() {
 
-        se.setFile(index); // Define o arquivo de efeito sonoro
-        se.play(); // Toca o efeito sonoro
-    }
+    music.stop(); // Para a música atual
+  }
+
+  public void playSE(int index) {
+
+    se.setFile(index); // Define o arquivo de efeito sonoro
+    se.play(); // Toca o efeito sonoro
+  }
 }
