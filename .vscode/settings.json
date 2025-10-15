@@ -1,7 +1,17 @@
 {
+    // Java
     "java.project.sourcePaths": [
         "src",
         "resource"
     ],
-    "java.project.outputPath": "bin"
+    "java.configuration.updateBuildConfiguration": "automatic",
+    // Formatação/arquivos (boas práticas multiplataforma)
+    "files.encoding": "utf8",
+    "files.eol": "\n",
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true,
+    // Git (coerente com o que você já usa)
+    "git.enableSmartCommit": true,
+    "git.confirmSync": false
 }
