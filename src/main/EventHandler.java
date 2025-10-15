@@ -99,14 +99,23 @@ public class EventHandler {
   }
 
   public void healingPool(int col, int row, int gameState) {
+    if (gp.keyH.enterPressed) {
+      gp.keyH.enterPressed = false;
 
-    if (gp.keyH.enterPressed == true) {
       gp.gameState = gameState;
       gp.player.attackCanceled = true;
+
       gp.playSE(2);
+
+      // Mostra texto
       gp.ui.currentDialogue = "Você bebe a água.\nSua vida e mana foi restaurada.";
+
+      // Efeito
       gp.player.life = gp.player.maxLife;
       gp.player.mana = gp.player.maxMana;
+
+      canTouchEvent = false;
+
       gp.aSetter.setMonster();
     }
   }

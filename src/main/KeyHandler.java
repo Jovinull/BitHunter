@@ -132,6 +132,14 @@ public class KeyHandler implements KeyListener {
         // Ex.: setar classe no player antes de iniciar
         // gp.player.setClazzByIndex(gp.ui.commandNum);
 
+        // Somente inicia o jogo se NÃO for "Voltar" (índice 3)
+        if (gp.ui.commandNum == 3) {
+          // Volta para o menu principal
+          gp.ui.titleScreenState = 0;
+          gp.ui.commandNum = 0;
+          return;
+        }
+
         gp.gameState = gp.playState;
         gp.playMusic(0);
       }

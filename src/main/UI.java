@@ -1,18 +1,11 @@
 package main;
 
-import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Graphics2D;
-import java.awt.LinearGradientPaint;
-import java.awt.MultipleGradientPaint.CycleMethod;
-import java.awt.RadialGradientPaint;
 import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.font.GlyphVector;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,10 +17,15 @@ import object.OBJ_ManaCrystal;
 
 public class UI {
 
-  GamePanel gp; // Referência ao painel principal do jogo
-  Graphics2D g2; // Contexto gráfico
-  Font maruMonica, purisaB; // Fontes
-  BufferedImage heart_full, heart_half, heart_blank, crystal_full, crystal_blank; // Imagens de coração
+  // --- Referências do jogo ---
+  GamePanel gp;
+  Graphics2D g2;
+
+  // --- Fontes & HUD ---
+  Font maruMonica, purisaB;
+  BufferedImage heart_full, heart_half, heart_blank, crystal_full, crystal_blank;
+
+  // --- Estado de UI ---
   public boolean messageOn = false;
   ArrayList<String> message = new ArrayList<>();
   ArrayList<Integer> messageCounter = new ArrayList<>();
@@ -39,92 +37,93 @@ public class UI {
   public int slotRow = 0;
   int subState = 0;
 
-  // Paleta temática (escura/épica)
-  private final Color COL_BG_DARK_1 = new Color(16, 18, 26); // #10121A (base fria, quase azul-grafite)
-  private final Color COL_BG_DARK_2 = new Color(28, 20, 18); // #1C1412 (base quente, marrom-âmbar profundo)
+  // --- Paleta simples (sólida, leve) ---
+  private static final Color COL_BG = new Color(18, 18, 22); // fundo geral
+  private static final Color COL_PANEL = new Color(34, 34, 42); // janelas
+  private static final Color COL_PANEL_BORDER = new Color(90, 90, 110);
+  private static final Color COL_ACCENT = new Color(220, 200, 120); // destaque
+  private static final Color COL_TEXT = new Color(235, 235, 235);
+  private static final Color COL_TEXT_DIM = new Color(200, 200, 210);
+  private static final Color COL_HIGHLIGHT_BG = new Color(60, 60, 75); // seleção simples
 
-  private final Color COL_GOLD_LIGHT = new Color(196, 168, 112); // #C4A870 (ouro claro mais “envelhecido”)
-  private final Color COL_GOLD = new Color(170, 128, 64); // #AA8040 (bronze/ouro fosco)
-  private final Color COL_GOLD_DARK = new Color(112, 84, 36); // #705424 (bronze escuro)
-
-  private final Color COL_BORDER_SOFT = new Color(210, 190, 150, 200); // #D2BE96 CC (borda clara, menos gritante que
-                                                                       // branco)
-  private final Color COL_PARCHMENT_1 = new Color(210, 198, 170, 220); // #D2C6AA DC (pergaminho mais escuro)
-  private final Color COL_PARCHMENT_2 = new Color(185, 170, 135, 220); // #B9AA87 DC (pergaminho de contraste)
-
-  // Ajuste fino: subir o fundo da seleção (sem mudar tamanho)
-  private static final float MENU_PILL_TOP_FACTOR = 0.90f; // antes 0.75f
+  // Altura de linha padrão de menus
+  private static final int MENU_LINE = 48;
 
   public UI(GamePanel gp) {
     this.gp = gp;
 
     try {
       InputStream is = getClass().getResourceAsStream("/font/x12y16pxMaruMonica.ttf");
-      maruMonica = Font.createFont(Font.TRUETYPE_FONT, is);
+      if (is != null)
+        maruMonica = Font.createFont(Font.TRUETYPE_FONT, is);
       is = getClass().getResourceAsStream("/font/Purisa Bold.ttf");
-      purisaB = Font.createFont(Font.TRUETYPE_FONT, is);
-    } catch (FontFormatException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
+      if (is != null)
+        purisaB = Font.createFont(Font.TRUETYPE_FONT, is);
+    } catch (FontFormatException | IOException e) {
+      // Se der ruim, mantém a fonte padrão do sistema
     }
 
-    // Criando HUD
+    // HUD
     Entity heart = new OBJ_Heart(gp);
     heart_full = heart.image;
     heart_half = heart.image2;
     heart_blank = heart.image3;
+
     Entity crystal = new OBJ_ManaCrystal(gp);
     crystal_full = crystal.image;
     crystal_blank = crystal.image2;
   }
 
-  // Exibe uma mensagem temporária (ex.: "Porta destrancada!")
+  // --- Mensagens temporárias ---
   public void addMessage(String text) {
-
     message.add(text);
     messageCounter.add(0);
   }
 
-  // Desenho principal
+  // --- Entrypoint de desenho ---
   public void draw(Graphics2D g2) {
     this.g2 = g2;
 
-    // Suavizações
+    // Antialias só para texto (barato o suficiente e melhora legibilidade)
     g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
     // Fonte base
-    g2.setFont(maruMonica != null ? maruMonica : g2.getFont());
-    g2.setColor(Color.white);
+    if (maruMonica != null)
+      g2.setFont(maruMonica.deriveFont(Font.PLAIN, 24f));
+    g2.setColor(COL_TEXT);
 
-    // Telas
     if (gp.gameState == gp.titleState) {
       drawTitleScreen();
+      return;
     }
 
     if (gp.gameState == gp.playState) {
       drawPlayerLife();
       drawMessage();
+      return;
     }
 
     if (gp.gameState == gp.pauseState) {
       drawPlayerLife();
       drawPauseScreen();
+      return;
     }
 
     if (gp.gameState == gp.dialogueState) {
       drawPlayerLife();
       drawDialogueScreen();
+      return;
     }
 
     if (gp.gameState == gp.characterState) {
       drawCharacterScreen();
       drawInventory();
+      return;
     }
 
     if (gp.gameState == gp.optionsState) {
       drawOptionsScreen();
+      return;
     }
 
     if (gp.gameState == gp.gameOverState) {
@@ -132,25 +131,26 @@ public class UI {
     }
   }
 
+  // --- HUD: Vida & Mana ---
   public void drawPlayerLife() {
 
     int x = gp.tileSize / 2;
     int y = gp.tileSize / 2;
     int i = 0;
 
-    // DRAW MAX LIFE
+    // Max life (vazio)
     while (i < gp.player.maxLife / 2) {
       g2.drawImage(heart_blank, x, y, null);
       i++;
       x += gp.tileSize;
     }
 
-    // RESET
+    // Reset
     x = gp.tileSize / 2;
     y = gp.tileSize / 2;
     i = 0;
 
-    // DRAW CURRENT LIFE
+    // Vida atual
     while (i < gp.player.life) {
       g2.drawImage(heart_half, x, y, null);
       i++;
@@ -161,18 +161,17 @@ public class UI {
       x += gp.tileSize;
     }
 
-    // DRAW MAX MANA
+    // Mana (vazio)
     x = (gp.tileSize / 2) - 5;
     y = (int) (gp.tileSize * 1.5);
     i = 0;
-
     while (i < gp.player.maxMana) {
       g2.drawImage(crystal_blank, x, y, null);
       i++;
       x += 35;
     }
 
-    // DRAW MANA
+    // Mana atual
     x = (gp.tileSize / 2) - 5;
     y = (int) (gp.tileSize * 1.5);
     i = 0;
@@ -183,108 +182,100 @@ public class UI {
     }
   }
 
+  // --- Mensagens flutuantes ---
   public void drawMessage() {
-
     int messageX = gp.tileSize;
     int messageY = gp.tileSize * 4;
-    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32F));
+
+    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 28F));
 
     for (int i = 0; i < message.size(); i++) {
-
-      if (message.get(i) != null) {
-
+      String m = message.get(i);
+      if (m != null) {
+        // sombra simples
         g2.setColor(Color.black);
-        g2.drawString(message.get(i), messageX + 2, messageY + 2);
+        g2.drawString(m, messageX + 2, messageY + 2);
+        // texto
+        g2.setColor(COL_TEXT);
+        g2.drawString(m, messageX, messageY);
 
-        g2.setColor(Color.white);
-        g2.drawString(message.get(i), messageX, messageY);
-
-        int counter = messageCounter.get(i) + 1; // messageCounter++
-        messageCounter.set(i, counter); // set the counter to the array
-        messageY += 50;
+        int counter = messageCounter.get(i) + 1;
+        messageCounter.set(i, counter);
+        messageY += 40;
 
         if (messageCounter.get(i) > 180) {
           message.remove(i);
           messageCounter.remove(i);
+          i--;
         }
       }
     }
   }
 
-  // ---------- TITLE SCREEN ----------
+  // --- Título ---
   public void drawTitleScreen() {
-    // Fundo com gradiente e vinheta
-    drawEpicBackground();
+    // fundo sólido leve
+    g2.setColor(COL_BG);
+    g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
 
     if (titleScreenState == 0) {
-      // Título
-      g2.setFont((purisaB != null ? purisaB : g2.getFont()).deriveFont(Font.BOLD, 96F));
+      // --- TELA 0: menu principal ---
+      if (purisaB != null)
+        g2.setFont(purisaB.deriveFont(Font.BOLD, 92F));
       String text = "Bit Hunter";
       int y = gp.tileSize * 3;
-      drawGoldTitleCentered(text, y);
+      drawTextShadowCentered(text, y, COL_TEXT, Color.black, 3);
 
-      // Personagem principal
       int xImg = gp.screenWidth / 2 - (gp.tileSize * 2) / 2;
       int yImg = y + gp.tileSize * 2;
-      g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.95f));
       g2.drawImage(gp.player.down1, xImg, yImg, gp.tileSize * 2, gp.tileSize * 2, null);
-      g2.setComposite(AlphaComposite.SrcOver);
 
-      // Menu
-      g2.setFont((purisaB != null ? purisaB : g2.getFont()).deriveFont(Font.BOLD, 44F));
-      int yMenu = yImg + (int) (gp.tileSize * 3.5);
+      if (purisaB != null)
+        g2.setFont(purisaB.deriveFont(Font.BOLD, 42F));
+      int yMenuStart = yImg + (int) (gp.tileSize * 3.2);
+      drawMenuItem("NOVO JOGO", yMenuStart, commandNum == 0);
+      drawMenuItem("CARREGAR JOGO", yMenuStart + MENU_LINE, commandNum == 1);
+      drawMenuItem("SAIR", yMenuStart + MENU_LINE * 2, commandNum == 2);
 
-      drawMenuItem("NOVO JOGO", yMenu, commandNum == 0);
-      drawMenuItem("CARREGAR JOGO", yMenu + gp.tileSize, commandNum == 1);
-      drawMenuItem("SAIR", yMenu + gp.tileSize * 2, commandNum == 2);
+      if (maruMonica != null)
+        g2.setFont(maruMonica.deriveFont(Font.PLAIN, 22F));
+      String hint = "W/S ou ↑/↓ navegam • ENTER confirma";
+      drawTextShadowCentered(hint, gp.screenHeight - gp.tileSize, COL_TEXT_DIM, Color.black, 2);
+      return; // <-- ENCERRA AQUI
+    }
 
-      // Dica no rodapé
-      g2.setFont((maruMonica != null ? maruMonica : g2.getFont()).deriveFont(Font.PLAIN, 18F));
-      String hint = "Use W/S ou ↑/↓ para navegar • ENTER para confirmar";
-      int xHint = getXforCenteredText(hint);
-      int yHint = gp.screenHeight - gp.tileSize;
-      drawTextWithShadow(hint, xHint, yHint, new Color(230, 230, 230), new Color(0, 0, 0, 140), 2);
-    } else if (titleScreenState == 1) {
-      // Seleção de classe
-      g2.setFont((purisaB != null ? purisaB : g2.getFont()).deriveFont(42F));
-      String text = "Selecione sua classe!";
-      int y = gp.tileSize * 3;
-      drawTextWithOutlineCentered(text, y, new Color(240, 235, 220), new Color(0, 0, 0, 170), 2.2f);
+    if (titleScreenState == 1) {
+      // --- TELA 1: seleção de classe (modal) ---
+      drawSubWindowCenter(gp.tileSize * 10, gp.tileSize * 8);
+      int cy = gp.screenHeight / 2 - gp.tileSize;
+      if (purisaB != null)
+        g2.setFont(purisaB.deriveFont(Font.BOLD, 36F));
+      drawTextShadowCentered("Selecione sua classe", cy - MENU_LINE, COL_TEXT, Color.black, 2);
 
-      int yStart = y + gp.tileSize * 3;
-
-      drawMenuItem("Guerreiro", yStart, commandNum == 0);
-      drawMenuItem("Ladrão", yStart + gp.tileSize, commandNum == 1);
-      drawMenuItem("Feiticeiro", yStart + gp.tileSize * 2, commandNum == 2);
-
-      drawMenuItem("Voltar", yStart + gp.tileSize * 4, commandNum == 3);
+      drawMenuItem("Guerreiro", cy, commandNum == 0);
+      drawMenuItem("Ladrão", cy + MENU_LINE, commandNum == 1);
+      drawMenuItem("Feiticeiro", cy + MENU_LINE * 2, commandNum == 2);
+      drawMenuItem("Voltar", cy + MENU_LINE * 4, commandNum == 3);
+      return;
     }
   }
 
-  // ---------- PAUSE ----------
+  // --- Pause ---
   public void drawPauseScreen() {
-    // Sobreposição escura
-    g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.55f));
-    g2.setColor(Color.black);
-    g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
-    g2.setComposite(AlphaComposite.SrcOver);
-
-    // Caixa central
+    // painel central
     int w = (int) (gp.screenWidth * 0.6);
     int h = gp.tileSize * 4;
     int x = (gp.screenWidth - w) / 2;
     int y = (gp.screenHeight - h) / 2;
     drawSubWindow(x, y, w, h);
 
-    // Texto
-    g2.setFont((purisaB != null ? purisaB : g2.getFont()).deriveFont(Font.PLAIN, 80F));
+    if (purisaB != null)
+      g2.setFont(purisaB.deriveFont(Font.PLAIN, 72F));
     String text = "PAUSADO";
-    int tx = getXforCenteredText(text);
-    int ty = y + (int) (h * 0.62);
-    drawTextWithOutline(text, tx, ty, COL_GOLD_LIGHT, new Color(0, 0, 0, 180), 3.2f);
+    drawTextShadowCentered(text, y + (int) (h * 0.62), COL_TEXT, Color.black, 3);
   }
 
-  // ---------- DIALOGUE ----------
+  // --- Diálogo ---
   public void drawDialogueScreen() {
     int x = gp.tileSize * 2;
     int y = gp.tileSize / 2;
@@ -293,39 +284,42 @@ public class UI {
 
     drawSubWindow(x, y, width, height);
 
-    g2.setFont((maruMonica != null ? maruMonica : g2.getFont()).deriveFont(Font.BOLD, 27F));
+    if (maruMonica != null)
+      g2.setFont(maruMonica.deriveFont(Font.BOLD, 26F));
     int innerX = x + gp.tileSize;
     int innerY = y + gp.tileSize;
 
+    g2.setColor(COL_TEXT);
     for (String line : currentDialogue.split("\n")) {
-      drawTextWithShadow(line, innerX, innerY, new Color(35, 25, 10), new Color(255, 255, 255, 60), 1);
-      innerY += 40;
+      // sombra leve de 1px
+      g2.setColor(Color.black);
+      g2.drawString(line, innerX + 1, innerY + 1);
+      g2.setColor(COL_TEXT);
+      g2.drawString(line, innerX, innerY);
+      innerY += 32;
     }
   }
 
+  // --- Inventário ---
   public void drawInventory() {
-
-    // FRAME
     int frameX = gp.tileSize * 12;
     int frameY = gp.tileSize;
     int frameWidth = gp.tileSize * 6;
     int frameHeight = gp.tileSize * 5;
     drawSubWindow(frameX, frameY, frameWidth, frameHeight);
 
-    // SLOT
     final int slotXstart = frameX + 20;
     final int slotYstart = frameY + 20;
     int slotX = slotXstart;
     int slotY = slotYstart;
     int slotSize = gp.tileSize + 3;
 
-    // DRAW PLAYER'S ITEMS
     for (int i = 0; i < gp.player.inventory.size(); i++) {
 
       if (gp.player.inventory.get(i) == gp.player.currentWeapon ||
           gp.player.inventory.get(i) == gp.player.currentShield) {
-        g2.setColor(new Color(240, 190, 90));
-        g2.fillRoundRect(slotX, slotY, gp.tileSize, gp.tileSize, 10, 10);
+        g2.setColor(COL_ACCENT);
+        g2.fillRoundRect(slotX, slotY, gp.tileSize, gp.tileSize, 8, 8);
       }
 
       g2.drawImage(gp.player.inventory.get(i).down1, slotX, slotY, null);
@@ -338,89 +332,61 @@ public class UI {
       }
     }
 
-    // CURSOR
+    // Cursor
     int cursorX = slotXstart + (slotSize * slotCol);
     int cursorY = slotYstart + (slotSize * slotRow);
     int cursorWidth = gp.tileSize;
     int cursorHeight = gp.tileSize;
 
-    // DRAW CURSOR
-    g2.setColor(Color.white);
+    g2.setColor(COL_TEXT);
     g2.setStroke(new BasicStroke(3));
-    g2.drawRoundRect(cursorX, cursorY, cursorWidth, cursorHeight, 10, 10);
+    g2.drawRoundRect(cursorX, cursorY, cursorWidth, cursorHeight, 8, 8);
 
-    // DESCRIPTION FRAME
+    // Descrição
     int dFrameX = frameX;
     int dFrameY = frameY + frameHeight;
     int dFrameWidth = frameWidth;
     int dFrameHeight = gp.tileSize * 3;
 
     int itemIndex = getItemIndexOnSlot();
-
     if (itemIndex < gp.player.inventory.size()) {
-
       drawSubWindow(dFrameX, dFrameY, dFrameWidth, dFrameHeight);
 
-      // DRAW DESCRIPTION TEXT
       int textX = dFrameX + 20;
       int textY = dFrameY + gp.tileSize;
-      g2.setColor(Color.white);
-      g2.setFont(g2.getFont().deriveFont(28F));
+      g2.setColor(COL_TEXT);
+      g2.setFont(g2.getFont().deriveFont(26F));
 
       for (String line : gp.player.inventory.get(itemIndex).description.split("\n")) {
-
         g2.drawString(line, textX, textY);
-        textY += 32;
+        textY += 28;
       }
     }
   }
 
+  // --- Game Over ---
   public void drawGameOverScreen() {
-
-    g2.setColor(new Color(0, 0, 0, 150));
+    // fundo escurecido leve
+    g2.setColor(new Color(0, 0, 0, 140));
     g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
 
-    int x;
-    int y;
-    String text;
-    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 110f));
+    if (purisaB != null)
+      g2.setFont(purisaB.deriveFont(Font.BOLD, 96f));
+    String text = "GAME OVER";
+    drawTextShadowCentered(text, gp.tileSize * 4, COL_TEXT, Color.black, 4);
 
-    text = "GAME OVER";
-    // Shadow
-    g2.setColor(Color.black);
-    x = getXforCenteredText(text);
-    y = gp.tileSize * 4;
-    g2.drawString(text, x + 5, y + 5);
-    // Main
-    g2.setColor(Color.white);
-    g2.drawString(text, x - 4, y - 4);
+    g2.setFont(g2.getFont().deriveFont(44f));
+    int y = gp.tileSize * 8;
 
-    // Retry
-    g2.setFont(g2.getFont().deriveFont(50f));
-    text = "Retry";
-    x = getXforCenteredText(text);
-    y += gp.tileSize * 4;
-    g2.drawString(text, x, y);
-    if (commandNum == 0) {
-      g2.drawString(">", x - 40, y);
-    }
-
-    // Back to the little screen
-    text = "Quit";
-    x = getXforCenteredText(text);
-    y += 55;
-    g2.drawString(text, x, y);
-    if (commandNum == 1) {
-      g2.drawString(">", x - 40, y);
-    }
+    drawMenuItem("Retry", y, commandNum == 0);
+    drawMenuItem("Quit", y + MENU_LINE, commandNum == 1);
   }
 
+  // --- Opções ---
   public void drawOptionsScreen() {
+    g2.setColor(COL_TEXT);
+    g2.setFont(g2.getFont().deriveFont(30F));
 
-    g2.setColor(Color.white);
-    g2.setFont(g2.getFont().deriveFont(32F));
-
-    // SUB WINDOW
     int frameX = gp.tileSize * 6;
     int frameY = gp.tileSize;
     int frameWidth = gp.tileSize * 8;
@@ -428,46 +394,33 @@ public class UI {
     drawSubWindow(frameX, frameY, frameWidth, frameHeight);
 
     switch (subState) {
-      case 0:
-        options_top(frameX, frameY);
-        break;
-      case 1:
-        options_fullScreenNotification(frameX, frameY);
-        break;
-      case 2:
-        options_control(frameX, frameY);
-        break;
-      case 3:
-        options_endGameConfirmation(frameX, frameY);
-        break;
+      case 0 -> options_top(frameX, frameY);
+      case 1 -> options_fullScreenNotification(frameX, frameY);
+      case 2 -> options_control(frameX, frameY);
+      case 3 -> options_endGameConfirmation(frameX, frameY);
     }
 
     gp.keyH.enterPressed = false;
   }
 
   public void options_top(int frameX, int frameY) {
-
     int textX;
     int textY;
 
-    // TITLE
     String text = "Options";
     textX = getXforCenteredText(text);
     textY = frameY + gp.tileSize;
-    g2.drawString(text, textX, textY);
+    drawTextShadow(text, textX, textY, COL_TEXT, Color.black, 2);
 
-    // FULL SCREEN ON/OFF
+    // FULL SCREEN
     textX = frameX + gp.tileSize;
     textY = frameY + gp.tileSize * 2;
+    g2.setColor(COL_TEXT);
     g2.drawString("Full Screen", textX, textY);
     if (commandNum == 0) {
       g2.drawString(">", textX - 25, textY);
       if (gp.keyH.enterPressed == true) {
-        if (gp.fullScreenOn == false) {
-          gp.fullScreenOn = true;
-        } else if (gp.fullScreenOn == true) {
-          gp.fullScreenOn = false;
-        }
+        gp.fullScreenOn = !gp.fullScreenOn;
         subState = 1;
       }
     }
@@ -475,16 +428,14 @@ public class UI {
     // MUSIC
     textY += gp.tileSize;
     g2.drawString("Music", textX, textY);
-    if (commandNum == 1) {
+    if (commandNum == 1)
       g2.drawString(">", textX - 25, textY);
-    }
 
     // SE
     textY += gp.tileSize;
     g2.drawString("SE", textX, textY);
-    if (commandNum == 2) {
+    if (commandNum == 2)
       g2.drawString(">", textX - 25, textY);
-    }
 
     // CONTROL
     textY += gp.tileSize;
@@ -523,36 +474,42 @@ public class UI {
     textX = frameX + (int) (gp.tileSize * 4.5);
     textY = frameY + gp.tileSize * 2 - 22;
     g2.setStroke(new BasicStroke(3));
+    g2.setColor(COL_PANEL_BORDER);
     g2.drawRect(textX, textY, 24, 24);
-    if (gp.fullScreenOn == true) {
-      g2.fillRect(textX, textY, 24, 24);
+    if (gp.fullScreenOn) {
+      g2.setColor(COL_ACCENT);
+      g2.fillRect(textX + 2, textY + 2, 20, 20);
     }
 
     // MUSIC VOLUME
     textY += gp.tileSize;
+    g2.setColor(COL_PANEL_BORDER);
     g2.drawRect(textX, textY, 120, 24);
+    g2.setColor(COL_ACCENT);
     int volumeWidth = 24 * gp.music.volumeScale;
-    g2.fillRect(textX, textY, volumeWidth, 24);
+    g2.fillRect(textX + 1, textY + 1, Math.max(0, volumeWidth - 2), 22);
 
     // SE VOLUME
     textY += gp.tileSize;
+    g2.setColor(COL_PANEL_BORDER);
     g2.drawRect(textX, textY, 120, 24);
+    g2.setColor(COL_ACCENT);
     volumeWidth = 24 * gp.se.volumeScale;
-    g2.fillRect(textX, textY, volumeWidth, 24);
+    g2.fillRect(textX + 1, textY + 1, Math.max(0, volumeWidth - 2), 22);
 
     gp.config.saveConfig();
   }
 
   public void options_fullScreenNotification(int frameX, int frameY) {
-
     int textX = frameX + gp.tileSize;
     int textY = frameY + gp.tileSize * 3;
 
     currentDialogue = "The change will take \neffect after restarting \nthe game.";
 
+    g2.setColor(COL_TEXT);
     for (String line : currentDialogue.split("\n")) {
       g2.drawString(line, textX, textY);
-      textY += 40;
+      textY += 32;
     }
 
     textY = frameY + gp.tileSize * 9;
@@ -566,18 +523,17 @@ public class UI {
   }
 
   public void options_control(int frameX, int frameY) {
-
     int textX;
     int textY;
 
-    // TITLE
     String text = "Control";
     textX = getXforCenteredText(text);
     textY = frameY + gp.tileSize;
-    g2.drawString(text, textX, textY);
+    drawTextShadow(text, textX, textY, COL_TEXT, Color.black, 2);
 
     textX = frameX + gp.tileSize;
     textY += gp.tileSize;
+    g2.setColor(COL_TEXT);
     g2.drawString("Move", textX, textY);
     textY += gp.tileSize;
     g2.drawString("Confirm/Attack", textX, textY);
@@ -589,7 +545,6 @@ public class UI {
     g2.drawString("Pause", textX, textY);
     textY += gp.tileSize;
     g2.drawString("Options", textX, textY);
-    textY += gp.tileSize;
 
     textX = frameX + gp.tileSize * 6;
     textY = frameY + gp.tileSize * 2;
@@ -604,9 +559,8 @@ public class UI {
     g2.drawString("P", textX, textY);
     textY += gp.tileSize;
     g2.drawString("ESC", textX, textY);
-    textY += gp.tileSize;
 
-    // BACK
+    // Back
     textX = frameX + gp.tileSize;
     textY = frameY + gp.tileSize * 9;
     g2.drawString("Back", textX, textY);
@@ -620,21 +574,21 @@ public class UI {
   }
 
   public void options_endGameConfirmation(int frameX, int frameY) {
-
     int textX = frameX + gp.tileSize;
     int textY = frameY + gp.tileSize * 3;
 
     currentDialogue = "Quit the game and \nreturn to the title screen?";
 
+    g2.setColor(COL_TEXT);
     for (String line : currentDialogue.split("\n")) {
       g2.drawString(line, textX, textY);
-      textY += 40;
+      textY += 32;
     }
 
     // YES
     String text = "Yes";
     textX = getXforCenteredText(text);
-    textY += gp.tileSize * 3;
+    textY += gp.tileSize * 2;
     g2.drawString(text, textX, textY);
     if (commandNum == 0) {
       g2.drawString(">", textX - 25, textY);
@@ -642,11 +596,8 @@ public class UI {
         subState = 0;
         commandNum = 0;
         titleScreenState = 0;
-
-        if (gp.music != null) {
+        if (gp.music != null)
           gp.music.stop();
-        }
-
         gp.gameState = gp.titleState;
         gp.keyH.enterPressed = false;
       }
@@ -667,208 +618,94 @@ public class UI {
     }
   }
 
+  // --- Índice do slot ---
   public int getItemIndexOnSlot() {
-    int itemIndex = slotCol + (slotRow * 5);
-    return itemIndex;
+    return slotCol + (slotRow * 5);
   }
 
-  // ---------- SUBWINDOW ESTILIZADA (pergaminho + moldura) ----------
+  // --- Subjanela leve (sem gradiente) ---
   public void drawSubWindow(int x, int y, int width, int height) {
-    // Salva o estado gráfico atual
-    java.awt.Paint oldPaint = g2.getPaint();
-    java.awt.Stroke oldStroke = g2.getStroke();
-    java.awt.Color oldColor = g2.getColor();
-
-    try {
-      // Fundo pergaminho com leve gradiente
-      LinearGradientPaint parchment = new LinearGradientPaint(
-          x, y, x, y + height,
-          new float[] { 0f, 1f },
-          new Color[] { COL_PARCHMENT_1, COL_PARCHMENT_2 },
-          CycleMethod.NO_CYCLE);
-      g2.setPaint(parchment);
-      g2.fillRoundRect(x, y, width, height, 28, 28);
-
-      // Borda dupla (ouro + branco suave)
-      g2.setStroke(new BasicStroke(4f));
-      g2.setColor(COL_GOLD);
-      g2.drawRoundRect(x + 2, y + 2, width - 4, height - 4, 24, 24);
-
-      g2.setStroke(new BasicStroke(2f));
-      g2.setColor(COL_BORDER_SOFT);
-      g2.drawRoundRect(x + 6, y + 6, width - 12, height - 12, 18, 18);
-
-      // Sombra interna leve (vinheta interna)
-      RadialGradientPaint innerShade = new RadialGradientPaint(
-          x + width / 2f, y + height / 2f, Math.max(width, height) / 1.2f,
-          new float[] { 0.7f, 1f },
-          new Color[] { new Color(0, 0, 0, 0), new Color(0, 0, 0, 50) },
-          CycleMethod.NO_CYCLE);
-      g2.setPaint(innerShade);
-      g2.fillRoundRect(x + 4, y + 4, width - 8, height - 8, 24, 24);
-    } finally {
-      // Restaura o estado gráfico original
-      g2.setPaint(oldPaint);
-      g2.setStroke(oldStroke);
-      g2.setColor(oldColor);
-    }
+    g2.setColor(COL_PANEL);
+    g2.fillRoundRect(x, y, width, height, 14, 14);
+    g2.setColor(COL_PANEL_BORDER);
+    g2.setStroke(new BasicStroke(2f));
+    g2.drawRoundRect(x, y, width, height, 14, 14);
   }
 
-  // ---------- HELPERS VISUAIS ----------
-  private void drawEpicBackground() {
-    // Gradiente de fundo
-    LinearGradientPaint bg = new LinearGradientPaint(
-        0, 0, 0, gp.screenHeight,
-        new float[] { 0f, 0.5f, 1f },
-        new Color[] { COL_BG_DARK_1, COL_BG_DARK_2, COL_BG_DARK_1 },
-        CycleMethod.NO_CYCLE);
-    g2.setPaint(bg);
-    g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
-
-    // Vinheta (borda escura)
-    RadialGradientPaint vignette = new RadialGradientPaint(
-        gp.screenWidth / 2f, gp.screenHeight / 2f, Math.max(gp.screenWidth, gp.screenHeight) / 1.2f,
-        new float[] { 0f, 0.85f, 1f },
-        new Color[] { new Color(0, 0, 0, 0), new Color(0, 0, 0, 100), new Color(0, 0, 0, 180) },
-        CycleMethod.NO_CYCLE);
-    g2.setPaint(vignette);
-    g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
-  }
-
-  private void drawGoldTitleCentered(String text, int baselineY) {
-    int x = getXforCenteredText(text);
-    drawGoldTitle(text, x, baselineY);
-  }
-
-  private void drawGoldTitle(String text, int x, int y) {
-    // Shape do texto
-    GlyphVector gv = g2.getFont().createGlyphVector(g2.getFontRenderContext(), text);
-    Shape textShape = gv.getOutline(x, y);
-
-    // Sombra
-    g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.35f));
-    g2.setColor(Color.black);
-    g2.translate(5, 5);
-    g2.fill(textShape);
-    g2.translate(-5, -5);
-    g2.setComposite(AlphaComposite.SrcOver);
-
-    // Preenchimento em ouro (gradiente)
-    Rectangle2D bounds = textShape.getBounds2D();
-    LinearGradientPaint gold = new LinearGradientPaint(
-        (float) bounds.getMinX(), (float) bounds.getMinY(), (float) bounds.getMinX(), (float) bounds.getMaxY(),
-        new float[] { 0f, 0.5f, 1f },
-        new Color[] { COL_GOLD_LIGHT, COL_GOLD, COL_GOLD_DARK },
-        CycleMethod.NO_CYCLE);
-    g2.setPaint(gold);
-    g2.fill(textShape);
-
-    // Contorno
-    g2.setStroke(new BasicStroke(3.2f));
-    g2.setColor(new Color(0, 0, 0, 200));
-    g2.draw(textShape);
-  }
-
-  private void drawMenuItem(String text, int y, boolean selected) {
-    int w = (int) (gp.screenWidth * 0.6);
+  // Centralizada por tamanho
+  private void drawSubWindowCenter(int w, int h) {
     int x = (gp.screenWidth - w) / 2;
+    int y = (gp.screenHeight - h) / 2;
+    drawSubWindow(x, y, w, h);
+  }
 
-    // Pílula de seleção (apenas ajusta posição para cima; tamanho igual)
+  // --- Helpers visuais leves ---
+  private void drawMenuItem(String text, int centerY, boolean selected) {
+    int w = Math.min((int) (gp.screenWidth * 0.6), 800);
+    int x = (gp.screenWidth - w) / 2;
+    int h = (int) (gp.tileSize * 1.0);
+    int yTop = centerY - (h * 3) / 4;
+
     if (selected) {
-      int pillTop = y - (int) (gp.tileSize * MENU_PILL_TOP_FACTOR); // <- subiu um pouco
-      int pillH = (int) (gp.tileSize * 1.2);
-
-      g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.18f));
-      g2.setColor(COL_GOLD);
-      g2.fillRoundRect(x, pillTop, w, pillH, 24, 24);
-      g2.setComposite(AlphaComposite.SrcOver);
-
-      // Borda suave
-      g2.setStroke(new BasicStroke(2f));
-      g2.setColor(new Color(255, 255, 255, 80));
-      g2.drawRoundRect(x, pillTop, w, pillH, 24, 24);
+      g2.setColor(COL_HIGHLIGHT_BG);
+      g2.fillRoundRect(x, yTop, w, h, 10, 10);
+      g2.setColor(COL_PANEL_BORDER);
+      g2.drawRoundRect(x, yTop, w, h, 10, 10);
     }
 
-    // Texto centralizado
     int tx = getXforCenteredText(text);
-    Color fill = selected ? new Color(255, 245, 210) : new Color(230, 230, 230);
-    Color outline = new Color(0, 0, 0, selected ? 200 : 140);
-    float ow = selected ? 2.2f : 1.6f;
+    g2.setColor(selected ? COL_ACCENT : COL_TEXT);
+    // sombra leve
+    g2.setColor(Color.black);
+    g2.drawString(text, tx + 2, centerY + 2);
+    g2.setColor(selected ? COL_ACCENT : COL_TEXT);
+    g2.drawString(text, tx, centerY);
 
-    drawTextWithOutline(text, tx, y, fill, outline, ow);
-
-    // Indicador à esquerda (triângulo) — permanece alinhado ao baseline do texto
+    // indicador esquerdo
     if (selected) {
-      int triX = x - (int) (gp.tileSize * 0.25);
-      int triY = y - (int) (gp.tileSize * 0.3);
-      int triH = (int) (gp.tileSize * 0.6);
-      int[] xs = { triX, triX + (int) (gp.tileSize * 0.4), triX };
+      int triX = x - (int) (gp.tileSize * 0.3);
+      int triY = centerY - (int) (gp.tileSize * 0.60);
+      int triH = (int) (gp.tileSize * 0.7);
+      int[] xs = { triX, triX + (int) (gp.tileSize * 0.45), triX };
       int[] ys = { triY, triY + triH / 2, triY + triH };
-      g2.setColor(COL_GOLD);
+      g2.setColor(COL_ACCENT);
       g2.fillPolygon(xs, ys, 3);
-      g2.setColor(new Color(0, 0, 0, 160));
-      g2.drawPolygon(xs, ys, 3);
     }
   }
 
-  private void drawTextWithShadow(String text, int x, int y, Color fill, Color shadow, int offset) {
+  private void drawTextShadowCentered(String text, int y, Color fill, Color shadow, int offset) {
+    int x = getXforCenteredText(text);
+    drawTextShadow(text, x, y, fill, shadow, offset);
+  }
+
+  private void drawTextShadow(String text, int x, int y, Color fill, Color shadow, int offset) {
     g2.setColor(shadow);
     g2.drawString(text, x + offset, y + offset);
     g2.setColor(fill);
     g2.drawString(text, x, y);
   }
 
-  private void drawTextWithOutlineCentered(String text, int y, Color fill, Color outline, float outlineW) {
-    int x = getXforCenteredText(text);
-    drawTextWithOutline(text, x, y, fill, outline, outlineW);
-  }
-
-  private void drawTextWithOutline(String text, int x, int y, Color fill, Color outline, float outlineW) {
-    GlyphVector gv = g2.getFont().createGlyphVector(g2.getFontRenderContext(), text);
-    Shape shape = gv.getOutline(x, y);
-
-    // Sombra leve
-    g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f));
-    g2.setColor(new Color(0, 0, 0, 220));
-    g2.translate(2, 2);
-    g2.fill(shape);
-    g2.translate(-2, -2);
-    g2.setComposite(AlphaComposite.SrcOver);
-
-    // Preenchimento
-    g2.setColor(fill);
-    g2.fill(shape);
-
-    // Contorno
-    g2.setStroke(new BasicStroke(outlineW));
-    g2.setColor(outline);
-    g2.draw(shape);
-  }
-
-  // ---------- UTIL ----------
+  // --- Utils ---
   public int getXforCenteredText(String text) {
     int length = (int) g2.getFontMetrics().getStringBounds(text, g2).getWidth();
     return gp.screenWidth / 2 - length / 2;
   }
 
   public void drawCharacterScreen() {
-
-    // CREATE A FRAME
     final int frameX = gp.tileSize * 2;
     final int frameY = gp.tileSize;
     final int frameWidth = gp.tileSize * 5;
     final int frameHeight = gp.tileSize * 10;
     drawSubWindow(frameX, frameY, frameWidth, frameHeight);
 
-    // TEXT
-    g2.setColor(Color.white);
-    g2.setFont(g2.getFont().deriveFont(32F));
+    g2.setColor(COL_TEXT);
+    g2.setFont(g2.getFont().deriveFont(30F));
 
     int textX = frameX + 20;
     int textY = frameY + gp.tileSize;
-    final int lineHeight = 32;
+    final int lineHeight = 30;
 
-    // NAMES
+    // Labels
     g2.drawString("Level", textX, textY);
     textY += lineHeight;
     g2.drawString("Life", textX, textY);
@@ -888,66 +725,56 @@ public class UI {
     g2.drawString("Next Level", textX, textY);
     textY += lineHeight;
     g2.drawString("Coin", textX, textY);
-    textY += lineHeight + 10;
+    textY += lineHeight + 8;
     g2.drawString("Weapon", textX, textY);
-    textY += lineHeight + 15;
+    textY += lineHeight + 12;
     g2.drawString("Shield", textX, textY);
     textY += lineHeight;
 
-    // VALUES
+    // Valores
     int tailX = (frameX + frameWidth) - 30;
-    // Reset textY
     textY = frameY + gp.tileSize;
+
     String value;
 
     value = String.valueOf(gp.player.level);
-    textX = getXforAlignToRightText(value, tailX);
-    g2.drawString(value, textX, textY);
+    g2.drawString(value, getXforAlignToRightText(value, tailX), textY);
     textY += lineHeight;
 
-    value = String.valueOf(gp.player.life + "/" + gp.player.maxLife);
-    textX = getXforAlignToRightText(value, tailX);
-    g2.drawString(value, textX, textY);
+    value = gp.player.life + "/" + gp.player.maxLife;
+    g2.drawString(value, getXforAlignToRightText(value, tailX), textY);
     textY += lineHeight;
 
-    value = String.valueOf(gp.player.mana + "/" + gp.player.maxMana);
-    textX = getXforAlignToRightText(value, tailX);
-    g2.drawString(value, textX, textY);
+    value = gp.player.mana + "/" + gp.player.maxMana;
+    g2.drawString(value, getXforAlignToRightText(value, tailX), textY);
     textY += lineHeight;
 
     value = String.valueOf(gp.player.strength);
-    textX = getXforAlignToRightText(value, tailX);
-    g2.drawString(value, textX, textY);
+    g2.drawString(value, getXforAlignToRightText(value, tailX), textY);
     textY += lineHeight;
 
     value = String.valueOf(gp.player.dexterity);
-    textX = getXforAlignToRightText(value, tailX);
-    g2.drawString(value, textX, textY);
+    g2.drawString(value, getXforAlignToRightText(value, tailX), textY);
     textY += lineHeight;
 
     value = String.valueOf(gp.player.attack);
-    textX = getXforAlignToRightText(value, tailX);
-    g2.drawString(value, textX, textY);
+    g2.drawString(value, getXforAlignToRightText(value, tailX), textY);
     textY += lineHeight;
 
     value = String.valueOf(gp.player.defense);
-    textX = getXforAlignToRightText(value, tailX);
-    g2.drawString(value, textX, textY);
+    g2.drawString(value, getXforAlignToRightText(value, tailX), textY);
     textY += lineHeight;
 
     value = String.valueOf(gp.player.exp);
-    textX = getXforAlignToRightText(value, tailX);
-    g2.drawString(value, textX, textY);
+    g2.drawString(value, getXforAlignToRightText(value, tailX), textY);
     textY += lineHeight;
 
     value = String.valueOf(gp.player.nextLevelExp);
-    textX = getXforAlignToRightText(value, tailX);
-    g2.drawString(value, textX, textY);
+    g2.drawString(value, getXforAlignToRightText(value, tailX), textY);
     textY += lineHeight;
 
     value = String.valueOf(gp.player.coin);
-    textX = getXforAlignToRightText(value, tailX);
-    g2.drawString(value, textX, textY);
+    g2.drawString(value, getXforAlignToRightText(value, tailX), textY);
     textY += lineHeight;
 
     g2.drawImage(gp.player.currentWeapon.down1, tailX - gp.tileSize, textY - 24, null);
@@ -956,9 +783,7 @@ public class UI {
   }
 
   public int getXforAlignToRightText(String text, int tailX) {
-
     int length = (int) g2.getFontMetrics().getStringBounds(text, g2).getWidth();
-    int x = tailX - length;
-    return x;
+    return tailX - length;
   }
 }
