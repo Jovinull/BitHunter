@@ -77,6 +77,7 @@ public class GamePanel extends JPanel implements Runnable {
   public final int dialogueState = 3; // Estado de diálogo (interações com NPCs)
   public final int characterState = 4; // Estado de status do personagem
   public final int optionsState = 5; // Estado de opções (configurações do jogo)
+  public final int gameOverState = 6; // Estado de game over
 
   // ==== CONSTRUTOR ====
   public GamePanel() {
@@ -104,6 +105,24 @@ public class GamePanel extends JPanel implements Runnable {
     if (fullScreenOn == true) {
       setFullScreen();
     }
+  }
+
+  public void retry() {
+
+    player.setDefaultPositions();
+    player.restoreLifeAndMana();
+    aSetter.setNPC();
+    aSetter.setMonster();
+  }
+
+  public void restart() {
+
+    player.setDefaultValues();
+    player.setItems();
+    aSetter.setObject();
+    aSetter.setNPC();
+    aSetter.setMonster();
+    aSetter.setInteractiveTile();
   }
 
   public void setFullScreen() {
