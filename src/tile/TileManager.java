@@ -16,84 +16,83 @@ public class TileManager {
 
   GamePanel gp; // Referência ao painel principal do jogo
   public Tile[] tile; // Vetor que armazena os tipos de tiles disponíveis (grama, parede, etc.)
-  public int mapTileNum[][]; // Matriz que representa o mapa (cada número corresponde a um tile)
+  public int mapTileNum[][][]; // Matriz que representa o mapa (cada número corresponde a um tile)
 
   // Construtor: carrega as imagens dos tiles e o mapa a partir de um arquivo .txt
   public TileManager(GamePanel gp) {
     this.gp = gp;
 
     tile = new Tile[50]; // Inicializa o array com espaço para até 10 tipos de tiles
-    mapTileNum = new int[gp.maxWorldCol][gp.maxWorldRow]; // Matriz do mapa com base no mundo total
+    mapTileNum = new int[gp.maxMap][gp.maxWorldCol][gp.maxWorldRow]; // Matriz do mapa com base no mundo total
 
     getTileImage(); // Carrega as imagens dos tiles
-    loadMap("/maps/world01.txt"); // Carrega o layout do mapa do arquivo
+    loadMap("/maps/world01.txt", 0);
+    loadMap("/maps/interior01.txt", 1);
   }
 
   // Carrega as imagens e solidez correspondentes a cada tipo de tile
   public void getTileImage() {
 
     // PLACEHOLDER
-    setup(0, "000", true);
-    setup(1, "000", true);
-    setup(2, "000", true);
-    setup(3, "000", true);
-    setup(4, "000", true);
-    setup(5, "000", true);
-    setup(6, "000", true);
-    setup(7, "000", true);
-    setup(8, "000", true);
-    setup(9, "000", true);
+    setup(0, "void", true);
+    setup(1, "void", true);
+    setup(2, "void", true);
+    setup(3, "void", true);
+    setup(4, "void", true);
+    setup(5, "void", true);
+    setup(6, "void", true);
+    setup(7, "void", true);
+    setup(8, "void", true);
+    setup(9, "void", true);
 
     // GRASS TILES
-    setup(10, "001", false);
-    setup(11, "002", false);
+    setup(10, "grass00", false);
+    setup(11, "grass01", false);
 
     // WATER TILES
-    setup(12, "018", true);
-    setup(13, "019", true);
-    setup(14, "020", true);
-    setup(15, "021", true);
-    setup(16, "022", true);
-    setup(17, "023", true);
-    setup(18, "024", true);
-    setup(19, "025", true);
-    setup(20, "026", true);
-    setup(21, "027", true);
-    setup(22, "028", true);
-    setup(23, "029", true);
-    setup(24, "030", true);
-    setup(25, "031", true);
+    setup(12, "water00", true);
+    setup(13, "water01", true);
+    setup(14, "water02", true);
+    setup(15, "water03", true);
+    setup(16, "water04", true);
+    setup(17, "water05", true);
+    setup(18, "water06", true);
+    setup(19, "water07", true);
+    setup(20, "water08", true);
+    setup(21, "water09", true);
+    setup(22, "water10", true);
+    setup(23, "water11", true);
+    setup(24, "water12", true);
+    setup(25, "water13", true);
 
     // ROAD TILES
-    setup(26, "003", false);
-    setup(27, "004", false);
-    setup(28, "005", false);
-    setup(29, "006", false);
-    setup(30, "007", false);
-    setup(31, "008", false);
-    setup(32, "009", false);
-    setup(33, "010", false);
-    setup(34, "011", false);
-    setup(35, "012", false);
-    setup(36, "013", false);
-    setup(37, "014", false);
-    setup(38, "015", false);
+    setup(26, "road00", false);
+    setup(27, "road01", false);
+    setup(28, "road02", false);
+    setup(29, "road03", false);
+    setup(30, "road04", false);
+    setup(31, "road05", false);
+    setup(32, "road06", false);
+    setup(33, "road07", false);
+    setup(34, "road08", false);
+    setup(35, "road09", false);
+    setup(36, "road10", false);
+    setup(37, "road11", false);
+    setup(38, "road12", false);
 
     // EARTH TILES
-    setup(39, "017", false);
+    setup(39, "earth", false);
 
     // WALL TILES
-    setup(40, "032", true);
+    setup(40, "wall", true);
 
     // TREE TILES
-    setup(41, "016", true);
+    setup(41, "tree", true);
 
     // TILES SEM USO
-    setup(42, "033", false);
-    setup(43, "034", false);
-    setup(44, "035", false);
-    setup(45, "036", false);
-    setup(46, "037", false);
+    setup(42, "hut", false);
+    setup(43, "floor01", false);
+    setup(44, "table01", true);
   }
 
   public void setup(int index, String imageName, boolean collision) {
@@ -112,7 +111,7 @@ public class TileManager {
   }
 
   // Lê o layout do mapa de um arquivo de texto e preenche a matriz mapTileNum
-  public void loadMap(String filePath) {
+  public void loadMap(String filePath, int map) {
     try {
       InputStream is = getClass().getResourceAsStream(filePath); // Abre o arquivo
       BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -127,7 +126,7 @@ public class TileManager {
 
         while (col < gp.maxWorldCol) {
           int num = Integer.parseInt(numbers[col]); // Converte para inteiro
-          mapTileNum[col][row] = num; // Armazena na posição [col][row]
+          mapTileNum[map][col][row] = num; // Armazena na posição [col][row]
           col++;
         }
 
@@ -155,7 +154,7 @@ public class TileManager {
     // Percorre cada tile do mundo
     while (worldCol < gp.maxWorldCol && worldRow < gp.maxWorldRow) {
 
-      int tileNum = mapTileNum[worldCol][worldRow]; // Identifica o tipo de tile naquela posição
+      int tileNum = mapTileNum[gp.currentMap][worldCol][worldRow]; // Identifica o tipo de tile naquela posição
 
       // Calcula a posição absoluta do tile no mundo
       int worldX = worldCol * gp.tileSize;

@@ -156,35 +156,65 @@ public class KeyHandler implements KeyListener {
    * Estado: Jogando (movimento, pausa, status, debug, etc).
    */
   public void playState(int key) {
-    switch (key) {
-      // Movimento (WASD)
-      case KeyEvent.VK_W -> upPressed = true;
-      case KeyEvent.VK_S -> downPressed = true;
-      case KeyEvent.VK_A -> leftPressed = true;
-      case KeyEvent.VK_D -> rightPressed = true;
 
-      // Pausa
-      case KeyEvent.VK_P -> gp.gameState = gp.pauseState;
+    // Movimento (WASD)
+    if (key == KeyEvent.VK_W) {
+      upPressed = true;
+    }
+    if (key == KeyEvent.VK_S) {
+      downPressed = true;
+    }
+    if (key == KeyEvent.VK_A) {
+      leftPressed = true;
+    }
+    if (key == KeyEvent.VK_D) {
+      rightPressed = true;
+    }
 
-      // Status do personagem
-      case KeyEvent.VK_C -> gp.gameState = gp.characterState;
+    // Pausa
+    if (key == KeyEvent.VK_P) {
+      gp.gameState = gp.pauseState;
+    }
 
-      // Confirmação (diálogo/ação)
-      case KeyEvent.VK_ENTER -> enterPressed = true;
+    // Status do personagem
+    if (key == KeyEvent.VK_C) {
+      gp.gameState = gp.characterState;
+    }
 
-      // Tecla para soltar magia
-      case KeyEvent.VK_F -> shotKeyPressed = true;
+    // Confirmação (diálogo/ação)
+    if (key == KeyEvent.VK_ENTER) {
+      enterPressed = true;
+    }
 
-      case KeyEvent.VK_ESCAPE -> gp.gameState = gp.optionsState;
+    // Tecla para soltar magia
+    if (key == KeyEvent.VK_F) {
+      shotKeyPressed = true;
+    }
 
-      // DEBUG: alternar exibição do tempo de renderização
-      case KeyEvent.VK_T -> showDebugText = !showDebugText;
+    // Opções
+    if (key == KeyEvent.VK_ESCAPE) {
+      gp.gameState = gp.optionsState;
+    }
 
-      // Recarregar mapa (atalho de dev)
-      case KeyEvent.VK_R -> gp.tileM.loadMap("/maps/worldV2.txt");
+    // DEBUG (alternar exibição do texto de debug)
+    if (key == KeyEvent.VK_T) {
+      if (showDebugText == false) {
+        showDebugText = true;
+      } else if (showDebugText == true) {
+        showDebugText = false;
+      }
+    }
 
-      default -> {
-        /* noop */ }
+    // Recarregar mapa (atalho de dev)
+    if (key == KeyEvent.VK_R) {
+      switch (gp.currentMap) {
+        case 0:
+          gp.tileM.loadMap("/maps/world01.txt", 0);
+          break;
+        case 1:
+          gp.tileM.loadMap("/maps/interior01.txt", 1);
+          break;
+      }
     }
   }
 

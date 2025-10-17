@@ -131,15 +131,15 @@ public class Entity {
 
   public void dropItem(Entity droppedItem) {
 
-    for (int i = 0; i < gp.obj.length; i++) {
+    for (int i = 0; i < gp.obj[1].length; i++) {
       // Verifica se o espaço no array de objetos está vazio
-      if (gp.obj[i] == null) {
+      if (gp.obj[gp.currentMap][i] == null) {
         // Atribui o item dropado à posição disponível
-        gp.obj[i] = droppedItem;
+        gp.obj[gp.currentMap][i] = droppedItem;
 
         // Define a posição do item no mundo, usando as coordenadas do monstro morto
-        gp.obj[i].worldX = worldX; // Posição X do item
-        gp.obj[i].worldY = worldY; // Posição Y do item
+        gp.obj[gp.currentMap][i].worldX = worldX; // Posição X do item
+        gp.obj[gp.currentMap][i].worldY = worldY; // Posição Y do item
 
         // Sai do loop para evitar sobrescrever outros slots
         break;
