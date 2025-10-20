@@ -61,7 +61,6 @@ public class AssetSetter {
     gp.obj[mapNum][i] = new OBJ_ManaCrystal(gp);
     gp.obj[mapNum][i].worldX = gp.tileSize * 22;
     gp.obj[mapNum][i].worldY = gp.tileSize * 31;
-    i++;
   }
 
   // Método responsável por definir os NPCs no jogo
@@ -69,9 +68,18 @@ public class AssetSetter {
 
     int mapNum = 0;
     int i = 0;
+
+    // MAP 0
     gp.npc[mapNum][i] = new NPC_OldMan(gp);
     gp.npc[mapNum][i].worldX = gp.tileSize * 21;
     gp.npc[mapNum][i].worldY = gp.tileSize * 21;
+    i++;
+
+    // MAP 1
+    mapNum = 1;
+    gp.npc[mapNum][i] = new NPC_OldMan(gp);
+    gp.npc[mapNum][i].worldX = gp.tileSize * 12;
+    gp.npc[mapNum][i].worldY = gp.tileSize * 7;
   }
 
   public void setMonster() {
@@ -102,7 +110,6 @@ public class AssetSetter {
     gp.monster[mapNum][i] = new MON_GreenSlime(gp);
     gp.monster[mapNum][i].worldX = gp.tileSize * 38;
     gp.monster[mapNum][i].worldY = gp.tileSize * 42;
-    i++;
 
     // mapNum = 1;
     // gp.monster[mapNum][i] = new MON_GreenSlime(gp);

@@ -266,7 +266,7 @@ public class Player extends Entity {
 
     if (life <= 0) {
       gp.gameState = gp.gameOverState;
-      gp.ui.commandNum = -1;
+      gp.ui.commandNum = 0;
       gp.playSE(12);
     }
   }
