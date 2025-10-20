@@ -81,6 +81,7 @@ public class GamePanel extends JPanel implements Runnable {
   public final int characterState = 4; // Estado de status do personagem
   public final int optionsState = 5; // Estado de opções (configurações do jogo)
   public final int gameOverState = 6; // Estado de game over
+  public final int transitionState = 7; // Estado de transição entre cenas
 
   // ==== CONSTRUTOR ====
   public GamePanel() {
