@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
@@ -67,12 +68,15 @@ public class Entity {
   public Entity currentShield;
   public Projectile projectile;
 
-  // ITEM ATTRIBUTES
+  // ITEM ATRIBUTES
+  public ArrayList<Entity> inventory = new ArrayList<>(); // Inventário do jogador
+  public final int maxInventorySize = 20; // Tamanho máximo do inventário
   public int value;
   public int attackValue;
   public int defenseValue;
   public String description = "";
   public int useCost;
+  public int price;
 
   // TIPOS
   public int type; // 0 = player, 1 = npc, 2 = monster
@@ -222,7 +226,7 @@ public class Entity {
 
     // Alterna entre os sprites (1 e 2) para criar efeito de movimento animado
     spriteCounter++;
-    if (spriteCounter > 12) { // Troca a cada 12 frames (~5x por segundo em 60FPS)
+    if (spriteCounter > 24) {
       spriteNum = (spriteNum == 1) ? 2 : 1;
       spriteCounter = 0;
     }

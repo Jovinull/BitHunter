@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 import main.GamePanel;
 import main.KeyHandler;
@@ -23,8 +22,6 @@ public class Player extends Entity {
   public final int screenY; // Posição fixa do jogador na tela no eixo Y (centro da tela)
   int standCounter = 0; // Contador para animação de parada
   public boolean attackCanceled = false; // Flag para indicar se o jogador está atacando
-  public ArrayList<Entity> inventory = new ArrayList<>(); // Inventário do jogador
-  public final int maxInventorySize = 20; // Tamanho máximo do inventário
 
   public boolean debugCollision = false; // Flag para depuração de colisão
 
@@ -56,6 +53,10 @@ public class Player extends Entity {
     worldX = gp.tileSize * 23; // Posição inicial em X no mundo (tile 23)
     worldY = gp.tileSize * 21; // Posição inicial em Y no mundo (tile 21)
 
+    worldX = gp.tileSize * 12;
+    worldY = gp.tileSize * 12;
+    gp.currentMap = 1;
+
     speed = 4; // Velocidade do jogador
     direction = "down"; // Direção inicial
 
@@ -70,7 +71,7 @@ public class Player extends Entity {
     dexterity = 1;
     exp = 0;
     nextLevelExp = 5;
-    coin = 0;
+    coin = 500;
     currentWeapon = new OBJ_Sword_Normal(gp);
     currentShield = new OBJ_Shield_Wood(gp);
     projectile = new OBJ_Fireball(gp);
@@ -461,7 +462,7 @@ public class Player extends Entity {
 
   public void selectItem() {
 
-    int itemIndex = gp.ui.getItemIndexOnSlot();
+    int itemIndex = gp.ui.getItemIndexOnSlot(gp.ui.playerSlotCol, gp.ui.playerSlotRow);
     if (itemIndex < gp.player.inventory.size()) {
       Entity selectedItem = gp.player.inventory.get(itemIndex);
 

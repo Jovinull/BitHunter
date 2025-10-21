@@ -69,6 +69,9 @@ public class KeyHandler implements KeyListener {
     if (gp.gameState == gp.gameOverState) {
       gameOverState(key);
     }
+    if (gp.gameState == gp.tradeState) {
+      tradeState(key);
+    }
   }
 
   /**
@@ -240,38 +243,14 @@ public class KeyHandler implements KeyListener {
    * Estado: Tela de status do personagem.
    */
   public void characterState(int code) {
-    switch (code) {
-      case KeyEvent.VK_C -> gp.gameState = gp.playState;
-
-      case KeyEvent.VK_W -> {
-        if (gp.ui.slotRow != 0) {
-          gp.ui.slotRow--;
-          gp.playSE(9);
-        }
-      }
-      case KeyEvent.VK_A -> {
-        if (gp.ui.slotCol != 0) {
-          gp.ui.slotCol--;
-          gp.playSE(9);
-        }
-      }
-      case KeyEvent.VK_S -> {
-        if (gp.ui.slotRow != SLOT_ROW_MAX) {
-          gp.ui.slotRow++;
-          gp.playSE(9);
-        }
-      }
-      case KeyEvent.VK_D -> {
-        if (gp.ui.slotCol != SLOT_COL_MAX) {
-          gp.ui.slotCol++;
-          gp.playSE(9);
-        }
-      }
-      case KeyEvent.VK_ENTER -> gp.player.selectItem();
-
-      default -> {
-        /* noop */ }
+    if (code == KeyEvent.VK_C) {
+      gp.gameState = gp.playState;
+    } else if (code == KeyEvent.VK_ENTER) {
+      gp.player.selectItem();
     }
+
+    // Continua tratando navegação do inventário com as teclas W/A/S/D
+    playerInventory(code);
   }
 
   public void optionsState(int code) {
@@ -369,6 +348,95 @@ public class KeyHandler implements KeyListener {
         gp.ui.subState = 0;
 
         gp.gameState = gp.titleState;
+      }
+    }
+  }
+
+  public void tradeState(int code) {
+
+    if (code == KeyEvent.VK_ENTER) {
+      enterPressed = true;
+    }
+
+    if (gp.ui.subState == 0) {
+      if (code == KeyEvent.VK_W) {
+        gp.ui.commandNum--;
+        if (gp.ui.commandNum < 0) {
+          gp.ui.commandNum = 2;
+        }
+        gp.playSE(9);
+      }
+
+      if (code == KeyEvent.VK_S) {
+        gp.ui.commandNum++;
+        if (gp.ui.commandNum > 2) {
+          gp.ui.commandNum = 0;
+        }
+        gp.playSE(9);
+      }
+    }
+
+    if (gp.ui.subState == 1) {
+
+      npcInventory(code);
+      if (code == KeyEvent.VK_ESCAPE) {
+        gp.ui.subState = 0;
+      }
+    }
+
+    if (gp.ui.subState == 2) {
+
+      playerInventory(code);
+      if (code == KeyEvent.VK_ESCAPE) {
+        gp.ui.subState = 0;
+      }
+    }
+  }
+
+  public void playerInventory(int code) {
+    if (code == KeyEvent.VK_W) {
+      if (gp.ui.playerSlotRow != 0) {
+        gp.ui.playerSlotRow--;
+        gp.playSE(9);
+      }
+    } else if (code == KeyEvent.VK_A) {
+      if (gp.ui.playerSlotCol != 0) {
+        gp.ui.playerSlotCol--;
+        gp.playSE(9);
+      }
+    } else if (code == KeyEvent.VK_S) {
+      if (gp.ui.playerSlotRow != SLOT_ROW_MAX) {
+        gp.ui.playerSlotRow++;
+        gp.playSE(9);
+      }
+    } else if (code == KeyEvent.VK_D) {
+      if (gp.ui.playerSlotCol != SLOT_COL_MAX) {
+        gp.ui.playerSlotCol++;
+        gp.playSE(9);
+      }
+    }
+  }
+
+  public void npcInventory(int code) {
+    if (code == KeyEvent.VK_W) {
+      if (gp.ui.npcSlotRow != 0) {
+        gp.ui.npcSlotRow--;
+        gp.playSE(9);
+      }
+    } else if (code == KeyEvent.VK_A) {
+      if (gp.ui.npcSlotCol != 0) {
+        gp.ui.npcSlotCol--;
+        gp.playSE(9);
+      }
+    } else if (code == KeyEvent.VK_S) {
+      if (gp.ui.npcSlotRow != SLOT_ROW_MAX) {
+        gp.ui.npcSlotRow++;
+        gp.playSE(9);
+      }
+    } else if (code == KeyEvent.VK_D) {
+      if (gp.ui.npcSlotCol != SLOT_COL_MAX) {
+        gp.ui.npcSlotCol++;
+        gp.playSE(9);
       }
     }
   }

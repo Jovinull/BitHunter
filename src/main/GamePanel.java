@@ -82,6 +82,7 @@ public class GamePanel extends JPanel implements Runnable {
   public final int optionsState = 5; // Estado de opções (configurações do jogo)
   public final int gameOverState = 6; // Estado de game over
   public final int transitionState = 7; // Estado de transição entre cenas
+  public final int tradeState = 8; // Estado de comércio com NPCs
 
   // ==== CONSTRUTOR ====
   public GamePanel() {

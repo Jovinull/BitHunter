@@ -13,5 +13,6 @@ public class OBJ_Key extends Entity {
     name = "Key"; // Identificador do objeto
     down1 = setup("/objects/key", gp.tileSize, gp.tileSize);
     description = "[" + name + "]\nAbre portas trancadas.";
+    price = 100;
   }
 }

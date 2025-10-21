@@ -1,5 +1,6 @@
 package entity;
 
+import java.awt.Rectangle;
 import java.util.Random;
 
 import main.GamePanel;
@@ -15,8 +16,9 @@ public class NPC_OldMan extends Entity {
     speed = 1; // Velocidade fixa para o NPC
 
     // Hitbox voltada para os pés (consistente com player/objetos)
+    solidArea = new Rectangle();
     solidArea.x = 8;
-    solidArea.y = 24;
+    solidArea.y = 16;
     solidAreaDefaultX = solidArea.x;
     solidAreaDefaultY = solidArea.y;
     solidArea.width = 32;
