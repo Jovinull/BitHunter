@@ -53,10 +53,6 @@ public class Player extends Entity {
     worldX = gp.tileSize * 23; // Posição inicial em X no mundo (tile 23)
     worldY = gp.tileSize * 21; // Posição inicial em Y no mundo (tile 21)
 
-    worldX = gp.tileSize * 12;
-    worldY = gp.tileSize * 12;
-    gp.currentMap = 1;
-
     speed = 4; // Velocidade do jogador
     direction = "down"; // Direção inicial
 

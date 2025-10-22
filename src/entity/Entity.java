@@ -39,6 +39,7 @@ public class Entity {
   public boolean alive = true;
   public boolean dying = false;
   boolean hpBarOn = false;
+  public boolean onPath = false;
 
   // COUNTER
   public int spriteCounter = 0;
@@ -189,9 +190,7 @@ public class Entity {
     gp.particleList.add(p4);
   }
 
-  // Atualiza a lógica da entidade a cada frame
-  public void update() {
-    setAction(); // Define a ação atual (movimento, idle, etc.)
+  public void checkCollision() {
 
     // Reinicia flag de colisão e verifica colisões com tiles, objetos e o jogador
     collisionOn = false;
@@ -205,6 +204,12 @@ public class Entity {
     if (this.type == type_monster && contactPlayer == true) {
       damagePlayer(attack);
     }
+  }
+
+  // Atualiza a lógica da entidade a cada frame
+  public void update() {
+    setAction(); // Define a ação atual (movimento, idle, etc.)
+    checkCollision(); // Verifica colisões com o ambiente e outras entidades
 
     // Se não houve colisão, move a entidade conforme a direção
     if (!collisionOn) {
@@ -384,5 +389,76 @@ public class Entity {
     }
 
     return image;
+  }
+
+  public void searchPath(int goalCol, int goalRow) {
+
+    int startCol = (worldX + solidArea.x) / gp.tileSize;
+    int startRow = (worldY + solidArea.y) / gp.tileSize;
+
+    gp.pFinder.setNodes(startCol, startRow, goalCol, goalRow);
+
+    if (gp.pFinder.search() == true) {
+
+      // Next worldX & worldY
+      int nextX = gp.pFinder.pathList.get(0).col * gp.tileSize;
+      int nextY = gp.pFinder.pathList.get(0).row * gp.tileSize;
+
+      // Entity's solidArea position
+      int enLeftX = worldX + solidArea.x;
+      int enRightX = worldX + solidArea.x + solidArea.width;
+      int enTopY = worldY + solidArea.y;
+      int enBottomY = worldY + solidArea.y + solidArea.height;
+
+      if (enTopY > nextY && enLeftX >= nextX && enRightX < nextX + gp.tileSize) {
+        direction = "up";
+      } else if (enTopY < nextY && enLeftX >= nextX && enRightX < nextX + gp.tileSize) {
+        direction = "down";
+      } else if (enTopY >= nextY && enBottomY < nextY + gp.tileSize) {
+        // left or right
+        if (enLeftX > nextX) {
+          direction = "left";
+        }
+        if (enLeftX < nextX) {
+          direction = "right";
+        }
+      } else if (enTopY > nextY && enLeftX > nextX) {
+        // up or left
+        direction = "up";
+        checkCollision();
+        if (collisionOn == true) {
+          direction = "left";
+        }
+      } else if (enTopY > nextY && enLeftX < nextX) {
+        // up or right
+        direction = "up";
+        checkCollision();
+        if (collisionOn == true) {
+          direction = "right";
+        }
+      } else if (enTopY < nextY && enLeftX >= nextX) {
+        // down or left
+        direction = "down";
+        checkCollision();
+        if (collisionOn == true) {
+          direction = "left";
+        }
+      } else if (enTopY < nextY && enLeftX < nextX) {
+        // down or right
+        direction = "down";
+        checkCollision();
+        if (collisionOn == true) {
+          direction = "right";
+        }
+      }
+
+      // Se atingir o objetivo, pare a busca
+      // Serve para destinos fixos
+      // int nextCol = gp.pFinder.pathList.get(0).col;
+      // int nextRow = gp.pFinder.pathList.get(0).row;
+      // if (nextCol == goalCol && nextRow == goalRow) {
+      // onPath = false;
+      // }
+    }
   }
 }

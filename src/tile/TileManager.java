@@ -1,5 +1,6 @@
 package tile;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,6 +18,7 @@ public class TileManager {
   GamePanel gp; // Referência ao painel principal do jogo
   public Tile[] tile; // Vetor que armazena os tipos de tiles disponíveis (grama, parede, etc.)
   public int mapTileNum[][][]; // Matriz que representa o mapa (cada número corresponde a um tile)
+  public boolean drawPath = false;
 
   // Construtor: carrega as imagens dos tiles e o mapa a partir de um arquivo .txt
   public TileManager(GamePanel gp) {
@@ -180,6 +182,21 @@ public class TileManager {
       if (worldCol == gp.maxWorldCol) {
         worldCol = 0;
         worldRow++;
+      }
+    }
+
+    if (drawPath == true) {
+
+      g2.setColor(new Color(255, 0, 0, 70));
+
+      for (int i = 0; i < gp.pFinder.pathList.size(); i++) {
+
+        int worldX = gp.pFinder.pathList.get(i).col * gp.tileSize;
+        int worldY = gp.pFinder.pathList.get(i).row * gp.tileSize;
+        int screenX = worldX - gp.player.worldX + gp.player.screenX;
+        int screenY = worldY - gp.player.worldY + gp.player.screenY;
+
+        g2.fillRect(screenX, screenY, gp.tileSize, gp.tileSize);
       }
     }
   }

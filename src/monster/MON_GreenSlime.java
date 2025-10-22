@@ -49,49 +49,82 @@ public class MON_GreenSlime extends Entity {
     right2 = setup("/monster/greenslime_down_2", gp.tileSize, gp.tileSize);
   }
 
-  public void setAction() {
+  public void update() {
 
-    actionLockCounter++;
+    super.update();
 
-    // A cada 120 frames (2 segundos em 60 FPS), o NPC escolhe uma nova direção
-    if (actionLockCounter == 120) {
+    int xDistance = Math.abs(worldX - gp.player.worldX);
+    int yDistance = Math.abs(worldY - gp.player.worldY);
+    int tileDistance = (xDistance + yDistance) / gp.tileSize;
 
-      Random random = new Random();
-      int i = random.nextInt(4); // Gera um número de 0 a 3
+    if (onPath == false && tileDistance < 5) {
 
-      // Altera a direção com base no número gerado
-      switch (i) {
-        case 0:
-          direction = "up";
-          break;
-        case 1:
-          direction = "down";
-          break;
-        case 2:
-          direction = "left";
-          break;
-        case 3:
-          direction = "right";
-          break;
+      int i = new Random().nextInt(100) + 1;
+      if (i > 50) {
+        onPath = true;
       }
-
-      actionLockCounter = 0; // Reinicia o contador para o próximo intervalo
     }
 
-    int i = new Random().nextInt(100) + 1;
+    if (onPath == true && tileDistance > 10) {
+      onPath = false;
+    }
+  }
 
-    if (i > 99 && projectile.alive == false && shotAvailableCounter == 30) {
+  public void setAction() {
 
-      projectile.set(worldX, worldY, direction, true, this);
-      gp.projectileList.add(projectile);
-      shotAvailableCounter = 0;
+    if (onPath == true) {
+
+      // DEFINE PARA O NPC IR ATÉ A POSIÇÃO DO JOGADOR
+      int goalCol = (gp.player.worldX + gp.player.solidArea.x) / gp.tileSize;
+      int goalRow = (gp.player.worldY + gp.player.solidArea.y) / gp.tileSize;
+
+      searchPath(goalCol, goalRow);
+
+      int i = new Random().nextInt(200) + 1;
+      if (i > 197 && projectile.alive == false && shotAvailableCounter == 30) {
+
+        projectile.set(worldX, worldY, direction, true, this);
+        gp.projectileList.add(projectile);
+        shotAvailableCounter = 0;
+      }
+    }
+
+    else {
+
+      actionLockCounter++;
+
+      // A cada 120 frames (2 segundos em 60 FPS), o NPC escolhe uma nova direção
+      if (actionLockCounter == 120) {
+
+        Random random = new Random();
+        int i = random.nextInt(4); // Gera um número de 0 a 3
+
+        // Altera a direção com base no número gerado
+        switch (i) {
+          case 0:
+            direction = "up";
+            break;
+          case 1:
+            direction = "down";
+            break;
+          case 2:
+            direction = "left";
+            break;
+          case 3:
+            direction = "right";
+            break;
+        }
+
+        actionLockCounter = 0; // Reinicia o contador para o próximo intervalo
+      }
     }
   }
 
   public void damageReaction() {
 
     actionLockCounter = 0; // Reseta o contador de ações
-    direction = gp.player.direction; // O monstro reage na direção do jogador
+    // direction = gp.player.direction; // O monstro reage na direção do jogador
+    onPath = true;
   }
 
   public void checkDrop() {

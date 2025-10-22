@@ -14,6 +14,7 @@ import java.util.Comparator;
 
 import javax.swing.JPanel;
 
+import ai.PathFinder;
 import entity.Entity;
 import entity.Player;
 import tile.TileManager;
@@ -51,7 +52,7 @@ public class GamePanel extends JPanel implements Runnable {
   int FPS = 60; // Quadros por segundo
 
   // ==== COMPONENTES DO JOGO ====
-  TileManager tileM = new TileManager(this); // Gerencia o carregamento e desenho dos tiles
+  public TileManager tileM = new TileManager(this); // Gerencia o carregamento e desenho dos tiles
   public KeyHandler keyH = new KeyHandler(this); // Captura entrada de teclado
   Sound music = new Sound(); // Gerencia a música do jogo
   Sound se = new Sound(); // Gerencia os efeitos sonoros do jogo
@@ -60,6 +61,7 @@ public class GamePanel extends JPanel implements Runnable {
   public UI ui = new UI(this); // Interface do usuário (HUD, mensagens, etc.)
   public EventHandler eHandler = new EventHandler(this);
   Config config = new Config(this);
+  public PathFinder pFinder = new PathFinder(this);
   Thread gameThread; // Thread para rodar o loop do jogo
 
   // ENTITY AND OBJECTS

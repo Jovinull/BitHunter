@@ -203,8 +203,10 @@ public class KeyHandler implements KeyListener {
     if (key == KeyEvent.VK_T) {
       if (showDebugText == false) {
         showDebugText = true;
+        gp.tileM.drawPath = true;
       } else if (showDebugText == true) {
         showDebugText = false;
+        gp.tileM.drawPath = false;
       }
     }
 

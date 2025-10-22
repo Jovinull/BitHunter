@@ -50,36 +50,50 @@ public class NPC_OldMan extends Entity {
   // Define o comportamento do NPC — neste caso, movimentação aleatória
   @Override
   public void setAction() {
-    actionLockCounter++;
 
-    // A cada 120 frames (2 segundos em 60 FPS), o NPC escolhe uma nova direção
-    if (actionLockCounter == 120) {
+    if (onPath == true) {
 
-      Random random = new Random();
-      int i = random.nextInt(4); // Gera um número de 0 a 3
+      int goalCol = 12;
+      int goalRow = 9;
 
-      // Altera a direção com base no número gerado
-      switch (i) {
-        case 0:
-          direction = "up";
-          break;
-        case 1:
-          direction = "down";
-          break;
-        case 2:
-          direction = "left";
-          break;
-        case 3:
-          direction = "right";
-          break;
+      searchPath(goalCol, goalRow);
+    }
+
+    else {
+
+      actionLockCounter++;
+
+      // A cada 120 frames (2 segundos em 60 FPS), o NPC escolhe uma nova direção
+      if (actionLockCounter == 120) {
+
+        Random random = new Random();
+        int i = random.nextInt(4); // Gera um número de 0 a 3
+
+        // Altera a direção com base no número gerado
+        switch (i) {
+          case 0:
+            direction = "up";
+            break;
+          case 1:
+            direction = "down";
+            break;
+          case 2:
+            direction = "left";
+            break;
+          case 3:
+            direction = "right";
+            break;
+        }
+
+        actionLockCounter = 0; // Reinicia o contador para o próximo intervalo
       }
-
-      actionLockCounter = 0; // Reinicia o contador para o próximo intervalo
     }
   }
 
   public void speak() {
 
     super.speak(); // Chama o método speak da superclasse Entity
+
+    onPath = true;
   }
 }
