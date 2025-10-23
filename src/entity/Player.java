@@ -363,9 +363,9 @@ public class Player extends Entity {
         String text;
         if (canObtainItem(gp.obj[gp.currentMap][i]) == true) {
           gp.playSE(1);
-          text = "Got a " + gp.obj[gp.currentMap][i].name + "!";
+          text = "Você obteve " + gp.obj[gp.currentMap][i].name + "!";
         } else {
-          text = "You cannot carry any more!";
+          text = "Você não pode carregar mais nada!";
         }
         gp.ui.addMessage(text);
         gp.obj[gp.currentMap][i] = null;

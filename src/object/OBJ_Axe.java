@@ -14,7 +14,7 @@ public class OBJ_Axe extends Entity {
     attackValue = 2;
     attackArea.width = 30;
     attackArea.height = 30;
-    description = "[Machado de Lenhador]\nUm pouco enferrujado, mas ainda\ncorta algumas árvores.";
+    description = "[Machado de Lenhador]\nUm pouco enferrujado, \nmas ainda corta algumas \nárvores.";
     price = 75;
     knockBackPower = 10;
   }

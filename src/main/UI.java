@@ -254,7 +254,7 @@ public class UI {
 
       if (maruMonica != null)
         g2.setFont(maruMonica.deriveFont(Font.PLAIN, 22F));
-      String hint = "W/S ou ↑/↓ navegam • ENTER confirma";
+      String hint = "W/S ou ↑/↓ navegar • ENTER confirma";
       drawTextShadowCentered(hint, gp.screenHeight - gp.tileSize, COL_TEXT_DIM, Color.black, 2);
       return; // <-- ENCERRA AQUI
     }
@@ -437,8 +437,8 @@ public class UI {
     g2.setFont(g2.getFont().deriveFont(44f));
     int y = gp.tileSize * 8;
 
-    drawMenuItem("Retry", y, commandNum == 0);
-    drawMenuItem("Quit", y + MENU_LINE, commandNum == 1);
+    drawMenuItem("Reviver", y, commandNum == 0);
+    drawMenuItem("Sair", y + MENU_LINE, commandNum == 1);
   }
 
   // --- Opções ---
@@ -969,29 +969,29 @@ public class UI {
     final int lineHeight = 30;
 
     // Labels
-    g2.drawString("Level", textX, textY);
+    g2.drawString("Nível", textX, textY);
     textY += lineHeight;
-    g2.drawString("Life", textX, textY);
+    g2.drawString("Vida", textX, textY);
     textY += lineHeight;
     g2.drawString("Mana", textX, textY);
     textY += lineHeight;
-    g2.drawString("Strength", textX, textY);
+    g2.drawString("Força", textX, textY);
     textY += lineHeight;
-    g2.drawString("Dexterity", textX, textY);
+    g2.drawString("Destreza", textX, textY);
     textY += lineHeight;
-    g2.drawString("Attack", textX, textY);
+    g2.drawString("Ataque", textX, textY);
     textY += lineHeight;
-    g2.drawString("Defense", textX, textY);
+    g2.drawString("Defesa", textX, textY);
     textY += lineHeight;
-    g2.drawString("Exp", textX, textY);
+    g2.drawString("EXP", textX, textY);
     textY += lineHeight;
-    g2.drawString("Next Level", textX, textY);
+    g2.drawString("Próximo Nível", textX, textY);
     textY += lineHeight;
-    g2.drawString("Coin", textX, textY);
+    g2.drawString("Moedas", textX, textY);
     textY += lineHeight + 8;
-    g2.drawString("Weapon", textX, textY);
+    g2.drawString("Arma", textX, textY);
     textY += lineHeight + 12;
-    g2.drawString("Shield", textX, textY);
+    g2.drawString("Escudo", textX, textY);
     textY += lineHeight;
 
     // Valores

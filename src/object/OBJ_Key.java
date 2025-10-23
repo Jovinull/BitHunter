@@ -14,7 +14,7 @@ public class OBJ_Key extends Entity {
     this.gp = gp;
 
     type = type_consumable;
-    name = "Key"; // Identificador do objeto
+    name = "Chave"; // Identificador do objeto
     down1 = setup("/objects/key", gp.tileSize, gp.tileSize);
     description = "[" + name + "]\nAbre portas trancadas.";
     price = 100;

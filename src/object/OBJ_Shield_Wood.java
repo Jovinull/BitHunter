@@ -12,7 +12,7 @@ public class OBJ_Shield_Wood extends Entity {
     name = "Escudo de Madeira";
     down1 = setup("/objects/shield_wood", gp.tileSize, gp.tileSize);
     defenseValue = 1;
-    description = "[" + name + "]\nUm escudo simples de madeira.";
+    description = "[" + name + "]\nUm escudo simples de \nmadeira.";
     price = 35;
   }
 }
