@@ -9,12 +9,12 @@ public class OBJ_Axe extends Entity {
     super(gp);
 
     type = type_axe;
-    name = "Woodcutter's Axe";
+    name = "Machado de Lenhador";
     down1 = setup("/objects/axe", gp.tileSize, gp.tileSize);
     attackValue = 2;
     attackArea.width = 30;
     attackArea.height = 30;
-    description = "[Woodcutter's Axe]\nA bit rusty but still \ncan cut some trees.";
+    description = "[Machado de Lenhador]\nUm pouco enferrujado, mas ainda\ncorta algumas árvores.";
     price = 75;
   }
 }

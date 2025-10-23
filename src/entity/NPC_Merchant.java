@@ -43,7 +43,7 @@ public class NPC_Merchant extends Entity {
   }
 
   public void setDialogue() {
-    dialogues[0] = "He he, so you found me. \nI gave some good stuff.\nDo you want to trade?";
+    dialogues[0] = "Hehe, então me encontrou.\nTenho mercadorias de primeira.\nQuer fazer negócio?";
   }
 
   public void setItems() {

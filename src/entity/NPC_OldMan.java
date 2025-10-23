@@ -13,7 +13,7 @@ public class NPC_OldMan extends Entity {
     super(gp); // Chama o construtor da superclasse Entity
 
     direction = "down"; // Direção inicial
-    speed = 1; // Velocidade fixa para o NPC
+    speed = 3; // Velocidade fixa para o NPC
 
     // Hitbox voltada para os pés (consistente com player/objetos)
     solidArea = new Rectangle();
