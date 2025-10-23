@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import ai.PathFinder;
 import entity.Entity;
 import entity.Player;
+import environment.EnvironmentManager;
 import tile.TileManager;
 import tile_interactive.InteractiveTile;
 
@@ -62,6 +63,7 @@ public class GamePanel extends JPanel implements Runnable {
   public EventHandler eHandler = new EventHandler(this);
   Config config = new Config(this);
   public PathFinder pFinder = new PathFinder(this);
+  EnvironmentManager eManager = new EnvironmentManager(this);
   Thread gameThread; // Thread para rodar o loop do jogo
 
   // ENTITY AND OBJECTS
@@ -104,6 +106,7 @@ public class GamePanel extends JPanel implements Runnable {
     aSetter.setNPC();
     aSetter.setMonster();
     aSetter.setInteractiveTile();
+    eManager.setup();
 
     gameState = titleState; // Define o estado inicial do jogo como "menu de título"
 
@@ -328,6 +331,9 @@ public class GamePanel extends JPanel implements Runnable {
       }
 
       entityList.clear();
+
+      // ENVIRONMENT
+      eManager.draw(g2);
 
       // UI
       ui.draw(g2);
