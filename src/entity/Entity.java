@@ -82,6 +82,8 @@ public class Entity {
   public int useCost;
   public int price;
   public int knockBackPower = 0;
+  public boolean stackable = false;
+  public int amount = 1;
 
   // TIPOS
   public int type; // 0 = player, 1 = npc, 2 = monster
