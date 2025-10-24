@@ -10,6 +10,7 @@ import main.GamePanel;
 import main.KeyHandler;
 import object.OBJ_Fireball;
 import object.OBJ_Key;
+import object.OBJ_Lantern;
 import object.OBJ_Shield_Wood;
 import object.OBJ_Sword_Normal;
 
@@ -22,6 +23,7 @@ public class Player extends Entity {
   public final int screenY; // Posição fixa do jogador na tela no eixo Y (centro da tela)
   int standCounter = 0; // Contador para animação de parada
   public boolean attackCanceled = false; // Flag para indicar se o jogador está atacando
+  public boolean lightUpdated = false;
 
   public boolean debugCollision = false; // Flag para depuração de colisão
 
@@ -94,6 +96,7 @@ public class Player extends Entity {
     inventory.add(currentWeapon);
     inventory.add(currentShield);
     inventory.add(new OBJ_Key(gp));
+    inventory.add(new OBJ_Lantern(gp));
   }
 
   public int getAttack() {
@@ -509,6 +512,17 @@ public class Player extends Entity {
         currentShield = selectedItem;
         defense = getDefense();
       }
+
+      if (selectedItem.type == type_light) {
+
+        if (currentLight == selectedItem) {
+          currentLight = null;
+        } else {
+          currentLight = selectedItem;
+        }
+        lightUpdated = true;
+      }
+
       if (selectedItem.type == type_consumable) {
 
         if (selectedItem.use(this) == true) {

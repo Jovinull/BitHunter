@@ -247,6 +247,7 @@ public class GamePanel extends JPanel implements Runnable {
           iTile[currentMap][i].update();
         }
       }
+      eManager.update();
     }
 
     // Se o jogo estiver pausado, essa parte é executada
