@@ -46,8 +46,8 @@ public class GamePanel extends JPanel implements Runnable {
   public boolean fullScreenOn = false;
 
   // ==== CONFIGURAÇÕES DO MUNDO ====
-  public final int maxWorldCol = 50; // Quantidade total de colunas no mundo
-  public final int maxWorldRow = 50; // Quantidade total de linhas no mundo
+  public int maxWorldCol;
+  public int maxWorldRow;
 
   // ==== CONFIGURAÇÃO DE FPS ====
   int FPS = 60; // Quadros por segundo
