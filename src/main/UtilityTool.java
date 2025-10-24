@@ -9,12 +9,17 @@ public class UtilityTool {
   /**
    * Redimensiona a imagem mantendo o tipo do BufferedImage original.
    *
-   * @param original imagem de entrada (não nula)
-   * @param width    largura destino (px)
-   * @param height   altura destino (px)
+   * @param original
+   *          imagem de entrada (não nula)
+   * @param width
+   *          largura destino (px)
+   * @param height
+   *          altura destino (px)
    * @return nova imagem escalada
-   * @throws NullPointerException     se original for nula
-   * @throws IllegalArgumentException se width/height <= 0
+   * @throws NullPointerException
+   *           se original for nula
+   * @throws IllegalArgumentException
+   *           se width/height <= 0
    */
   public BufferedImage scaleImage(final BufferedImage original, final int width, final int height) {
     Objects.requireNonNull(original, "original image must not be null");
