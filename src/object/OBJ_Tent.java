@@ -12,9 +12,9 @@ public class OBJ_Tent extends Entity {
     this.gp = gp;
 
     type = type_consumable;
-    name = "Tent";
+    name = "Tenda";
     down1 = setup("/objects/tent", gp.tileSize, gp.tileSize);
-    description = "[Tent]\nVocê pode dormir até \na manhã seguinte.";
+    description = "[" + name + "]\nVocê pode dormir até \na manhã seguinte.";
     price = 300;
     stackable = true;
   }

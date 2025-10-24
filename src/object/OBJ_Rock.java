@@ -14,7 +14,7 @@ public class OBJ_Rock extends Projectile {
     super(gp);
     this.gp = gp;
 
-    name = "Rock";
+    name = "Pedra";
     speed = 8;
     maxLife = 80;
     life = maxLife;

@@ -12,7 +12,7 @@ public class OBJ_ManaCrystal extends Entity {
     this.gp = gp;
 
     type = type_pickupOnly;
-    name = "Mana Crystal";
+    name = "Cristal de Mana";
     value = 1;
     down1 = setup("/objects/manacrystal_full", gp.tileSize, gp.tileSize);
     image = setup("/objects/manacrystal_full", gp.tileSize, gp.tileSize);

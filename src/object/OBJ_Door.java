@@ -14,7 +14,7 @@ public class OBJ_Door extends Entity {
     this.gp = gp;
 
     type = type_obstacle;
-    name = "Door"; // Identificador do objeto
+    name = "Porta";
     down1 = setup("/objects/door", gp.tileSize, gp.tileSize);
     collision = true;
 

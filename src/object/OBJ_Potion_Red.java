@@ -16,7 +16,7 @@ public class OBJ_Potion_Red extends Entity {
     name = "Poção Vermelha";
     value = 5;
     down1 = setup("/objects/potion_red", gp.tileSize, gp.tileSize);
-    description = "[Poção Vermelha]\nRestaura sua vida em " + value + ".";
+    description = "[" + name + "]\nRestaura sua vida em " + value + ".";
     price = 25;
     stackable = true;
   }

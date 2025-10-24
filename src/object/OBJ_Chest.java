@@ -15,7 +15,7 @@ public class OBJ_Chest extends Entity {
     this.loot = loot;
 
     type = type_obstacle;
-    name = "Chest";
+    name = "Baú";
     image = setup("/objects/chest", gp.tileSize, gp.tileSize);
     image2 = setup("/objects/chest_opened", gp.tileSize, gp.tileSize);
     down1 = image;

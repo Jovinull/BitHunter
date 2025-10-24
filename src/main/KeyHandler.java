@@ -17,7 +17,7 @@ public class KeyHandler implements KeyListener {
   public boolean upPressed, downPressed, leftPressed, rightPressed, enterPressed, shotKeyPressed;
 
   // DEBUG: exibir/ocultar tempo de desenho
-  boolean showDebugText = false;
+  public boolean showDebugText = false;
 
   // Limites de índices dos menus de título (evita "números mágicos")
   private static final int MENU_MAIN_MAX_INDEX = 2; // [Iniciar, Créditos, Sair]

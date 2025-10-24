@@ -133,26 +133,27 @@ public class Lighting {
     g2.drawImage(darknessFilter, 0, 0, null);
     g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 
-    // DEBUG
-    String situation = "";
+    // DEBUG: só mostra quando Toggle (T) estiver ligado no KeyHandler
+    if (gp != null && gp.keyH != null && gp.keyH.showDebugText) {
+      String situation = "";
+      switch (dayState) {
+        case day:
+          situation = "Day";
+          break;
+        case dusk:
+          situation = "Dusk";
+          break;
+        case night:
+          situation = "Night";
+          break;
+        case dawn:
+          situation = "Dawn";
+          break;
+      }
 
-    switch (dayState) {
-      case day:
-        situation = "Day";
-        break;
-      case dusk:
-        situation = "Dusk";
-        break;
-      case night:
-        situation = "Night";
-        break;
-      case dawn:
-        situation = "Dawn";
-        break;
+      g2.setColor(Color.white);
+      g2.setFont(g2.getFont().deriveFont(50f));
+      g2.drawString(situation, 800, 500);
     }
-
-    g2.setColor(Color.white);
-    g2.setFont(g2.getFont().deriveFont(50f));
-    g2.drawString(situation, 800, 500);
   }
 }
