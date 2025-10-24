@@ -101,24 +101,24 @@ public class Lighting {
     if (dayState == day) {
       dayCounter++;
 
-      if (dayCounter > 600) {
+      if (dayCounter > 18000) {
         dayState = dusk;
         dayCounter = 0;
       }
     } else if (dayState == dusk) {
-      filterAlpha += 0.001f;
+      filterAlpha += 1f / 1800f; // ANTIGO: filterAlpha += 0.001f;
       if (filterAlpha > 1f) {
         filterAlpha = 1f;
         dayState = night;
       }
     } else if (dayState == night) {
       dayCounter++;
-      if (dayCounter > 36000) {
+      if (dayCounter > 10800) {
         dayState = dawn;
         dayCounter = 0;
       }
     } else if (dayState == dawn) {
-      filterAlpha -= 0.001f;
+      filterAlpha -= 1f / 1800f; // ANTIGO: filterAlpha -= 0.001f;
       if (filterAlpha < 0f) {
         filterAlpha = 0f;
         dayState = day;
