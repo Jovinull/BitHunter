@@ -32,6 +32,7 @@ public class Sound {
     soundURL[11] = getClass().getResource("/sounds/cuttree.wav");
     soundURL[12] = getClass().getResource("/sounds/gameover.wav");
     soundURL[13] = getClass().getResource("/sounds/stairs.wav");
+    soundURL[14] = getClass().getResource("/sounds/sleep.wav");
   }
 
   // Prepara o áudio correspondente ao índice informado
