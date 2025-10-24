@@ -1,45 +1,43 @@
 {
   // Telemetria do plugin da RedHat
   "redhat.telemetry.enabled": true,
-
   // Git
   "git.autofetch": true,
   "git.enableSmartCommit": true,
   "git.confirmSync": false,
-
   // Projeto Java
-  "java.project.sourcePaths": ["src", "resource"],
+  "java.project.sourcePaths": [
+    "src",
+    "resource"
+  ],
   "java.configuration.updateBuildConfiguration": "automatic",
-
   "extensions.ignoreRecommendations": false,
-
   "cSpell.language": "pt,pt-BR,en",
-  "cSpell.dictionaries": ["portuguese-brazilian", "en-US"],
-
+  "cSpell.dictionaries": [
+    "portuguese-brazilian",
+    "en-US"
+  ],
   // Ações ao salvar
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
   "java.saveActions.organizeImports": true,
-
   // Indentação padronizada no projeto
   "editor.insertSpaces": true,
   "editor.tabSize": 2,
   "editor.detectIndentation": false,
-
   // Arquivos (higiene multiplataforma)
   "files.encoding": "utf8",
   "files.eol": "\n",
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
-
   // Escopo só para Java (evita forçar formatter em outras linguagens)
   "[java]": {
     "editor.defaultFormatter": "redhat.java",
     "editor.insertSpaces": true,
     "editor.tabSize": 2
   },
-
   // Checkstyle
   "java.checkstyle.properties": {},
-  "java.checkstyle.modules": []
+  "java.checkstyle.modules": [],
+  "java.format.settings.url": "/.vscode/eclipse-formatter.xml"
 }
