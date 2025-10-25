@@ -92,9 +92,6 @@ public class UI {
   public void draw(Graphics2D g2) {
     this.g2 = g2;
 
-    // Antialias só para texto (barato o suficiente e melhora legibilidade)
-    g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-
     // Fonte base
     if (maruMonica != null)
       g2.setFont(maruMonica.deriveFont(Font.PLAIN, 24f));
