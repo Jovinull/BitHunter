@@ -25,7 +25,7 @@ public class OBJ_Key extends Entity {
 
     gp.gameState = gp.dialogueState;
 
-    int objIndex = getDetected(entity, gp.obj, "Door");
+    int objIndex = getDetected(entity, gp.obj, "Porta");
 
     if (objIndex != 999) {
       gp.ui.currentDialogue = "Você usa o " + name + " e abra a porta";
