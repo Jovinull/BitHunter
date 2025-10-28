@@ -176,62 +176,137 @@ O projeto prioriza **clareza mecânica**, **leitura visual limpa** e **desempenh
 
 ## Controles
 
-* **WASD/Setas:** mover
-* **J/K/L (configurável):** ataque leve / pesado / habilidade
-* **E:** interagir (falar, abrir baú/porta, alavanca)
-* **Q:** usar consumível rápido (poção)
-* **I:** inventário
-* **M:** mapa/minimapa
-* **Esc:** pausa/opções
+* **W/A/S/D:** mover (e navegar em listas/slots de inventário)
+* **Enter:** confirmar/interagir (diálogos, menus, trade, usar/equipar item na tela de personagem)
+* **P:** pausar / retomar
+* **C:** abrir/fechar status do personagem
+* **Esc:** abrir opções (em jogo) / voltar (em submenus e seleção de classe)
+* **F:** disparo/magia
+* **T:** alternar texto de debug e exibição de caminho (dev)
+* **R:** recarregar mapa atual (atalho de desenvolvimento)
+* **W/S (menus):** navegar para cima/baixo; **Enter** seleciona
 
-> Suporte a **rebind** e **acessibilidade** (alto contraste, fontes maiores, reduzir animações).
+  * Tela de Game Over: **W/S** navega, **Enter** confirma
+  * Trade/Inventários: **W/A/S/D** navegam slots; **Esc** volta
+
+> Observações
+>
+> * Não há suporte a **rebind** no código atual (as opções tratam volume e navegação).
+> * As teclas **E**, **Q**, **J/K/L** e **M** não estão implementadas no `KeyHandler`, então foram removidas desta seção para evitar inconsistências.
+> * Se quiser manter “atalhos planejados” (ex.: **M** para mapa, **Q** para consumível rápido), recomendo listá-los numa subseção “Planejados” e só movê-los para “Controles” após implementar no `KeyHandler`.
 
 ---
 
+Aqui vai a seção reescrita com base direta no que o seu código já implementa hoje (e sinalizando o que está “Planejado” mas ainda não existe no código):
+
 ## Sistemas de Pontuação e Atributos
 
-### HP / MP / Stamina
+### HP / MP / (Stamina)
 
-* **HP** (corações na HUD): dano físico/mágico reduz corações; regeneração por itens/descanso.
-* **MP** (cristais): gasto por habilidades; recarrega por tempo lento + itens.
-* **Stamina** (opcional): custo para dash/ataque pesado, regenera fora de combate.
+* **HP (vida)**: inteiro com limite por `maxLife`. Dano recebido = `attackInimigo - defense` (mínimo 0).
+
+  * **i-frames** (invencibilidade) ao tomar dano: ~60 frames no player; monstros têm i-frames próprios e barra de HP opcional na cabeça.
+  * Vida é **restaurada** por itens (`consumable.use(this)`) e por rotinas de descanso/recuperação como `restoreLifeAndMana()`.
+* **MP (mana)**: inteiro com limite por `maxMana`.
+
+  * **Gasto** por projéteis/habilidades (ex.: `OBJ_Fireball` via `haveResource()`/`subtractResource()`).
+  * **Recuperação** por itens/descanso (não há regen passiva no loop principal).
+* **Stamina**: **Planejado**. Não há custo de dash/ataque pesado no código atual.
+
+**Atributos e combate**
+
+* **Força** e **Destreza** escalam ataque/defesa:
+
+  * `attack = strength * currentWeapon.attackValue`
+  * `defense = dexterity * currentShield.defenseValue`
+* **Knockback**: armas podem ter `knockBackPower`; aplica recuo no alvo.
+* **Ammunition** (`ammo`): existe no player; o uso depende do projétil. No caso do **Fireball**, o custo tende a ser **mana** (não munição).
+
+---
 
 ### XP e Níveis
 
-* **XP** por inimigos, missões e descobertas.
-* Ao **subir de nível**, jogador recebe pontos de atributo/talento (força, destreza, espírito).
+* **XP** ganho ao matar monstros (`exp += monster.exp`), com feedback na UI.
+* **Level up** em `checkLevelUp()`:
+
+  * `nextLevelExp` **dobra** a cada nível.
+  * +2 em **maxLife**, +1 em **strength** e **dexterity**; recalcula `attack/defense`; **vida é cheia**.
+  * Mensagem de nível na UI (estado de diálogo).
+* **Fontes de XP**: combate e (no futuro) objetivos; não há XP por exploração no código atual.
+
+---
 
 ### Moedas e Recompensas
 
-* **Coins** (bronze→prata→ouro) para lojistas/upgrades.
-* Baús, eventos e mini-desafios concedem recompensas.
+* **Coins**: inteiro (`coin`), inicial ~`500`. Usado para lojas/compras (**Planejado** no GDD; no código base, já há `price` nos itens, mas a economia completa depende das telas de trade/loja).
+* **Drops de itens**: via `checkDrop()`/`dropItem()` em monstros (estrutura pronta; lógica de quais itens ainda é sua).
+* **Tipos de item**: espada, machado, escudo, consumível, luz (lanterna), chave, pickupOnly, obstáculo etc.
+* **Inventário**: até **20** slots; itens **stackable** incrementam `amount`. Mensagens de pickup na UI.
+
+> Observação: a ideia de **tiers visuais** (bronze→prata→ouro) pode existir só como **apresentação**; tecnicamente `coin` é um número.
+
+---
 
 ### Missões e Pontos de Tarefa
 
-* **Missões principais** (história) e **secundárias** (exploração).
-* **Pontos de Tarefa** (internos) medem conclusão de capítulo e liberam recompensas cumulativas.
+* **Missões principais/secundárias**: **Planejado**. Não há sistema de quests por hora.
+* **Pontos de Tarefa** (medir capítulo/progredir recompensas cumulativas): **Planejado**.
+* **Hoje**: o ciclo de progresso é orientado por **combate + XP + equipamento**, com estados de UI para diálogo, trade e game over já estruturados.
 
 ---
 
 ## Interface (HUD) e UX
 
-### HUD
+### HUD (implementado)
 
-* **Corações** (HP), **Cristais** (MP), **Ícone de moeda + valor**.
-* **Barra de XP** discreta.
-* **Slots rápidos** (consumível/skill).
-* **Indicadores de status**: veneno, sangramento, buff.
+* **Vida (HP):** corações desenhados no canto superior esquerdo (`drawPlayerLife`), com **vazio / meio / cheio**.
+* **Mana (MP):** cristais abaixo dos corações, exibindo **máximo** e **atual**.
+* **Mensagens rápidas:** feed de mensagens flutuantes na tela (ex.: “Você obteve…”, “X de dano!”) com sombra leve e expiração automática (`drawMessage`).
+* **Status do personagem:** tela dedicada com **nível, vida, mana, força, destreza, ataque, defesa, EXP, EXP para próximo nível, moedas**, além de **arma/escudo** equipados (`drawCharacterScreen`).
+* **Game Over:** overlay com opções **Reviver** / **Sair**.
+* **Pausa / Diálogo / Opções:** janelas modais com fundo e bordas discretos.
 
-### Mapas e Mini-mapa
+> Nota: **Moedas** e **EXP** não aparecem na HUD de “play” por padrão; aparecem na tela de personagem e em janelas (trade/opções). Se quiser moedas/EXP sempre visíveis, é uma adição simples ao `drawPlayerLife()` ou criando `drawTopBar()`.
 
-* Mini-mapa opcional; mapa de área com salas exploradas e **marcadores** (portas trancadas, chefes).
+### Inventário e Trade (implementado)
 
-### Feedbacks Visuais e Sonoros
+* **Inventário com grid** (até 20 itens), **highlight** para itens equipados (arma/escudo/luz) e **contador** para itens empilháveis.
+* **Cursor** com borda e **janela de descrição** do item selecionado.
+* **Trade** (comprar/vender) com janela de preço, saldo do jogador (ícone de moeda) e navegação por W/A/S/D + Enter/Esc.
 
-* Dano: flash leve no sprite + sfx.
-* Acerto crítico: número flutuante com ênfase.
-* Loot: brilho pulsante; pickup sfx distinto.
-* Acessibilidade: **alto contraste**, **fontes escaláveis**, **redução de motion**.
+### Feedbacks Visuais e Sonoros (implementado)
+
+* **Dano recebido:** som de acerto (`playSE(6)`) e **transparência** temporária do player (i-frames), com **HP bar** opcional em monstros quando atingidos.
+* **Pickup/uso de item:** som dedicado e mensagem no feed.
+* **Transições / dormir:** fades leves com controle de alpha.
+* **Legibilidade:** fontes bitmap limpas, **sombra de texto** para contraste, paleta sóbria (fundo/painéis/bordas/destaques).
+
+### Mapas e Mini-mapa (planejado)
+
+* Não há mini-mapa nem mapa de área no código atual.
+
+  * **Sugestão rápida:** criar `drawMapOverlay()` com matriz de salas exploradas e marcadores simples (porta trancada, chefe), acionado por tecla (ex.: `M`).
+
+### Indicadores de Status (planejado)
+
+* Ícones para **veneno / sangramento / buff** não estão implementados.
+
+  * **Sugestão:** reservar uma faixa à direita dos cristais e desenhar pequenos `BufferedImage` com tooltip em `drawPlayerLife()`.
+
+### Barra de XP (planejado)
+
+* EXP está visível na **tela de personagem**, mas não há **barra de XP** na HUD.
+
+  * **Sugestão:** em `drawPlayerLife()`, após MP, desenhar uma barra fina proporcional a `player.exp / player.nextLevelExp`.
+
+### Acessibilidade e UX
+
+* **Já presente:** alto contraste funcional (fundo escuro, texto claro), **sombra de texto**, tamanhos de fonte ajustáveis via `deriveFont` (embora fixos em runtime), navegação de menus por teclado com feedback visual.
+* **Planejado:**
+
+  * **Escala de fonte** configurável nas **Opções** (slider como o de volume).
+  * **Redução de motion:** flag nas **Opções** que limita fades/transições (pular `transitionState`/`sleepState` ou reduzir alpha-step).
+  * **Indicadores auditivos opcionais** (ex.: leve beep ao focar item no inventário).
 
 ---
 
@@ -239,13 +314,15 @@ O projeto prioriza **clareza mecânica**, **leitura visual limpa** e **desempenh
 
 ### Iluminação e Ciclo Dia/Noite
 
-* **Sombras** por máscara (foco no jogador).
-* **Estados**: dia / crepúsculo / noite / amanhecer (afetando alcance de visão e spawn).
-* **Filtro de cor** e **opacidade** ajustados por estado (performance-friendly).
+* **Implementado:** máscara/overlay com **alpha** variável (filtro de cor/opacidade) controlado por `eManager.lighting.filterAlpha`, usado também em transições (ex.: tela de dormir). Estados de dia/noite já existem como `dayState`/`day`, alternados com fade.
+* **Efeito prático:** foco visual no player (região clara) e ambiente escurecido à medida que o alpha sobe; solução **performance-friendly** (um overlay, sem pós-processo pesado).
+* **Planejado:** ampliar os **estados** (dia / crepúsculo / noite / amanhecer) para afetar **alcance de visão** e **spawn**. Hoje o overlay muda a luminosidade, mas não altera IA/spawn.
 
 ### Clima e Ambiente
 
-* Efeitos leves (chuva/névoa) que influenciam **velocidade**, **visão** ou **IA** (opcional).
+* **Planejado:** efeitos leves (chuva/névoa) alterando **velocidade**, **visão** ou **IA**.
+
+  * (Não há efeitos climáticos no código atual; a mesma técnica de overlay e partículas pode ser reaproveitada.)
 
 ---
 
@@ -253,31 +330,47 @@ O projeto prioriza **clareza mecânica**, **leitura visual limpa** e **desempenh
 
 ### Movimentação
 
-* Top-down 8 direções (ou grid-based).
-* **Dash** curto com i-frames (cooldown).
+* **Implementado:** top-down **4 direções** (W/A/S/D), com colisão de tiles/objetos/entidades e animação de caminhada.
+* **Planejado:** 8 direções ou modo grid-based (hoje não há).
+* **Dash:** **planejado**. Não há dash nem custo de stamina no código atual.
 
 ### Interação
 
-* Abrir portas/baús (chaves), alavancas, conversar, ler placas.
-* Coletar itens (auto-pickup para moedas).
+* **Implementado:**
+
+  * **Coleta** de itens ao colidir (`pickUpObject`), com **stack**, mensagem e som; itens `pickupOnly` são usados automaticamente.
+  * **Chaves/obstáculos:** há `OBJ_Key` e `type_obstacle` com `interact()` quando o jogador confirma (Enter).
+  * **Conversar/diálogo** com NPCs (Enter), com janela dedicada.
+* **Planejado:** **auto-pickup só para moedas** (hoje a coleta é por colisão + lógica do item; ajustar para moedas se quiser esse comportamento).
+* **Placas/alavancas:** parcialmente coberto via `type_obstacle`/`interact()`; expandir conforme necessidade.
 
 ### Combate
 
-* **Ataque leve** (rápido) / **pesado** (lento, mais dano/poise).
-* **Parry/Block** (opcional), **stagger** em inimigos.
-* **Habilidades** que consomem MP (ex.: disparo arcano, golpe giratório).
-* **Elementos** (físico, fogo, gelo, sombra) criam fraquezas/resistências simples.
+* **Implementado:**
+
+  * **Ataque corpo-a-corpo** com Enter (espada/machado), caixa de ataque temporária e cálculo de **dano = ataque − defesa** (mín. 0).
+  * **Projétil/habilidade** (tecla **F**, ex.: **Fireball**) consumindo **mana** com cooldown.
+  * **Knockback** opcional por arma (`knockBackPower`).
+  * **i-frames** ao sofrer dano (player e monstros).
+* **Planejado:**
+
+  * **Ataque pesado** e **parry/block ativo** (o escudo hoje só dá **defesa** passiva).
+  * **Stagger** por poise/ataque pesado.
+  * **Elementos** (físico/fogo/gelo/sombra) com resistências/fraquezas; o Fireball sugere “fogo”, mas não há resistências no dano.
 
 ### Habilidades
 
-* **Árvore de talentos** simples (3 trilhas: Ofensiva, Defensiva, Utilitária).
-* Sinergias com equipamentos (ex.: +chance crítico com adagas).
+* **Planejado:** **árvore/roda de talentos** com trilhas Ofensiva/Defensiva/Utilitária e sinergias de build.
+
+  * **Hoje:** progressão por **nível** (vida/força/destreza sobem) e troca de **arma/escudo/luz**; não há sistema de talentos.
 
 ### Inventário e Equipamentos
 
-* Slots: **arma**, **armadura**, **acessório**.
-* Raridades (comuns → lendários).
-* Peso/encumbrance (opcional, leve).
+* **Implementado:**
+
+  * **Slots funcionais:** **arma**, **escudo**, **luz** (lanterna).
+  * **Inventário** com até **20** itens; itens **empilháveis**; preço/compra/venda em **Trade**; destaque para itens equipados; descrição contextual.
+* **Planejado:**
 
 ---
 
@@ -285,19 +378,40 @@ O projeto prioriza **clareza mecânica**, **leitura visual limpa** e **desempenh
 
 ### Terreno e Colisão
 
-* Tilemap com camadas: **colisão**, **decoração**, **interação**.
-* Propriedades por tile: escorregadio, venenoso, lento (ex.: lama).
+* **Implementado (no código):**
+
+  * **Tilemap com colisão** via `TileManager` + `CollisionChecker.checkTile(this)`. Tiles sólidos são respeitados no movimento de player/NPC/monstros.
+  * **Camada de interação**: `InteractiveTile` (ex.: tiles destruíveis, vida, `destructible`, `invincible`, `getDestroyedForm()`), atualizados em `GamePanel.update()` e desenhados antes das entidades.
+  * **Objetos interativos** (portas/obstáculos/baús): `type_obstacle` com `interact()` e coleta via `pickUpObject`.
+* **Planejado (extensões fáceis com a base atual):**
+
+  * **Camada de decoração** sem colisão (apenas visual) já é suportada pelo fluxo de draw; seguir pelo `TileManager`.
+  * **Propriedades por tile** (escorregadio/venenoso/lento): aproveitar `InteractiveTile` ou um mapa de propriedades no `TileManager` e aplicar efeitos no `CollisionChecker`/`EventHandler` (ex.: aplicar slow por N frames).
 
 ### IA: NPCs e Inimigos
 
-* **NPCs**: diálogo, loja, missão, dicas de exploração.
-* **Inimigos**: estados simples (patrulha, perseguir, atacar, recuar).
-* **Partículas/Traços** (opcional): vestígios em áreas perigosas ou buffadas.
+* **Implementado (no código):**
+
+  * **NPCs**: diálogo com `speak()` (UI de diálogo dedicada); comércio (`tradeState`, inventário do NPC, compra/venda com preço e validações).
+  * **Inimigos**: ciclo básico com `update()` e flags (`alive`, `dying`, `invincible`, `hpBarOn`), dano em player (`damagePlayer`), **knockback**, drops (`checkDrop()`), e A* com `PathFinder` e `onPath`/`searchPath`.
+  * **Estados práticos** já emergem: **patrulha** (via `setAction()`), **perseguir** (quando `onPath`), **atacar** (hitbox de ataque do player + cálculo de dano), **recuo** (knockback).
+  * **Partículas**: sistema de `Particle` já integrado (`generateParticle`, `particleList`).
+* **Planejado:**
+
+  * Tabelar estados de IA (patrulha → perseguir → atacar → recuar) numa FSM simples por `Entity.setAction()`.
+  * Variantes de percepção (raio/cone) e timers de aggro/desaggro (usar `actionLockCounter` já existente).
 
 ### Itens e Objetos Inanimados
 
-* **Rochas/Crates** (quebráveis), **Portas** (chave/interruptor), **Altares** (buffs).
-* **Moedas** (OBJ_Coin_Bronze, etc.), **Corações**, **Cristais de Mana** (itens já presentes no seu código).
+* **Implementado (no código):**
+
+  * **Moedas** (`OBJ_Coin_Bronze`), **Corações** (`OBJ_Heart`), **Cristais de Mana** (`OBJ_ManaCrystal`) com HUD pronto e coleta.
+  * **Portas/Chaves**: `OBJ_Key` + `type_obstacle` com `interact()` (chaves consumíveis; portas/obstáculos destravados/abertos por ação).
+  * **Baús** e pickups (`type_pickupOnly`) com uso instantâneo.
+* **Planejado:**
+
+  * **Rochas/Crates** quebráveis como `InteractiveTile` (destructible, vida, som) com possibilidade de **drop**.
+  * **Altares** (buffs temporários) usando `interact()` + aplicação de status no player (ex.: +força por 60s).
 
 ---
 
@@ -305,68 +419,44 @@ O projeto prioriza **clareza mecânica**, **leitura visual limpa** e **desempenh
 
 ### Classes/Arquétipos (opcional)
 
-* **Caçador** (crit/dash), **Guardião** (defesa/poise), **Arcanista** (skills/MP).
+* **Base disponível:** tela de **seleção de classe** (title `state == 1`) já existe.
+* **Planejado:**
+
+  * **Caçador** (crit/dash), **Guardião** (defesa/poise), **Arcanista** (skills/MP).
+  * Aplicar no `Player.setDefaultValues()` ajustes de **força/destreza/mana**, arma inicial e passivas leves (ex.: +crit com adaga para Caçador).
 
 ### Inimigos e Facções
 
-* **Ratos de Dados** (rápidos, fracos), **Specters** (fantasmas, vulneráveis a luz),
-* **Mimics** (baús falsos), **Cultistas** (humanóides com magia).
-* Facções influenciam **agressividade** e **drops** por área.
+* **Implementado:** variedade pronta para crescer (arrays por mapa, `checkDrop`, HP bar, A*).
+* **Planejado:**
 
-### Chefes
-
-* 1 chefe por capítulo, com **padrões telegráficos**, **2–3 fases** e **drops únicos**.
-
----
-
-## Estrutura de Fases/Capítulos
-
-### Capítulo 1 — Bairro das Ruínas
-
-* **Objetivo:** aprender combate básico, abrir atalhos, derrotar mini-chefe.
-* **Missões:** recuperar chave antiga, ativar 2 alavancas.
-* **Chefão:** Guardião Quebrado (telegráfos simples, golpe pesado).
-
-### Capítulo 2 — Mercado Subterrâneo
-
-* **Objetivo:** introduzir **lojas**, **crafting leve** e inimigos elementais.
-* **Missões:** escoltar NPC, limpar ninho, encontrar reagentes.
-* **Chefão:** Tecelã de Sombras (fase 2 com adds).
-
-### Capítulo 3 — Fortaleza dos Caçadores
-
-* **Objetivo:** domínio de build; encontros combinando mobs + elites.
-* **Missões:** sabotar portões, recuperar relíquia “Bit-Núcleo”.
-* **Chefão:** Mestre dos BitHunters (parry, combos, punição a greed).
-
----
-
-## Sessenta Segundos de Jogo
-
-O jogador nasce no **Bairro das Ruínas**, HUD mostra **corações**, **cristais** e **coins**. Dois inimigos patrulham um beco escuro. O filtro de **crepúsculo** reduz o alcance de visão; um **baú** brilha ao fundo. O jogador avança com **WASD**, usa **J** para um ataque leve e elimina o primeiro inimigo; o segundo telegrava um golpe pesado — **dash** com **Shift** para sair da linha e contra-atacar. Cai um **coração** e **moedas** (pickup automático). A alavanca à direita libera um atalho marcado no **mini-mapa**. Um NPC próximo oferece uma **poção** e uma dica do **chefão** da área. O jogador segue a trilha de tochas rumo ao portão.
+  * **Ratos de Dados** (rápidos, fracos), **Specters** (vulneráveis à luz → sinergia com `currentLight`), **Mimics** (baú que ataca), **Cultistas** (projéteis/MP drain).
+  * Facções por área para modular **agressividade** e **tabela de drop** (usar prefixo/flag em `Entity.name` + handler de loot).
 
 ---
 
 ## Conteúdo Futuro / Backlog
 
-* Sistema de **crafting** (imbuir armas com bits/essências).
-* **Contratos de caça** (mini-chefes opcionais).
-* **Seeds** de mapa para variação leve (replayability).
-* **Acessibilidade extra**: daltônico, alto contraste ampliado, modo texto grande global.
+* **Crafting/Imbuir** armas com **bits/essências** (slots de elemento).
+* **Contratos de caça**: mini-chefes opcionais com recompensas únicas.
+* **Seeds** de mapa para variação leve por sessão.
+* **Acessibilidade extra**: daltônico, alto contraste expandido, modo texto grande global.
 
 ---
 
 ## Referências
 
-* *The Legend of Zelda* (top-down combat/readability de telegráfos)
-* *Hyper Light Drifter* (dash/combat vibe)
-* *Enter the Gungeon* (telegráfos/variedade de encontros)
-* Documentos e códigos do próprio projeto (**UI**, **Lighting**, **OBJ_Coin_Bronze**, **OBJ_Heart**, **OBJ_ManaCrystal**) como guias de HUD/iluminação.
+* *The Legend of Zelda* (telegráfos legíveis, combate top-down)
+* *Hyper Light Drifter* (dash/combat feel)
+* *Enter the Gungeon* (padrões/variedade)
+* Seu próprio código: **UI** (HUD e mensagens), **Lighting/Environment** (overlay e transições), **OBJ_Coin_Bronze / OBJ_Heart / OBJ_ManaCrystal** (coleta/HUD), **PathFinder** (A*), **InteractiveTile** (destrutíveis).
 
 ---
 
-> **Notas para produção**
->
-> * Manter o jogo **leve**: sprites otimizados, culling simples, partículas com limites.
-> * **Comentário e organização** de código (Clean Code), escalando sistemas (HUD, IA, Itens) em módulos.
-> * Este documento é a **base**: use como “esqueleto”, detalhando cada seção à medida que os assets e as mecânicas forem fechando.
+### Notas rápidas de implementação (pragmáticas)
+
+* **Terreno “lento/venenoso/escorregadio”**: adicionar mapa de propriedades por tile (ex.: `tileProps[row][col]`) e aplicar em `CollisionChecker`/`EventHandler` (slow por N frames, tick de dano, mod de atrito).
+* **Dash**: flag no `Player` com **cooldown** e **i-frames**, custo opcional de **Stamina** (se ativar barra).
+* **Elementos**: atributo `element` em arma/projétil/monstro; tabela simples de multiplicadores.
+* **Parry/Block**: tecla de defesa ativando **i-frames curtos** e “stagger” se perfect-timing.
+* **Boss fights**: use `transitionState` para setup de arena + música; fases controladas por limiares de HP.
