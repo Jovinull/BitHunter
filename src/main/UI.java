@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +22,8 @@ public class UI {
   Graphics2D g2;
 
   // --- Fontes & HUD ---
-  Font maruMonica, purisaB;
+  public Font maruMonica;
+  Font purisaB;
   BufferedImage heart_full, heart_half, heart_blank, crystal_full, crystal_blank, coin;
 
   // --- Estado de UI ---
