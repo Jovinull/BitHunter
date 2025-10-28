@@ -7,6 +7,7 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 
@@ -126,6 +127,31 @@ public class Entity {
 
   public int getRow() {
     return (worldY + solidArea.y) / gp.tileSize;
+  }
+
+  public int getXdistance(Entity target) {
+    int xDistance = Math.abs(worldX - target.worldX);
+    return xDistance;
+  }
+
+  public int getYdistance(Entity target) {
+    int yDistance = Math.abs(worldY - target.worldY);
+    return yDistance;
+  }
+
+  public int getTileDistance(Entity target) {
+    int tileDistance = (getXdistance(target) + getYdistance(target) / gp.tileSize);
+    return tileDistance;
+  }
+
+  public int getGoalCol(Entity target) {
+    int goalCol = (gp.player.worldX + gp.player.solidArea.x) / gp.tileSize;
+    return goalCol;
+  }
+
+  public int getGoalRow(Entity target) {
+    int goalRow = (gp.player.worldY + gp.player.solidArea.y) / gp.tileSize;
+    return goalRow;
   }
 
   public void setAction() {
@@ -324,6 +350,75 @@ public class Entity {
 
     if (shotAvailableCounter < 30) {
       shotAvailableCounter++;
+    }
+  }
+
+  public void checkShootOrNot(int rate, int shotInterval) {
+
+    int i = new Random().nextInt(rate);
+    if (i == 0 && projectile.alive == false && shotAvailableCounter == shotInterval) {
+
+      projectile.set(worldX, worldY, direction, true, this);
+
+      // CHECK VACANCY
+      for (int j = 0; j < gp.projectile[1].length; j++) {
+        if (gp.projectile[gp.currentMap][j] == null) {
+          gp.projectile[gp.currentMap][j] = projectile;
+          break;
+        }
+      }
+
+      shotAvailableCounter = 0;
+    }
+  }
+
+  public void checkStartChasingOrNot(Entity target, int distance, int rate) {
+
+    if (getTileDistance(target) < distance) {
+      int i = new Random().nextInt(rate);
+      if (i == 0) {
+        onPath = true;
+      }
+    }
+  }
+
+  public void checkStopChasingOrNot(Entity target, int distance, int rate) {
+
+    if (getTileDistance(target) > distance) {
+      int i = new Random().nextInt(rate);
+      if (i == 0) {
+        onPath = false;
+      }
+    }
+  }
+
+  public void getRandomDirection() {
+
+    actionLockCounter++;
+
+    // A cada 120 frames (2 segundos em 60 FPS), o NPC escolhe uma nova direção
+    if (actionLockCounter == 120) {
+
+      Random random = new Random();
+      int i = random.nextInt(4); // Gera um número de 0 a 3
+
+      // Altera a direção com base no número gerado
+      switch (i) {
+        case 0:
+          direction = "up";
+          break;
+        case 1:
+          direction = "down";
+          break;
+        case 2:
+          direction = "left";
+          break;
+        case 3:
+          direction = "right";
+          break;
+      }
+
+      actionLockCounter = 0; // Reinicia o contador para o próximo intervalo
     }
   }
 
