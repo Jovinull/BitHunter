@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,14 +43,14 @@ public class UI {
   int counter = 0;
   public Entity npc;
 
-  // --- Paleta simples (sólida, leve) ---
-  private static final Color COL_BG = new Color(18, 18, 22); // fundo geral
-  private static final Color COL_PANEL = new Color(34, 34, 42); // janelas
-  private static final Color COL_PANEL_BORDER = new Color(90, 90, 110);
-  private static final Color COL_ACCENT = new Color(220, 200, 120); // destaque
-  private static final Color COL_TEXT = new Color(235, 235, 235);
-  private static final Color COL_TEXT_DIM = new Color(200, 200, 210);
-  private static final Color COL_HIGHLIGHT_BG = new Color(60, 60, 75); // seleção simples
+  // --- Paleta de Cores ---
+  private static final Color COL_BG = new Color(0x0F, 0x11, 0x15);
+  private static final Color COL_PANEL = new Color(0x1A, 0x1F, 0x29);
+  private static final Color COL_PANEL_BORDER = new Color(0x3A, 0x42, 0x54);
+  private static final Color COL_TEXT = new Color(0xE6, 0xE9, 0xEF);
+  private static final Color COL_TEXT_DIM = new Color(0xB8, 0xC0, 0xCC);
+  private static final Color COL_HIGHLIGHT_BG = new Color(0x2A, 0x34, 0x43);
+  private static final Color COL_ACCENT = new Color(0xE0, 0xB5, 0x66);
 
   // Altura de linha padrão de menus
   private static final int MENU_LINE = 48;
@@ -92,13 +93,31 @@ public class UI {
   public void draw(Graphics2D g2) {
     this.g2 = g2;
 
-    // Fonte base
-    if (maruMonica != null)
-      g2.setFont(maruMonica.deriveFont(Font.PLAIN, 24f));
+    // Estados com UI "suave" (Purisa): título, pausa e game over
+    boolean smoothUi = gp.gameState == gp.titleState ||
+        gp.gameState == gp.pauseState ||
+        gp.gameState == gp.gameOverState;
+
+    if (smoothUi) {
+      useSmoothUiText(g2);
+      // Base para essas telas (tamanhos específicos são definidos dentro dos métodos
+      // de desenho)
+      if (purisaB != null) {
+        g2.setFont(purisaB.deriveFont(Font.PLAIN, 48F));
+      }
+    } else {
+      // Estados com texto "pixel-perfect" (MaruMonica): HUD, diálogo, opções,
+      // personagem, trade, etc.
+      useCrispPixelText(g2);
+      if (maruMonica != null) {
+        g2.setFont(maruMonica.deriveFont(Font.PLAIN, 16F)); // base em múltiplo de 16
+      }
+    }
+
     g2.setColor(COL_TEXT);
 
     if (gp.gameState == gp.titleState) {
-      drawTitleScreen();
+      drawTitleScreen(); // dentro dela, se usar MaruMonica para a dica, pode chamar useCrispPixelText lá
       return;
     }
 
@@ -203,7 +222,7 @@ public class UI {
     int messageX = gp.tileSize;
     int messageY = gp.tileSize * 4;
 
-    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 28F));
+    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32F));
 
     for (int i = 0; i < message.size(); i++) {
       String m = message.get(i);
@@ -230,49 +249,46 @@ public class UI {
 
   // --- Título ---
   public void drawTitleScreen() {
-    // fundo sólido leve
     g2.setColor(COL_BG);
     g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
 
     if (titleScreenState == 0) {
       // --- TELA 0: menu principal ---
       if (purisaB != null)
-        g2.setFont(purisaB.deriveFont(Font.BOLD, 92F));
-      String text = "Bit Hunter";
-      int y = gp.tileSize * 3;
-      drawTextShadowCentered(text, y, COL_TEXT, Color.black, 3);
+        g2.setFont(purisaB.deriveFont(Font.BOLD, 112F));
+      drawTextShadowCentered("Bit Hunter", gp.tileSize * 3, COL_TEXT, Color.black, 3);
 
       int xImg = gp.screenWidth / 2 - (gp.tileSize * 2) / 2;
-      int yImg = y + gp.tileSize * 2;
+      int yImg = gp.tileSize * 3 + gp.tileSize * 2;
       g2.drawImage(gp.player.down1, xImg, yImg, gp.tileSize * 2, gp.tileSize * 2, null);
 
       if (purisaB != null)
-        g2.setFont(purisaB.deriveFont(Font.BOLD, 42F));
+        g2.setFont(purisaB.deriveFont(Font.BOLD, 48F));
       int yMenuStart = yImg + (int) (gp.tileSize * 3.2);
       drawMenuItem("NOVO JOGO", yMenuStart, commandNum == 0);
       drawMenuItem("CARREGAR JOGO", yMenuStart + MENU_LINE, commandNum == 1);
       drawMenuItem("SAIR", yMenuStart + MENU_LINE * 2, commandNum == 2);
 
+      // Troca para texto pixel (MaruMonica) só para a dica:
+      useCrispPixelText(g2);
       if (maruMonica != null)
-        g2.setFont(maruMonica.deriveFont(Font.PLAIN, 22F));
+        g2.setFont(maruMonica.deriveFont(Font.PLAIN, 16F));
       String hint = "W/S ou ↑/↓ navegar • ENTER confirma";
       drawTextShadowCentered(hint, gp.screenHeight - gp.tileSize, COL_TEXT_DIM, Color.black, 2);
-      return; // <-- ENCERRA AQUI
+
+      return;
     }
 
     if (titleScreenState == 1) {
-      // --- TELA 1: seleção de classe (modal) ---
-      drawSubWindowCenter(gp.tileSize * 10, gp.tileSize * 8);
-      int cy = gp.screenHeight / 2 - gp.tileSize;
       if (purisaB != null)
         g2.setFont(purisaB.deriveFont(Font.BOLD, 36F));
+      drawSubWindowCenter(gp.tileSize * 10, gp.tileSize * 8);
+      int cy = gp.screenHeight / 2 - gp.tileSize;
       drawTextShadowCentered("Selecione sua classe", cy - MENU_LINE, COL_TEXT, Color.black, 2);
-
       drawMenuItem("Guerreiro", cy, commandNum == 0);
       drawMenuItem("Ladrão", cy + MENU_LINE, commandNum == 1);
       drawMenuItem("Feiticeiro", cy + MENU_LINE * 2, commandNum == 2);
       drawMenuItem("Voltar", cy + MENU_LINE * 4, commandNum == 3);
-      return;
     }
   }
 
@@ -286,7 +302,7 @@ public class UI {
     drawSubWindow(x, y, w, h);
 
     if (purisaB != null)
-      g2.setFont(purisaB.deriveFont(Font.PLAIN, 72F));
+      g2.setFont(purisaB.deriveFont(Font.PLAIN, 80F));
     String text = "PAUSADO";
     drawTextShadowCentered(text, y + (int) (h * 0.62), COL_TEXT, Color.black, 3);
   }
@@ -301,7 +317,7 @@ public class UI {
     drawSubWindow(x, y, width, height);
 
     if (maruMonica != null)
-      g2.setFont(maruMonica.deriveFont(Font.BOLD, 26F));
+      g2.setFont(maruMonica.deriveFont(Font.BOLD, 28F));
     int innerX = x + gp.tileSize;
     int innerY = y + gp.tileSize;
 
@@ -415,7 +431,7 @@ public class UI {
         int textX = dFrameX + 20;
         int textY = dFrameY + gp.tileSize;
         g2.setColor(COL_TEXT);
-        g2.setFont(g2.getFont().deriveFont(26F));
+        g2.setFont(g2.getFont().deriveFont(28F));
 
         for (String line : entity.inventory.get(itemIndex).description.split("\n")) {
           g2.drawString(line, textX, textY);
@@ -446,7 +462,7 @@ public class UI {
   // --- Opções ---
   public void drawOptionsScreen() {
     g2.setColor(COL_TEXT);
-    g2.setFont(g2.getFont().deriveFont(30F));
+    g2.setFont(g2.getFont().deriveFont(32F));
 
     int frameX = gp.tileSize * 6;
     int frameY = gp.tileSize;
@@ -962,6 +978,19 @@ public class UI {
     }
   }
 
+  // --- Helpers de render ---
+  private void useCrispPixelText(Graphics2D g) {
+    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+    g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
+    g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+  }
+
+  private void useSmoothUiText(Graphics2D g) {
+    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB); // ou ON
+    g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+    g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_NORMALIZE);
+  }
+
   private void drawTextShadowCentered(String text, int y, Color fill, Color shadow, int offset) {
     int x = getXforCenteredText(text);
     drawTextShadow(text, x, y, fill, shadow, offset);
@@ -988,7 +1017,7 @@ public class UI {
     drawSubWindow(frameX, frameY, frameWidth, frameHeight);
 
     g2.setColor(COL_TEXT);
-    g2.setFont(g2.getFont().deriveFont(30F));
+    g2.setFont(g2.getFont().deriveFont(32F));
 
     int textX = frameX + 20;
     int textY = frameY + gp.tileSize;
