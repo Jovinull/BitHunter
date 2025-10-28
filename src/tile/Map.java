@@ -56,8 +56,8 @@ public class Map extends TileManager {
     g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
 
     // Draw Map
-    int width = 300;
-    int height = 300;
+    int width = 600;
+    int height = 600;
     int x = gp.screenWidth / 2 - width / 2;
     int y = gp.screenHeight / 2 - height / 2;
     g2.drawImage(worldMap[gp.currentMap], x, y, width, height, null);
@@ -66,13 +66,13 @@ public class Map extends TileManager {
     double scale = (double) (gp.tileSize * gp.maxWorldCol) / width;
     int playerX = (int) (x + gp.player.worldX / scale);
     int playerY = (int) (y + gp.player.worldY / scale);
-    int playerSize = (int) (gp.tileSize / scale);
+    int playerSize = (int) (gp.tileSize / 2);
     g2.drawImage(gp.player.down1, playerX, playerY, playerSize, playerSize, null);
 
     // Hint
-    g2.setFont(gp.ui.maruMonica.deriveFont(32f));
-    g2.setColor(Color.white);
-    g2.drawString("Pressione M para fechar", 750, 550);
+    // g2.setFont(gp.ui.maruMonica.deriveFont(32f));
+    // g2.setColor(Color.white);
+    // g2.drawString("Pressione M para fechar", 650, 550);
   }
 
   public void drawMiniMap(Graphics2D g2) {
@@ -80,8 +80,8 @@ public class Map extends TileManager {
     if (miniMapOn == true) {
 
       // Draw Map
-      int width = 200;
-      int height = 200;
+      int width = 300;
+      int height = 300;
       int x = gp.screenWidth - width - 50;
       int y = 50;
       g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8f));
