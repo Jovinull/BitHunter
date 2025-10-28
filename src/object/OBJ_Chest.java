@@ -37,18 +37,18 @@ public class OBJ_Chest extends Entity {
       gp.playSE(3);
 
       StringBuilder sb = new StringBuilder();
-      sb.append("You open the chest and find a " + loot.name + "!");
+      sb.append("Você abre o baú e encontra um " + loot.name + "!");
 
       if (gp.player.canObtainItem(loot) == false) {
-        sb.append("\n...But you cannot carry any more!");
+        sb.append("\n...Mas você não pode carregar mais nada!");
       } else {
-        sb.append("\nYou obtain the " + loot.name + "!");
+        sb.append("\nVocê obteve " + loot.name + "!");
         down1 = image2;
         opened = true;
       }
       gp.ui.currentDialogue = sb.toString();
     } else {
-      gp.ui.currentDialogue = "It's empty";
+      gp.ui.currentDialogue = "Está vazio";
     }
   }
 }
