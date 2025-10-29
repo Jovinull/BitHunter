@@ -15,14 +15,18 @@
     - [Economia](#economia)
   - [Controles](#controles)
   - [Sistemas de Pontuação e Atributos](#sistemas-de-pontuação-e-atributos)
-    - [HP / MP / Stamina](#hp--mp--stamina)
+    - [HP / MP / (Stamina)](#hp--mp--stamina)
     - [XP e Níveis](#xp-e-níveis)
     - [Moedas e Recompensas](#moedas-e-recompensas)
     - [Missões e Pontos de Tarefa](#missões-e-pontos-de-tarefa)
   - [Interface (HUD) e UX](#interface-hud-e-ux)
-    - [HUD](#hud)
-    - [Mapas e Mini-mapa](#mapas-e-mini-mapa)
-    - [Feedbacks Visuais e Sonoros](#feedbacks-visuais-e-sonoros)
+    - [HUD (implementado)](#hud-implementado)
+    - [Inventário e Trade (implementado)](#inventário-e-trade-implementado)
+    - [Feedbacks Visuais e Sonoros (implementado)](#feedbacks-visuais-e-sonoros-implementado)
+    - [Mapas e Mini-mapa (planejado)](#mapas-e-mini-mapa-planejado)
+    - [Indicadores de Status (planejado)](#indicadores-de-status-planejado)
+    - [Barra de XP (planejado)](#barra-de-xp-planejado)
+    - [Acessibilidade e UX](#acessibilidade-e-ux)
   - [Percepção e Mundo](#percepção-e-mundo)
     - [Iluminação e Ciclo Dia/Noite](#iluminação-e-ciclo-dianoite)
     - [Clima e Ambiente](#clima-e-ambiente)
@@ -39,14 +43,10 @@
   - [Elementos de Jogo](#elementos-de-jogo)
     - [Classes/Arquétipos (opcional)](#classesarquétipos-opcional)
     - [Inimigos e Facções](#inimigos-e-facções)
-    - [Chefes](#chefes)
-  - [Estrutura de Fases/Capítulos](#estrutura-de-fasescapítulos)
-    - [Capítulo 1 — Bairro das Ruínas](#capítulo-1--bairro-das-ruínas)
-    - [Capítulo 2 — Mercado Subterrâneo](#capítulo-2--mercado-subterrâneo)
-    - [Capítulo 3 — Fortaleza dos Caçadores](#capítulo-3--fortaleza-dos-caçadores)
-  - [Sessenta Segundos de Jogo](#sessenta-segundos-de-jogo)
   - [Conteúdo Futuro / Backlog](#conteúdo-futuro--backlog)
   - [Referências](#referências)
+    - [Notas rápidas de implementação (pragmáticas)](#notas-rápidas-de-implementação-pragmáticas)
+  - [Notas de Bugs/Implementações](#notas-de-bugsimplementações)
 
 ---
 
@@ -464,4 +464,4 @@ Aqui vai a seção reescrita com base direta no que o seu código já implementa
 ## Notas de Bugs/Implementações
 
 * **Modo Debug Travando:** Quando aperta "T" para ativar o modo DEBUG trava apenas na primeira vez que é utilizado no LOOP, depois não retorna a travar mais.
-* **Modo Debug Mudando Fonte:** Quando entra no modo DEBUG apertando "T" a fonte Arial modifica provavelmente por causa do Antiallising.
+* **Modo Debug Mudando Fonte:** Quando entra no modo DEBUG apertando "T" a fonte Arial modifica provavelmente por causa do Antiallising pois só ocorre ao apertar "P" e entrar no pause.
