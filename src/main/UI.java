@@ -673,10 +673,9 @@ public class UI {
         subState = 0;
         commandNum = 0;
         titleScreenState = 0;
-        if (gp.music != null)
-          gp.music.stop();
         gp.gameState = gp.titleState;
         gp.keyH.enterPressed = false;
+        gp.resetGame(true);
       }
     }
 

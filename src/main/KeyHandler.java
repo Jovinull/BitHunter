@@ -358,11 +358,12 @@ public class KeyHandler implements KeyListener {
     if (code == KeyEvent.VK_ENTER) {
       if (gp.ui.commandNum == 0) {
         gp.gameState = gp.playState;
-        gp.retry();
+        gp.resetGame(false);
+        gp.playMusic(0);
 
       } else if (gp.ui.commandNum == 1) {
         gp.stopMusic();
-        gp.restart();
+        gp.resetGame(true);
 
         gp.ui.titleScreenState = 0;
         gp.ui.commandNum = 0;
