@@ -460,8 +460,3 @@ Aqui vai a seção reescrita com base direta no que o seu código já implementa
 * **Elementos**: atributo `element` em arma/projétil/monstro; tabela simples de multiplicadores.
 * **Parry/Block**: tecla de defesa ativando **i-frames curtos** e “stagger” se perfect-timing.
 * **Boss fights**: use `transitionState` para setup de arena + música; fases controladas por limiares de HP.
-
-## Notas de Bugs/Implementações
-
-* **Modo Debug Travando:** Quando aperta "T" para ativar o modo DEBUG trava apenas na primeira vez que é utilizado no LOOP, depois não retorna a travar mais.
-* **Modo Debug Mudando Fonte:** Quando entra no modo DEBUG apertando "T" a fonte Arial modifica provavelmente por causa do Antiallising pois só ocorre ao apertar "P" e entrar no pause.
