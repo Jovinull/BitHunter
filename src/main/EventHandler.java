@@ -131,7 +131,8 @@ public class EventHandler {
       gp.playSE(2);
 
       // Mostra texto
-      gp.ui.currentDialogue = "Você bebe a água.\nSua vida e mana foi restaurada.";
+      gp.ui.currentDialogue = "Você bebe a água.\nSua vida e mana foi restaurada.\n"
+          + "(O progresso foi salvo)";
 
       // Efeito
       gp.player.life = gp.player.maxLife;
@@ -140,6 +141,8 @@ public class EventHandler {
       canTouchEvent = false;
 
       gp.aSetter.setMonster();
+
+      gp.saveLoad.save();
     }
   }
 
