@@ -14,7 +14,7 @@ public class KeyHandler implements KeyListener {
   private final GamePanel gp;
 
   // Flags de input contínuo (consumidas no update do jogo)
-  public boolean upPressed, downPressed, leftPressed, rightPressed, enterPressed, shotKeyPressed;
+  public boolean upPressed, downPressed, leftPressed, rightPressed, enterPressed, shotKeyPressed, spacePressed;
 
   // DEBUG: exibir/ocultar tempo de desenho
   public boolean showDebugText = false;
@@ -212,6 +212,10 @@ public class KeyHandler implements KeyListener {
       } else {
         gp.map.miniMapOn = false;
       }
+    }
+
+    if (key == KeyEvent.VK_SPACE) {
+      spacePressed = true;
     }
 
     // DEBUG (alternar exibição do texto de debug)
@@ -477,6 +481,8 @@ public class KeyHandler implements KeyListener {
       case KeyEvent.VK_A -> leftPressed = false;
       case KeyEvent.VK_D -> rightPressed = false;
       case KeyEvent.VK_F -> shotKeyPressed = false;
+      case KeyEvent.VK_ENTER -> enterPressed = false;
+      case KeyEvent.VK_SPACE -> spacePressed = false;
       default -> {
         /* noop */ }
     }

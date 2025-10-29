@@ -45,8 +45,9 @@ public class Player extends Entity {
     solidArea.height = 32; // Altura da área sólida
 
     setDefaultValues(); // Define a posição inicial no mundo e outras propriedades
-    getPlayerImage(); // Carrega os sprites do personagem
-    getPlayerAttackImage(); // Carrega os sprites de ataque do personagem
+    getImage(); // Carrega os sprites do personagem
+    getAttackImage(); // Carrega os sprites de ataque do personagem
+    getGuardImage();
     setItems(); // Adiciona itens iniciais ao inventário
   }
 
@@ -88,6 +89,7 @@ public class Player extends Entity {
     life = maxLife;
     mana = maxMana;
     invincible = false;
+    transparent = false;
   }
 
   public void setItems() {
@@ -111,7 +113,7 @@ public class Player extends Entity {
   }
 
   // Carrega os sprites de animação para cada direção
-  public void getPlayerImage() {
+  public void getImage() {
 
     up1 = setup("/player/Walking sprites/boy_up_1", gp.tileSize, gp.tileSize);
     up2 = setup("/player/Walking sprites/boy_up_2", gp.tileSize, gp.tileSize);
@@ -134,7 +136,7 @@ public class Player extends Entity {
     right2 = image;
   }
 
-  public void getPlayerAttackImage() {
+  public void getAttackImage() {
 
     if (currentWeapon.type == type_sword) {
       attackUp1 = setup("/player/Attacking sprites/boy_attack_up_1", gp.tileSize, gp.tileSize * 2);
@@ -159,11 +161,64 @@ public class Player extends Entity {
     }
   }
 
+  public void getGuardImage() {
+
+    guardUp = setup("/player/Guarding sprites/boy_guard_up", gp.tileSize, gp.tileSize);
+    guardDown = setup("/player/Guarding sprites/boy_guard_down", gp.tileSize, gp.tileSize);
+    guardLeft = setup("/player/Guarding sprites/boy_guard_left", gp.tileSize, gp.tileSize);
+    guardRight = setup("/player/Guarding sprites/boy_guard_right", gp.tileSize, gp.tileSize);
+  }
+
   // Atualiza a lógica do jogador: movimentação e animação
   public void update() {
 
-    if (attacking == true) {
+    if (knockBack == true) {
+
+      collisionOn = false;
+      gp.cChecker.checkTile(this);
+      gp.cChecker.checkObject(this, true);
+      gp.cChecker.checkEntity(this, gp.npc);
+      gp.cChecker.checkEntity(this, gp.monster);
+      gp.cChecker.checkEntity(this, gp.iTile);
+
+      if (collisionOn == true) {
+        knockBackCounter = 0;
+        knockBack = false;
+        speed = defaultSpeed;
+      }
+
+      else if (collisionOn == false) {
+        switch (knockBackDirection) {
+          case "up":
+            worldY -= speed;
+            break;
+          case "down":
+            worldY += speed;
+            break;
+          case "left":
+            worldX -= speed;
+            break;
+          case "right":
+            worldX += speed;
+            break;
+        }
+      }
+
+      knockBackCounter++;
+      if (knockBackCounter == 10) {
+        knockBackCounter = 0;
+        knockBack = false;
+        speed = defaultSpeed;
+      }
+    }
+
+    else if (attacking == true) {
       attacking();
+    }
+
+    else if (keyH.spacePressed == true) {
+      guarding = true;
+      guardCounter++;
     }
 
     // Só atualiza se alguma tecla de movimento estiver pressionada
@@ -227,6 +282,8 @@ public class Player extends Entity {
 
       attackCanceled = false;
       gp.keyH.enterPressed = false; // Reseta a flag de enter após a interação
+      guarding = false;
+      guardCounter = 0;
 
       // Troca de sprite a cada 12 frames (animação)
       spriteCounter++;
@@ -243,6 +300,8 @@ public class Player extends Entity {
         spriteNum = 1; // Define o sprite de parada
         standCounter = 0; // Reseta o contador de parada
       }
+      guarding = false;
+      guardCounter = 0;
     }
 
     if (gp.keyH.shotKeyPressed == true && projectile.alive == false && shotAvailableCounter == 30
@@ -268,6 +327,7 @@ public class Player extends Entity {
       invincibleCounter++;
       if (invincibleCounter > 60) {
         invincible = false;
+        transparent = false;
         invincibleCounter = 0;
       }
     }
@@ -349,12 +409,13 @@ public class Player extends Entity {
 
         int damage = gp.monster[gp.currentMap][i].attack - defense;
 
-        if (damage < 0) {
-          damage = 0;
+        if (damage < 1) {
+          damage = 1;
         }
 
         life -= damage;
         invincible = true;
+        transparent = true;
       }
     }
   }
@@ -368,6 +429,10 @@ public class Player extends Entity {
 
         if (knockBackPower > 0) {
           setKnockBack(gp.monster[gp.currentMap][i], attacker, knockBackPower);
+        }
+
+        if (gp.monster[gp.currentMap][i].offBalance == true) {
+          attack *= 5;
         }
 
         int damage = attack - gp.monster[gp.currentMap][i].defense;
@@ -451,7 +516,7 @@ public class Player extends Entity {
       if (selectedItem.type == type_sword || selectedItem.type == type_axe) {
         currentWeapon = selectedItem;
         attack = getAttack();
-        getPlayerAttackImage();
+        getAttackImage();
       }
       if (selectedItem.type == type_shield) {
         currentShield = selectedItem;
@@ -537,6 +602,9 @@ public class Player extends Entity {
         } else {
           image = (spriteNum == 1) ? up1 : up2;
         }
+        if (guarding == true) {
+          image = guardUp;
+        }
         break;
 
       case "down":
@@ -544,6 +612,9 @@ public class Player extends Entity {
           image = (spriteNum == 1) ? attackDown1 : attackDown2;
         } else {
           image = (spriteNum == 1) ? down1 : down2;
+        }
+        if (guarding == true) {
+          image = guardDown;
         }
         break;
 
@@ -554,6 +625,9 @@ public class Player extends Entity {
         } else {
           image = (spriteNum == 1) ? left1 : left2;
         }
+        if (guarding == true) {
+          image = guardLeft;
+        }
         break;
 
       case "right":
@@ -562,10 +636,13 @@ public class Player extends Entity {
         } else {
           image = (spriteNum == 1) ? right1 : right2;
         }
+        if (guarding == true) {
+          image = guardRight;
+        }
         break;
     }
 
-    if (invincible == true) {
+    if (transparent == true) {
       g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f)); // Aplica transparência
     }
 
