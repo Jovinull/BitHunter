@@ -258,7 +258,7 @@ public class KeyHandler implements KeyListener {
    */
   public void dialogueState(int key) {
     if (key == KeyEvent.VK_ENTER) {
-      gp.gameState = gp.playState;
+      enterPressed = true;
     }
   }
 

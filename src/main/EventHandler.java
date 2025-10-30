@@ -6,6 +6,7 @@ public class EventHandler {
 
   GamePanel gp;
   EventRect[][][] eventRect;
+  Entity eventMaster;
 
   int previousEventX, previousEventY;
   boolean canTouchEvent = true;
@@ -13,6 +14,8 @@ public class EventHandler {
 
   public EventHandler(GamePanel gp) {
     this.gp = gp;
+
+    eventMaster = new Entity(gp);
 
     eventRect = new EventRect[gp.maxMap][gp.maxWorldCol][gp.maxWorldRow];
 
@@ -40,6 +43,16 @@ public class EventHandler {
         }
       }
     }
+
+    setDialogue();
+  }
+
+  public void setDialogue() {
+
+    eventMaster.dialogues[0][0] = "Você caiu em um buraco!!";
+    eventMaster.dialogues[1][0] = "Você bebe a água.\nSua vida e mana foi restaurada.\n"
+        + "(O progresso foi salvo)";
+    eventMaster.dialogues[1][1] = "Caramba, essa água é boa demais.";
   }
 
   public boolean hit(int map, int col, int row, String reqDirection) {
@@ -116,7 +129,8 @@ public class EventHandler {
 
   public void damagePit(int gameState) {
     gp.gameState = gameState;
-    gp.ui.currentDialogue = "Você caiu em um buraco!!";
+    gp.playSE(6);
+    eventMaster.startDialogue(eventMaster, 0);
     gp.player.life -= 1;
     canTouchEvent = false;
   }
@@ -131,8 +145,7 @@ public class EventHandler {
       gp.playSE(2);
 
       // Mostra texto
-      gp.ui.currentDialogue = "Você bebe a água.\nSua vida e mana foi restaurada.\n"
-          + "(O progresso foi salvo)";
+      eventMaster.startDialogue(eventMaster, 1);
 
       // Efeito
       gp.player.life = gp.player.maxLife;

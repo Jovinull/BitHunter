@@ -21,8 +21,10 @@ public class NPC_OldMan extends Entity {
     solidArea.y = 16;
     solidAreaDefaultX = solidArea.x;
     solidAreaDefaultY = solidArea.y;
-    solidArea.width = 32;
-    solidArea.height = 32;
+    solidArea.width = 30;
+    solidArea.height = 30;
+
+    dialogueSet = -1;
 
     getImage(); // Carrega as imagens de sprite para animação
     setDialogue(); // Define os diálogos do NPC
@@ -41,10 +43,16 @@ public class NPC_OldMan extends Entity {
   }
 
   public void setDialogue() {
-    dialogues[0] = "Olá, rapaz.";
-    dialogues[1] = "Então você veio até esta ilha em busca do \ntesouro?";
-    dialogues[2] = "Eu costumava ser um grande mago, mas agora... \nestou um pouco velho para aventuras.";
-    dialogues[3] = "Bem, boa sorte para você!";
+    dialogues[0][0] = "Olá, rapaz.";
+    dialogues[0][1] = "Então você veio até esta ilha em busca do \ntesouro?";
+    dialogues[0][2] = "Eu costumava ser um grande mago, mas agora... \nestou um pouco velho para aventuras.";
+    dialogues[0][3] = "Bem, boa sorte para você!";
+
+    dialogues[1][0] = "Se você ficar cansado, descanse na água.";
+    dialogues[1][1] = "Porém, os monstros reaparecem quando você descansa.\nNão sei por quê, mas é assim que funciona.";
+    dialogues[1][2] = "De qualquer forma, não se esforce demais.";
+
+    dialogues[2][0] = "Eu me pergunto como abrir aquela porta...";
   }
 
   // Define o comportamento do NPC — neste caso, movimentação aleatória
@@ -92,8 +100,21 @@ public class NPC_OldMan extends Entity {
 
   public void speak() {
 
-    super.speak(); // Chama o método speak da superclasse Entity
+    facePlayer();
+    startDialogue(this, dialogueSet);
 
-    onPath = true;
+    dialogueSet++;
+
+    // if (dialogues[dialogueSet][0] == null) {
+
+    // // dialogueSet = 0;
+    // dialogueSet--;
+    // }
+
+    if (gp.player.life < gp.player.maxLife / 3) {
+      dialogueSet = 1;
+    }
+
+    // onPath = true;
   }
 }

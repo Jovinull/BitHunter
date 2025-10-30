@@ -35,6 +35,7 @@ public class Sound {
     soundURL[14] = getClass().getResource("/sounds/sleep.wav");
     soundURL[15] = getClass().getResource("/sounds/blocked.wav");
     soundURL[16] = getClass().getResource("/sounds/parry.wav");
+    soundURL[17] = getClass().getResource("/sounds/speak.wav");
   }
 
   // Prepara o áudio correspondente ao índice informado

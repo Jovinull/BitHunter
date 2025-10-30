@@ -24,11 +24,17 @@ public class OBJ_Door extends Entity {
     solidArea.height = 32;
     solidAreaDefaultX = solidArea.x;
     solidAreaDefaultY = solidArea.y;
+
+    setDialogue();
+  }
+
+  public void setDialogue() {
+
+    dialogues[0][0] = "Uma porta trancada. Você precisa de uma \nchave para abri-la.";
   }
 
   public void interact() {
 
-    gp.gameState = gp.dialogueState;
-    gp.ui.currentDialogue = "Uma porta trancada. Você precisa de uma \nchave para abri-la.";
+    startDialogue(this, 0);
   }
 }

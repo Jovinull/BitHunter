@@ -28,28 +28,31 @@ public class OBJ_Chest extends Entity {
 
   public void setLoot(Entity loot) {
     this.loot = loot;
+
+    setDialogue();
+  }
+
+  public void setDialogue() {
+
+    dialogues[0][0] = "Você abre o baú e encontra um " + loot.name + "!" + "\n...Mas você não pode carregar mais nada!";
+    dialogues[1][0] = "Você abre o baú e encontra um " + loot.name + "!" + "\nVocê obteve " + loot.name + "!";
+    dialogues[2][0] = "Está vazio.";
   }
 
   public void interact() {
 
-    gp.gameState = gp.dialogueState;
-
     if (opened == false) {
       gp.playSE(3);
 
-      StringBuilder sb = new StringBuilder();
-      sb.append("Você abre o baú e encontra um " + loot.name + "!");
-
       if (gp.player.canObtainItem(loot) == false) {
-        sb.append("\n...Mas você não pode carregar mais nada!");
+        startDialogue(this, 0);
       } else {
-        sb.append("\nVocê obteve " + loot.name + "!");
+        startDialogue(this, 1);
         down1 = image2;
         opened = true;
       }
-      gp.ui.currentDialogue = sb.toString();
     } else {
-      gp.ui.currentDialogue = "Está vazio";
+      startDialogue(this, 2);
     }
   }
 }

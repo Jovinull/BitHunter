@@ -42,6 +42,8 @@ public class UI {
   int subState = 0;
   int counter = 0;
   public Entity npc;
+  int charIndex = 0;
+  String combinedText = "";
 
   // --- Paleta de Cores ---
   private static final Color COL_BG = new Color(0x0F, 0x11, 0x15);
@@ -309,26 +311,59 @@ public class UI {
 
   // --- Diálogo ---
   public void drawDialogueScreen() {
+
+    // WINDOW
     int x = gp.tileSize * 3;
     int y = gp.tileSize / 2;
     int width = gp.screenWidth - (gp.tileSize * 6);
     int height = gp.tileSize * 4;
-
     drawSubWindow(x, y, width, height);
 
     if (maruMonica != null)
-      g2.setFont(maruMonica.deriveFont(Font.BOLD, 28F));
-    int innerX = x + gp.tileSize;
-    int innerY = y + gp.tileSize;
+      g2.setFont(maruMonica.deriveFont(Font.PLAIN, 32F)); // marumonica
+    x += gp.tileSize;
+    y += gp.tileSize;
 
-    g2.setColor(COL_TEXT);
+    if (npc.dialogues[npc.dialogueSet][npc.dialogueIndex] != null) {
+
+      // currentDialogue = npc.dialogues[npc.dialogueSet][npc.dialogueIndex];
+
+      char characters[] = npc.dialogues[npc.dialogueSet][npc.dialogueIndex].toCharArray();
+
+      if (charIndex < characters.length) {
+
+        gp.playSE(17);
+        String s = String.valueOf(characters[charIndex]);
+        combinedText = combinedText + s;
+        currentDialogue = combinedText;
+        charIndex++;
+      }
+
+      if (gp.keyH.enterPressed == true) {
+
+        charIndex = 0;
+        combinedText = "";
+
+        if (gp.gameState == gp.dialogueState) {
+
+          npc.dialogueIndex++;
+          gp.keyH.enterPressed = false;
+        }
+      }
+    }
+
+    else {
+
+      npc.dialogueIndex = 0;
+
+      if (gp.gameState == gp.dialogueState) {
+        gp.gameState = gp.playState;
+      }
+    }
+
     for (String line : currentDialogue.split("\n")) {
-      // sombra leve de 1px
-      g2.setColor(Color.black);
-      g2.drawString(line, innerX + 1, innerY + 1);
-      g2.setColor(COL_TEXT);
-      g2.drawString(line, innerX, innerY);
-      innerY += 32;
+      g2.drawString(line, x, y);
+      y += 40;
     }
   }
 
@@ -510,7 +545,7 @@ public class UI {
 
     // EFEITOS SONOROS
     textY += gp.tileSize;
-    g2.drawString("Efeitos sonoros", textX, textY);
+    g2.drawString("Efeitos", textX, textY);
     if (commandNum == 2)
       g2.drawString(">", textX - 25, textY);
 
@@ -708,6 +743,8 @@ public class UI {
 
   public void trade_select() {
 
+    npc.dialogueSet = 0;
+
     drawDialogueScreen();
 
     // JANELA
@@ -744,8 +781,7 @@ public class UI {
       g2.drawString(">", x - 24, y);
       if (gp.keyH.enterPressed == true) {
         commandNum = 0;
-        gp.gameState = gp.dialogueState;
-        currentDialogue = "Volte sempre, hehe!";
+        npc.startDialogue(npc, 1);
       }
     }
   }
@@ -794,9 +830,7 @@ public class UI {
       if (gp.keyH.enterPressed == true) {
         if (npc.inventory.get(itemIndex).price > gp.player.coin) {
           subState = 0;
-          gp.gameState = gp.dialogueState;
-          currentDialogue = "Você precisa de mais moedas para comprar isso!";
-          drawDialogueScreen();
+          npc.startDialogue(npc, 2);
         }
 
         else {
@@ -804,8 +838,7 @@ public class UI {
             gp.player.coin -= npc.inventory.get(itemIndex).price;
           } else {
             subState = 0;
-            gp.gameState = gp.dialogueState;
-            currentDialogue = "Você não pode carregar mais itens!";
+            npc.startDialogue(npc, 3);
           }
         }
       }
@@ -862,8 +895,7 @@ public class UI {
 
           commandNum = 0;
           subState = 0;
-          gp.gameState = gp.dialogueState;
-          currentDialogue = "Você não pode vender um item equipado!";
+          npc.startDialogue(npc, 4);
         } else {
           if (gp.player.inventory.get(itemIndex).amount > 1) {
             gp.player.inventory.get(itemIndex).amount--;

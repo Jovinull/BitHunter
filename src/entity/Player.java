@@ -79,12 +79,19 @@ public class Player extends Entity {
     getAttackImage(); // Carrega os sprites de ataque do personagem
     getGuardImage();
     setItems(); // Adiciona itens iniciais ao inventário
+    setDialogue();
   }
 
   public void setDefaultPositions() {
     worldX = gp.tileSize * 23; // Posição inicial em X no mundo (tile 23)
     worldY = gp.tileSize * 21; // Posição inicial em Y no mundo (tile 21)
     direction = "down"; // Direção inicial
+  }
+
+  public void setDialogue() {
+
+    dialogues[0][0] = "Você subiu de level!\n" + "Seu level agora é " + level + "!\n"
+        + "Vida máxima aumentada!\n" + "Força e Destreza aumentadas!";
   }
 
   public void restoreStatus() {
@@ -422,7 +429,6 @@ public class Player extends Entity {
 
       if (i != 999) {
         attackCanceled = true;
-        gp.gameState = gp.dialogueState;
         gp.npc[gp.currentMap][i].speak();
       }
     }
@@ -530,8 +536,8 @@ public class Player extends Entity {
 
       gp.playSE(8);
       gp.gameState = gp.dialogueState;
-      gp.ui.currentDialogue = "Você subiu de level!\n" + "Seu level agora é " + level + "!\n"
-          + "Vida máxima aumentada!\n" + "Força e Destreza aumentadas!";
+
+      startDialogue(this, 0);
     }
   }
 

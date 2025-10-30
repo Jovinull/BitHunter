@@ -44,7 +44,11 @@ public class NPC_Merchant extends Entity {
   }
 
   public void setDialogue() {
-    dialogues[0] = "Hehe, então me encontrou.\nTenho mercadorias de primeira.\nQuer fazer negócio?";
+    dialogues[0][0] = "Hehe, então me encontrou.\nTenho mercadorias de primeira.\nQuer fazer negócio?";
+    dialogues[1][0] = "Volte sempre, hehe!";
+    dialogues[2][0] = "Você precisa de mais moedas para comprar isso!";
+    dialogues[3][0] = "Você não pode carregar mais itens!";
+    dialogues[4][0] = "Você não pode vender um item equipado!";
   }
 
   public void setItems() {
@@ -60,7 +64,7 @@ public class NPC_Merchant extends Entity {
 
   public void speak() {
 
-    super.speak();
+    facePlayer();
     gp.gameState = gp.tradeState;
     gp.ui.npc = this;
   }

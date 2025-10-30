@@ -19,21 +19,28 @@ public class OBJ_Key extends Entity {
     description = "[" + name + "]\nAbre portas trancadas.";
     price = 100;
     stackable = true;
+
+    setDialogue();
+  }
+
+  public void setDialogue() {
+
+    dialogues[0][0] = "Você usa o " + name + " e abra a porta";
+
+    dialogues[1][0] = "O que você está fazendo?";
   }
 
   public boolean use(Entity entity) {
 
-    gp.gameState = gp.dialogueState;
-
     int objIndex = getDetected(entity, gp.obj, "Porta");
 
     if (objIndex != 999) {
-      gp.ui.currentDialogue = "Você usa o " + name + " e abra a porta";
+      startDialogue(this, 0);
       gp.playSE(3);
       gp.obj[gp.currentMap][objIndex] = null;
       return true;
     } else {
-      gp.ui.currentDialogue = "O que você está fazendo?";
+      startDialogue(this, 1);
       return false;
     }
   }
