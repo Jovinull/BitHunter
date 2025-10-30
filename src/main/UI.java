@@ -463,6 +463,7 @@ public class UI {
       if (itemIndex < entity.inventory.size()) {
         drawSubWindow(dFrameX, dFrameY, dFrameWidth, dFrameHeight);
 
+        // ANALISAR O QUE ISSO FAZ?
         int textX = dFrameX + 20;
         int textY = dFrameY + gp.tileSize;
         g2.setColor(COL_TEXT);
