@@ -7,6 +7,7 @@ import main.GamePanel;
 public class OBJ_Door extends Entity {
 
   GamePanel gp;
+  public static final String objName = "Porta";
 
   // Construtor: define nome, habilita colisão e carrega a imagem da porta
   public OBJ_Door(GamePanel gp) {
@@ -14,7 +15,7 @@ public class OBJ_Door extends Entity {
     this.gp = gp;
 
     type = type_obstacle;
-    name = "Porta";
+    name = objName;
     down1 = setup("/objects/door", gp.tileSize, gp.tileSize);
     collision = true;
 

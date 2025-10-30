@@ -7,6 +7,7 @@ import main.GamePanel;
 public class OBJ_Key extends Entity {
 
   GamePanel gp;
+  public static final String objName = "Chave";
 
   // Construtor: define nome e carrega a imagem da chave
   public OBJ_Key(GamePanel gp) {
@@ -14,7 +15,7 @@ public class OBJ_Key extends Entity {
     this.gp = gp;
 
     type = type_consumable;
-    name = "Chave";
+    name = objName;
     down1 = setup("/objects/key", gp.tileSize, gp.tileSize);
     description = "[" + name + "]\nAbre portas trancadas.";
     price = 100;
