@@ -104,22 +104,39 @@ public class EventHandler {
       }
 
       else if (hit(0, 10, 39, "any") == true) {
-        teleport(1, 12, 13);
-      }
+        teleport(1, 12, 13, gp.indoor);
+      } // to the merchant's house
 
       else if (hit(1, 12, 13, "any") == true) {
-        teleport(0, 10, 39);
-      }
+        teleport(0, 10, 39, gp.outside);
+      } // outside
 
       else if (hit(1, 12, 9, "up") == true) {
         speak(gp.npc[1][0]);
       }
+
+      else if (hit(0, 12, 9, "any") == true) {
+        teleport(2, 9, 41, gp.dungeon);
+      } // to the dungeon
+
+      else if (hit(2, 9, 41, "any") == true) {
+        teleport(0, 12, 9, gp.outside);
+      } // to outside
+
+      else if (hit(2, 8, 7, "any") == true) {
+        teleport(3, 26, 41, gp.dungeon);
+      } // to B2
+
+      else if (hit(3, 26, 41, "any") == true) {
+        teleport(2, 8, 7, gp.dungeon);
+      } // to B1
     }
   }
 
-  public void teleport(int map, int col, int row) {
+  public void teleport(int map, int col, int row, int area) {
 
     gp.gameState = gp.transitionState;
+    gp.nextArea = area;
     tempMap = map;
     tempCol = col;
     tempRow = row;

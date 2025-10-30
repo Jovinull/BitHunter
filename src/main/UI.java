@@ -156,7 +156,7 @@ public class UI {
     }
 
     if (gp.gameState == gp.transitionState) {
-      transitionState();
+      drawTransition();
     }
 
     if (gp.gameState == gp.tradeState) {
@@ -909,7 +909,7 @@ public class UI {
     }
   }
 
-  public void transitionState() {
+  public void drawTransition() {
 
     counter++;
     g2.setColor(new Color(0, 0, 0, counter * 5));
@@ -923,6 +923,7 @@ public class UI {
       gp.player.worldY = gp.tileSize * gp.eHandler.tempRow;
       gp.eHandler.previousEventX = gp.player.worldX;
       gp.eHandler.previousEventY = gp.player.worldY;
+      gp.changeArea();
     }
   }
 
