@@ -1,0 +1,134 @@
+Project License — Code & Assets
+Version: 1.0 (2025-11-01)
+
+Author/Copyright: © 2025 Felipe Jovino
+Repository: This file governs all materials in this project unless a file or folder explicitly states a different license.
+
+──────────────────────────────────────────────────────────────────────────────
+0) PLAIN-LANGUAGE SUMMARY (Non-legal, for convenience only)
+──────────────────────────────────────────────────────────────────────────────
+• CODE: Licensed under the MIT License. You may use, copy, modify, merge, publish,
+  distribute, sublicense, and sell copies of the code, provided you include the
+  copyright notice and the license text. No warranty.
+
+• ASSETS (art/audio/fonts/video/etc.): Licensed under Creative Commons
+  Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0).
+  You may share the assets for non-commercial purposes with proper attribution.
+  You may not distribute derivatives (e.g., recolors, edits, remixes), and you
+  may not use the assets commercially without separate permission.
+
+This summary does not replace the legal terms below.
+
+──────────────────────────────────────────────────────────────────────────────
+1) SCOPE & DEFINITIONS
+──────────────────────────────────────────────────────────────────────────────
+“Code” means source code and build/automation scripts located in folders such as
+`src/`, `app/`, or other programming files (e.g., `.java`, `.kt`, `.xml` for build),
+plus technical documentation specifically about the code.
+
+“Assets” means non-code creative works including (without limitation) images,
+sprites, tiles, concept art, UI elements, icons, logos, illustrations, 2D/3D art,
+audio (music, SFX), fonts bundled with the project, and video. Typically located
+under folders like `assets/`, `art/`, `audio/`, `music/`, `fonts/`, `gfx/`, `ui/`,
+`sfx/`, `video/`, and subfolders. Assets generated automatically by the toolchain
+(e.g., compiled binaries) are not “Assets” unless they embed or replicate original
+creative content.
+
+“Third-party components” are files that include their own license header or a
+nearby LICENSE/NOTICE file. For those, the third-party license prevails for that
+component.
+
+For absolute clarity: the Code is under MIT; the Assets are under CC BY-NC-ND 4.0.
+If a path or file is unclear, the author’s intent is: code → MIT; creative media → CC.
+
+──────────────────────────────────────────────────────────────────────────────
+2) CODE LICENSE (MIT)
+──────────────────────────────────────────────────────────────────────────────
+MIT License
+
+Copyright (c) 2025 Felipe Jovino
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+──────────────────────────────────────────────────────────────────────────────
+3) ASSETS LICENSE (CREATIVE COMMONS BY-NC-ND 4.0)
+──────────────────────────────────────────────────────────────────────────────
+License: Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International
+Canonical Legal Code: https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+By exercising the licensed rights in the Assets, you accept the CC BY-NC-ND 4.0
+terms. In short (this summary does not replace the legal code at the URL above):
+
+• Attribution (BY): When sharing the Assets, you must give appropriate credit to
+  “Felipe Jovino”, provide a link to this license, and indicate if changes were made.
+  (Note: You are not permitted to distribute Adapted Material—see “ND” below.)
+
+• NonCommercial (NC): You may not use the Assets for commercial purposes or for
+  monetary compensation/advantage without separate written permission from the author.
+
+• NoDerivatives (ND): You may not share modified, remixed, recolored, edited, or
+  otherwise adapted versions of the Assets. Distribution of such derivatives is not
+  permitted under this license.
+
+• Technical transformations: Purely technical modifications necessary for use
+  (e.g., compression, format conversion) do not, by themselves, create “Adapted
+  Material” under the CC license, provided they do not produce a new creative work.
+
+• No endorsement: You must not imply endorsement by the author.
+
+• Other rights: Moral rights, publicity/privacy rights, patent and trademark rights
+  are not licensed. “AS IS”/no warranty; liability is disclaimed to the maximum extent.
+
+For the complete and authoritative terms, consult the legal code at the canonical URL.
+
+──────────────────────────────────────────────────────────────────────────────
+4) PRACTICAL GUIDANCE (NON-BINDING, FOR CLARITY)
+──────────────────────────────────────────────────────────────────────────────
+Allowed with Assets:
+• Non-commercial sharing of the original, unmodified Assets with attribution to
+  “Felipe Jovino” and a link to the CC BY-NC-ND 4.0 license.
+• Technical changes needed for runtime (e.g., compression) that are not distributed
+  as standalone “new” assets.
+
+Not allowed with Assets:
+• Commercial use by third parties (e.g., using the art/audio in a paid game).
+• Distribution of modified Assets (e.g., recolors, edits, remixes, extractions as a pack).
+• Publishing the Assets separately as a stock/asset pack, whether free or paid.
+
+If you want a commercial or derivative-friendly license for the Assets, contact
+the author to negotiate a separate license.
+
+──────────────────────────────────────────────────────────────────────────────
+5) THIRD-PARTY COMPONENTS
+──────────────────────────────────────────────────────────────────────────────
+Any third-party file that contains its own license header or is accompanied by a
+license/notice file remains governed by that third-party license. Where required,
+include the third-party notices when redistributing.
+
+──────────────────────────────────────────────────────────────────────────────
+6) SHORT NOTICE FOR README (OPTIONAL COPY/PASTE)
+──────────────────────────────────────────────────────────────────────────────
+Code: MIT © 2025 Felipe Jovino — see LICENSE.txt
+Assets (art/audio/fonts/etc.): CC BY-NC-ND 4.0 — attribution required, no commercial
+use, no derivatives. Legal code: https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+──────────────────────────────────────────────────────────────────────────────
+7) CONTACT
+──────────────────────────────────────────────────────────────────────────────
+For special permissions (e.g., commercial or derivative use of Assets), please
+contact the author.
