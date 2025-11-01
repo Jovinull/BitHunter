@@ -105,16 +105,13 @@ public class NPC_OldMan extends Entity {
 
     dialogueSet++;
 
-    // if (dialogues[dialogueSet][0] == null) {
-
-    // // dialogueSet = 0;
-    // dialogueSet--;
-    // }
-
     if (gp.player.life < gp.player.maxLife / 3) {
       dialogueSet = 1;
     }
 
-    // onPath = true;
+    if (dialogues[dialogueSet][0] == null) {
+
+      dialogueSet--;
+    }
   }
 }
