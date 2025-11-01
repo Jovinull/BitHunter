@@ -11,6 +11,7 @@ import object.OBJ_Heart;
 import object.OBJ_Key;
 import object.OBJ_Lantern;
 import object.OBJ_ManaCrystal;
+import object.OBJ_Pickaxe;
 import object.OBJ_Potion_Red;
 import object.OBJ_Rock;
 import object.OBJ_Shield_Blue;
@@ -60,6 +61,9 @@ public class EntityGenerator {
         break;
       case OBJ_ManaCrystal.objName:
         obj = new OBJ_ManaCrystal(gp);
+        break;
+      case OBJ_Pickaxe.objName:
+        obj = new OBJ_Pickaxe(gp);
         break;
       case OBJ_Potion_Red.objName:
         obj = new OBJ_Potion_Red(gp);
