@@ -1,9 +1,11 @@
 package tile_interactive;
 
 import java.awt.Color;
+import java.util.Random;
 
 import entity.Entity;
 import main.GamePanel;
+import object.OBJ_Coin_Bronze;
 
 public class IT_DestructibleWall extends InteractiveTile {
 
@@ -58,23 +60,12 @@ public class IT_DestructibleWall extends InteractiveTile {
     return maxLife;
   }
 
-  // DROPAR ITEM DO WALL
-  // public void checkDrop() {
+  public void checkDrop() {
 
-  // // CAST A DIE (sorteia um número de 1 a 100)
-  // int i = new Random().nextInt(100) + 1;
+    int i = new Random().nextInt(100) + 1;
 
-  // // SET THE MONSTER DROP (define o item que o monstro irá dropar)
-  // if (i < 50) {
-  // dropItem(new OBJ_Coin_Bronze(gp));
-  // }
-
-  // if (i >= 50 && i < 75) {
-  // dropItem(new OBJ_Heart(gp));
-  // }
-
-  // if (i >= 75 && i <= 100) {
-  // dropItem(new OBJ_ManaCrystal(gp));
-  // }
-  // }
+    if (i < 20) {
+      dropItem(new OBJ_Coin_Bronze(gp));
+    }
+  }
 }

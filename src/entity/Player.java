@@ -518,8 +518,7 @@ public class Player extends Entity {
       generateParticle(gp.iTile[gp.currentMap][i], gp.iTile[gp.currentMap][i]);
 
       if (gp.iTile[gp.currentMap][i].life == 0) {
-        // DROPAR ITEM DO WALL
-        // gp.iTile[gp.currentMap][i].checkDrop();
+        gp.iTile[gp.currentMap][i].checkDrop();
         gp.iTile[gp.currentMap][i] = gp.iTile[gp.currentMap][i].getDestroyedForm();
       }
     }
