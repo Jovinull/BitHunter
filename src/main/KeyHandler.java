@@ -18,6 +18,7 @@ public class KeyHandler implements KeyListener {
 
   // DEBUG: exibir/ocultar tempo de desenho
   public boolean showDebugText = false;
+  public boolean godModeOn = false;
 
   // Limites de índices dos menus de título (evita "números mágicos")
   private static final int MENU_MAIN_MAX_INDEX = 2; // [Iniciar, Créditos, Sair]
@@ -240,6 +241,14 @@ public class KeyHandler implements KeyListener {
         case 1:
           gp.tileM.loadMap("/maps/interior01.txt", 1);
           break;
+      }
+    }
+
+    if (key == KeyEvent.VK_G) {
+      if (godModeOn == false) {
+        godModeOn = true;
+      } else if (godModeOn == true) {
+        godModeOn = false;
       }
     }
   }
