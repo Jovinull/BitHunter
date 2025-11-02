@@ -38,6 +38,8 @@ public class Sound {
     soundURL[17] = getClass().getResource("/sounds/speak.wav");
     soundURL[18] = getClass().getResource("/sounds/Merchant.wav");
     soundURL[19] = getClass().getResource("/sounds/Dungeon.wav");
+    soundURL[20] = getClass().getResource("/sounds/chipwall.wav");
+    soundURL[21] = getClass().getResource("/sounds/dooropen.wav");
   }
 
   // Prepara o áudio correspondente ao índice informado

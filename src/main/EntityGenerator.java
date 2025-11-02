@@ -6,11 +6,13 @@ import object.OBJ_Boots;
 import object.OBJ_Chest;
 import object.OBJ_Coin_Bronze;
 import object.OBJ_Door;
+import object.OBJ_Door_Iron;
 import object.OBJ_Fireball;
 import object.OBJ_Heart;
 import object.OBJ_Key;
 import object.OBJ_Lantern;
 import object.OBJ_ManaCrystal;
+import object.OBJ_Pickaxe;
 import object.OBJ_Potion_Red;
 import object.OBJ_Rock;
 import object.OBJ_Shield_Blue;
@@ -43,6 +45,9 @@ public class EntityGenerator {
       case OBJ_Coin_Bronze.objName:
         obj = new OBJ_Coin_Bronze(gp);
         break;
+      case OBJ_Door_Iron.objName:
+        obj = new OBJ_Door_Iron(gp);
+        break;
       case OBJ_Door.objName:
         obj = new OBJ_Door(gp);
         break;
@@ -60,6 +65,9 @@ public class EntityGenerator {
         break;
       case OBJ_ManaCrystal.objName:
         obj = new OBJ_ManaCrystal(gp);
+        break;
+      case OBJ_Pickaxe.objName:
+        obj = new OBJ_Pickaxe(gp);
         break;
       case OBJ_Potion_Red.objName:
         obj = new OBJ_Potion_Red(gp);
