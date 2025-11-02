@@ -82,6 +82,11 @@ public class CollisionChecker {
   public int checkObject(Entity entity, boolean player) {
     int index = 999; // Índice padrão (999 = nenhum objeto relevante colidido)
 
+    String direction = entity.direction;
+    if (entity.knockBack == true) {
+      direction = entity.knockBackDirection;
+    }
+
     for (int i = 0; i < gp.obj[1].length; i++) {
       if (gp.obj[gp.currentMap][i] != null) {
 
@@ -95,7 +100,7 @@ public class CollisionChecker {
 
         // Simula o movimento da entidade conforme a direção atual para verificar
         // colisão
-        switch (entity.direction) {
+        switch (direction) {
           case "up" -> entity.solidArea.y -= entity.speed;
           case "down" -> entity.solidArea.y += entity.speed;
           case "left" -> entity.solidArea.x -= entity.speed;
