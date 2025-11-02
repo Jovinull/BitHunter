@@ -83,6 +83,8 @@ public class Player extends Entity {
   }
 
   public void setDefaultPositions() {
+
+    gp.currentMap = 0;
     worldX = gp.tileSize * 23; // Posição inicial em X no mundo (tile 23)
     worldY = gp.tileSize * 21; // Posição inicial em Y no mundo (tile 21)
     direction = "down"; // Direção inicial
