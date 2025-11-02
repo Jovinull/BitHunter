@@ -188,6 +188,9 @@ public class Entity {
     // Implementação padrão vazia, deve ser sobrescrita por subclasses
   }
 
+  public void move(String direction) {
+  }
+
   public void damageReaction() {
     // Implementação padrão vazia, deve ser sobrescrita por subclasses
   }

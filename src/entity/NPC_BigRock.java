@@ -65,4 +65,29 @@ public class NPC_BigRock extends Entity {
       dialogueSet--;
     }
   }
+
+  public void move(String d) {
+
+    this.direction = d;
+
+    checkCollision();
+
+    if (collisionOn == false) {
+
+      switch (direction) {
+        case "up":
+          worldY -= speed;
+          break;
+        case "down":
+          worldY += speed;
+          break;
+        case "left":
+          worldX -= speed;
+          break;
+        case "right":
+          worldX += speed;
+          break;
+      }
+    }
+  }
 }

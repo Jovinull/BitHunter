@@ -436,12 +436,15 @@ public class Player extends Entity {
 
   // Método responsável por interagir com um NPC baseado no índice passado
   public void interactNPC(int i) {
-    if (gp.keyH.enterPressed == true) {
 
-      if (i != 999) {
+    if (i != 999) {
+
+      if (gp.keyH.enterPressed == true) {
         attackCanceled = true;
         gp.npc[gp.currentMap][i].speak();
       }
+
+      gp.npc[gp.currentMap][i].move(direction);
     }
   }
 
