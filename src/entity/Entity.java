@@ -683,9 +683,9 @@ public class Entity {
 
     // Otimização: desenha apenas se a entidade estiver dentro da área visível da
     // tela
-    if (worldX + gp.tileSize > gp.player.worldX - gp.player.screenX &&
+    if (worldX + gp.tileSize * 5 > gp.player.worldX - gp.player.screenX &&
         worldX - gp.tileSize < gp.player.worldX + gp.player.screenX &&
-        worldY + gp.tileSize > gp.player.worldY - gp.player.screenY &&
+        worldY + gp.tileSize * 5 > gp.player.worldY - gp.player.screenY &&
         worldY - gp.tileSize < gp.player.worldY + gp.player.screenY) {
 
       int tempScreenX = screenX;
