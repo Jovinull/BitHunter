@@ -501,7 +501,7 @@ public class Entity {
     actionLockCounter++;
 
     // A cada 120 frames (2 segundos em 60 FPS), o NPC escolhe uma nova direção
-    if (actionLockCounter == interval) {
+    if (actionLockCounter > interval) {
 
       Random random = new Random();
       int i = random.nextInt(4); // Gera um número de 0 a 3
@@ -523,6 +523,29 @@ public class Entity {
       }
 
       actionLockCounter = 0; // Reinicia o contador para o próximo intervalo
+    }
+  }
+
+  public void moveTowardPlayer(int interval) {
+
+    actionLockCounter++;
+
+    if (actionLockCounter > interval) {
+
+      if (getXdistance(gp.player) > getYdistance(gp.player)) {
+        if (gp.player.getCenterX() < getCenterX()) {
+          direction = "left";
+        } else {
+          direction = "right";
+        }
+      } else if (getXdistance(gp.player) < getYdistance(gp.player)) {
+        if (gp.player.getCenterY() < getCenterY()) {
+          direction = "up";
+        } else {
+          direction = "down";
+        }
+      }
+      actionLockCounter = 0;
     }
   }
 

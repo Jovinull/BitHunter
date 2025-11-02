@@ -74,7 +74,9 @@ public class MON_SkeletonLord extends Entity {
 
   public void setAction() {
 
-    if (onPath == true) {
+    if (getTileDistance(gp.player) < 10) {
+
+      moveTowardPlayer(60);
     }
 
     else {
@@ -85,7 +87,7 @@ public class MON_SkeletonLord extends Entity {
 
     // Check if it attacks
     if (attacking == false) {
-      checkAttackOrNot(60, gp.tileSize * 10, gp.tileSize * 5);
+      checkAttackOrNot(60, gp.tileSize * 7, gp.tileSize * 5);
     }
   }
 
