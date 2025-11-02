@@ -69,7 +69,7 @@ public class MON_RedSlime extends Entity {
       checkStartChasingOrNot(gp.player, 5, 100);
 
       // Escolhe uma direção aleatória
-      getRandomDirection();
+      getRandomDirection(120);
     }
   }
 

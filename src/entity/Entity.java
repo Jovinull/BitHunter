@@ -486,12 +486,12 @@ public class Entity {
     }
   }
 
-  public void getRandomDirection() {
+  public void getRandomDirection(int interval) {
 
     actionLockCounter++;
 
     // A cada 120 frames (2 segundos em 60 FPS), o NPC escolhe uma nova direção
-    if (actionLockCounter == 120) {
+    if (actionLockCounter == interval) {
 
       Random random = new Random();
       int i = random.nextInt(4); // Gera um número de 0 a 3
