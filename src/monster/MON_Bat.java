@@ -50,25 +50,7 @@ public class MON_Bat extends Entity {
 
   public void setAction() {
 
-    if (onPath == true) {
-
-      // // Check if it stops chasing
-      // checkStopChasingOrNot(gp.player, 15, 100);
-
-      // // DEFINE PARA O NPC IR ATÉ A POSIÇÃO DO JOGADOR
-      // searchPath(getGoalCol(gp.player), getGoalRow(gp.player));
-
-      // // Check if it shoots a projectile
-      // checkShootOrNot(200, 30);
-    }
-
-    else {
-      // // Check if it starts chasing
-      // checkStartChasingOrNot(gp.player, 5, 100);
-
-      // Get a random direction
-      getRandomDirection(10);
-    }
+    getRandomDirection(10);
   }
 
   public void damageReaction() {
