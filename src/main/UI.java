@@ -171,51 +171,100 @@ public class UI {
   // --- HUD: Vida & Mana ---
   public void drawPlayerLife() {
 
-    int x = gp.tileSize / 2;
-    int y = gp.tileSize / 2;
+    final int iconSize = 32;
+    final int colsPerRow = 10;
+
+    int startX = gp.tileSize / 2;
+    int startY = gp.tileSize / 2;
+
+    int x = startX;
+    int y = startY;
     int i = 0;
 
-    // Max life (vazio)
-    while (i < gp.player.maxLife / 2) {
-      g2.drawImage(heart_blank, x, y, null);
-      i++;
-      x += gp.tileSize;
-    }
+    int manaStartX = (gp.tileSize / 2) + 2;
+    int manaStartY = 0;
 
-    // Reset
-    x = gp.tileSize / 2;
-    y = gp.tileSize / 2;
-    i = 0;
-
-    // Vida atual
-    while (i < gp.player.life) {
-      g2.drawImage(heart_half, x, y, null);
+    // --- MAX LIFE (corações vazios) ---
+    int maxHearts = gp.player.maxLife / 2;
+    while (i < maxHearts) {
+      g2.drawImage(heart_blank, x, y, iconSize, iconSize, null);
       i++;
-      if (i < gp.player.life) {
-        g2.drawImage(heart_full, x, y, null);
+      x += iconSize;
+
+      if (i % colsPerRow == 0) {
+        x = startX;
+        y += iconSize;
       }
-      i++;
-      x += gp.tileSize;
     }
 
-    // Mana (vazio)
-    x = (gp.tileSize / 2) - 5;
-    y = (int) (gp.tileSize * 1.5);
+    // Base da mana fica logo abaixo da última linha de corações
+    // (se terminou no meio da linha, y já está correto; se terminou exato na
+    // quebra, y já foi avançado)
+    manaStartY = y + 4; // próxima linha depois dos corações
+
+    // --- VIDA ATUAL (corações cheios/meio) ---
+    // Reposiciona para o topo (mesmo grid usado acima)
+    x = startX;
+    y = startY;
+
+    int fullHearts = gp.player.life / 2;
+    int halfHeart = gp.player.life % 2;
+
+    // Corações cheios
+    for (int idx = 0; idx < fullHearts; idx++) {
+      g2.drawImage(heart_full, x, y, iconSize, iconSize, null);
+      x += iconSize;
+      if ((idx + 1) % colsPerRow == 0) {
+        x = startX;
+        y += iconSize;
+      }
+    }
+
+    // Meio coração (se houver)
+    if (halfHeart == 1) {
+      g2.drawImage(heart_half, x, y, iconSize, iconSize, null);
+      // avanço de posição para manter consistência do grid (caso outros overlays
+      // usem)
+      x += iconSize;
+      if (((fullHearts + 1) % colsPerRow) == 0) {
+        x = startX;
+        y += iconSize;
+      }
+    }
+
+    // --- MANA (vazio) ---
+    // Usa a base calculada (abaixo dos corações) e quebra de linha igual (8 por
+    // linha)
+    int crystalStep = iconSize;
+    x = manaStartX;
+    y = manaStartY;
     i = 0;
+
     while (i < gp.player.maxMana) {
-      g2.drawImage(crystal_blank, x, y, null);
+      g2.drawImage(crystal_blank, x, y, iconSize, iconSize, null);
       i++;
-      x += 35;
+      x += crystalStep;
+
+      if (i % colsPerRow == 0) {
+        x = manaStartX;
+        y += iconSize;
+      }
     }
 
-    // Mana atual
-    x = (gp.tileSize / 2) - 5;
-    y = (int) (gp.tileSize * 1.5);
+    // --- MANA ATUAL ---
+    x = manaStartX;
+    y = manaStartY;
     i = 0;
+
     while (i < gp.player.mana) {
-      g2.drawImage(crystal_full, x, y, null);
+      g2.drawImage(crystal_full, x, y, iconSize, iconSize, null);
       i++;
-      x += 35;
+      x += crystalStep;
+
+      if (i % colsPerRow == 0) {
+        x = manaStartX;
+        y += iconSize;
+      }
     }
   }
 
