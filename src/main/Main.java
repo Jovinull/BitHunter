@@ -1,5 +1,6 @@
 package main;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 // Classe principal que inicia o jogo
@@ -19,6 +20,8 @@ public class Main {
 
     // Define o título da janela
     window.setTitle("Bit Hunter");
+
+    new Main().setIcon();
 
     // Cria o painel do jogo e adiciona à janela
     GamePanel gamePanel = new GamePanel();
@@ -43,5 +46,11 @@ public class Main {
 
     // Inicia a thread do jogo (começa o loop do jogo)
     gamePanel.startGameThread();
+  }
+
+  public void setIcon() {
+
+    ImageIcon icon = new ImageIcon(getClass().getClassLoader().getResource("objects/blueheart.png"));
+    window.setIconImage(icon.getImage());
   }
 }
