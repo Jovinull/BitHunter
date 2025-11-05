@@ -271,9 +271,15 @@ public class Entity {
         // Atribui o item dropado à posição disponível
         gp.obj[gp.currentMap][i] = droppedItem;
 
-        // Define a posição do item no mundo, usando as coordenadas do monstro morto
-        gp.obj[gp.currentMap][i].worldX = worldX; // Posição X do item
-        gp.obj[gp.currentMap][i].worldY = worldY; // Posição Y do item
+        // Centraliza o drop no centro da hitbox (solidArea) da entidade que morreu
+        int centerX = worldX + solidArea.x + solidArea.width / 2;
+        int centerY = worldY + solidArea.y + solidArea.height / 2;
+
+        // Se seus itens ocupam 1 tile, use metade do tile para centralizar
+        int itemHalf = gp.tileSize / 2;
+
+        gp.obj[gp.currentMap][i].worldX = centerX - itemHalf;
+        gp.obj[gp.currentMap][i].worldY = centerY - itemHalf;
 
         // Sai do loop para evitar sobrescrever outros slots
         break;

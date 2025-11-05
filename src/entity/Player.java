@@ -63,7 +63,7 @@ public class Player extends Entity {
     maxMana = 4;
     mana = maxMana;
     ammo = 10;
-    strength = 8;
+    strength = 1;
     dexterity = 1;
     exp = 0;
     nextLevelExp = 5;
