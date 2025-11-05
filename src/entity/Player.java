@@ -63,7 +63,7 @@ public class Player extends Entity {
     maxMana = 4;
     mana = maxMana;
     ammo = 10;
-    strength = 1;
+    strength = 8;
     dexterity = 1;
     exp = 0;
     nextLevelExp = 5;
@@ -702,9 +702,11 @@ public class Player extends Entity {
       g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f)); // Aplica transparência
     }
 
-    // Desenha o sprite na posição fixa do centro da tela, com o tamanho padrão do
-    // tile
-    g2.drawImage(image, tempScreenX, tempScreenY, null);
+    if (drawing == true) {
+      // Desenha o sprite na posição fixa do centro da tela, com o tamanho padrão do
+      // tile
+      g2.drawImage(image, tempScreenX, tempScreenY, null);
+    }
 
     // Reset alpha
     g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));

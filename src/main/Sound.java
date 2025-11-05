@@ -40,6 +40,7 @@ public class Sound {
     soundURL[19] = getClass().getResource("/sounds/Dungeon.wav");
     soundURL[20] = getClass().getResource("/sounds/chipwall.wav");
     soundURL[21] = getClass().getResource("/sounds/dooropen.wav");
+    soundURL[22] = getClass().getResource("/sounds/FinalBattle.wav");
   }
 
   // Prepara o áudio correspondente ao índice informado

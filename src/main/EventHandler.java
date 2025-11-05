@@ -1,5 +1,6 @@
 package main;
 
+import data.Progress;
 import entity.Entity;
 
 public class EventHandler {
@@ -130,6 +131,10 @@ public class EventHandler {
       else if (hit(3, 26, 41, "any") == true) {
         teleport(2, 8, 7, gp.dungeon);
       } // to B1
+
+      else if (hit(3, 25, 27, "any")) {
+        skeletonLord();
+      }
     }
   }
 
@@ -183,6 +188,14 @@ public class EventHandler {
       gp.gameState = gp.dialogueState;
       gp.player.attackCanceled = true;
       entity.speak();
+    }
+  }
+
+  public void skeletonLord() {
+
+    if (gp.bossBattleOn == false && Progress.skeletonLordDefeated == false) {
+      gp.gameState = gp.cutsceneState;
+      gp.csManager.sceneNum = gp.csManager.skeletonLord;
     }
   }
 }
