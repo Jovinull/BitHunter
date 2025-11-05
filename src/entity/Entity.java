@@ -43,7 +43,7 @@ public class Entity {
   public boolean attacking = false;
   public boolean alive = true;
   public boolean dying = false;
-  boolean hpBarOn = false;
+  public boolean hpBarOn = false;
   public boolean onPath = false;
   public boolean knockBack = false;
   public String knockBackDirection;
@@ -60,7 +60,7 @@ public class Entity {
   public int invincibleCounter = 0;
   public int shotAvailableCounter = 0;
   int dyingCounter = 0;
-  int hpBarCounter = 0;
+  public int hpBarCounter = 0;
   int knockBackCounter = 0;
   public int guardCounter = 0;
   int offBalanceCounter = 0;
@@ -88,6 +88,7 @@ public class Entity {
   public Entity currentShield;
   public Entity currentLight;
   public Projectile projectile;
+  public boolean boss;
 
   // ITEM ATRIBUTES
   public ArrayList<Entity> inventory = new ArrayList<>(); // Inventário do jogador
@@ -119,6 +120,16 @@ public class Entity {
 
   public Entity(GamePanel gp) {
     this.gp = gp;
+  }
+
+  public int getScreenX() {
+    int screenX = worldX - gp.player.worldX + gp.player.screenX;
+    return screenX;
+  }
+
+  public int getScreenY() {
+    int screenY = worldY - gp.player.worldY + gp.player.screenY;
+    return screenY;
   }
 
   public int getLeftX() {
@@ -696,30 +707,37 @@ public class Entity {
     target.knockBack = true;
   }
 
-  // Renderiza a entidade na tela, com base na posição relativa ao jogador
-  // (scroll/câmera)
-  public void draw(Graphics2D g2) {
-    BufferedImage image = null;
+  public boolean inCamera() {
+    boolean inCamera = false;
 
-    // Calcula a posição relativa à tela, com base na posição do jogador (scroll)
-    int screenX = worldX - gp.player.worldX + gp.player.screenX;
-    int screenY = worldY - gp.player.worldY + gp.player.screenY;
-
-    // Otimização: desenha apenas se a entidade estiver dentro da área visível da
-    // tela
     if (worldX + gp.tileSize * 5 > gp.player.worldX - gp.player.screenX &&
         worldX - gp.tileSize < gp.player.worldX + gp.player.screenX &&
         worldY + gp.tileSize * 5 > gp.player.worldY - gp.player.screenY &&
         worldY - gp.tileSize < gp.player.worldY + gp.player.screenY) {
 
-      int tempScreenX = screenX;
-      int tempScreenY = screenY;
+      inCamera = true;
+    }
+
+    return inCamera;
+  }
+
+  // Renderiza a entidade na tela, com base na posição relativa ao jogador
+  // (scroll/câmera)
+  public void draw(Graphics2D g2) {
+    BufferedImage image = null;
+
+    // Otimização: desenha apenas se a entidade estiver dentro da área visível da
+    // tela
+    if (inCamera() == true) {
+
+      int tempScreenX = getScreenX();
+      int tempScreenY = getScreenY();
 
       // Escolhe o sprite correto com base na direção e no frame da animação
       switch (direction) {
         case "up":
           if (attacking) {
-            tempScreenY = screenY - up1.getHeight();
+            tempScreenY = getScreenY() - up1.getHeight();
             image = (spriteNum == 1) ? attackUp1 : attackUp2;
           } else {
             image = (spriteNum == 1) ? up1 : up2;
@@ -736,7 +754,7 @@ public class Entity {
 
         case "left":
           if (attacking) {
-            tempScreenX = screenX - left1.getWidth();
+            tempScreenX = getScreenX() - left1.getWidth();
             image = (spriteNum == 1) ? attackLeft1 : attackLeft2;
           } else {
             image = (spriteNum == 1) ? left1 : left2;
@@ -759,10 +777,10 @@ public class Entity {
         double hpBarValue = oneScale * life;
 
         g2.setColor(new Color(35, 35, 35));
-        g2.fillRect(screenX - 1, screenY - 16, gp.tileSize + 2, 12);
+        g2.fillRect(getScreenX() - 1, getScreenY() - 16, gp.tileSize + 2, 12);
 
         g2.setColor(new Color(255, 0, 30));
-        g2.fillRect(screenX, screenY - 15, (int) hpBarValue, 10);
+        g2.fillRect(getScreenX(), getScreenY() - 15, (int) hpBarValue, 10);
 
         hpBarCounter++;
 

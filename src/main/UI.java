@@ -125,6 +125,7 @@ public class UI {
 
     if (gp.gameState == gp.playState) {
       drawPlayerLife();
+      drawMonsterLife();
       drawMessage();
       return;
     }
@@ -172,7 +173,7 @@ public class UI {
   public void drawPlayerLife() {
 
     final int iconSize = 32;
-    final int colsPerRow = 10;
+    final int colsPerRow = 8;
 
     int startX = gp.tileSize / 2;
     int startY = gp.tileSize / 2;
@@ -181,7 +182,7 @@ public class UI {
     int y = startY;
     int i = 0;
 
-    int manaStartX = (gp.tileSize / 2) + 2;
+    int manaStartX = (gp.tileSize / 2) - 5;
     int manaStartY = 0;
 
     // --- MAX LIFE (corações vazios) ---
@@ -200,7 +201,7 @@ public class UI {
     // Base da mana fica logo abaixo da última linha de corações
     // (se terminou no meio da linha, y já está correto; se terminou exato na
     // quebra, y já foi avançado)
-    manaStartY = y + 4; // próxima linha depois dos corações
+    manaStartY = y + iconSize; // próxima linha depois dos corações
 
     // --- VIDA ATUAL (corações cheios/meio) ---
     // Reposiciona para o topo (mesmo grid usado acima)
@@ -235,7 +236,7 @@ public class UI {
     // --- MANA (vazio) ---
     // Usa a base calculada (abaixo dos corações) e quebra de linha igual (8 por
     // linha)
-    int crystalStep = iconSize;
+    int crystalStep = iconSize + 3; // ligeiro espaço para os cristais
     x = manaStartX;
     y = manaStartY;
     i = 0;
@@ -264,6 +265,58 @@ public class UI {
       if (i % colsPerRow == 0) {
         x = manaStartX;
         y += iconSize;
+      }
+    }
+
+    // Observação: se você quiser desenhar outros elementos do HUD depois,
+    // use 'y + iconSize' como base para continuar "empurrando" tudo para baixo.
+  }
+
+  public void drawMonsterLife() {
+
+    for (int i = 0; i < gp.monster[1].length; i++) {
+
+      Entity monster = gp.monster[gp.currentMap][i];
+
+      if (monster != null && monster.inCamera() == true) {
+
+        if (monster.hpBarOn == true && monster.boss == false) {
+
+          double oneScale = (double) gp.tileSize / monster.maxLife;
+          double hpBarValue = oneScale * monster.life;
+
+          g2.setColor(new Color(35, 35, 35));
+          g2.fillRect(monster.getScreenX() - 1, monster.getScreenY() - 16, gp.tileSize + 2, 12);
+
+          g2.setColor(new Color(255, 0, 30));
+          g2.fillRect(monster.getScreenX(), monster.getScreenY() - 15, (int) hpBarValue, 10);
+
+          monster.hpBarCounter++;
+
+          if (monster.hpBarCounter > 600) {
+            monster.hpBarCounter = 0;
+            monster.hpBarOn = false;
+          }
+        }
+
+        else if (monster.boss == true) {
+
+          double oneScale = (double) gp.tileSize * 8 / monster.maxLife;
+          double hpBarValue = oneScale * monster.life;
+
+          int x = gp.screenWidth / 2 - gp.tileSize * 4;
+          int y = gp.tileSize * 10;
+
+          g2.setColor(new Color(35, 35, 35));
+          g2.fillRect(x - 1, y - 1, gp.tileSize * 8 + 2, 22);
+
+          g2.setColor(new Color(255, 0, 30));
+          g2.fillRect(x, y, (int) hpBarValue, 20);
+
+          g2.setFont(g2.getFont().deriveFont(Font.BOLD, 24f));
+          g2.setColor(Color.white);
+          g2.drawString(monster.name, x + 4, y - 10);
+        }
       }
     }
   }
