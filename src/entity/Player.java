@@ -259,8 +259,8 @@ public class Player extends Entity {
       }
     }
 
-    else if (attacking == true) {
-      attacking();
+    else if (attacking) {
+      performAttack();
     }
 
     else if (keyH.spacePressed == true) {
