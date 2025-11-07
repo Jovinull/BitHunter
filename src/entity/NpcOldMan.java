@@ -80,20 +80,20 @@ public class NpcOldMan extends Entity {
   public void speak() {
     facePlayer();
     startDialogue(this, dialogueSet);
-
     dialogueSet++;
+
+    if (gp.player.life < gp.player.maxLife / 3) {
+      dialogueSet = 1;
+      startDialogue(this, dialogueSet);
+    }
 
     if (dialogueSet == 1 && !startedWalkToGoal && !atGoal()) {
       startedWalkToGoal = true;
       onPath = true;
     }
 
-    if (gp.player.life < gp.player.maxLife / 3) {
-      dialogueSet = 1;
-    }
-
     if (dialogues[dialogueSet][0] == null) {
-      dialogueSet--;
+      dialogueSet = Math.max(0, dialogueSet - 1);
     }
   }
 }
