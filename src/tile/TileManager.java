@@ -187,8 +187,8 @@ public class TileManager {
 
       for (int i = 0; i < gp.pFinder.pathList.size(); i++) {
 
-        int worldX = gp.pFinder.pathList.get(i).col * gp.tileSize;
-        int worldY = gp.pFinder.pathList.get(i).row * gp.tileSize;
+        int worldX = gp.pFinder.pathList.get(i).getCol() * gp.tileSize;
+        int worldY = gp.pFinder.pathList.get(i).getRow() * gp.tileSize;
         int screenX = worldX - gp.player.worldX + gp.player.screenX;
         int screenY = worldY - gp.player.worldY + gp.player.screenY;
 

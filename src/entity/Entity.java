@@ -862,8 +862,8 @@ public class Entity {
     if (gp.pFinder.search() == true) {
 
       // Next worldX & worldY
-      int nextX = gp.pFinder.pathList.get(0).col * gp.tileSize;
-      int nextY = gp.pFinder.pathList.get(0).row * gp.tileSize;
+      int nextX = gp.pFinder.pathList.get(0).getCol() * gp.tileSize;
+      int nextY = gp.pFinder.pathList.get(0).getRow() * gp.tileSize;
 
       // Entity's solidArea position
       int enLeftX = worldX + solidArea.x;
@@ -914,8 +914,8 @@ public class Entity {
       }
 
       // Se atingir o objetivo, pare a busca
-      int nextCol = gp.pFinder.pathList.get(0).col;
-      int nextRow = gp.pFinder.pathList.get(0).row;
+      int nextCol = gp.pFinder.pathList.get(0).getCol();
+      int nextRow = gp.pFinder.pathList.get(0).getRow();
       if (nextCol == goalCol && nextRow == goalRow) {
         onPath = false;
       }
