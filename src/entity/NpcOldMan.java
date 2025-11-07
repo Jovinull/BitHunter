@@ -1,21 +1,23 @@
 package entity;
 
 import java.awt.Rectangle;
-import java.util.Random;
 
 import main.GamePanel;
 
-// Representa o NPC "Old Man", herda da classe Entity
-public class NPC_OldMan extends Entity {
+public class NpcOldMan extends Entity {
 
-  // Construtor: define direção inicial, velocidade e carrega os sprites
-  public NPC_OldMan(GamePanel gp) {
-    super(gp); // Chama o construtor da superclasse Entity
+  private static final int GOAL_COL = 23;
+  private static final int GOAL_ROW = 13;
 
-    direction = "down"; // Direção inicial
-    speed = 1; // Velocidade fixa para o NPC
+  private boolean startedWalkToGoal = false;
 
-    // Hitbox voltada para os pés (consistente com player/objetos)
+  public NpcOldMan(GamePanel gp) {
+    super(gp);
+
+    direction = "down";
+    speed = 1;
+    defaultSpeed = speed;
+
     solidArea = new Rectangle();
     solidArea.x = 8;
     solidArea.y = 16;
@@ -26,11 +28,10 @@ public class NPC_OldMan extends Entity {
 
     dialogueSet = -1;
 
-    getImage(); // Carrega as imagens de sprite para animação
-    setDialogue(); // Define os diálogos do NPC
+    getImage();
+    setDialogue();
   }
 
-  // Carrega as imagens do NPC em todas as direções (2 frames por direção)
   public void getImage() {
     up1 = setup("/npc/oldman/oldman_up_1", gp.tileSize, gp.tileSize);
     up2 = setup("/npc/oldman/oldman_up_2", gp.tileSize, gp.tileSize);
@@ -55,62 +56,43 @@ public class NPC_OldMan extends Entity {
     dialogues[2][0] = "Eu me pergunto como abrir aquela porta...";
   }
 
-  // Define o comportamento do NPC — neste caso, movimentação aleatória
-  @Override
-  public void setAction() {
-
-    if (onPath == true) {
-
-      int goalCol = 12;
-      int goalRow = 9;
-
-      searchPath(goalCol, goalRow);
-    }
-
-    else {
-
-      actionLockCounter++;
-
-      // A cada 120 frames (2 segundos em 60 FPS), o NPC escolhe uma nova direção
-      if (actionLockCounter == 120) {
-
-        Random random = new Random();
-        int i = random.nextInt(4); // Gera um número de 0 a 3
-
-        // Altera a direção com base no número gerado
-        switch (i) {
-          case 0:
-            direction = "up";
-            break;
-          case 1:
-            direction = "down";
-            break;
-          case 2:
-            direction = "left";
-            break;
-          case 3:
-            direction = "right";
-            break;
-        }
-
-        actionLockCounter = 0; // Reinicia o contador para o próximo intervalo
-      }
-    }
+  private boolean atGoal() {
+    return getCol() == GOAL_COL && getRow() == GOAL_ROW;
   }
 
-  public void speak() {
+  @Override
+  public void setAction() {
+    if (startedWalkToGoal) {
+      if (atGoal()) {
+        startedWalkToGoal = false;
+        onPath = false;
+      } else {
+        onPath = true;
+        searchPath(GOAL_COL, GOAL_ROW);
+      }
+      return;
+    }
 
+    getRandomDirection(120);
+  }
+
+  @Override
+  public void speak() {
     facePlayer();
     startDialogue(this, dialogueSet);
 
     dialogueSet++;
+
+    if (dialogueSet == 1 && !startedWalkToGoal && !atGoal()) {
+      startedWalkToGoal = true;
+      onPath = true;
+    }
 
     if (gp.player.life < gp.player.maxLife / 3) {
       dialogueSet = 1;
     }
 
     if (dialogues[dialogueSet][0] == null) {
-
       dialogueSet--;
     }
   }

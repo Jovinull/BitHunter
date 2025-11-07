@@ -3,7 +3,7 @@ package main;
 import data.Progress;
 import entity.NPC_BigRock;
 import entity.NPC_Merchant;
-import entity.NPC_OldMan;
+import entity.NpcOldMan;
 import monster.MON_Bat;
 import monster.MON_GreenSlime;
 import monster.MON_Orc;
@@ -141,7 +141,7 @@ public class AssetSetter {
     int i = 0;
 
     // MAP 0
-    gp.npc[mapNum][i] = new NPC_OldMan(gp);
+    gp.npc[mapNum][i] = new NpcOldMan(gp);
     gp.npc[mapNum][i].worldX = gp.tileSize * 21;
     gp.npc[mapNum][i].worldY = gp.tileSize * 21;
     i++;
