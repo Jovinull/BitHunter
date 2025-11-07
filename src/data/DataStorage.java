@@ -1,33 +1,181 @@
 package data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class DataStorage implements Serializable {
+  @Serial
+  private static final long serialVersionUID = 1L;
 
   // PLAYER STATS
-  int level;
-  int maxLife;
-  int life;
-  int maxMana;
-  int mana;
-  int strength;
-  int dexterity;
-  int exp;
-  int nextLevelExp;
-  int coin;
+  private int level;
+  private int maxLife;
+  private int life;
+  private int maxMana;
+  private int mana;
+  private int strength;
+  private int dexterity;
+  private int exp;
+  private int nextLevelExp;
+  private int coin;
 
   // PLAYER INVENTORY
-  ArrayList<String> itemNames = new ArrayList<>();
-  ArrayList<Integer> itemAmounts = new ArrayList<>();
+  private final List<String> itemNames = new ArrayList<>();
+  private final List<Integer> itemAmounts = new ArrayList<>();
 
-  int currentWeaponSlot;
-  int currentShieldSlot;
+  private int currentWeaponSlot;
+  private int currentShieldSlot;
 
   // OBJECT ON MAP
-  String mapObjectNames[][];
-  int mapObjectWorldX[][];
-  int mapObjectWorldY[][];
-  String mapObjectLootNames[][];
-  boolean mapObjectOpened[][];
+  private String[][] mapObjectNames;
+  private int[][] mapObjectWorldX;
+  private int[][] mapObjectWorldY;
+  private String[][] mapObjectLootNames;
+  private boolean[][] mapObjectOpened;
+
+  public int getLevel() {
+    return level;
+  }
+
+  public void setLevel(int level) {
+    this.level = level;
+  }
+
+  public int getMaxLife() {
+    return maxLife;
+  }
+
+  public void setMaxLife(int maxLife) {
+    this.maxLife = maxLife;
+  }
+
+  public int getLife() {
+    return life;
+  }
+
+  public void setLife(int life) {
+    this.life = life;
+  }
+
+  public int getMaxMana() {
+    return maxMana;
+  }
+
+  public void setMaxMana(int maxMana) {
+    this.maxMana = maxMana;
+  }
+
+  public int getMana() {
+    return mana;
+  }
+
+  public void setMana(int mana) {
+    this.mana = mana;
+  }
+
+  public int getStrength() {
+    return strength;
+  }
+
+  public void setStrength(int strength) {
+    this.strength = strength;
+  }
+
+  public int getDexterity() {
+    return dexterity;
+  }
+
+  public void setDexterity(int dexterity) {
+    this.dexterity = dexterity;
+  }
+
+  public int getExp() {
+    return exp;
+  }
+
+  public void setExp(int exp) {
+    this.exp = exp;
+  }
+
+  public int getNextLevelExp() {
+    return nextLevelExp;
+  }
+
+  public void setNextLevelExp(int nextLevelExp) {
+    this.nextLevelExp = nextLevelExp;
+  }
+
+  public int getCoin() {
+    return coin;
+  }
+
+  public void setCoin(int coin) {
+    this.coin = coin;
+  }
+
+  public List<String> getItemNames() {
+    return itemNames;
+  }
+
+  public List<Integer> getItemAmounts() {
+    return itemAmounts;
+  }
+
+  public int getCurrentWeaponSlot() {
+    return currentWeaponSlot;
+  }
+
+  public void setCurrentWeaponSlot(int currentWeaponSlot) {
+    this.currentWeaponSlot = currentWeaponSlot;
+  }
+
+  public int getCurrentShieldSlot() {
+    return currentShieldSlot;
+  }
+
+  public void setCurrentShieldSlot(int currentShieldSlot) {
+    this.currentShieldSlot = currentShieldSlot;
+  }
+
+  public String[][] getMapObjectNames() {
+    return mapObjectNames;
+  }
+
+  public void setMapObjectNames(String[][] mapObjectNames) {
+    this.mapObjectNames = mapObjectNames;
+  }
+
+  public int[][] getMapObjectWorldX() {
+    return mapObjectWorldX;
+  }
+
+  public void setMapObjectWorldX(int[][] mapObjectWorldX) {
+    this.mapObjectWorldX = mapObjectWorldX;
+  }
+
+  public int[][] getMapObjectWorldY() {
+    return mapObjectWorldY;
+  }
+
+  public void setMapObjectWorldY(int[][] mapObjectWorldY) {
+    this.mapObjectWorldY = mapObjectWorldY;
+  }
+
+  public String[][] getMapObjectLootNames() {
+    return mapObjectLootNames;
+  }
+
+  public void setMapObjectLootNames(String[][] mapObjectLootNames) {
+    this.mapObjectLootNames = mapObjectLootNames;
+  }
+
+  public boolean[][] getMapObjectOpened() {
+    return mapObjectOpened;
+  }
+
+  public void setMapObjectOpened(boolean[][] mapObjectOpened) {
+    this.mapObjectOpened = mapObjectOpened;
+  }
 }
