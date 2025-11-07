@@ -145,7 +145,7 @@ public class MON_SkeletonLord extends Entity {
   public void checkDrop() {
 
     gp.bossBattleOn = false;
-    Progress.skeletonLordDefeated = true;
+    Progress.setSkeletonLordDefeated(true);
 
     // Restore the pervious music
     gp.stopMusic();

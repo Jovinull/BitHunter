@@ -193,7 +193,7 @@ public class EventHandler {
 
   public void skeletonLord() {
 
-    if (gp.bossBattleOn == false && Progress.skeletonLordDefeated == false) {
+    if (!gp.bossBattleOn && !Progress.isSkeletonLordDefeated()) {
       gp.gameState = gp.cutsceneState;
       gp.csManager.sceneNum = gp.csManager.skeletonLord;
     }

@@ -1,6 +1,17 @@
 package data;
 
-public class Progress {
+public final class Progress {
 
-  public static boolean skeletonLordDefeated;
+  private Progress() {
+  }
+
+  private static boolean skeletonLordDefeated;
+
+  public static boolean isSkeletonLordDefeated() {
+    return skeletonLordDefeated;
+  }
+
+  public static void setSkeletonLordDefeated(boolean defeated) {
+    skeletonLordDefeated = defeated;
+  }
 }
