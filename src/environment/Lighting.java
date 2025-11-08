@@ -12,6 +12,8 @@ public class Lighting {
 
   private final GamePanel gp;
   private BufferedImage darknessFilter;
+
+  // Estados internos do ciclo
   private int dayCounter;
   private float filterAlpha = 0f;
 
@@ -164,5 +166,41 @@ public class Lighting {
       g2.setFont(g2.getFont().deriveFont(50f));
       g2.drawString(situation, 800, 500);
     }
+  }
+
+  // ===== API pública usada pela UI =====
+
+  /** Retorna o alpha atual do filtro de iluminação (0..1). */
+  public float getFilterAlpha() {
+    return filterAlpha;
+  }
+
+  /** Define o alpha do filtro de iluminação (valor é clampado para 0..1). */
+  public void setFilterAlpha(float alpha) {
+    if (alpha < 0f)
+      alpha = 0f;
+    if (alpha > 1f)
+      alpha = 1f;
+    this.filterAlpha = alpha;
+  }
+
+  /** Retorna o contador interno do ciclo dia/noite. */
+  public int getDayCounter() {
+    return dayCounter;
+  }
+
+  /** Define o contador interno do ciclo dia/noite (mínimo 0). */
+  public void setDayCounter(int value) {
+    this.dayCounter = Math.max(0, value);
+  }
+
+  /** Atalho para colocar imediatamente no estado "dia". */
+  public void setDayStateToDay() {
+    this.dayPhase = DayPhase.DAY;
+  }
+
+  // (Opcional) getter do estado atual caso precise debugar fora:
+  public String getDayPhaseName() {
+    return dayPhase.name();
   }
 }
