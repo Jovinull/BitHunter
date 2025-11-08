@@ -88,8 +88,8 @@ public class PathFinder {
       // iTiles sólidos
       for (int i = 0; i < gp.iTile[gp.currentMap].length; i++) {
         if (gp.iTile[gp.currentMap][i] != null && gp.iTile[gp.currentMap][i].destructible) {
-          int itCol = gp.iTile[gp.currentMap][i].worldX / gp.tileSize;
-          int itRow = gp.iTile[gp.currentMap][i].worldY / gp.tileSize;
+          int itCol = gp.iTile[gp.currentMap][i].getWorldX() / gp.tileSize;
+          int itRow = gp.iTile[gp.currentMap][i].getWorldY() / gp.tileSize;
           node[itCol][itRow].setSolid(true);
         }
       }
