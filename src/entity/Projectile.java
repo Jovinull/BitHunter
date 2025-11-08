@@ -1,84 +1,108 @@
 package entity;
 
+import java.util.Objects;
 import main.GamePanel;
 
 public class Projectile extends Entity {
 
-  Entity user;
+  private Entity user;
 
   public Projectile(GamePanel gp) {
     super(gp);
   }
 
   public void set(int worldX, int worldY, String direction, boolean alive, Entity user) {
-
-    this.worldX = worldX;
-    this.worldY = worldY;
-    this.direction = direction;
-    this.alive = alive;
-    this.user = user;
-    this.life = this.maxLife;
+    setWorldX(worldX);
+    setWorldY(worldY);
+    setDirection(direction);
+    setAlive(alive);
+    this.user = Objects.requireNonNull(user, "user");
+    setLife(getMaxLife());
   }
 
+  @Override
   public void update() {
 
+    // Se o dono do projétil for o player, colide em monstros
     if (user == gp.player) {
-
       int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
       if (monsterIndex != 999) {
-        gp.player.damageMonster(monsterIndex, this, attack * (gp.player.level / 2), knockBackPower);
-        generateParticle(user.projectile, gp.monster[gp.currentMap][monsterIndex]);
-        alive = false;
+        gp.player.damageMonster(
+            monsterIndex,
+            this,
+            getAttack() * Math.max(1, gp.player.getLevel() / 2),
+            getKnockBackPower());
+        // partículas usando o projétil do "user" (mesmo comportamento antigo)
+        if (user.getProjectile() != null) {
+          generateParticle(user.getProjectile(), gp.monster[gp.currentMap][monsterIndex]);
+        }
+        setAlive(false);
       }
     }
 
+    // Se o dono NÃO for o player, colide no player
     if (user != gp.player) {
       boolean contactPlayer = gp.cChecker.checKPlayer(this);
-      if (gp.player.invincible == false && contactPlayer == true) {
-        damagePlayer(attack);
-        generateParticle(user.projectile, user.projectile);
-        alive = false;
+      if (!gp.player.isInvincible() && contactPlayer) {
+        damagePlayer(getAttack());
+        if (user.getProjectile() != null) {
+          generateParticle(user.getProjectile(), user.getProjectile());
+        }
+        setAlive(false);
       }
     }
 
-    switch (direction) {
-      case "up":
-        worldY -= speed;
+    // Movimento
+    switch (getDirection()) {
+      case DIR_UP:
+        setWorldY(getWorldY() - getSpeed());
         break;
-      case "down":
-        worldY += speed;
+      case DIR_DOWN:
+        setWorldY(getWorldY() + getSpeed());
         break;
-      case "left":
-        worldX -= speed;
+      case DIR_LEFT:
+        setWorldX(getWorldX() - getSpeed());
         break;
-      case "right":
-        worldX += speed;
+      case DIR_RIGHT:
+        setWorldX(getWorldX() + getSpeed());
+        break;
+      default:
         break;
     }
 
-    life--;
-    if (life <= 0) {
-      alive = false;
+    // Vida do projétil
+    setLife(getLife() - 1);
+    if (getLife() <= 0) {
+      setAlive(false);
     }
 
-    spriteCounter++;
-    if (spriteCounter > 12) {
-      if ((spriteNum == 1)) {
-        spriteNum = 2;
-      } else if (spriteNum == 2) {
-        spriteNum = 1;
-      }
-
-      spriteCounter = 0;
+    // Animação
+    setSpriteCounter(getSpriteCounter() + 1);
+    if (getSpriteCounter() > 12) {
+      setSpriteNum(getSpriteNum() == 1 ? 2 : 1);
+      setSpriteCounter(0);
     }
   }
 
+  /**
+   * Template method: por padrão, projéteis genéricos não têm custo.
+   * Subclasses (ex.: Fireball) devem sobrescrever.
+   */
   public boolean haveResource(Entity user) {
-
-    boolean haveResource = false;
-    return haveResource;
+    Objects.requireNonNull(user, "user");
+    return false;
   }
 
+  /**
+   * Template method: por padrão, não consome nada.
+   * Subclasses (ex.: Fireball) devem sobrescrever.
+   */
   public void subtractResource(Entity user) {
+    Objects.requireNonNull(user, "user");
+    // no-op por padrão
+  }
+
+  public Entity getUser() {
+    return user;
   }
 }
