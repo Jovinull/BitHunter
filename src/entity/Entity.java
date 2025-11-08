@@ -239,20 +239,20 @@ public class Entity {
     return (t.worldY + t.solidArea.y) / gp.tileSize;
   }
 
-  public BufferedImage getDown1() {
-    return down1;
-  }
-
-  public BufferedImage getImage() {
+  public BufferedImage getBaseImage() {
     return image;
   }
 
-  public BufferedImage getImage2() {
+  public BufferedImage getAltImage1() {
     return image2;
   }
 
-  public BufferedImage getImage3() {
+  public BufferedImage getAltImage2() {
     return image3;
+  }
+
+  public BufferedImage getDown1() {
+    return down1;
   }
 
   public void resetCounter() {
