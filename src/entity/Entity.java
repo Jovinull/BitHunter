@@ -653,6 +653,12 @@ public class Entity {
     }
   }
 
+  public void applyOpenedAppearance() {
+    if (this.image2 != null) {
+      this.down1 = this.image2;
+    }
+  }
+
   public void damagePlayer(int attack) {
     if (gp.player.isInvincible()) {
       return;
