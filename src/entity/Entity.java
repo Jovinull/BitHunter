@@ -14,7 +14,7 @@ import javax.imageio.ImageIO;
 import main.GamePanel;
 import main.UtilityTool;
 
-public class Entity {
+public abstract class Entity {
 
   // =========================
   // Constantes de Direção
@@ -39,15 +39,10 @@ public class Entity {
   public static final int TYPE_LIGHT = 9;
   public static final int TYPE_PICKAXE = 10;
 
-  // =========================
-  // Outros
-  // =========================
   public static final int MAX_INVENTORY_SIZE = 20;
 
-  // Reutilize um único Random
   private static final Random RNG = new Random();
 
-  // Acesso por subclasses
   protected final GamePanel gp;
 
   // Sprites de movimento
@@ -145,7 +140,6 @@ public class Entity {
   public int nextLevelExp;
   public int coin;
 
-  // S116: renomeados para camelCase
   public int motion1Duration;
   public int motion2Duration;
 
@@ -156,7 +150,6 @@ public class Entity {
   public boolean boss;
 
   // ITEM ATRIBUTES
-  // S1319: use o tipo de interface em vez da implementação
   public final List<Entity> inventory = new ArrayList<>();
   public int value;
   public int attackValue;
@@ -169,7 +162,6 @@ public class Entity {
   public int amount = 1;
   public int lightRadius;
 
-  // tipo atual da entidade
   public int type; // usar TYPE_*
 
   public Entity(GamePanel gp) {
@@ -228,7 +220,6 @@ public class Entity {
     return (getXdistance(target) + getYdistance(target)) / gp.tileSize;
   }
 
-  // Removido SuppressWarnings e passamos a usar o parâmetro
   public int getGoalCol(Entity target) {
     Entity t = (target != null) ? target : gp.player;
     return (t.worldX + t.solidArea.x) / gp.tileSize;
@@ -256,12 +247,10 @@ public class Entity {
 
   /** hook: sobrescreva em subclasses para definir ações por frame */
   public void setAction() {
-    // Intencionalmente vazio (hook)
   }
 
   /** hook: atualização direcional direta; padrão apenas ajusta a direção atual */
   public void move(String direction) {
-    // Intencionalmente simples: padrão atualiza a direção
     if (direction != null) {
       this.direction = direction;
     }
@@ -269,17 +258,14 @@ public class Entity {
 
   /** hook: reação de dano em subclasses (knockback custom etc.) */
   public void damageReaction() {
-    // Intencionalmente vazio (hook)
   }
 
   /** hook: diálogo em NPCs/Jogador */
   public void speak() {
-    // Intencionalmente vazio (hook)
   }
 
   /** hook: interação genérica (abrir baú, alavanca, etc.) */
   public void interact() {
-    // Intencionalmente vazio (hook)
   }
 
   public void facePlayer() {
@@ -308,14 +294,10 @@ public class Entity {
   }
 
   /** hook: uso/aplicação de item/entidade sobre outra entidade */
-  public boolean use(Entity entity) {
-    // Intencionalmente retorna false por padrão (sem efeito)
-    return false;
-  }
+  public abstract boolean use(Entity entity);
 
   /** hook: lógica de drop em morte/abertura */
   public void checkDrop() {
-    // Intencionalmente vazio (hook)
   }
 
   public void dropItem(Entity droppedItem) {
@@ -479,7 +461,6 @@ public class Entity {
     }
   }
 
-  // S1066: mesclar ifs aninhados
   public void checkAttackOrNot(int rate, int straight, int horizontal) {
     if (isTargetInFront(gp.player, straight, horizontal) && RNG.nextInt(rate) == 0) {
       attacking = true;
@@ -713,7 +694,6 @@ public class Entity {
     changeAlpha(g2, 1f);
   }
 
-  // S3776/S3358: reduzir complexidade e remover ternários aninhados
   private Frame resolveFrameAndOffsets(int baseX, int baseY) {
     BufferedImage img = null;
     int x = baseX;
@@ -743,7 +723,7 @@ public class Entity {
         break;
 
       default:
-        img = down1; // fallback seguro
+        img = down1;
         break;
     }
     return new Frame(img, x, y);
@@ -798,61 +778,109 @@ public class Entity {
     return img;
   }
 
+  // =========================
+  // PATHFINDING (refatorado)
+  // =========================
   public void searchPath(int goalCol, int goalRow) {
-    int startCol = (worldX + solidArea.x) / gp.tileSize;
-    int startRow = (worldY + solidArea.y) / gp.tileSize;
+    int startCol = getCol();
+    int startRow = getRow();
 
     gp.pFinder.setNodes(startCol, startRow, goalCol, goalRow);
 
-    if (!gp.pFinder.search())
+    if (!gp.pFinder.search() || gp.pFinder.pathList.isEmpty()) {
+      onPath = false;
       return;
-
-    int nextX = gp.pFinder.pathList.get(0).getCol() * gp.tileSize;
-    int nextY = gp.pFinder.pathList.get(0).getRow() * gp.tileSize;
-
-    int enLeftX = worldX + solidArea.x;
-    int enRightX = worldX + solidArea.x + solidArea.width;
-    int enTopY = worldY + solidArea.y;
-    int enBottomY = worldY + solidArea.y + solidArea.height;
-
-    boolean alignedVertical = (enLeftX >= nextX) && (enRightX < nextX + gp.tileSize);
-    boolean alignedHorizontal = (enTopY >= nextY) && (enBottomY < nextY + gp.tileSize);
-
-    if (enTopY > nextY && alignedVertical) {
-      direction = DIR_UP;
-    } else if (enTopY < nextY && alignedVertical) {
-      direction = DIR_DOWN;
-    } else if (enLeftX > nextX && alignedHorizontal) {
-      direction = DIR_LEFT;
-    } else if (enLeftX < nextX && alignedHorizontal) {
-      direction = DIR_RIGHT;
-    } else {
-      // Diagonal: escolhe eixo dominante e usa fallback se colidir
-      int centerX = (enLeftX + enRightX) / 2;
-      int centerY = (enTopY + enBottomY) / 2;
-      int targetCenterX = nextX + gp.tileSize / 2;
-      int targetCenterY = nextY + gp.tileSize / 2;
-
-      int dx = centerX - targetCenterX;
-      int dy = centerY - targetCenterY;
-
-      if (Math.abs(dx) > Math.abs(dy)) {
-        direction = (dx > 0) ? DIR_LEFT : DIR_RIGHT;
-        checkCollision();
-        if (collisionOn)
-          direction = (dy > 0) ? DIR_UP : DIR_DOWN;
-      } else {
-        direction = (dy > 0) ? DIR_UP : DIR_DOWN;
-        checkCollision();
-        if (collisionOn)
-          direction = (dx > 0) ? DIR_LEFT : DIR_RIGHT;
-      }
     }
 
+    // Primeiro passo do caminho
     int nextCol = gp.pFinder.pathList.get(0).getCol();
     int nextRow = gp.pFinder.pathList.get(0).getRow();
-    if (nextCol == goalCol && nextRow == goalRow)
+
+    int nextX = nextCol * gp.tileSize;
+    int nextY = nextRow * gp.tileSize;
+
+    int enLeftX = getLeftX();
+    int enRightX = getRightX();
+    int enTopY = getTopY();
+    int enBottomY = getBottomY();
+
+    boolean alignedVertical = isAlignedVertical(enLeftX, enRightX, nextX);
+    boolean alignedHorizontal = isAlignedHorizontal(enTopY, enBottomY, nextY);
+
+    // Movimentos retos
+    if (alignedVertical && moveVerticallyToward(enTopY, nextY)) {
+      checkGoalReached(goalCol, goalRow, nextCol, nextRow);
+      return;
+    }
+    if (alignedHorizontal && moveHorizontallyToward(enLeftX, nextX)) {
+      checkGoalReached(goalCol, goalRow, nextCol, nextRow);
+      return;
+    }
+
+    // Movimento diagonal com fallback
+    moveDiagonallyTowards(nextX, nextY, enLeftX, enRightX, enTopY, enBottomY);
+
+    checkGoalReached(goalCol, goalRow, nextCol, nextRow);
+  }
+
+  private boolean isAlignedVertical(int leftX, int rightX, int nextX) {
+    return leftX >= nextX && rightX < nextX + gp.tileSize;
+  }
+
+  private boolean isAlignedHorizontal(int topY, int bottomY, int nextY) {
+    return topY >= nextY && bottomY < nextY + gp.tileSize;
+  }
+
+  private boolean moveVerticallyToward(int enTopY, int nextY) {
+    if (enTopY > nextY) {
+      direction = DIR_UP;
+      return true;
+    } else if (enTopY < nextY) {
+      direction = DIR_DOWN;
+      return true;
+    }
+    return false;
+  }
+
+  private boolean moveHorizontallyToward(int enLeftX, int nextX) {
+    if (enLeftX > nextX) {
+      direction = DIR_LEFT;
+      return true;
+    } else if (enLeftX < nextX) {
+      direction = DIR_RIGHT;
+      return true;
+    }
+    return false;
+  }
+
+  private void moveDiagonallyTowards(int nextX, int nextY, int enLeftX, int enRightX, int enTopY, int enBottomY) {
+    int centerX = (enLeftX + enRightX) / 2;
+    int centerY = (enTopY + enBottomY) / 2;
+    int targetCenterX = nextX + gp.tileSize / 2;
+    int targetCenterY = nextY + gp.tileSize / 2;
+
+    int dx = centerX - targetCenterX;
+    int dy = centerY - targetCenterY;
+
+    if (Math.abs(dx) > Math.abs(dy)) {
+      direction = (dx > 0) ? DIR_LEFT : DIR_RIGHT;
+      checkCollision();
+      if (collisionOn) {
+        direction = (dy > 0) ? DIR_UP : DIR_DOWN;
+      }
+    } else {
+      direction = (dy > 0) ? DIR_UP : DIR_DOWN;
+      checkCollision();
+      if (collisionOn) {
+        direction = (dx > 0) ? DIR_LEFT : DIR_RIGHT;
+      }
+    }
+  }
+
+  private void checkGoalReached(int goalCol, int goalRow, int nextCol, int nextRow) {
+    if (nextCol == goalCol && nextRow == goalRow) {
       onPath = false;
+    }
   }
 
   public int getDetected(Entity user, Entity[][] target, String targetName) {
