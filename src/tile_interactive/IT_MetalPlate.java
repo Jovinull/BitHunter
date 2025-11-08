@@ -1,27 +1,35 @@
 package tile_interactive;
 
+import java.awt.Rectangle;
+
 import main.GamePanel;
 
 public class IT_MetalPlate extends InteractiveTile {
 
-  GamePanel gp;
   public static final String itName = "Placa de Metal";
 
   public IT_MetalPlate(GamePanel gp, int col, int row) {
     super(gp, col, row);
-    this.gp = gp;
 
-    this.worldX = gp.tileSize * col;
-    this.worldY = gp.tileSize * row;
+    // Posição via setters
+    setWorldX(gp.tileSize * col);
+    setWorldY(gp.tileSize * row);
 
-    name = itName;
+    // Nome via setter
+    setName(itName);
+
+    // Sprite
     down1 = setup("/tiles_interactive/metalplate", gp.tileSize, gp.tileSize);
 
-    solidArea.x = 0;
-    solidArea.y = 0;
-    solidArea.width = 0;
-    solidArea.height = 0;
-    solidAreaDefaultX = solidArea.x;
-    solidAreaDefaultY = solidArea.y;
+    // Área sólida zerada usando getters/setters (sem acessar campos privados)
+    Rectangle sa = getSolidArea();
+    sa.x = 0;
+    sa.y = 0;
+    sa.width = 0;
+    sa.height = 0;
+
+    // Defaults da área sólida
+    setSolidAreaDefaultX(sa.x);
+    setSolidAreaDefaultY(sa.y);
   }
 }
