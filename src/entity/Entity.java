@@ -874,27 +874,52 @@ public class Entity {
   }
 
   private void moveDiagonallyTowards(int nextX, int nextY, int enLeftX, int enRightX, int enTopY, int enBottomY) {
-    int centerX = (enLeftX + enRightX) / 2;
-    int centerY = (enTopY + enBottomY) / 2;
-    int targetCenterX = nextX + gp.tileSize / 2;
-    int targetCenterY = nextY + gp.tileSize / 2;
+    final int centerX = (enLeftX + enRightX) / 2;
+    final int centerY = (enTopY + enBottomY) / 2;
+    final int targetCenterX = nextX + gp.tileSize / 2;
+    final int targetCenterY = nextY + gp.tileSize / 2;
 
-    int dx = centerX - targetCenterX;
-    int dy = centerY - targetCenterY;
+    final int dx = centerX - targetCenterX;
+    final int dy = centerY - targetCenterY;
 
-    if (Math.abs(dx) > Math.abs(dy)) {
-      direction = (dx > 0) ? DIR_LEFT : DIR_RIGHT;
-      checkCollision();
-      if (collisionOn) {
-        direction = (dy > 0) ? DIR_UP : DIR_DOWN;
-      }
+    final boolean horizontalPrimary = Math.abs(dx) > Math.abs(dy);
+
+    String primaryDir;
+    String fallbackDir;
+
+    if (horizontalPrimary) {
+      primaryDir = horizontalDir(dx);
+      fallbackDir = verticalDir(dy);
     } else {
-      direction = (dy > 0) ? DIR_UP : DIR_DOWN;
-      checkCollision();
-      if (collisionOn) {
-        direction = (dx > 0) ? DIR_LEFT : DIR_RIGHT;
-      }
+      primaryDir = verticalDir(dy);
+      fallbackDir = horizontalDir(dx);
     }
+
+    setDirectionAndCheck(primaryDir);
+    if (collisionOn) {
+      direction = fallbackDir;
+    }
+  }
+
+  private String horizontalDir(int dx) {
+    if (dx > 0) {
+      return DIR_LEFT;
+    } else {
+      return DIR_RIGHT;
+    }
+  }
+
+  private String verticalDir(int dy) {
+    if (dy > 0) {
+      return DIR_UP;
+    } else {
+      return DIR_DOWN;
+    }
+  }
+
+  private void setDirectionAndCheck(String dir) {
+    direction = dir;
+    checkCollision();
   }
 
   private void checkGoalReached(int goalCol, int goalRow, int nextCol, int nextRow) {
