@@ -1,41 +1,42 @@
 package object;
 
+import java.awt.Rectangle;
+
 import entity.Entity;
 import main.GamePanel;
 
-// Representa a porta do jogo, permite bloqueio de passagem se collision=true
+// Representa a porta do jogo; bloqueia passagem se collision=true
 public class OBJ_Door extends Entity {
 
-  GamePanel gp;
   public static final String objName = "Porta";
 
-  // Construtor: define nome, habilita colisão e carrega a imagem da porta
   public OBJ_Door(GamePanel gp) {
     super(gp);
-    this.gp = gp;
 
-    type = TYPE_OBSTACLE;
-    name = objName;
+    setType(TYPE_OBSTACLE);
+    setName(objName);
+
     down1 = setup("/objects/door", gp.tileSize, gp.tileSize);
-    collision = true;
+    setCollision(true);
 
-    solidArea.x = 0;
-    solidArea.y = 16;
-    solidArea.width = 48;
-    solidArea.height = 32;
-    solidAreaDefaultX = solidArea.x;
-    solidAreaDefaultY = solidArea.y;
+    Rectangle sa = getSolidArea();
+    sa.x = 0;
+    sa.y = 16;
+    sa.width = 48;
+    sa.height = 32;
+    setSolidAreaDefaultX(sa.x);
+    setSolidAreaDefaultY(sa.y);
 
     setDialogue();
   }
 
   public void setDialogue() {
-
-    dialogues[0][0] = "Uma porta trancada. Você precisa de uma \nchave para abri-la.";
+    String[][] d = getDialogues();
+    d[0][0] = "Uma porta trancada. Você precisa de uma \nchave para abri-la.";
   }
 
+  @Override
   public void interact() {
-
     startDialogue(this, 0);
   }
 }
