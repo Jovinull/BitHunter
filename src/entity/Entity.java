@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import javax.imageio.ImageIO;
 
@@ -298,15 +299,20 @@ public class Entity {
     dialogueSet = setNum;
   }
 
-  /** hook: uso/aplicação de item/entidade sobre outra entidade */
+  /**
+   * hook: uso/aplicação de item/entidade sobre outra entidade.
+   *
+   * @param entity
+   *          alvo do uso (não pode ser null)
+   * @return true se houve uso bem-sucedido
+   * @throws NullPointerException
+   *           se entity for null
+   * @throws UnsupportedOperationException
+   *           se esta entidade não for usável
+   */
   public boolean use(Entity entity) {
-    // Por padrão, entidades base não são "usáveis".
-    // Referenciamos o parâmetro explicitamente para documentar o contrato
-    // e evitar alerta de parâmetro não utilizado (S1172).
-    if (entity == null) {
-      return false;
-    }
-    return false;
+    Objects.requireNonNull(entity, "entity");
+    throw new UnsupportedOperationException(getClass().getSimpleName() + " não é usável.");
   }
 
   /** hook: lógica de drop em morte/abertura */
