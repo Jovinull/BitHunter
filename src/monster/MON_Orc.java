@@ -10,39 +10,40 @@ import object.OBJ_ManaCrystal;
 
 public class MON_Orc extends Entity {
 
-  GamePanel gp;
-
   public MON_Orc(GamePanel gp) {
     super(gp);
 
-    this.gp = gp;
+    // Atributos base
+    setType(TYPE_MONSTER);
+    setName("Orc");
+    setDefaultSpeed(1);
+    setSpeed(getDefaultSpeed());
+    setMaxLife(12);
+    setLife(getMaxLife());
+    setAttack(8);
+    setDefense(2);
+    setExp(10);
+    setKnockBackPower(5);
 
-    type = TYPE_MONSTER;
-    name = "Orc";
-    defaultSpeed = 1;
-    speed = defaultSpeed;
-    maxLife = 12;
-    life = maxLife;
-    attack = 8;
-    defense = 2;
-    exp = 10;
-    knockBackPower = 5;
+    // Colisão / Ataque
+    getSolidArea().x = 4;
+    getSolidArea().y = 4;
+    getSolidArea().width = 40;
+    getSolidArea().height = 44;
+    setSolidAreaDefaultX(getSolidArea().x);
+    setSolidAreaDefaultY(getSolidArea().y);
 
-    solidArea.x = 4;
-    solidArea.y = 4;
-    solidArea.width = 40;
-    solidArea.height = 44;
-    solidAreaDefaultX = solidArea.x;
-    solidAreaDefaultY = solidArea.y;
-    attackArea.width = 48;
-    attackArea.height = 48;
-    motion1Duration = 40;
-    motion2Duration = 85;
+    getAttackArea().width = 48;
+    getAttackArea().height = 48;
+
+    setMotion1Duration(40);
+    setMotion2Duration(85);
 
     getImage();
     getAttackImage();
   }
 
+  @Override
   public void getImage() {
     up1 = setup("/monster/orc_up_1", gp.tileSize, gp.tileSize);
     up2 = setup("/monster/orc_up_2", gp.tileSize, gp.tileSize);
@@ -65,53 +66,42 @@ public class MON_Orc extends Entity {
     attackRight2 = setup("/monster/orc_attack_right_2", gp.tileSize * 2, gp.tileSize);
   }
 
+  @Override
   public void setAction() {
-
-    if (onPath == true) {
-
-      // Check if it stops chasing
+    if (isOnPath()) {
+      // Para de perseguir?
       checkStopChasingOrNot(gp.player, 15, 100);
-
-      // DEFINE PARA O NPC IR ATÉ A POSIÇÃO DO JOGADOR
+      // Vai até a posição do jogador
       searchPath(getGoalCol(gp.player), getGoalRow(gp.player));
-    }
-
-    else {
-      // Check if it starts chasing
+    } else {
+      // Começa a perseguir?
       checkStartChasingOrNot(gp.player, 5, 100);
-
-      // Get a random direction
+      // Direção aleatória
       getRandomDirection(120);
     }
 
-    // Check if it attacks
-    if (attacking == false) {
+    // Ataca se estiver apto
+    if (!isAttacking()) {
       checkAttackOrNot(30, gp.tileSize * 4, gp.tileSize);
     }
   }
 
+  @Override
   public void damageReaction() {
-
-    actionLockCounter = 0; // Reseta o contador de ações
-    // direction = gp.player.direction; // O monstro reage na direção do jogador
-    onPath = true;
+    setActionLockCounter(0);
+    setOnPath(true);
   }
 
+  @Override
   public void checkDrop() {
-
-    // CAST A DIE (sorteia um número de 1 a 100)
+    // 1..100
     int i = new Random().nextInt(100) + 1;
 
-    // SET THE MONSTER DROP (define o item que o monstro irá dropar)
     if (i < 50) {
       dropItem(new OBJ_Coin_Bronze(gp));
-    }
-
-    if (i >= 50 && i < 75) {
+    } else if (i < 75) {
       dropItem(new OBJ_Heart(gp));
-    }
-
-    if (i >= 75 && i <= 100) {
+    } else {
       dropItem(new OBJ_ManaCrystal(gp));
     }
   }
