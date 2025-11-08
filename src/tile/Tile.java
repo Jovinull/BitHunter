@@ -2,12 +2,31 @@ package tile;
 
 import java.awt.image.BufferedImage;
 
-// Classe Tile representa um bloco (tile) do mapa do jogo
+/**
+ * Representa um bloco (tile) do mapa do jogo.
+ * Fornece getters/setters para evitar acesso direto quando possível.
+ */
 public class Tile {
 
-  // Imagem que será desenhada na tela para representar esse tile
+  // Ainda públicos para compatibilidade com código legado
   public BufferedImage image;
-
-  // Define se esse tile bloqueia a passagem (true = colisão ativa)
   public boolean collision = false;
+
+  // --- Getters/Setters preferenciais ---
+
+  public BufferedImage getImage() {
+    return image;
+  }
+
+  public void setImage(BufferedImage image) {
+    this.image = image;
+  }
+
+  public boolean isCollision() {
+    return collision;
+  }
+
+  public void setCollision(boolean collision) {
+    this.collision = collision;
+  }
 }
