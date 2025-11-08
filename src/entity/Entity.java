@@ -239,6 +239,22 @@ public class Entity {
     return (t.worldY + t.solidArea.y) / gp.tileSize;
   }
 
+  public BufferedImage getDown1() {
+    return down1;
+  }
+
+  public BufferedImage getImage() {
+    return image;
+  }
+
+  public BufferedImage getImage2() {
+    return image2;
+  }
+
+  public BufferedImage getImage3() {
+    return image3;
+  }
+
   public void resetCounter() {
     actionLockCounter = 0;
     invincibleCounter = 0;
