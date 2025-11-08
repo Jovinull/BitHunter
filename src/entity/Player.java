@@ -114,8 +114,10 @@ public class Player extends Entity {
     // attackArea é final -> copia dimensões ao invés de reatribuir
     attackArea.width = currentWeapon.attackArea.width;
     attackArea.height = currentWeapon.attackArea.height;
-    motion1_duration = currentWeapon.motion1_duration;
-    motion2_duration = currentWeapon.motion2_duration;
+
+    motion1Duration = currentWeapon.motion1Duration;
+    motion2Duration = currentWeapon.motion2Duration;
+
     return attack = strength * currentWeapon.attackValue;
   }
 

@@ -7,16 +7,13 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import javax.imageio.ImageIO;
 
 import main.GamePanel;
 import main.UtilityTool;
 
-// Muitos avisos da IDE/analizador reclamam de campos públicos herdados.
-// Vamos tratar isso por etapas. Por enquanto, suprimimos regras do Sonar
-// específicas para "public fields" até migrarmos para getters/setters.
-@SuppressWarnings({ "java:S1104" })
 public class Entity {
 
   // =========================
@@ -147,8 +144,11 @@ public class Entity {
   public int exp;
   public int nextLevelExp;
   public int coin;
-  public int motion1_duration;
-  public int motion2_duration;
+
+  // S116: renomeados para camelCase
+  public int motion1Duration;
+  public int motion2Duration;
+
   public Entity currentWeapon;
   public Entity currentShield;
   public Entity currentLight;
@@ -156,7 +156,8 @@ public class Entity {
   public boolean boss;
 
   // ITEM ATRIBUTES
-  public ArrayList<Entity> inventory = new ArrayList<>();
+  // S1319: use o tipo de interface em vez da implementação
+  public final List<Entity> inventory = new ArrayList<>();
   public int value;
   public int attackValue;
   public int defenseValue;
@@ -227,12 +228,15 @@ public class Entity {
     return (getXdistance(target) + getYdistance(target)) / gp.tileSize;
   }
 
-  public int getGoalCol(@SuppressWarnings("unused") Entity target) {
-    return (gp.player.worldX + gp.player.solidArea.x) / gp.tileSize;
+  // Removido SuppressWarnings e passamos a usar o parâmetro
+  public int getGoalCol(Entity target) {
+    Entity t = (target != null) ? target : gp.player;
+    return (t.worldX + t.solidArea.x) / gp.tileSize;
   }
 
-  public int getGoalRow(@SuppressWarnings("unused") Entity target) {
-    return (gp.player.worldY + gp.player.solidArea.y) / gp.tileSize;
+  public int getGoalRow(Entity target) {
+    Entity t = (target != null) ? target : gp.player;
+    return (t.worldY + t.solidArea.y) / gp.tileSize;
   }
 
   public void resetCounter() {
@@ -250,20 +254,33 @@ public class Entity {
     this.loot = loot;
   }
 
+  /** hook: sobrescreva em subclasses para definir ações por frame */
   public void setAction() {
-  } // hook
+    // Intencionalmente vazio (hook)
+  }
 
-  public void move(@SuppressWarnings("unused") String direction) {
-  } // hook
+  /** hook: atualização direcional direta; padrão apenas ajusta a direção atual */
+  public void move(String direction) {
+    // Intencionalmente simples: padrão atualiza a direção
+    if (direction != null) {
+      this.direction = direction;
+    }
+  }
 
+  /** hook: reação de dano em subclasses (knockback custom etc.) */
   public void damageReaction() {
-  } // hook
+    // Intencionalmente vazio (hook)
+  }
 
+  /** hook: diálogo em NPCs/Jogador */
   public void speak() {
-  } // hook
+    // Intencionalmente vazio (hook)
+  }
 
+  /** hook: interação genérica (abrir baú, alavanca, etc.) */
   public void interact() {
-  } // hook
+    // Intencionalmente vazio (hook)
+  }
 
   public void facePlayer() {
     switch (gp.player.direction) {
@@ -290,11 +307,15 @@ public class Entity {
     dialogueSet = setNum;
   }
 
-  public boolean use(@SuppressWarnings("unused") Entity entity) {
+  /** hook: uso/aplicação de item/entidade sobre outra entidade */
+  public boolean use(Entity entity) {
+    // Intencionalmente retorna false por padrão (sem efeito)
     return false;
   }
 
+  /** hook: lógica de drop em morte/abertura */
   public void checkDrop() {
+    // Intencionalmente vazio (hook)
   }
 
   public void dropItem(Entity droppedItem) {
@@ -458,15 +479,13 @@ public class Entity {
     }
   }
 
+  // S1066: mesclar ifs aninhados
   public void checkAttackOrNot(int rate, int straight, int horizontal) {
-    if (isTargetInFront(gp.player, straight, horizontal)) {
-      // chance de atacar
-      if (RNG.nextInt(rate) == 0) {
-        attacking = true;
-        spriteNum = 1;
-        spriteCounter = 0;
-        shotAvailableCounter = 0;
-      }
+    if (isTargetInFront(gp.player, straight, horizontal) && RNG.nextInt(rate) == 0) {
+      attacking = true;
+      spriteNum = 1;
+      spriteCounter = 0;
+      shotAvailableCounter = 0;
     }
   }
 
@@ -545,7 +564,7 @@ public class Entity {
     }
   }
 
-  public String getOppositeDireciton(String dir) {
+  public String getOppositeDirection(String dir) {
     switch (dir) {
       case DIR_UP:
         return DIR_DOWN;
@@ -563,11 +582,11 @@ public class Entity {
   protected void performAttack() {
     spriteCounter++;
 
-    if (spriteCounter <= motion1_duration) {
+    if (spriteCounter <= motion1Duration) {
       spriteNum = 1;
     }
 
-    if (spriteCounter > motion1_duration && spriteCounter <= motion2_duration) {
+    if (spriteCounter > motion1Duration && spriteCounter <= motion2Duration) {
       spriteNum = 2;
 
       int currentWorldX = worldX;
@@ -615,7 +634,7 @@ public class Entity {
       solidArea.height = solidAreaHeight;
     }
 
-    if (spriteCounter > motion2_duration) {
+    if (spriteCounter > motion2Duration) {
       spriteNum = 1;
       spriteCounter = 0;
       attacking = false;
@@ -627,7 +646,7 @@ public class Entity {
       return;
 
     int damage = attack - gp.player.defense;
-    String canGuardDirection = getOppositeDireciton(direction);
+    String canGuardDirection = getOppositeDirection(direction);
 
     if (gp.player.guarding && gp.player.direction.equals(canGuardDirection)) {
       if (gp.player.guardCounter < 10) {
@@ -694,7 +713,7 @@ public class Entity {
     changeAlpha(g2, 1f);
   }
 
-  // Reduz complexidade do draw: encapsula escolha de sprite e deslocamentos
+  // S3776/S3358: reduzir complexidade e remover ternários aninhados
   private Frame resolveFrameAndOffsets(int baseX, int baseY) {
     BufferedImage img = null;
     int x = baseX;
@@ -704,31 +723,37 @@ public class Entity {
       case DIR_UP:
         if (attacking) {
           y = baseY - up1.getHeight();
-          img = (spriteNum == 1) ? attackUp1 : attackUp2;
-        } else {
-          img = (spriteNum == 1) ? up1 : up2;
         }
+        img = pickFrame(attackUp1, attackUp2, up1, up2);
         break;
+
       case DIR_DOWN:
-        img = attacking ? ((spriteNum == 1) ? attackDown1 : attackDown2)
-            : ((spriteNum == 1) ? down1 : down2);
+        img = pickFrame(attackDown1, attackDown2, down1, down2);
         break;
+
       case DIR_LEFT:
         if (attacking) {
           x = baseX - left1.getWidth();
-          img = (spriteNum == 1) ? attackLeft1 : attackLeft2;
-        } else {
-          img = (spriteNum == 1) ? left1 : left2;
         }
+        img = pickFrame(attackLeft1, attackLeft2, left1, left2);
         break;
+
       case DIR_RIGHT:
-        img = attacking ? ((spriteNum == 1) ? attackRight1 : attackRight2)
-            : ((spriteNum == 1) ? right1 : right2);
+        img = pickFrame(attackRight1, attackRight2, right1, right2);
         break;
+
       default:
+        img = down1; // fallback seguro
         break;
     }
     return new Frame(img, x, y);
+  }
+
+  private BufferedImage pickFrame(BufferedImage atk1, BufferedImage atk2, BufferedImage idle1, BufferedImage idle2) {
+    if (attacking) {
+      return (spriteNum == 1) ? atk1 : atk2;
+    }
+    return (spriteNum == 1) ? idle1 : idle2;
   }
 
   private static final class Frame {

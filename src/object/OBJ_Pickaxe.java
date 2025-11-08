@@ -19,7 +19,7 @@ public class OBJ_Pickaxe extends Entity {
     description = "[Picareta]\nVocê vai adorar cavar \ncom isso!.";
     price = 75;
     knockBackPower = 10;
-    motion1_duration = 10;
-    motion2_duration = 20;
+    motion1Duration = 10;
+    motion2Duration = 20;
   }
 }

@@ -41,8 +41,8 @@ public class MON_SkeletonLord extends Entity {
     solidAreaDefaultY = solidArea.y;
     attackArea.width = 170;
     attackArea.height = 170;
-    motion1_duration = 25;
-    motion2_duration = 50;
+    motion1Duration = 25;
+    motion2Duration = 50;
 
     getImage();
     getAttackImage();
