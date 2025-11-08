@@ -8,25 +8,24 @@ import main.GamePanel;
 
 public class OBJ_Fireball extends Projectile {
 
-  GamePanel gp;
   public static final String objName = "Bola de Fogo";
 
   public OBJ_Fireball(GamePanel gp) {
     super(gp);
-    this.gp = gp;
 
-    name = objName;
-    speed = 5;
-    maxLife = 80;
-    life = maxLife;
-    attack = 2;
-    knockBackPower = 5;
-    useCost = 1;
-    alive = false;
-    getImage();
+    setName(objName);
+    setSpeed(5);
+    setMaxLife(80);
+    setLife(getMaxLife());
+    setAttack(2);
+    setKnockBackPower(5);
+    setUseCost(1);
+    setAlive(false);
+
+    loadSprites();
   }
 
-  public void getImage() {
+  private void loadSprites() {
     up1 = setup("/projectile/fireball_up_1", gp.tileSize, gp.tileSize);
     up2 = setup("/projectile/fireball_up_2", gp.tileSize, gp.tileSize);
     down1 = setup("/projectile/fireball_down_1", gp.tileSize, gp.tileSize);
@@ -37,37 +36,33 @@ public class OBJ_Fireball extends Projectile {
     right2 = setup("/projectile/fireball_right_2", gp.tileSize, gp.tileSize);
   }
 
+  @Override
   public boolean haveResource(Entity user) {
-
-    boolean haveResource = false;
-    if (user.mana >= useCost) {
-      haveResource = true;
-    }
-    return haveResource;
+    return user.getMana() >= getUseCost();
   }
 
+  @Override
   public void subtractResource(Entity user) {
-
-    user.mana -= useCost;
+    user.setMana(user.getMana() - getUseCost());
   }
 
+  @Override
   public Color getParticleColor() {
-    Color color = new Color(240, 50, 0);
-    return color;
+    return new Color(240, 50, 0);
   }
 
+  @Override
   public int getParticleSize() {
-    int size = 10;
-    return size;
+    return 10;
   }
 
+  @Override
   public int getParticleSpeed() {
-    int speed = 1;
-    return speed;
+    return 1;
   }
 
+  @Override
   public int getParticleMaxLife() {
-    int maxLife = 20;
-    return maxLife;
+    return 20;
   }
 }
