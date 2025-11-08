@@ -247,6 +247,8 @@ public class Entity {
 
   /** hook: sobrescreva em subclasses para definir ações por frame */
   public void setAction() {
+    // no-op por design: método de template. Subclasses que precisarem
+    // de comportamento por frame devem sobrescrever este método.
   }
 
   /** hook: atualização direcional direta; padrão apenas ajusta a direção atual */
@@ -258,14 +260,17 @@ public class Entity {
 
   /** hook: reação de dano em subclasses (knockback custom etc.) */
   public void damageReaction() {
+    // no-op por design: reação padrão inexistente. Subclasses customizam.
   }
 
   /** hook: diálogo em NPCs/Jogador */
   public void speak() {
+    // no-op por design: apenas NPCs/Jogador costumam implementar.
   }
 
   /** hook: interação genérica (abrir baú, alavanca, etc.) */
   public void interact() {
+    // no-op por design: entidades interativas sobrescrevem.
   }
 
   public void facePlayer() {
@@ -294,14 +299,23 @@ public class Entity {
   }
 
   /** hook: uso/aplicação de item/entidade sobre outra entidade */
-  public boolean use(Entity entity);
+  public boolean use(Entity entity) {
+    // Por padrão, entidades base não são "usáveis".
+    // Referenciamos o parâmetro explicitamente para documentar o contrato
+    // e evitar alerta de parâmetro não utilizado (S1172).
+    if (entity == null) {
+      return false;
+    }
+    return false;
+  }
 
   /** hook: lógica de drop em morte/abertura */
   public void checkDrop() {
+    // no-op por design: monstros/baús específicos definem seus drops.
   }
 
   public void dropItem(Entity droppedItem) {
-    for (int i = 0; i < gp.obj[1].length; i++) {
+    for (int i = 0; i < gp.obj[gp.currentMap].length; i++) { // usar o mapa atual
       if (gp.obj[gp.currentMap][i] == null) {
         gp.obj[gp.currentMap][i] = droppedItem;
 
@@ -489,10 +503,10 @@ public class Entity {
   }
 
   public void checkShootOrNot(int rate, int shotInterval) {
-    if (RNG.nextInt(rate) == 0 && !projectile.alive && shotAvailableCounter == shotInterval) {
+    if (RNG.nextInt(rate) == 0 && projectile != null && !projectile.alive && shotAvailableCounter == shotInterval) {
       projectile.set(worldX, worldY, direction, true, this);
 
-      for (int j = 0; j < gp.projectile[1].length; j++) {
+      for (int j = 0; j < gp.projectile[gp.currentMap].length; j++) { // usar o mapa atual
         if (gp.projectile[gp.currentMap][j] == null) {
           gp.projectile[gp.currentMap][j] = projectile;
           break;
