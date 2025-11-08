@@ -7,53 +7,50 @@ import main.GamePanel;
 
 public class InteractiveTile extends Entity {
 
-  GamePanel gp;
   public boolean destructible = false;
 
   public InteractiveTile(GamePanel gp, int col, int row) {
     super(gp);
-    this.gp = gp;
+    // posiciona o tile no mundo com base no grid
+    setWorldX(col * gp.tileSize);
+    setWorldY(row * gp.tileSize);
   }
 
   public boolean isCorrectItem(Entity entity) {
-    boolean isCorrectItem = false;
-    return isCorrectItem;
+    // Por padrão, nenhum item é o correto; subclasses podem sobrescrever
+    return false;
   }
 
   public void playSE() {
+    // hook: som ao interagir/quebrar; sobrescreva nas subclasses
   }
 
   public InteractiveTile getDestroyedForm() {
-    InteractiveTile tile = null;
-    return tile;
+    // hook: retorna a forma destruída; por padrão não há
+    return null;
   }
 
+  @Override
   public void update() {
-
-    if (invincible == true) {
-      invincibleCounter++;
-      if (invincibleCounter > 20) {
-        invincible = false;
-        invincibleCounter = 0;
+    if (isInvincible()) {
+      setInvincibleCounter(getInvincibleCounter() + 1);
+      if (getInvincibleCounter() > 20) {
+        setInvincible(false);
+        setInvincibleCounter(0);
       }
     }
   }
 
+  @Override
   public void draw(Graphics2D g2) {
-
-    // Calcula a posição relativa à tela, com base na posição do jogador (scroll)
-    int screenX = worldX - gp.player.worldX + gp.player.screenX;
-    int screenY = worldY - gp.player.worldY + gp.player.screenY;
-
-    // Otimização: desenha apenas se a entidade estiver dentro da área visível da
-    // tela
-    if (worldX + gp.tileSize > gp.player.worldX - gp.player.screenX &&
-        worldX - gp.tileSize < gp.player.worldX + gp.player.screenX &&
-        worldY + gp.tileSize > gp.player.worldY - gp.player.screenY &&
-        worldY - gp.tileSize < gp.player.worldY + gp.player.screenY) {
-
-      // Desenha a sprite ajustada ao tamanho do tile (em pixels)
-      g2.drawImage(down1, screenX, screenY, null);
+    // Desenha apenas se dentro da câmera (usa cálculo do Entity)
+    if (!inCamera()) {
+      return;
     }
+    int screenX = getScreenX();
+    int screenY = getScreenY();
+
+    // Desenha a sprite base do tile interativo
+    g2.drawImage(getDown1(), screenX, screenY, null);
   }
 }
