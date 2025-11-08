@@ -24,7 +24,6 @@ public class EventHandler {
     int col = 0;
     int row = 0;
     while (map < gp.maxMap && col < gp.maxWorldCol && row < gp.maxWorldRow) {
-
       eventRect[map][col][row] = new EventRect();
       eventRect[map][col][row].x = 23;
       eventRect[map][col][row].y = 23;
@@ -37,7 +36,6 @@ public class EventHandler {
       if (col == gp.maxWorldCol) {
         col = 0;
         row++;
-
         if (row == gp.maxWorldRow) {
           row = 0;
           map++;
@@ -49,36 +47,41 @@ public class EventHandler {
   }
 
   public void setDialogue() {
-
-    eventMaster.dialogues[0][0] = "Você caiu em um buraco!!";
-    eventMaster.dialogues[1][0] = "Você bebe a água.\nSua vida e mana foi restaurada.\n"
-        + "(O progresso foi salvo)";
-    eventMaster.dialogues[1][1] = "Caramba, essa água é boa demais.";
+    // Usar o getter para acessar a matriz de diálogos encapsulada
+    String[][] d = eventMaster.getDialogues();
+    d[0][0] = "Você caiu em um buraco!!";
+    d[1][0] = "Você bebe a água.\nSua vida e mana foi restaurada.\n(O progresso foi salvo)";
+    d[1][1] = "Caramba, essa água é boa demais.";
   }
 
   public boolean hit(int map, int col, int row, String reqDirection) {
-
     boolean hit = false;
 
     if (map == gp.currentMap) {
+      // Posiciona áreas sólidas no mundo (usando getters)
+      var playerArea = gp.player.getSolidArea();
+      int playerDefaultX = gp.player.getSolidAreaDefaultX();
+      int playerDefaultY = gp.player.getSolidAreaDefaultY();
 
-      gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
-      gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
+      playerArea.x = gp.player.getWorldX() + playerArea.x;
+      playerArea.y = gp.player.getWorldY() + playerArea.y;
+
       eventRect[map][col][row].x = col * gp.tileSize + eventRect[map][col][row].x;
       eventRect[map][col][row].y = row * gp.tileSize + eventRect[map][col][row].y;
 
-      if (gp.player.solidArea.intersects(eventRect[map][col][row]) && eventRect[map][col][row].eventDone == false) {
-        if (gp.player.direction.contentEquals(reqDirection) ||
-            reqDirection.contentEquals("any")) {
-          hit = true;
+      String playerDir = gp.player.getDirection();
 
-          previousEventX = gp.player.worldX;
-          previousEventY = gp.player.worldY;
+      if (playerArea.intersects(eventRect[map][col][row]) && !eventRect[map][col][row].eventDone) {
+        if (playerDir.equals(reqDirection) || "any".equals(reqDirection)) {
+          hit = true;
+          previousEventX = gp.player.getWorldX();
+          previousEventY = gp.player.getWorldY();
         }
       }
 
-      gp.player.solidArea.x = gp.player.solidAreaDefaultX;
-      gp.player.solidArea.y = gp.player.solidAreaDefaultY;
+      // Restaura posições
+      playerArea.x = playerDefaultX;
+      playerArea.y = playerDefaultY;
       eventRect[map][col][row].x = eventRect[map][col][row].eventRectDefaultX;
       eventRect[map][col][row].y = eventRect[map][col][row].eventRectDefaultY;
     }
@@ -87,59 +90,39 @@ public class EventHandler {
   }
 
   public void checkEvent() {
-
-    int xDistance = Math.abs(gp.player.worldX - previousEventX);
-    int yDistance = Math.abs(gp.player.worldY - previousEventY);
+    int xDistance = Math.abs(gp.player.getWorldX() - previousEventX);
+    int yDistance = Math.abs(gp.player.getWorldY() - previousEventY);
     int distance = Math.max(xDistance, yDistance);
     if (distance > gp.tileSize) {
       canTouchEvent = true;
     }
 
-    if (canTouchEvent == true) {
-      if (hit(0, 27, 16, "right") == true) {
+    if (canTouchEvent) {
+      if (hit(0, 27, 16, Entity.DIR_RIGHT)) {
         damagePit(gp.dialogueState);
-      }
-
-      else if (hit(0, 23, 12, "up") == true) {
+      } else if (hit(0, 23, 12, Entity.DIR_UP)) {
         healingPool(gp.dialogueState);
-      }
-
-      else if (hit(0, 10, 39, "any") == true) {
-        teleport(1, 12, 13, gp.indoor);
-      } // to the merchant's house
-
-      else if (hit(1, 12, 13, "any") == true) {
-        teleport(0, 10, 39, gp.outside);
-      } // outside
-
-      else if (hit(1, 12, 9, "up") == true) {
+      } else if (hit(0, 10, 39, "any")) {
+        teleport(1, 12, 13, gp.indoor); // para a casa do mercador
+      } else if (hit(1, 12, 13, "any")) {
+        teleport(0, 10, 39, gp.outside); // para fora
+      } else if (hit(1, 12, 9, Entity.DIR_UP)) {
         speak(gp.npc[1][0]);
-      }
-
-      else if (hit(0, 12, 9, "any") == true) {
-        teleport(2, 9, 41, gp.dungeon);
-      } // to the dungeon
-
-      else if (hit(2, 9, 41, "any") == true) {
-        teleport(0, 12, 9, gp.outside);
-      } // to outside
-
-      else if (hit(2, 8, 7, "any") == true) {
-        teleport(3, 26, 41, gp.dungeon);
-      } // to B2
-
-      else if (hit(3, 26, 41, "any") == true) {
-        teleport(2, 8, 7, gp.dungeon);
-      } // to B1
-
-      else if (hit(3, 25, 27, "any")) {
+      } else if (hit(0, 12, 9, "any")) {
+        teleport(2, 9, 41, gp.dungeon); // para a dungeon
+      } else if (hit(2, 9, 41, "any")) {
+        teleport(0, 12, 9, gp.outside); // para fora
+      } else if (hit(2, 8, 7, "any")) {
+        teleport(3, 26, 41, gp.dungeon); // B2
+      } else if (hit(3, 26, 41, "any")) {
+        teleport(2, 8, 7, gp.dungeon); // B1
+      } else if (hit(3, 25, 27, "any")) {
         skeletonLord();
       }
     }
   }
 
   public void teleport(int map, int col, int row, int area) {
-
     gp.gameState = gp.transitionState;
     gp.nextArea = area;
     tempMap = map;
@@ -153,7 +136,7 @@ public class EventHandler {
     gp.gameState = gameState;
     gp.playSE(6);
     eventMaster.startDialogue(eventMaster, 0);
-    gp.player.life -= 1;
+    gp.player.setLife(gp.player.getLife() - 1);
     canTouchEvent = false;
   }
 
@@ -170,8 +153,8 @@ public class EventHandler {
       eventMaster.startDialogue(eventMaster, 1);
 
       // Efeito
-      gp.player.life = gp.player.maxLife;
-      gp.player.mana = gp.player.maxMana;
+      gp.player.setLife(gp.player.getMaxLife());
+      gp.player.setMana(gp.player.getMaxMana());
 
       canTouchEvent = false;
 
@@ -182,9 +165,7 @@ public class EventHandler {
   }
 
   public void speak(Entity entity) {
-
     if (gp.keyH.enterPressed) {
-
       gp.gameState = gp.dialogueState;
       gp.player.attackCanceled = true;
       entity.speak();
@@ -192,7 +173,6 @@ public class EventHandler {
   }
 
   public void skeletonLord() {
-
     if (!gp.bossBattleOn && !Progress.isSkeletonLordDefeated()) {
       gp.gameState = gp.cutsceneState;
       gp.csManager.sceneNum = gp.csManager.skeletonLord;
