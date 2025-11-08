@@ -10,7 +10,7 @@ public class OBJ_Pickaxe extends Entity {
   public OBJ_Pickaxe(GamePanel gp) {
     super(gp);
 
-    type = type_pickaxe;
+    type = TYPE_PICKAXE;
     name = objName;
     down1 = setup("/objects/pickaxe", gp.tileSize, gp.tileSize);
     attackValue = 2;

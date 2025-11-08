@@ -12,7 +12,7 @@ public class OBJ_ManaCrystal extends Entity {
     super(gp);
     this.gp = gp;
 
-    type = type_pickupOnly;
+    type = TYPE_PICKUP_ONLY;
     name = objName;
     value = 1;
     down1 = setup("/objects/manacrystal_full", gp.tileSize, gp.tileSize);

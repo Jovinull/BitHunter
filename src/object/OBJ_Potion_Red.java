@@ -13,7 +13,7 @@ public class OBJ_Potion_Red extends Entity {
 
     this.gp = gp;
 
-    type = type_consumable;
+    type = TYPE_CONSUMABLE;
     name = objName;
     value = 5;
     down1 = setup("/objects/potion_red", gp.tileSize, gp.tileSize);

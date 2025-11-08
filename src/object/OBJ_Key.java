@@ -14,7 +14,7 @@ public class OBJ_Key extends Entity {
     super(gp);
     this.gp = gp;
 
-    type = type_consumable;
+    type = TYPE_CONSUMABLE;
     name = objName;
     down1 = setup("/objects/key", gp.tileSize, gp.tileSize);
     description = "[" + name + "]\nAbre portas trancadas.";

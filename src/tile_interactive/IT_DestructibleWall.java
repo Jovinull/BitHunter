@@ -25,7 +25,7 @@ public class IT_DestructibleWall extends InteractiveTile {
 
   public boolean isCorrectItem(Entity entity) {
     boolean isCorrectItem = false;
-    if (entity.currentWeapon.type == type_pickaxe) {
+    if (entity.currentWeapon.type == TYPE_PICKAXE) {
       isCorrectItem = true;
     }
     return isCorrectItem;

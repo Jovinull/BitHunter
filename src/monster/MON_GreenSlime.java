@@ -18,7 +18,7 @@ public class MON_GreenSlime extends Entity {
 
     this.gp = gp;
 
-    type = type_monster;
+    type = TYPE_MONSTER;
     name = "Slime Verde";
     defaultSpeed = 1;
     speed = defaultSpeed;

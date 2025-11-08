@@ -17,7 +17,7 @@ public class MON_Orc extends Entity {
 
     this.gp = gp;
 
-    type = type_monster;
+    type = TYPE_MONSTER;
     name = "Orc";
     defaultSpeed = 1;
     speed = defaultSpeed;

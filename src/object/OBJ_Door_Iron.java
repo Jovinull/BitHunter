@@ -12,7 +12,7 @@ public class OBJ_Door_Iron extends Entity {
     super(gp);
     this.gp = gp;
 
-    type = type_obstacle;
+    type = TYPE_OBSTACLE;
     name = objName;
     down1 = setup("/objects/door_iron", gp.tileSize, gp.tileSize);
     collision = true;
