@@ -9,61 +9,61 @@ import object.OBJ_Coin_Bronze;
 
 public class IT_DestructibleWall extends InteractiveTile {
 
-  GamePanel gp;
-
   public IT_DestructibleWall(GamePanel gp, int col, int row) {
     super(gp, col, row);
-    this.gp = gp;
 
-    this.worldX = gp.tileSize * col;
-    this.worldY = gp.tileSize * row;
-
+    // Sprite do bloco
     down1 = setup("/tiles_interactive/destructiblewall", gp.tileSize, gp.tileSize);
+
+    // Comportamento de "quebrável" + vida
     destructible = true;
-    life = 3;
+    setMaxLife(3);
+    setLife(3);
   }
 
+  @Override
   public boolean isCorrectItem(Entity entity) {
-    boolean isCorrectItem = false;
-    if (entity.currentWeapon.type == TYPE_PICKAXE) {
-      isCorrectItem = true;
-    }
-    return isCorrectItem;
+    // Requer picareta equipada
+    return entity.getCurrentWeapon() != null
+        && entity.getCurrentWeapon().getType() == TYPE_PICKAXE;
   }
 
+  @Override
   public void playSE() {
+    // usa gp herdado de Entity (sem shadow)
     gp.playSE(20);
   }
 
+  @Override
   public InteractiveTile getDestroyedForm() {
-    InteractiveTile tile = null;
-    return tile;
+    // Sem forma destruída por padrão; retorne outra InteractiveTile se quiser
+    return null;
   }
 
+  // Partículas (aparência ao ser atingido)
+  @Override
   public Color getParticleColor() {
-    Color color = new Color(65, 65, 65);
-    return color;
+    return new Color(65, 65, 65);
   }
 
+  @Override
   public int getParticleSize() {
-    int size = 6; // 6 pixels
-    return size;
+    return 6; // pixels
   }
 
+  @Override
   public int getParticleSpeed() {
-    int speed = 1;
-    return speed;
+    return 1;
   }
 
+  @Override
   public int getParticleMaxLife() {
-    int maxLife = 20;
-    return maxLife;
+    return 20;
   }
 
+  @Override
   public void checkDrop() {
-
     int i = new Random().nextInt(100) + 1;
-
     if (i < 20) {
       dropItem(new OBJ_Coin_Bronze(gp));
     }
