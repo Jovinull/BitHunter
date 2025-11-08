@@ -14,19 +14,20 @@ public class NpcOldMan extends Entity {
   public NpcOldMan(GamePanel gp) {
     super(gp);
 
-    direction = DIR_DOWN;
-    speed = 1;
-    defaultSpeed = speed;
+    setDirection(DIR_DOWN);
+    setSpeed(1);
+    setDefaultSpeed(getSpeed());
 
-    // solidArea é final -> apenas setar
-    solidArea.x = 8;
-    solidArea.y = 16;
-    solidAreaDefaultX = solidArea.x;
-    solidAreaDefaultY = solidArea.y;
-    solidArea.width = 30;
-    solidArea.height = 30;
+    // solidArea é final -> configurar via getter
+    Rectangle sa = getSolidArea();
+    sa.x = 8;
+    sa.y = 16;
+    setSolidAreaDefaultX(sa.x);
+    setSolidAreaDefaultY(sa.y);
+    sa.width = 30;
+    sa.height = 30;
 
-    dialogueSet = -1;
+    setDialogueSet(-1);
 
     getImage();
     setDialogue();
@@ -44,16 +45,17 @@ public class NpcOldMan extends Entity {
   }
 
   public void setDialogue() {
-    dialogues[0][0] = "Olá, rapaz.";
-    dialogues[0][1] = "Então você veio até esta ilha em busca do \ntesouro?";
-    dialogues[0][2] = "Eu costumava ser um grande mago, mas agora... \nestou um pouco velho para aventuras.";
-    dialogues[0][3] = "Bem, boa sorte para você!";
+    String[][] d = getDialogues();
+    d[0][0] = "Olá, rapaz.";
+    d[0][1] = "Então você veio até esta ilha em busca do \ntesouro?";
+    d[0][2] = "Eu costumava ser um grande mago, mas agora... \nestou um pouco velho para aventuras.";
+    d[0][3] = "Bem, boa sorte para você!";
 
-    dialogues[1][0] = "Se você ficar cansado, descanse na água.";
-    dialogues[1][1] = "Porém, os monstros reaparecem quando você descansa.\nNão sei por quê, mas é assim que funciona.";
-    dialogues[1][2] = "De qualquer forma, não se esforce demais.";
+    d[1][0] = "Se você ficar cansado, descanse na água.";
+    d[1][1] = "Porém, os monstros reaparecem quando você descansa.\nNão sei por quê, mas é assim que funciona.";
+    d[1][2] = "De qualquer forma, não se esforce demais.";
 
-    dialogues[2][0] = "Eu me pergunto como abrir aquela porta...";
+    d[2][0] = "Eu me pergunto como abrir aquela porta...";
   }
 
   private boolean atGoal() {
@@ -65,9 +67,9 @@ public class NpcOldMan extends Entity {
     if (startedWalkToGoal) {
       if (atGoal()) {
         startedWalkToGoal = false;
-        onPath = false;
+        setOnPath(false);
       } else {
-        onPath = true;
+        setOnPath(true);
         searchPath(GOAL_COL, GOAL_ROW);
       }
       return;
@@ -78,21 +80,24 @@ public class NpcOldMan extends Entity {
   @Override
   public void speak() {
     facePlayer();
-    startDialogue(this, dialogueSet);
-    dialogueSet++;
+    startDialogue(this, getDialogueSet());
+    setDialogueSet(getDialogueSet() + 1);
 
-    if (gp.player.life < gp.player.maxLife / 3) {
-      dialogueSet = 1;
-      startDialogue(this, dialogueSet);
+    // Reage ao HP do player (encapsulado)
+    if (gp.player.getLife() < gp.player.getMaxLife() / 3) {
+      setDialogueSet(1);
+      startDialogue(this, getDialogueSet());
     }
 
-    if (dialogueSet == 1 && !startedWalkToGoal && !atGoal()) {
+    // Inicia caminhada ao objetivo quando entra no diálogo 1
+    if (getDialogueSet() == 1 && !startedWalkToGoal && !atGoal()) {
       startedWalkToGoal = true;
-      onPath = true;
+      setOnPath(true);
     }
 
-    if (dialogues[dialogueSet][0] == null) {
-      dialogueSet = Math.max(0, dialogueSet - 1);
+    String[][] d = getDialogues();
+    if (d[getDialogueSet()][0] == null) {
+      setDialogueSet(Math.max(0, getDialogueSet() - 1));
     }
   }
 }
