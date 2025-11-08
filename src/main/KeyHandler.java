@@ -21,7 +21,7 @@ public class KeyHandler implements KeyListener {
   public boolean godModeOn = false;
 
   // Limites de índices dos menus de título (evita "números mágicos")
-  private static final int MENU_MAIN_MAX_INDEX = 2; // [Iniciar, Créditos, Sair]
+  private static final int MENU_MAIN_MAX_INDEX = 2; // [Novo jogo, Carregar, Sair]
   private static final int MENU_CLASS_MAX_INDEX = 3; // [Guerreiro, Ladrão, Feiticeiro, Voltar]
 
   // Limites do grid de slots na tela de personagem
@@ -84,23 +84,15 @@ public class KeyHandler implements KeyListener {
    */
   public void titleState(int code) {
 
-    // ===== Configurações de limites =====
-    final int MAIN_MENU_MAX = 2; // 0..2 (ex.: Novo Jogo, (Add later), Sair)
-    final int CLASS_MENU_MAX = 3; // 0..3 (ex.: Guerreiro, Mago, Arqueiro) — ajuste ao seu caso
-
     // ===== TELA 0: MENU PRINCIPAL =====
     if (gp.ui.titleScreenState == 0) {
 
       if (code == KeyEvent.VK_W) {
-        gp.ui.commandNum--;
-        if (gp.ui.commandNum < 0)
-          gp.ui.commandNum = MAIN_MENU_MAX;
+        navigateUp(MENU_MAIN_MAX_INDEX);
       }
 
       if (code == KeyEvent.VK_S) {
-        gp.ui.commandNum++;
-        if (gp.ui.commandNum > MAIN_MENU_MAX)
-          gp.ui.commandNum = 0;
+        navigateDown(MENU_MAIN_MAX_INDEX);
       }
 
       if (code == KeyEvent.VK_ENTER) {
@@ -125,30 +117,20 @@ public class KeyHandler implements KeyListener {
     if (gp.ui.titleScreenState == 1) {
 
       if (code == KeyEvent.VK_W) {
-        gp.ui.commandNum--;
-        if (gp.ui.commandNum < 0)
-          gp.ui.commandNum = CLASS_MENU_MAX;
+        navigateUp(MENU_CLASS_MAX_INDEX);
       }
 
       if (code == KeyEvent.VK_S) {
-        gp.ui.commandNum++;
-        if (gp.ui.commandNum > CLASS_MENU_MAX)
-          gp.ui.commandNum = 0;
+        navigateDown(MENU_CLASS_MAX_INDEX);
       }
 
       if (code == KeyEvent.VK_ENTER) {
-        // Aqui você confirma a classe selecionada e inicia o jogo
-        // Ex.: setar classe no player antes de iniciar
-        // gp.player.setClazzByIndex(gp.ui.commandNum);
-
         // Somente inicia o jogo se NÃO for "Voltar" (índice 3)
         if (gp.ui.commandNum == 3) {
-          // Volta para o menu principal
           gp.ui.titleScreenState = 0;
           gp.ui.commandNum = 0;
           return;
         }
-
         gp.gameState = gp.playState;
         gp.playMusic(0);
       }
@@ -205,16 +187,14 @@ public class KeyHandler implements KeyListener {
       gp.gameState = gp.optionsState;
     }
 
+    // Mapa (tela cheia)
     if (key == KeyEvent.VK_M) {
       gp.gameState = gp.mapState;
     }
 
+    // Mini-mapa (toggle com encapsulamento)
     if (key == KeyEvent.VK_X) {
-      if (gp.map.miniMapOn == false) {
-        gp.map.miniMapOn = true;
-      } else {
-        gp.map.miniMapOn = false;
-      }
+      gp.map.setMiniMapOn(!gp.map.isMiniMapOn());
     }
 
     if (key == KeyEvent.VK_SPACE) {
@@ -223,33 +203,24 @@ public class KeyHandler implements KeyListener {
 
     // DEBUG (alternar exibição do texto de debug)
     if (key == KeyEvent.VK_T) {
-      if (showDebugText == false) {
-        showDebugText = true;
-        gp.tileM.drawPath = true;
-      } else if (showDebugText == true) {
-        showDebugText = false;
-        gp.tileM.drawPath = false;
-      }
+      showDebugText = !showDebugText;
+      gp.tileM.drawPath = showDebugText;
     }
 
     // Recarregar mapa (atalho de dev)
     if (key == KeyEvent.VK_R) {
       switch (gp.currentMap) {
-        case 0:
-          gp.tileM.loadMap("/maps/world01.txt", 0);
-          break;
-        case 1:
-          gp.tileM.loadMap("/maps/interior01.txt", 1);
-          break;
+        case 0 -> gp.tileM.loadMap("/maps/world01.txt", 0);
+        case 1 -> gp.tileM.loadMap("/maps/interior01.txt", 1);
+        default -> {
+          // noop
+        }
       }
     }
 
+    // God mode (toggle)
     if (key == KeyEvent.VK_G) {
-      if (godModeOn == false) {
-        godModeOn = true;
-      } else if (godModeOn == true) {
-        godModeOn = false;
-      }
+      godModeOn = !godModeOn;
     }
   }
 
@@ -281,7 +252,7 @@ public class KeyHandler implements KeyListener {
       gp.player.selectItem();
     }
 
-    // Continua tratando navegação do inventário com as teclas W/A/S/D
+    // Navegação do inventário com W/A/S/D
     playerInventory(code);
   }
 
@@ -296,12 +267,11 @@ public class KeyHandler implements KeyListener {
 
     int maxCommandNum = 0;
     switch (gp.ui.subState) {
-      case 0:
-        maxCommandNum = 5;
-        break;
-      case 3:
-        maxCommandNum = 1;
-        break;
+      case 0 -> maxCommandNum = 5;
+      case 3 -> maxCommandNum = 1;
+      default -> {
+        // noop
+      }
     }
 
     if (code == KeyEvent.VK_W) {
@@ -518,53 +488,5 @@ public class KeyHandler implements KeyListener {
     if (gp.ui.commandNum > maxIndex) {
       gp.ui.commandNum = 0;
     }
-  }
-
-  /** Ações do Enter no menu principal (titleScreenState == 0). */
-  private void handleTitleScreen0Enter() {
-    if (gp.ui.commandNum == 0) {
-      // Ir para seleção de classe
-      gp.ui.titleScreenState = 1;
-      return;
-    }
-    if (gp.ui.commandNum == 1) {
-      // Créditos / informações
-      System.out.println("Exibindo créditos...");
-      return;
-    }
-    if (gp.ui.commandNum == 2) {
-      // Sair
-      System.exit(0);
-    }
-  }
-
-  /** Ações do Enter na seleção de classe (titleScreenState == 1). */
-  private void handleTitleScreen1Enter() {
-    if (gp.ui.commandNum == 0) {
-      System.out.println("Executar ações específicas do Guerreiro");
-      startGameFromTitle();
-      return;
-    }
-    if (gp.ui.commandNum == 1) {
-      System.out.println("Executar ações específicas do Ladrão");
-      startGameFromTitle();
-      return;
-    }
-    if (gp.ui.commandNum == 2) {
-      System.out.println("Executar ações específicas do Feiticeiro");
-      startGameFromTitle();
-      return;
-    }
-    if (gp.ui.commandNum == 3) {
-      // Voltar ao menu principal
-      gp.ui.titleScreenState = 0;
-      gp.ui.commandNum = 0; // reset seleção
-    }
-  }
-
-  /** Inicia o jogo a partir do título, mantendo o comportamento original. */
-  private void startGameFromTitle() {
-    gp.gameState = gp.playState;
-    gp.playMusic(0);
   }
 }
