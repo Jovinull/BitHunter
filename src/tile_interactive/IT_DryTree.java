@@ -7,54 +7,59 @@ import main.GamePanel;
 
 public class IT_DryTree extends InteractiveTile {
 
-  GamePanel gp;
-
   public IT_DryTree(GamePanel gp, int col, int row) {
     super(gp, col, row);
-    this.gp = gp;
 
-    this.worldX = gp.tileSize * col;
-    this.worldY = gp.tileSize * row;
+    // Posiciona via setters (sem acessar worldX/worldY diretamente)
+    setWorldX(gp.tileSize * col);
+    setWorldY(gp.tileSize * row);
 
+    // Sprite
     down1 = setup("/tiles_interactive/drytree", gp.tileSize, gp.tileSize);
+
+    // Comportamento
     destructible = true;
-    life = 3;
+    setMaxLife(3);
+    setLife(3);
   }
 
+  @Override
   public boolean isCorrectItem(Entity entity) {
-    boolean isCorrectItem = false;
-    if (entity.currentWeapon.type == TYPE_AXE) {
-      isCorrectItem = true;
-    }
-    return isCorrectItem;
+    // Precisa de machado equipado
+    return entity.getCurrentWeapon() != null
+        && entity.getCurrentWeapon().getType() == TYPE_AXE;
   }
 
+  @Override
   public void playSE() {
     gp.playSE(11);
   }
 
+  @Override
   public InteractiveTile getDestroyedForm() {
-    InteractiveTile tile = new IT_Trunk(gp, worldX / gp.tileSize, worldY / gp.tileSize);
-    return tile;
+    int col = getWorldX() / gp.tileSize;
+    int row = getWorldY() / gp.tileSize;
+    return new IT_Trunk(gp, col, row);
   }
 
+  // Aparência das partículas ao ser atingido
+  @Override
   public Color getParticleColor() {
-    Color color = new Color(65, 50, 30);
-    return color;
+    return new Color(65, 50, 30);
   }
 
+  @Override
   public int getParticleSize() {
-    int size = 6; // 6 pixels
-    return size;
+    return 6;
   }
 
+  @Override
   public int getParticleSpeed() {
-    int speed = 1;
-    return speed;
+    return 1;
   }
 
+  @Override
   public int getParticleMaxLife() {
-    int maxLife = 20;
-    return maxLife;
+    return 20;
   }
 }
