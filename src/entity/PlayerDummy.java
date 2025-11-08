@@ -4,16 +4,15 @@ import main.GamePanel;
 
 public class PlayerDummy extends Entity {
 
-  public static final String npcName = "Dummy";
+  public static final String NPC_NAME = "Dummy";
 
   public PlayerDummy(GamePanel gp) {
     super(gp);
-
-    name = npcName;
+    setName(NPC_NAME);
     getImage();
   }
 
-  public void getImage() {
+  private void getImage() {
     up1 = setup("/player/Walking sprites/boy_up_1", gp.tileSize, gp.tileSize);
     up2 = setup("/player/Walking sprites/boy_up_2", gp.tileSize, gp.tileSize);
 
