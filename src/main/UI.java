@@ -60,7 +60,7 @@ public class UI {
   public UI(GamePanel gp) {
     this.gp = gp;
 
-    // Carrega fontes com try-with-resources (fecha os streams)
+    // Carrega fontes com try-with-resources
     try (InputStream is = getClass().getResourceAsStream("/font/x12y16pxMaruMonica.ttf")) {
       if (is != null) {
         maruMonica = Font.createFont(Font.TRUETYPE_FONT, is);
@@ -77,15 +77,15 @@ public class UI {
       System.err.println("Falha ao carregar fonte Purisa Bold: " + e.getMessage());
     }
 
-    // HUD (usar getters da Entity)
+    // HUD (via getters, sem acessar campos diretamente)
     Entity heart = new OBJ_Heart(gp);
-    heart_full = heart.getImage();
-    heart_half = heart.getImage2();
-    heart_blank = heart.getImage3();
+    heart_full = heart.getBaseImage();
+    heart_half = heart.getAltImage1();
+    heart_blank = heart.getAltImage2();
 
     Entity crystal = new OBJ_ManaCrystal(gp);
-    crystal_full = crystal.getImage();
-    crystal_blank = crystal.getImage2();
+    crystal_full = crystal.getBaseImage();
+    crystal_blank = crystal.getAltImage1();
 
     Entity bronzeCoin = new OBJ_Coin_Bronze(gp);
     coin = bronzeCoin.getDown1();
@@ -101,7 +101,6 @@ public class UI {
   public void draw(Graphics2D g2) {
     this.g2 = g2;
 
-    // Estados com UI "suave" (Purisa): título, pausa e game over
     boolean smoothUi = gp.gameState == gp.titleState ||
         gp.gameState == gp.pauseState ||
         gp.gameState == gp.gameOverState;
@@ -112,10 +111,9 @@ public class UI {
         g2.setFont(purisaB.deriveFont(Font.PLAIN, 48F));
       }
     } else {
-      // Estados com texto "pixel-perfect" (MaruMonica)
       useCrispPixelText(g2);
       if (maruMonica != null) {
-        g2.setFont(maruMonica.deriveFont(Font.PLAIN, 16F)); // base em múltiplo de 16
+        g2.setFont(maruMonica.deriveFont(Font.PLAIN, 16F));
       }
     }
 
@@ -174,7 +172,6 @@ public class UI {
 
   // --- HUD: Vida & Mana ---
   public void drawPlayerLife() {
-
     final int iconSize = 32;
     final int colsPerRow = 8;
 
@@ -201,7 +198,7 @@ public class UI {
       }
     }
 
-    // Base da mana fica logo abaixo da última linha de corações
+    // Base da mana logo abaixo dos corações
     manaStartY = y + iconSize;
 
     // --- VIDA ATUAL ---
@@ -230,7 +227,7 @@ public class UI {
     }
 
     // --- MANA (vazio) ---
-    int crystalStep = iconSize + 3; // ligeiro espaço para os cristais
+    int crystalStep = iconSize + 3;
     x = manaStartX;
     y = manaStartY;
     i = 0;
@@ -264,13 +261,9 @@ public class UI {
   }
 
   public void drawMonsterLife() {
-
     for (int i = 0; i < gp.monster[1].length; i++) {
-
       Entity monster = gp.monster[gp.currentMap][i];
-
       if (monster != null && monster.inCamera()) {
-
         if (monster.isHpBarOn() && !monster.isBoss()) {
 
           double oneScale = (double) gp.tileSize / monster.getMaxLife();
@@ -283,7 +276,6 @@ public class UI {
           g2.fillRect(monster.getScreenX(), monster.getScreenY() - 15, (int) hpBarValue, 10);
 
           monster.setHpBarCounter(monster.getHpBarCounter() + 1);
-
           if (monster.getHpBarCounter() > 600) {
             monster.setHpBarCounter(0);
             monster.setHpBarOn(false);
@@ -405,7 +397,6 @@ public class UI {
 
   // --- Diálogo ---
   public void drawDialogueScreen() {
-
     // WINDOW
     int x = gp.tileSize * 3;
     int y = gp.tileSize / 2;
@@ -419,13 +410,12 @@ public class UI {
     x += gp.tileSize;
     y += gp.tileSize;
 
-    String[][] dlg = npc.getDialogues();
-    int ds = npc.getDialogueSet();
-    int di = npc.getDialogueIndex();
+    String[][] ds = npc.getDialogues();
+    int set = npc.getDialogueSet();
+    int idx = npc.getDialogueIndex();
 
-    if (dlg[ds][di] != null) {
-
-      char[] characters = dlg[ds][di].toCharArray();
+    if (ds[set][idx] != null) {
+      char[] characters = ds[set][idx].toCharArray();
 
       if (charIndex < characters.length) {
         gp.playSE(17);
@@ -440,7 +430,7 @@ public class UI {
         combinedText = "";
 
         if (gp.gameState == gp.dialogueState || gp.gameState == gp.cutsceneState) {
-          npc.setDialogueIndex(di + 1);
+          npc.setDialogueIndex(idx + 1);
           gp.keyH.enterPressed = false;
         }
       }
@@ -464,7 +454,6 @@ public class UI {
 
   // --- Inventário ---
   public void drawInventory(Entity entity, boolean cursor) {
-
     int frameX;
     int frameY;
     int frameWidth;
@@ -496,29 +485,23 @@ public class UI {
     int slotY = slotYstart;
     int slotSize = gp.tileSize + 3;
 
-    var inv = entity.getInventory();
+    for (int i = 0; i < entity.getInventory().size(); i++) {
 
-    for (int i = 0; i < inv.size(); i++) {
-
-      if (inv.get(i) == entity.getCurrentWeapon()
-          || inv.get(i) == entity.getCurrentShield()
-          || inv.get(i) == entity.getCurrentLight()) {
+      if (entity.getInventory().get(i) == entity.getCurrentWeapon() ||
+          entity.getInventory().get(i) == entity.getCurrentShield() ||
+          entity.getInventory().get(i) == entity.getCurrentLight()) {
         g2.setColor(COL_ACCENT);
         g2.fillRoundRect(slotX, slotY, gp.tileSize, gp.tileSize, 8, 8);
       }
 
-      g2.drawImage(inv.get(i).getDown1(), slotX, slotY, null);
+      g2.drawImage(entity.getInventory().get(i).getDown1(), slotX, slotY, null);
 
       // DISPLAY AMOUNT
-      if (entity == gp.player && inv.get(i).getAmount() > 1) {
-
+      if (entity == gp.player && entity.getInventory().get(i).getAmount() > 1) {
         g2.setFont(g2.getFont().deriveFont(32f));
-        int amountX;
-        int amountY;
-
-        String s = String.valueOf(inv.get(i).getAmount());
-        amountX = getXforAlignToRightText(s, slotX + 44);
-        amountY = slotY + gp.tileSize;
+        String s = String.valueOf(entity.getInventory().get(i).getAmount());
+        int amountX = getXforAlignToRightText(s, slotX + 44);
+        int amountY = slotY + gp.tileSize;
 
         // SHADOW
         g2.setColor(new Color(60, 60, 60));
@@ -555,7 +538,7 @@ public class UI {
       int dFrameHeight = gp.tileSize * 3;
 
       int itemIndex = getItemIndexOnSlot(slotCol, slotRow);
-      if (itemIndex < inv.size()) {
+      if (itemIndex < entity.getInventory().size()) {
         drawSubWindow(dFrameX, dFrameY, dFrameWidth, dFrameHeight);
 
         int textX = dFrameX + 20;
@@ -563,7 +546,7 @@ public class UI {
         g2.setColor(COL_TEXT);
         g2.setFont(g2.getFont().deriveFont(28F));
 
-        for (String line : inv.get(itemIndex).getDescription().split("\n")) {
+        for (String line : entity.getInventory().get(itemIndex).getDescription().split("\n")) {
           g2.drawString(line, textX, textY);
           textY += 28;
         }
@@ -606,8 +589,7 @@ public class UI {
       case 2 -> optionsControl(frameX, frameY);
       case 3 -> optionsEndGameConfirmation(frameX, frameY);
       default -> {
-        // no-op
-      }
+        /* no-op */ }
     }
 
     gp.keyH.enterPressed = false;
@@ -831,23 +813,18 @@ public class UI {
   }
 
   public void drawTradeScreen() {
-
     switch (subState) {
       case 0 -> tradeSelect();
       case 1 -> tradeBuy();
       case 2 -> tradeSell();
       default -> {
-        // no-op
-      }
+        /* no-op */ }
     }
-
     gp.keyH.enterPressed = false;
   }
 
   public void tradeSelect() {
-
     npc.setDialogueSet(0);
-
     drawDialogueScreen();
 
     // JANELA
@@ -890,7 +867,6 @@ public class UI {
   }
 
   public void tradeBuy() {
-
     // INVENTÁRIO DO JOGADOR
     drawInventory(gp.player, false);
 
@@ -916,7 +892,6 @@ public class UI {
     // JANELA DE PREÇO
     int itemIndex = getItemIndexOnSlot(npcSlotCol, npcSlotRow);
     if (itemIndex < npc.getInventory().size()) {
-
       x = (int) (gp.tileSize * 5.5);
       y = (int) (gp.tileSize * 5.5);
       width = (int) (gp.tileSize * 2.5);
@@ -947,7 +922,6 @@ public class UI {
   }
 
   public void tradeSell() {
-
     // INVENTÁRIO DO JOGADOR
     drawInventory(gp.player, true);
 
@@ -975,7 +949,6 @@ public class UI {
     // JANELA DE PREÇO
     int itemIndex = getItemIndexOnSlot(playerSlotCol, playerSlotRow);
     if (itemIndex < gp.player.getInventory().size()) {
-
       x = (int) (gp.tileSize * 15.5);
       y = (int) (gp.tileSize * 5.5);
       width = (int) (gp.tileSize * 2.5);
@@ -990,20 +963,19 @@ public class UI {
 
       // VENDER UM ITEM
       if (gp.keyH.enterPressed) {
-        var inv = gp.player.getInventory();
-        Entity selected = inv.get(itemIndex);
 
-        if (selected == gp.player.getCurrentWeapon()
-            || selected == gp.player.getCurrentShield()) {
+        if (gp.player.getInventory().get(itemIndex) == gp.player.getCurrentWeapon()
+            || gp.player.getInventory().get(itemIndex) == gp.player.getCurrentShield()) {
 
           commandNum = 0;
           subState = 0;
           npc.startDialogue(npc, 4);
         } else {
-          if (selected.getAmount() > 1) {
-            selected.setAmount(selected.getAmount() - 1);
+          if (gp.player.getInventory().get(itemIndex).getAmount() > 1) {
+            gp.player.getInventory().get(itemIndex)
+                .setAmount(gp.player.getInventory().get(itemIndex).getAmount() - 1);
           } else {
-            inv.remove(itemIndex);
+            gp.player.getInventory().remove(itemIndex);
           }
           gp.player.setCoin(gp.player.getCoin() + price);
         }
@@ -1012,7 +984,6 @@ public class UI {
   }
 
   public void drawTransition() {
-
     counter++;
     g2.setColor(new Color(0, 0, 0, counter * 5));
     g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
@@ -1021,36 +992,38 @@ public class UI {
       counter = 0;
       gp.gameState = gp.playState;
       gp.currentMap = gp.eHandler.tempMap;
+
       gp.player.setWorldX(gp.tileSize * gp.eHandler.tempCol);
       gp.player.setWorldY(gp.tileSize * gp.eHandler.tempRow);
+
       gp.eHandler.previousEventX = gp.player.getWorldX();
       gp.eHandler.previousEventY = gp.player.getWorldY();
+
       gp.changeArea();
     }
   }
 
   public void drawSleepScreen() {
-
     counter++;
 
     if (counter < 120) {
-      float alpha = Math.min(1f, gp.eManager.lighting.getFilterAlpha() + 0.01f);
-      gp.eManager.lighting.setFilterAlpha(alpha);
+      float a = gp.eManager.lighting.getFilterAlpha() + 0.01f;
+      gp.eManager.lighting.setFilterAlpha(a);
+      if (gp.eManager.lighting.getFilterAlpha() > 1f) {
+        gp.eManager.lighting.setFilterAlpha(1f);
+      }
     }
 
     if (counter >= 120) {
-      float alpha = Math.max(0f, gp.eManager.lighting.getFilterAlpha() - 0.01f);
-      gp.eManager.lighting.setFilterAlpha(alpha);
-
-      if (alpha <= 0f) {
+      float a = gp.eManager.lighting.getFilterAlpha() - 0.01f;
+      gp.eManager.lighting.setFilterAlpha(a);
+      if (gp.eManager.lighting.getFilterAlpha() <= 0f) {
+        gp.eManager.lighting.setFilterAlpha(0f);
         counter = 0;
-
-        // Voltar para o estado de dia e zerar o contador do ciclo:
         gp.eManager.lighting.setDayStateToDay();
         gp.eManager.lighting.setDayCounter(0);
-
         gp.gameState = gp.playState;
-        gp.player.getImage();
+        gp.player.getImage(); // método void existente nas entidades
       }
     }
   }
@@ -1232,9 +1205,13 @@ public class UI {
     g2.drawString(value, getXforAlignToRightText(value, tailX), textY);
     textY += lineHeight;
 
-    g2.drawImage(gp.player.getCurrentWeapon().getDown1(), tailX - gp.tileSize, textY - 24, null);
+    if (gp.player.getCurrentWeapon() != null) {
+      g2.drawImage(gp.player.getCurrentWeapon().getDown1(), tailX - gp.tileSize, textY - 24, null);
+    }
     textY += gp.tileSize;
-    g2.drawImage(gp.player.getCurrentShield().getDown1(), tailX - gp.tileSize, textY - 24, null);
+    if (gp.player.getCurrentShield() != null) {
+      g2.drawImage(gp.player.getCurrentShield().getDown1(), tailX - gp.tileSize, textY - 24, null);
+    }
   }
 
   public int getXforAlignToRightText(String text, int tailX) {
