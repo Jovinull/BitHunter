@@ -14,7 +14,7 @@ import javax.imageio.ImageIO;
 import main.GamePanel;
 import main.UtilityTool;
 
-public abstract class Entity {
+public class Entity {
 
   // =========================
   // Constantes de Direção
@@ -294,7 +294,7 @@ public abstract class Entity {
   }
 
   /** hook: uso/aplicação de item/entidade sobre outra entidade */
-  public abstract boolean use(Entity entity);
+  public boolean use(Entity entity);
 
   /** hook: lógica de drop em morte/abertura */
   public void checkDrop() {
