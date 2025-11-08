@@ -12,7 +12,8 @@ public class PlayerDummy extends Entity {
     getImage();
   }
 
-  private void getImage() {
+  @Override
+  public void getImage() {
     up1 = setup("/player/Walking sprites/boy_up_1", gp.tileSize, gp.tileSize);
     up2 = setup("/player/Walking sprites/boy_up_2", gp.tileSize, gp.tileSize);
 
