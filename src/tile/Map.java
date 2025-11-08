@@ -9,9 +9,10 @@ import main.GamePanel;
 
 public class Map extends TileManager {
 
-  GamePanel gp;
-  BufferedImage worldMap[];
-  public boolean miniMapOn = false;
+  // Referências e estado
+  private final GamePanel gp;
+  private BufferedImage[] worldMap;
+  private boolean miniMapOn = false;
 
   public Map(GamePanel gp) {
     super(gp);
@@ -19,8 +20,20 @@ public class Map extends TileManager {
     createWorldMap();
   }
 
-  public void createWorldMap() {
+  // Getters/Setters públicos (evita acesso direto a fields)
+  public boolean isMiniMapOn() {
+    return miniMapOn;
+  }
 
+  public void setMiniMapOn(boolean miniMapOn) {
+    this.miniMapOn = miniMapOn;
+  }
+
+  public BufferedImage[] getWorldMap() {
+    return worldMap;
+  }
+
+  public void createWorldMap() {
     worldMap = new BufferedImage[gp.maxMap];
     int worldMapWidth = gp.tileSize * gp.maxWorldCol;
     int worldMapHeight = gp.tileSize * gp.maxWorldRow;
@@ -35,10 +48,13 @@ public class Map extends TileManager {
 
       while (col < gp.maxWorldCol && row < gp.maxWorldRow) {
 
+        // Se o TileManager/Tile expuserem getters, use-os
         int tileNum = mapTileNum[i][col][row];
         int x = gp.tileSize * col;
         int y = gp.tileSize * row;
-        g2.drawImage(tile[tileNum].image, x, y, null);
+
+        // Preferir getter do Tile, se existir (ex.: tile[tileNum].getImage())
+        g2.drawImage(tile[tileNum].getImage(), x, y, null);
 
         col++;
         if (col == gp.maxWorldCol) {
@@ -63,23 +79,17 @@ public class Map extends TileManager {
     int y = gp.screenHeight / 2 - height / 2;
     g2.drawImage(worldMap[gp.currentMap], x, y, width, height, null);
 
-    // Draw Player
+    // Draw Player (usando getters)
     double scale = (double) (gp.tileSize * gp.maxWorldCol) / width;
-    int playerX = (int) (x + gp.player.worldX / scale);
-    int playerY = (int) (y + gp.player.worldY / scale);
+    int playerX = (int) (x + gp.player.getWorldX() / scale);
+    int playerY = (int) (y + gp.player.getWorldY() / scale);
     int playerSize = (int) (gp.tileSize / 2);
-    g2.drawImage(gp.player.down1, playerX, playerY, playerSize, playerSize, null);
-
-    // Hint
-    // g2.setFont(gp.ui.maruMonica.deriveFont(32f));
-    // g2.setColor(Color.white);
-    // g2.drawString("Pressione M para fechar", 650, 550);
+    g2.drawImage(gp.player.getDown1(), playerX, playerY, playerSize, playerSize, null);
   }
 
   public void drawMiniMap(Graphics2D g2) {
 
-    if (miniMapOn == true) {
-
+    if (miniMapOn) {
       // Draw Map
       int width = 300;
       int height = 300;
@@ -88,12 +98,12 @@ public class Map extends TileManager {
       g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8f));
       g2.drawImage(worldMap[gp.currentMap], x, y, width, height, null);
 
-      // Draw Player
+      // Draw Player (usando getters)
       double scale = (double) (gp.tileSize * gp.maxWorldCol) / width;
-      int playerX = (int) (x + gp.player.worldX / scale);
-      int playerY = (int) (y + gp.player.worldY / scale);
+      int playerX = (int) (x + gp.player.getWorldX() / scale);
+      int playerY = (int) (y + gp.player.getWorldY() / scale);
       int playerSize = (int) (gp.tileSize / 3);
-      g2.drawImage(gp.player.down1, playerX - 6, playerY - 6, playerSize, playerSize, null);
+      g2.drawImage(gp.player.getDown1(), playerX - 6, playerY - 6, playerSize, playerSize, null);
 
       g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
     }
