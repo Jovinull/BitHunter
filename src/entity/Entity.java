@@ -46,135 +46,143 @@ public class Entity {
 
   protected final GamePanel gp;
 
-  // Sprites de movimento
-  public BufferedImage up1;
-  public BufferedImage up2;
-  public BufferedImage down1;
-  public BufferedImage down2;
-  public BufferedImage left1;
-  public BufferedImage left2;
-  public BufferedImage right1;
-  public BufferedImage right2;
+  // Sprites de movimento (visíveis para subclasses, não públicos)
+  protected BufferedImage up1;
+  protected BufferedImage up2;
+  protected BufferedImage down1;
+  protected BufferedImage down2;
+  protected BufferedImage left1;
+  protected BufferedImage left2;
+  protected BufferedImage right1;
+  protected BufferedImage right2;
 
   // Sprites de ataque/guarda
-  public BufferedImage attackUp1;
-  public BufferedImage attackUp2;
-  public BufferedImage attackDown1;
-  public BufferedImage attackDown2;
-  public BufferedImage attackLeft1;
-  public BufferedImage attackLeft2;
-  public BufferedImage attackRight1;
-  public BufferedImage attackRight2;
-  public BufferedImage guardUp;
-  public BufferedImage guardDown;
-  public BufferedImage guardLeft;
-  public BufferedImage guardRight;
+  protected BufferedImage attackUp1;
+  protected BufferedImage attackUp2;
+  protected BufferedImage attackDown1;
+  protected BufferedImage attackDown2;
+  protected BufferedImage attackLeft1;
+  protected BufferedImage attackLeft2;
+  protected BufferedImage attackRight1;
+  protected BufferedImage attackRight2;
+  protected BufferedImage guardUp;
+  protected BufferedImage guardDown;
+  protected BufferedImage guardLeft;
+  protected BufferedImage guardRight;
 
-  public BufferedImage image;
-  public BufferedImage image2;
-  public BufferedImage image3;
+  // Sprites genéricos
+  protected BufferedImage image;
+  protected BufferedImage image2;
+  protected BufferedImage image3;
 
-  public final Rectangle solidArea = new Rectangle(0, 0, 48, 48);
-  public final Rectangle attackArea = new Rectangle(0, 0, 0, 0);
+  // Áreas de colisão/ataque
+  private final Rectangle solidArea = new Rectangle(0, 0, 48, 48);
+  private final Rectangle attackArea = new Rectangle(0, 0, 0, 0);
 
-  public int solidAreaDefaultX;
-  public int solidAreaDefaultY;
+  private int solidAreaDefaultX;
+  private int solidAreaDefaultY;
 
-  public boolean collision = false;
-  public String[][] dialogues = new String[20][20];
+  private boolean collision = false;
 
-  public Entity attacker;
-  public Entity linkedEntity;
-  public boolean temp = false;
+  // Diálogos (expostos via getter para UI/consumo externo)
+  private final String[][] dialogues = new String[20][20];
+
+  private Entity attacker;
+  private Entity linkedEntity;
+  private boolean temp = false;
 
   // STATE
-  public int worldX;
-  public int worldY;
-  public String direction = DIR_DOWN;
-  public int spriteNum = 1;
-  public int dialogueSet = 0;
-  public int dialogueIndex = 0;
-  public boolean collisionOn = false;
-  public boolean invincible = false;
-  public boolean attacking = false;
-  public boolean alive = true;
-  public boolean dying = false;
-  public boolean hpBarOn = false;
-  public boolean onPath = false;
-  public boolean knockBack = false;
-  public String knockBackDirection;
-  public boolean guarding = false;
-  public boolean transparent = false;
-  public boolean offBalance = false;
-  public Entity loot;
-  public boolean opened = false;
-  public boolean inRage = false;
-  public boolean sleep = false;
-  public boolean drawing = true;
+  private int worldX;
+  private int worldY;
+  private String direction = DIR_DOWN;
+  private int spriteNum = 1;
+  private int dialogueSet = 0;
+  private int dialogueIndex = 0;
+  private boolean collisionOn = false;
+  private boolean invincible = false;
+  private boolean attacking = false;
+  private boolean alive = true;
+  private boolean dying = false;
+  private boolean hpBarOn = false;
+  private boolean onPath = false;
+  private boolean knockBack = false;
+  private String knockBackDirection;
+  private boolean guarding = false;
+  private boolean transparent = false;
+  private boolean offBalance = false;
+  private Entity loot;
+  private boolean opened = false;
+  private boolean inRage = false;
+  private boolean sleep = false;
+  private boolean drawing = true;
 
   // COUNTERS
-  public int spriteCounter = 0;
-  public int actionLockCounter = 0;
-  public int invincibleCounter = 0;
-  public int shotAvailableCounter = 0;
-  int dyingCounter = 0;
-  public int hpBarCounter = 0;
-  int knockBackCounter = 0;
-  public int guardCounter = 0;
-  int offBalanceCounter = 0;
+  private int spriteCounter = 0;
+  private int actionLockCounter = 0;
+  private int invincibleCounter = 0;
+  private int shotAvailableCounter = 0;
+  private int dyingCounter = 0;
+  private int hpBarCounter = 0;
+  private int knockBackCounter = 0;
+  private int guardCounter = 0;
+  private int offBalanceCounter = 0;
 
   // CHARACTER ATTRIBUTES
-  public String name;
-  public int defaultSpeed;
-  public int speed;
-  public int maxLife;
-  public int life;
-  public int maxMana;
-  public int mana;
-  public int ammo;
-  public int level;
-  public int strength;
-  public int dexterity;
-  public int attack;
-  public int defense;
-  public int exp;
-  public int nextLevelExp;
-  public int coin;
+  private String name;
+  private int defaultSpeed;
+  private int speed;
+  private int maxLife;
+  private int life;
+  private int maxMana;
+  private int mana;
+  private int ammo;
+  private int level;
+  private int strength;
+  private int dexterity;
+  private int attack;
+  private int defense;
+  private int exp;
+  private int nextLevelExp;
+  private int coin;
 
-  public int motion1Duration;
-  public int motion2Duration;
+  private int motion1Duration;
+  private int motion2Duration;
 
-  public Entity currentWeapon;
-  public Entity currentShield;
-  public Entity currentLight;
-  public Projectile projectile;
-  public boolean boss;
+  private Entity currentWeapon;
+  private Entity currentShield;
+  private Entity currentLight;
+  private Projectile projectile;
+  private boolean boss;
 
   // ITEM ATRIBUTES
-  public final List<Entity> inventory = new ArrayList<>();
-  public int value;
-  public int attackValue;
-  public int defenseValue;
-  public String description = "";
-  public int useCost;
-  public int price;
-  public int knockBackPower = 0;
-  public boolean stackable = false;
-  public int amount = 1;
-  public int lightRadius;
+  private final List<Entity> inventory = new ArrayList<>();
+  private int value;
+  private int attackValue;
+  private int defenseValue;
+  private String description = "";
+  private int useCost;
+  private int price;
+  private int knockBackPower = 0;
+  private boolean stackable = false;
+  private int amount = 1;
+  private int lightRadius;
 
-  public int type; // usar TYPE_*
+  private int type; // usar TYPE_*
 
   public Entity(GamePanel gp) {
     this.gp = gp;
   }
 
+  // =========================
+  // Helpers de posição/tela
+  // =========================
+
   public int getScreenX() {
-    return worldX - gp.player.worldX + gp.player.screenX;
+    return worldX - gp.player.getWorldX() + gp.player.screenX;
   }
 
   public int getScreenY() {
-    return worldY - gp.player.worldY + gp.player.screenY;
+    return worldY - gp.player.getWorldY() + gp.player.screenY;
   }
 
   public int getLeftX() {
@@ -202,11 +210,11 @@ public class Entity {
   }
 
   public int getCenterX() {
-    return worldX + left1.getWidth() / 2;
+    return worldX + (left1 != null ? left1.getWidth() : gp.tileSize) / 2;
   }
 
   public int getCenterY() {
-    return worldY + up1.getHeight() / 2;
+    return worldY + (up1 != null ? up1.getHeight() : gp.tileSize) / 2;
   }
 
   public int getXdistance(Entity target) {
@@ -248,8 +256,7 @@ public class Entity {
 
   /** hook: sobrescreva em subclasses para definir ações por frame */
   public void setAction() {
-    // no-op por design: método de template. Subclasses que precisarem
-    // de comportamento por frame devem sobrescrever este método.
+    // no-op
   }
 
   /** hook: atualização direcional direta; padrão apenas ajusta a direção atual */
@@ -261,21 +268,21 @@ public class Entity {
 
   /** hook: reação de dano em subclasses (knockback custom etc.) */
   public void damageReaction() {
-    // no-op por design: reação padrão inexistente. Subclasses customizam.
+    // no-op
   }
 
   /** hook: diálogo em NPCs/Jogador */
   public void speak() {
-    // no-op por design: apenas NPCs/Jogador costumam implementar.
+    // no-op
   }
 
   /** hook: interação genérica (abrir baú, alavanca, etc.) */
   public void interact() {
-    // no-op por design: entidades interativas sobrescrevem.
+    // no-op
   }
 
   public void facePlayer() {
-    switch (gp.player.direction) {
+    switch (gp.player.getDirection()) {
       case DIR_UP:
         direction = DIR_DOWN;
         break;
@@ -317,11 +324,11 @@ public class Entity {
 
   /** hook: lógica de drop em morte/abertura */
   public void checkDrop() {
-    // no-op por design: monstros/baús específicos definem seus drops.
+    // no-op
   }
 
   public void dropItem(Entity droppedItem) {
-    for (int i = 0; i < gp.obj[gp.currentMap].length; i++) { // usar o mapa atual
+    for (int i = 0; i < gp.obj[gp.currentMap].length; i++) {
       if (gp.obj[gp.currentMap][i] == null) {
         gp.obj[gp.currentMap][i] = droppedItem;
 
@@ -509,10 +516,14 @@ public class Entity {
   }
 
   public void checkShootOrNot(int rate, int shotInterval) {
-    if (RNG.nextInt(rate) == 0 && projectile != null && !projectile.alive && shotAvailableCounter == shotInterval) {
+    if (RNG.nextInt(rate) == 0
+        && projectile != null
+        && !projectile.isAlive()
+        && shotAvailableCounter == shotInterval) {
+
       projectile.set(worldX, worldY, direction, true, this);
 
-      for (int j = 0; j < gp.projectile[gp.currentMap].length; j++) { // usar o mapa atual
+      for (int j = 0; j < gp.projectile[gp.currentMap].length; j++) {
         if (gp.projectile[gp.currentMap][j] == null) {
           gp.projectile[gp.currentMap][j] = projectile;
           break;
@@ -643,14 +654,15 @@ public class Entity {
   }
 
   public void damagePlayer(int attack) {
-    if (gp.player.invincible)
+    if (gp.player.isInvincible()) {
       return;
+    }
 
-    int damage = attack - gp.player.defense;
+    int damage = attack - gp.player.getDefense();
     String canGuardDirection = getOppositeDirection(direction);
 
-    if (gp.player.guarding && gp.player.direction.equals(canGuardDirection)) {
-      if (gp.player.guardCounter < 10) {
+    if (gp.player.isGuarding() && gp.player.getDirection().equals(canGuardDirection)) {
+      if (gp.player.getGuardCounter() < 10) {
         damage = 0;
         gp.playSE(16);
         setKnockBack(this, gp.player, knockBackPower);
@@ -667,12 +679,12 @@ public class Entity {
     }
 
     if (damage != 0) {
-      gp.player.transparent = true;
+      gp.player.setTransparent(true);
       setKnockBack(gp.player, this, knockBackPower);
     }
 
-    gp.player.life -= damage;
-    gp.player.invincible = true;
+    gp.player.setLife(gp.player.getLife() - damage);
+    gp.player.setInvincible(true);
   }
 
   public void setKnockBack(Entity target, Entity attacker, int knockBackPower) {
@@ -683,10 +695,10 @@ public class Entity {
   }
 
   public boolean inCamera() {
-    return (worldX + gp.tileSize * 5 > gp.player.worldX - gp.player.screenX &&
-        worldX - gp.tileSize < gp.player.worldX + gp.player.screenX &&
-        worldY + gp.tileSize * 5 > gp.player.worldY - gp.player.screenY &&
-        worldY - gp.tileSize < gp.player.worldY + gp.player.screenY);
+    return (worldX + gp.tileSize * 5 > gp.player.getWorldX() - gp.player.screenX &&
+        worldX - gp.tileSize < gp.player.getWorldX() + gp.player.screenX &&
+        worldY + gp.tileSize * 5 > gp.player.getWorldY() - gp.player.screenY &&
+        worldY - gp.tileSize < gp.player.getWorldY() + gp.player.screenY);
   }
 
   // -------- DRAW --------
@@ -721,7 +733,7 @@ public class Entity {
 
     switch (direction) {
       case DIR_UP:
-        if (attacking) {
+        if (attacking && up1 != null) {
           y = baseY - up1.getHeight();
         }
         img = pickFrame(attackUp1, attackUp2, up1, up2);
@@ -732,7 +744,7 @@ public class Entity {
         break;
 
       case DIR_LEFT:
-        if (attacking) {
+        if (attacking && left1 != null) {
           x = baseX - left1.getWidth();
         }
         img = pickFrame(attackLeft1, attackLeft2, left1, left2);
@@ -902,19 +914,11 @@ public class Entity {
   }
 
   private String horizontalDir(int dx) {
-    if (dx > 0) {
-      return DIR_LEFT;
-    } else {
-      return DIR_RIGHT;
-    }
+    return (dx > 0) ? DIR_LEFT : DIR_RIGHT;
   }
 
   private String verticalDir(int dy) {
-    if (dy > 0) {
-      return DIR_UP;
-    } else {
-      return DIR_DOWN;
-    }
+    return (dy > 0) ? DIR_UP : DIR_DOWN;
   }
 
   private void setDirectionAndCheck(String dir) {
@@ -934,16 +938,16 @@ public class Entity {
 
     switch (user.direction) {
       case DIR_UP:
-        nextWorldY = user.getTopY() - gp.player.speed;
+        nextWorldY = user.getTopY() - gp.player.getSpeed();
         break;
       case DIR_DOWN:
-        nextWorldY = user.getBottomY() + gp.player.speed;
+        nextWorldY = user.getBottomY() + gp.player.getSpeed();
         break;
       case DIR_LEFT:
-        nextWorldX = user.getLeftX() - gp.player.speed;
+        nextWorldX = user.getLeftX() - gp.player.getSpeed();
         break;
       case DIR_RIGHT:
-        nextWorldX = user.getRightX() + gp.player.speed;
+        nextWorldX = user.getRightX() + gp.player.getSpeed();
         break;
       default:
         break;
@@ -959,5 +963,589 @@ public class Entity {
       }
     }
     return 999;
+  }
+
+  // =========================
+  // Getters/Setters essenciais
+  // =========================
+
+  public Rectangle getSolidArea() {
+    return solidArea;
+  }
+
+  public Rectangle getAttackArea() {
+    return attackArea;
+  }
+
+  public int getSolidAreaDefaultX() {
+    return solidAreaDefaultX;
+  }
+
+  public void setSolidAreaDefaultX(int solidAreaDefaultX) {
+    this.solidAreaDefaultX = solidAreaDefaultX;
+  }
+
+  public int getSolidAreaDefaultY() {
+    return solidAreaDefaultY;
+  }
+
+  public void setSolidAreaDefaultY(int solidAreaDefaultY) {
+    this.solidAreaDefaultY = solidAreaDefaultY;
+  }
+
+  public boolean isCollision() {
+    return collision;
+  }
+
+  public void setCollision(boolean collision) {
+    this.collision = collision;
+  }
+
+  public String[][] getDialogues() {
+    return dialogues;
+  }
+
+  public Entity getAttacker() {
+    return attacker;
+  }
+
+  public void setAttacker(Entity attacker) {
+    this.attacker = attacker;
+  }
+
+  public Entity getLinkedEntity() {
+    return linkedEntity;
+  }
+
+  public void setLinkedEntity(Entity linkedEntity) {
+    this.linkedEntity = linkedEntity;
+  }
+
+  public boolean isTemp() {
+    return temp;
+  }
+
+  public void setTemp(boolean temp) {
+    this.temp = temp;
+  }
+
+  public int getWorldX() {
+    return worldX;
+  }
+
+  public void setWorldX(int worldX) {
+    this.worldX = worldX;
+  }
+
+  public int getWorldY() {
+    return worldY;
+  }
+
+  public void setWorldY(int worldY) {
+    this.worldY = worldY;
+  }
+
+  public String getDirection() {
+    return direction;
+  }
+
+  public void setDirection(String direction) {
+    this.direction = direction;
+  }
+
+  public int getSpriteNum() {
+    return spriteNum;
+  }
+
+  public void setSpriteNum(int spriteNum) {
+    this.spriteNum = spriteNum;
+  }
+
+  public int getDialogueSet() {
+    return dialogueSet;
+  }
+
+  public void setDialogueSet(int dialogueSet) {
+    this.dialogueSet = dialogueSet;
+  }
+
+  public int getDialogueIndex() {
+    return dialogueIndex;
+  }
+
+  public void setDialogueIndex(int dialogueIndex) {
+    this.dialogueIndex = dialogueIndex;
+  }
+
+  public boolean isCollisionOn() {
+    return collisionOn;
+  }
+
+  public void setCollisionOn(boolean collisionOn) {
+    this.collisionOn = collisionOn;
+  }
+
+  public boolean isInvincible() {
+    return invincible;
+  }
+
+  public void setInvincible(boolean invincible) {
+    this.invincible = invincible;
+  }
+
+  public boolean isAttacking() {
+    return attacking;
+  }
+
+  public void setAttacking(boolean attacking) {
+    this.attacking = attacking;
+  }
+
+  public boolean isAlive() {
+    return alive;
+  }
+
+  public void setAlive(boolean alive) {
+    this.alive = alive;
+  }
+
+  public boolean isDying() {
+    return dying;
+  }
+
+  public void setDying(boolean dying) {
+    this.dying = dying;
+  }
+
+  public boolean isHpBarOn() {
+    return hpBarOn;
+  }
+
+  public void setHpBarOn(boolean hpBarOn) {
+    this.hpBarOn = hpBarOn;
+  }
+
+  public boolean isOnPath() {
+    return onPath;
+  }
+
+  public void setOnPath(boolean onPath) {
+    this.onPath = onPath;
+  }
+
+  public boolean isKnockBack() {
+    return knockBack;
+  }
+
+  public void setKnockBack(boolean knockBack) {
+    this.knockBack = knockBack;
+  }
+
+  public String getKnockBackDirection() {
+    return knockBackDirection;
+  }
+
+  public void setKnockBackDirection(String knockBackDirection) {
+    this.knockBackDirection = knockBackDirection;
+  }
+
+  public boolean isGuarding() {
+    return guarding;
+  }
+
+  public void setGuarding(boolean guarding) {
+    this.guarding = guarding;
+  }
+
+  public boolean isTransparent() {
+    return transparent;
+  }
+
+  public void setTransparent(boolean transparent) {
+    this.transparent = transparent;
+  }
+
+  public boolean isOffBalance() {
+    return offBalance;
+  }
+
+  public void setOffBalance(boolean offBalance) {
+    this.offBalance = offBalance;
+  }
+
+  public Entity getLoot() {
+    return loot;
+  }
+
+  public boolean isOpened() {
+    return opened;
+  }
+
+  public void setOpened(boolean opened) {
+    this.opened = opened;
+  }
+
+  public boolean isInRage() {
+    return inRage;
+  }
+
+  public void setInRage(boolean inRage) {
+    this.inRage = inRage;
+  }
+
+  public boolean isSleep() {
+    return sleep;
+  }
+
+  public void setSleep(boolean sleep) {
+    this.sleep = sleep;
+  }
+
+  public boolean isDrawing() {
+    return drawing;
+  }
+
+  public void setDrawing(boolean drawing) {
+    this.drawing = drawing;
+  }
+
+  public int getSpriteCounter() {
+    return spriteCounter;
+  }
+
+  public void setSpriteCounter(int spriteCounter) {
+    this.spriteCounter = spriteCounter;
+  }
+
+  public int getActionLockCounter() {
+    return actionLockCounter;
+  }
+
+  public void setActionLockCounter(int actionLockCounter) {
+    this.actionLockCounter = actionLockCounter;
+  }
+
+  public int getInvincibleCounter() {
+    return invincibleCounter;
+  }
+
+  public void setInvincibleCounter(int invincibleCounter) {
+    this.invincibleCounter = invincibleCounter;
+  }
+
+  public int getShotAvailableCounter() {
+    return shotAvailableCounter;
+  }
+
+  public void setShotAvailableCounter(int shotAvailableCounter) {
+    this.shotAvailableCounter = shotAvailableCounter;
+  }
+
+  public int getHpBarCounter() {
+    return hpBarCounter;
+  }
+
+  public void setHpBarCounter(int hpBarCounter) {
+    this.hpBarCounter = hpBarCounter;
+  }
+
+  public int getKnockBackCounter() {
+    return knockBackCounter;
+  }
+
+  public void setKnockBackCounter(int knockBackCounter) {
+    this.knockBackCounter = knockBackCounter;
+  }
+
+  public int getGuardCounter() {
+    return guardCounter;
+  }
+
+  public void setGuardCounter(int guardCounter) {
+    this.guardCounter = guardCounter;
+  }
+
+  public int getOffBalanceCounter() {
+    return offBalanceCounter;
+  }
+
+  public void setOffBalanceCounter(int offBalanceCounter) {
+    this.offBalanceCounter = offBalanceCounter;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public int getDefaultSpeed() {
+    return defaultSpeed;
+  }
+
+  public void setDefaultSpeed(int defaultSpeed) {
+    this.defaultSpeed = defaultSpeed;
+  }
+
+  public int getSpeed() {
+    return speed;
+  }
+
+  public void setSpeed(int speed) {
+    this.speed = speed;
+  }
+
+  public int getMaxLife() {
+    return maxLife;
+  }
+
+  public void setMaxLife(int maxLife) {
+    this.maxLife = maxLife;
+  }
+
+  public int getLife() {
+    return life;
+  }
+
+  public void setLife(int life) {
+    this.life = life;
+  }
+
+  public int getMaxMana() {
+    return maxMana;
+  }
+
+  public void setMaxMana(int maxMana) {
+    this.maxMana = maxMana;
+  }
+
+  public int getMana() {
+    return mana;
+  }
+
+  public void setMana(int mana) {
+    this.mana = mana;
+  }
+
+  public int getAmmo() {
+    return ammo;
+  }
+
+  public void setAmmo(int ammo) {
+    this.ammo = ammo;
+  }
+
+  public int getLevel() {
+    return level;
+  }
+
+  public void setLevel(int level) {
+    this.level = level;
+  }
+
+  public int getStrength() {
+    return strength;
+  }
+
+  public void setStrength(int strength) {
+    this.strength = strength;
+  }
+
+  public int getDexterity() {
+    return dexterity;
+  }
+
+  public void setDexterity(int dexterity) {
+    this.dexterity = dexterity;
+  }
+
+  public int getAttack() {
+    return attack;
+  }
+
+  public void setAttack(int attack) {
+    this.attack = attack;
+  }
+
+  public int getDefense() {
+    return defense;
+  }
+
+  public void setDefense(int defense) {
+    this.defense = defense;
+  }
+
+  public int getExp() {
+    return exp;
+  }
+
+  public void setExp(int exp) {
+    this.exp = exp;
+  }
+
+  public int getNextLevelExp() {
+    return nextLevelExp;
+  }
+
+  public void setNextLevelExp(int nextLevelExp) {
+    this.nextLevelExp = nextLevelExp;
+  }
+
+  public int getCoin() {
+    return coin;
+  }
+
+  public void setCoin(int coin) {
+    this.coin = coin;
+  }
+
+  public int getMotion1Duration() {
+    return motion1Duration;
+  }
+
+  public void setMotion1Duration(int motion1Duration) {
+    this.motion1Duration = motion1Duration;
+  }
+
+  public int getMotion2Duration() {
+    return motion2Duration;
+  }
+
+  public void setMotion2Duration(int motion2Duration) {
+    this.motion2Duration = motion2Duration;
+  }
+
+  public Entity getCurrentWeapon() {
+    return currentWeapon;
+  }
+
+  public void setCurrentWeapon(Entity currentWeapon) {
+    this.currentWeapon = currentWeapon;
+  }
+
+  public Entity getCurrentShield() {
+    return currentShield;
+  }
+
+  public void setCurrentShield(Entity currentShield) {
+    this.currentShield = currentShield;
+  }
+
+  public Entity getCurrentLight() {
+    return currentLight;
+  }
+
+  public void setCurrentLight(Entity currentLight) {
+    this.currentLight = currentLight;
+  }
+
+  public Projectile getProjectile() {
+    return projectile;
+  }
+
+  public void setProjectile(Projectile projectile) {
+    this.projectile = projectile;
+  }
+
+  public boolean isBoss() {
+    return boss;
+  }
+
+  public void setBoss(boolean boss) {
+    this.boss = boss;
+  }
+
+  public List<Entity> getInventory() {
+    return inventory;
+  }
+
+  public int getValue() {
+    return value;
+  }
+
+  public void setValue(int value) {
+    this.value = value;
+  }
+
+  public int getAttackValue() {
+    return attackValue;
+  }
+
+  public void setAttackValue(int attackValue) {
+    this.attackValue = attackValue;
+  }
+
+  public int getDefenseValue() {
+    return defenseValue;
+  }
+
+  public void setDefenseValue(int defenseValue) {
+    this.defenseValue = defenseValue;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public int getUseCost() {
+    return useCost;
+  }
+
+  public void setUseCost(int useCost) {
+    this.useCost = useCost;
+  }
+
+  public int getPrice() {
+    return price;
+  }
+
+  public void setPrice(int price) {
+    this.price = price;
+  }
+
+  public int getKnockBackPower() {
+    return knockBackPower;
+  }
+
+  public void setKnockBackPower(int knockBackPower) {
+    this.knockBackPower = knockBackPower;
+  }
+
+  public boolean isStackable() {
+    return stackable;
+  }
+
+  public void setStackable(boolean stackable) {
+    this.stackable = stackable;
+  }
+
+  public int getAmount() {
+    return amount;
+  }
+
+  public void setAmount(int amount) {
+    this.amount = amount;
+  }
+
+  public int getLightRadius() {
+    return lightRadius;
+  }
+
+  public void setLightRadius(int lightRadius) {
+    this.lightRadius = lightRadius;
+  }
+
+  public int getType() {
+    return type;
+  }
+
+  public void setType(int type) {
+    this.type = type;
   }
 }
