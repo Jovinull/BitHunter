@@ -5,26 +5,25 @@ import main.GamePanel;
 
 public class OBJ_ManaCrystal extends Entity {
 
-  GamePanel gp;
   public static final String objName = "Cristal de Mana";
 
   public OBJ_ManaCrystal(GamePanel gp) {
     super(gp);
-    this.gp = gp;
 
-    type = TYPE_PICKUP_ONLY;
-    name = objName;
-    value = 1;
+    setType(TYPE_PICKUP_ONLY);
+    setName(objName);
+    setValue(1);
+
     down1 = setup("/objects/manacrystal_full", gp.tileSize, gp.tileSize);
     image = setup("/objects/manacrystal_full", gp.tileSize, gp.tileSize);
     image2 = setup("/objects/manacrystal_blank", gp.tileSize, gp.tileSize);
   }
 
+  @Override
   public boolean use(Entity entity) {
-
     gp.playSE(2);
-    gp.ui.addMessage("Mana +" + value);
-    gp.player.mana += value;
+    gp.ui.addMessage("Mana +" + getValue());
+    gp.player.setMana(gp.player.getMana() + getValue());
     return true;
   }
 }

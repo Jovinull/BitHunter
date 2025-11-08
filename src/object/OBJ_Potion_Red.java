@@ -5,33 +5,30 @@ import main.GamePanel;
 
 public class OBJ_Potion_Red extends Entity {
 
-  GamePanel gp;
   public static final String objName = "Poção Vermelha";
 
   public OBJ_Potion_Red(GamePanel gp) {
     super(gp);
 
-    this.gp = gp;
+    setType(TYPE_CONSUMABLE);
+    setName(objName);
+    setValue(5);
 
-    type = TYPE_CONSUMABLE;
-    name = objName;
-    value = 5;
     down1 = setup("/objects/potion_red", gp.tileSize, gp.tileSize);
-    description = "[" + name + "]\nRestaura sua vida em " + value + ".";
-    price = 25;
-    stackable = true;
+    setDescription("[" + getName() + "]\nRestaura sua vida em " + getValue() + ".");
+    setPrice(25);
+    setStackable(true);
 
     setDialogue();
   }
 
   public void setDialogue() {
-
-    dialogues[0][0] = "Você bebe a " + name + "!\n"
-        + "Sua vida foi restaurada em " + value + ".";
+    String[][] d = getDialogues();
+    d[0][0] = "Você bebe a " + getName() + "!\nSua vida foi restaurada em " + getValue() + ".";
   }
 
+  @Override
   public boolean use(Entity entity) {
-
     startDialogue(this, 0);
     gp.playSE(2);
     return true;

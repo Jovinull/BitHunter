@@ -10,16 +10,20 @@ public class OBJ_Pickaxe extends Entity {
   public OBJ_Pickaxe(GamePanel gp) {
     super(gp);
 
-    type = TYPE_PICKAXE;
-    name = objName;
+    setType(TYPE_PICKAXE);
+    setName(objName);
+
     down1 = setup("/objects/pickaxe", gp.tileSize, gp.tileSize);
-    attackValue = 2;
-    attackArea.width = 30;
-    attackArea.height = 30;
-    description = "[Picareta]\nVocê vai adorar cavar \ncom isso!.";
-    price = 75;
-    knockBackPower = 10;
-    motion1Duration = 10;
-    motion2Duration = 20;
+
+    setAttackValue(2);
+    getAttackArea().width = 30;
+    getAttackArea().height = 30;
+
+    setDescription("[Picareta]\nVocê vai adorar cavar \ncom isso!.");
+    setPrice(75);
+    setKnockBackPower(10);
+
+    setMotion1Duration(10);
+    setMotion2Duration(20);
   }
 }

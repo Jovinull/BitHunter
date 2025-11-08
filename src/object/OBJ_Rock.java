@@ -8,24 +8,24 @@ import main.GamePanel;
 
 public class OBJ_Rock extends Projectile {
 
-  GamePanel gp;
   public static final String objName = "Pedra";
 
   public OBJ_Rock(GamePanel gp) {
     super(gp);
-    this.gp = gp;
 
-    name = objName;
-    speed = 8;
-    maxLife = 80;
-    life = maxLife;
-    attack = 2;
-    useCost = 1;
-    alive = false;
-    getImage();
+    setName(objName);
+    setSpeed(8);
+    setMaxLife(80);
+    setLife(getMaxLife());
+    setAttack(2);
+    setUseCost(1);
+    setAlive(false);
+
+    loadSprites();
   }
 
-  public void getImage() {
+  private void loadSprites() {
+    // As sprites da pedra usam a mesma imagem para todas as direções
     up1 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
     up2 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
     down1 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
@@ -36,37 +36,33 @@ public class OBJ_Rock extends Projectile {
     right2 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
   }
 
+  @Override
   public boolean haveResource(Entity user) {
-
-    boolean haveResource = false;
-    if (user.ammo >= useCost) {
-      haveResource = true;
-    }
-    return haveResource;
+    return user.getAmmo() >= getUseCost();
   }
 
+  @Override
   public void subtractResource(Entity user) {
-
-    user.ammo -= useCost;
+    user.setAmmo(user.getAmmo() - getUseCost());
   }
 
+  @Override
   public Color getParticleColor() {
-    Color color = new Color(40, 50, 0);
-    return color;
+    return new Color(40, 50, 0);
   }
 
+  @Override
   public int getParticleSize() {
-    int size = 10;
-    return size;
+    return 10;
   }
 
+  @Override
   public int getParticleSpeed() {
-    int speed = 1;
-    return speed;
+    return 1;
   }
 
+  @Override
   public int getParticleMaxLife() {
-    int maxLife = 20;
-    return maxLife;
+    return 20;
   }
 }

@@ -10,11 +10,11 @@ public class OBJ_Lantern extends Entity {
   public OBJ_Lantern(GamePanel gp) {
     super(gp);
 
-    type = TYPE_LIGHT;
-    name = objName;
+    setType(TYPE_LIGHT);
+    setName(objName);
     down1 = setup("/objects/lantern", gp.tileSize, gp.tileSize);
-    description = "[" + name + "]\nIlumina seus arredores.";
-    price = 200;
-    lightRadius = 250;
+    setDescription("[" + getName() + "]\nIlumina seus arredores.");
+    setPrice(200);
+    setLightRadius(250);
   }
 }
