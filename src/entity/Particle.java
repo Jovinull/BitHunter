@@ -7,49 +7,49 @@ import main.GamePanel;
 
 public class Particle extends Entity {
 
-  Entity generator;
-  Color color;
-  int size;
-  int xd;
-  int yd;
+  private final Color color;
+  private final int size;
+  private int xd;
+  private int yd;
 
   public Particle(GamePanel gp, Entity generator, Color color, int size, int speed, int maxLife, int xd, int yd) {
     super(gp);
 
-    this.generator = generator;
     this.color = color;
     this.size = size;
-    this.speed = speed;
-    this.maxLife = maxLife;
     this.xd = xd;
     this.yd = yd;
 
-    life = maxLife;
+    setSpeed(speed);
+    setMaxLife(maxLife);
+    setLife(maxLife);
+
     int offset = (gp.tileSize / 2) - (size / 2);
-    worldX = generator.worldX + offset;
-    worldY = generator.worldY + offset;
+    setWorldX(generator.getWorldX() + offset);
+    setWorldY(generator.getWorldY() + offset);
   }
 
+  @Override
   public void update() {
 
-    life--;
+    setLife(getLife() - 1);
 
-    if (life < maxLife / 3) {
+    if (getLife() < getMaxLife() / 3) {
       yd++;
     }
 
-    worldX += xd * speed;
-    worldY += yd * speed;
+    setWorldX(getWorldX() + xd * getSpeed());
+    setWorldY(getWorldY() + yd * getSpeed());
 
-    if (life == 0) {
-      alive = false;
+    if (getLife() == 0) {
+      setAlive(false);
     }
   }
 
+  @Override
   public void draw(Graphics2D g2) {
-
-    int screenX = worldX - gp.player.worldX + gp.player.screenX;
-    int screenY = worldY - gp.player.worldY + gp.player.screenY;
+    int screenX = getScreenX();
+    int screenY = getScreenY();
 
     g2.setColor(color);
     g2.fillRect(screenX, screenY, size, size);
