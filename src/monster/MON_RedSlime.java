@@ -11,34 +11,33 @@ import object.OBJ_Rock;
 
 public class MON_RedSlime extends Entity {
 
-  GamePanel gp;
-
   public MON_RedSlime(GamePanel gp) {
     super(gp);
 
-    this.gp = gp;
+    // Atributos base
+    setType(TYPE_MONSTER);
+    setName("Slime Vermelho");
+    setDefaultSpeed(2);
+    setSpeed(getDefaultSpeed());
+    setMaxLife(8);
+    setLife(getMaxLife());
+    setAttack(7);
+    setDefense(1);
+    setExp(5);
+    setProjectile(new OBJ_Rock(gp));
 
-    type = TYPE_MONSTER;
-    name = "Slime Vermelho";
-    defaultSpeed = 2;
-    speed = defaultSpeed;
-    maxLife = 8;
-    life = maxLife;
-    attack = 7;
-    defense = 1;
-    exp = 5;
-    projectile = new OBJ_Rock(gp);
-
-    solidArea.x = 3;
-    solidArea.y = 18;
-    solidArea.width = 42;
-    solidArea.height = 30;
-    solidAreaDefaultX = solidArea.x;
-    solidAreaDefaultY = solidArea.y;
+    // Colisão
+    getSolidArea().x = 3;
+    getSolidArea().y = 18;
+    getSolidArea().width = 42;
+    getSolidArea().height = 30;
+    setSolidAreaDefaultX(getSolidArea().x);
+    setSolidAreaDefaultY(getSolidArea().y);
 
     getImage();
   }
 
+  @Override
   public void getImage() {
     up1 = setup("/monster/redslime_down_1", gp.tileSize, gp.tileSize);
     up2 = setup("/monster/redslime_down_2", gp.tileSize, gp.tileSize);
@@ -50,46 +49,38 @@ public class MON_RedSlime extends Entity {
     right2 = setup("/monster/redslime_down_2", gp.tileSize, gp.tileSize);
   }
 
+  @Override
   public void setAction() {
-
-    if (onPath == true) {
-
+    if (isOnPath()) {
       // Verifica se para de perseguir
       checkStopChasingOrNot(gp.player, 15, 100);
-
-      // Faz o monstro perseguir o jogador
+      // Persegue o jogador
       searchPath(getGoalCol(gp.player), getGoalRow(gp.player));
-
-      // Verifica se atira projétil
-      checkShootOrNot(150, 30); // Atira com mais frequência
-    }
-
-    else {
+      // Dispara projétil com mais frequência
+      checkShootOrNot(150, 30);
+    } else {
       // Verifica se começa a perseguir
       checkStartChasingOrNot(gp.player, 5, 100);
-
-      // Escolhe uma direção aleatória
+      // Direção aleatória
       getRandomDirection(120);
     }
   }
 
+  @Override
   public void damageReaction() {
-    actionLockCounter = 0;
-    onPath = true; // Começa a perseguir ao ser atingido
+    setActionLockCounter(0);
+    setOnPath(true); // Começa a perseguir ao ser atingido
   }
 
+  @Override
   public void checkDrop() {
     int i = new Random().nextInt(100) + 1;
 
     if (i < 40) {
       dropItem(new OBJ_Coin_Bronze(gp));
-    }
-
-    if (i >= 40 && i < 70) {
+    } else if (i < 70) {
       dropItem(new OBJ_Heart(gp));
-    }
-
-    if (i >= 70 && i <= 100) {
+    } else {
       dropItem(new OBJ_ManaCrystal(gp));
     }
   }
