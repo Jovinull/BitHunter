@@ -8,8 +8,8 @@ import object.OBJ_Door_Iron;
 
 public class CutsceneManager {
 
-  GamePanel gp;
-  Graphics2D g2;
+  private final GamePanel gp;
+  private Graphics2D g2;
   public int sceneNum;
   public int scenePhase;
 
@@ -26,8 +26,10 @@ public class CutsceneManager {
 
     switch (sceneNum) {
       case skeletonLord:
-
         scene_skeletonLord();
+        break;
+      default:
+        // nenhuma cena ativa
         break;
     }
   }
@@ -38,54 +40,48 @@ public class CutsceneManager {
 
       gp.bossBattleOn = true;
 
-      // Shut the iron door
-      for (int i = 0; i < gp.obj[1].length; i++) {
-
+      // Fechar a porta de ferro
+      for (int i = 0; i < gp.obj[gp.currentMap].length; i++) {
         if (gp.obj[gp.currentMap][i] == null) {
           gp.obj[gp.currentMap][i] = new OBJ_Door_Iron(gp);
-          gp.obj[gp.currentMap][i].worldX = gp.tileSize * 25;
-          gp.obj[gp.currentMap][i].worldY = gp.tileSize * 28;
-          gp.obj[gp.currentMap][i].temp = true;
+          gp.obj[gp.currentMap][i].setWorldX(gp.tileSize * 25);
+          gp.obj[gp.currentMap][i].setWorldY(gp.tileSize * 28);
+          gp.obj[gp.currentMap][i].setTemp(true);
           gp.playSE(21);
           break;
         }
       }
 
-      // Search a vacant slot for the dummy
-      for (int i = 0; i < gp.npc[1].length; i++) {
-
+      // Slot vago para o dummy
+      for (int i = 0; i < gp.npc[gp.currentMap].length; i++) {
         if (gp.npc[gp.currentMap][i] == null) {
           gp.npc[gp.currentMap][i] = new PlayerDummy(gp);
-          gp.npc[gp.currentMap][i].worldX = gp.player.worldX;
-          gp.npc[gp.currentMap][i].worldY = gp.player.worldY;
-          gp.npc[gp.currentMap][i].direction = gp.player.direction;
+          gp.npc[gp.currentMap][i].setWorldX(gp.player.getWorldX());
+          gp.npc[gp.currentMap][i].setWorldY(gp.player.getWorldY());
+          gp.npc[gp.currentMap][i].setDirection(gp.player.getDirection());
           break;
         }
       }
 
-      gp.player.drawing = false;
-
+      gp.player.setDrawing(false);
       scenePhase++;
     }
 
     if (scenePhase == 1) {
+      gp.player.setWorldY(gp.player.getWorldY() - 2);
 
-      gp.player.worldY -= 2;
-
-      if (gp.player.worldY < gp.tileSize * 16) {
+      if (gp.player.getWorldY() < gp.tileSize * 16) {
         scenePhase++;
       }
     }
 
     if (scenePhase == 2) {
+      // Procurar o boss
+      for (int i = 0; i < gp.monster[gp.currentMap].length; i++) {
+        if (gp.monster[gp.currentMap][i] != null
+            && MON_SkeletonLord.monName.equals(gp.monster[gp.currentMap][i].getName())) {
 
-      // Search the boss
-      for (int i = 0; i < gp.monster[1].length; i++) {
-
-        if (gp.monster[gp.currentMap][i] != null &&
-            gp.monster[gp.currentMap][i].name == MON_SkeletonLord.monName) {
-
-          gp.monster[gp.currentMap][i].sleep = false;
+          gp.monster[gp.currentMap][i].setSleep(false);
           gp.ui.npc = gp.monster[gp.currentMap][i];
           scenePhase++;
           break;
@@ -94,34 +90,32 @@ public class CutsceneManager {
     }
 
     if (scenePhase == 3) {
-
-      // The boss speaks
+      // O boss fala
       gp.ui.drawDialogueScreen();
     }
 
     if (scenePhase == 4) {
-      // Search the dummy
-      for (int i = 0; i < gp.npc[1].length; i++) {
-
-        if (gp.npc[gp.currentMap][i] != null && gp.npc[gp.currentMap][i].name.equals(PlayerDummy.npcName)) {
-          // Restore the player position
-          gp.player.worldX = gp.npc[gp.currentMap][i].worldX;
-          gp.player.worldY = gp.npc[gp.currentMap][i].worldY;
-          // Delete the dummy
+      // Procurar o dummy
+      for (int i = 0; i < gp.npc[gp.currentMap].length; i++) {
+        if (gp.npc[gp.currentMap][i] != null && PlayerDummy.NPC_NAME.equals(gp.npc[gp.currentMap][i].getName())) {
+          // Restaurar posição do player
+          gp.player.setWorldX(gp.npc[gp.currentMap][i].getWorldX());
+          gp.player.setWorldY(gp.npc[gp.currentMap][i].getWorldY());
+          // Remover o dummy
           gp.npc[gp.currentMap][i] = null;
           break;
         }
       }
 
-      // Start drawing the player
-      gp.player.drawing = true;
+      // Voltar a desenhar o player
+      gp.player.setDrawing(true);
 
       // Reset
       sceneNum = NA;
       scenePhase = 0;
       gp.gameState = gp.playState;
 
-      // Change the music
+      // Trocar música
       gp.stopMusic();
       gp.playMusic(22);
     }
