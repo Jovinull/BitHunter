@@ -14,11 +14,11 @@ public class NpcOldMan extends Entity {
   public NpcOldMan(GamePanel gp) {
     super(gp);
 
-    direction = "down";
+    direction = DIR_DOWN;
     speed = 1;
     defaultSpeed = speed;
 
-    solidArea = new Rectangle();
+    // solidArea é final -> apenas setar
     solidArea.x = 8;
     solidArea.y = 16;
     solidAreaDefaultX = solidArea.x;
@@ -72,7 +72,6 @@ public class NpcOldMan extends Entity {
       }
       return;
     }
-
     getRandomDirection(120);
   }
 

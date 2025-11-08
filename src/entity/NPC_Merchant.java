@@ -16,10 +16,10 @@ public class NPC_Merchant extends Entity {
   public NPC_Merchant(GamePanel gp) {
     super(gp);
 
-    direction = "down";
+    direction = DIR_DOWN;
     speed = 1;
 
-    solidArea = new Rectangle();
+    // solidArea é final -> apenas setar
     solidArea.x = 8;
     solidArea.y = 16;
     solidAreaDefaultX = solidArea.x;
@@ -52,7 +52,6 @@ public class NPC_Merchant extends Entity {
   }
 
   public void setItems() {
-
     inventory.add(new OBJ_Potion_Red(gp));
     inventory.add(new OBJ_Key(gp));
     inventory.add(new OBJ_Sword_Normal(gp));
@@ -62,8 +61,8 @@ public class NPC_Merchant extends Entity {
     inventory.add(new OBJ_Lantern(gp));
   }
 
+  @Override
   public void speak() {
-
     facePlayer();
     gp.gameState = gp.tradeState;
     gp.ui.npc = this;

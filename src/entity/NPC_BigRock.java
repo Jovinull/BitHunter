@@ -2,7 +2,6 @@ package entity;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.Random;
 
 import main.GamePanel;
 import object.OBJ_Door_Iron;
@@ -17,10 +16,10 @@ public class NPC_BigRock extends Entity {
     super(gp);
 
     name = npcName;
-    direction = "down";
+    direction = DIR_DOWN;
     speed = 4;
 
-    solidArea = new Rectangle();
+    // solidArea é final na Entity -> apenas configuramos
     solidArea.x = 2;
     solidArea.y = 6;
     solidAreaDefaultX = solidArea.x;
@@ -54,51 +53,46 @@ public class NPC_BigRock extends Entity {
   public void setAction() {
   }
 
+  @Override
   public void update() {
   }
 
+  @Override
   public void speak() {
-
-    // Do this character specific stuff
     facePlayer();
     startDialogue(this, dialogueSet);
-
     dialogueSet++;
-
     if (dialogues[dialogueSet][0] == null) {
       dialogueSet--;
     }
   }
 
   public void move(String d) {
-
-    this.direction = d;
-
+    this.direction = d; // já vem como DIR_*
     checkCollision();
 
-    if (collisionOn == false) {
-
+    if (!collisionOn) {
       switch (direction) {
-        case "up":
+        case DIR_UP:
           worldY -= speed;
           break;
-        case "down":
+        case DIR_DOWN:
           worldY += speed;
           break;
-        case "left":
+        case DIR_LEFT:
           worldX -= speed;
           break;
-        case "right":
+        case DIR_RIGHT:
           worldX += speed;
+          break;
+        default:
           break;
       }
     }
-
     detectPlate();
   }
 
   public void detectPlate() {
-
     ArrayList<InteractiveTile> plateList = new ArrayList<>();
     ArrayList<Entity> rockList = new ArrayList<>();
 
@@ -114,7 +108,7 @@ public class NPC_BigRock extends Entity {
     // Create a rock list
     for (int i = 0; i < gp.npc[1].length; i++) {
       if (gp.npc[gp.currentMap][i] != null &&
-          gp.npc[gp.currentMap][i].name.equals(NPC_BigRock.npcName)) {
+          npcName.equals(gp.npc[gp.currentMap][i].name)) {
         rockList.add(gp.npc[gp.currentMap][i]);
       }
     }
@@ -123,7 +117,6 @@ public class NPC_BigRock extends Entity {
 
     // Scan the plate list
     for (int i = 0; i < plateList.size(); i++) {
-
       int xDistance = Math.abs(worldX - plateList.get(i).worldX);
       int yDistance = Math.abs(worldY - plateList.get(i).worldY);
       int distance = Math.max(xDistance, yDistance);
@@ -133,26 +126,22 @@ public class NPC_BigRock extends Entity {
           linkedEntity = plateList.get(i);
           gp.playSE(3);
         }
-      } else {
-        if (linkedEntity == plateList.get(i)) {
-          linkedEntity = null;
-        }
+      } else if (linkedEntity == plateList.get(i)) {
+        linkedEntity = null;
       }
     }
 
-    // Scan the rock list
+    // Count rocks on plates
     for (int i = 0; i < rockList.size(); i++) {
-      // Count the rock on the plate
-      if (rockList.get(i).linkedEntity != null) {
+      if (rockList.get(i).linkedEntity != null)
         count++;
-      }
     }
 
-    // If all the rocks are on the plates, the iron door opens
+    // If all rocks are on plates, open iron door
     if (count == rockList.size()) {
       for (int i = 0; i < gp.obj[1].length; i++) {
         if (gp.obj[gp.currentMap][i] != null &&
-            gp.obj[gp.currentMap][i].name.equals(OBJ_Door_Iron.objName)) {
+            OBJ_Door_Iron.objName.equals(gp.obj[gp.currentMap][i].name)) {
           gp.obj[gp.currentMap][i] = null;
           gp.playSE(21);
         }
