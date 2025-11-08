@@ -16,16 +16,17 @@ public class NPC_Merchant extends Entity {
   public NPC_Merchant(GamePanel gp) {
     super(gp);
 
-    direction = DIR_DOWN;
-    speed = 1;
+    setDirection(DIR_DOWN);
+    setSpeed(1);
 
-    // solidArea é final -> apenas setar
-    solidArea.x = 8;
-    solidArea.y = 16;
-    solidAreaDefaultX = solidArea.x;
-    solidAreaDefaultY = solidArea.y;
-    solidArea.width = 32;
-    solidArea.height = 32;
+    // solidArea é final -> apenas configurar via getter
+    Rectangle sa = getSolidArea();
+    sa.x = 8;
+    sa.y = 16;
+    setSolidAreaDefaultX(sa.x);
+    setSolidAreaDefaultY(sa.y);
+    sa.width = 32;
+    sa.height = 32;
 
     getImage();
     setDialogue();
@@ -33,6 +34,7 @@ public class NPC_Merchant extends Entity {
   }
 
   public void getImage() {
+    // Sprites continuam protegidos na Entity, então pode usar direto
     up1 = setup("/npc/merchant/merchant_down_1", gp.tileSize, gp.tileSize);
     up2 = setup("/npc/merchant/merchant_down_2", gp.tileSize, gp.tileSize);
     down1 = setup("/npc/merchant/merchant_down_1", gp.tileSize, gp.tileSize);
@@ -44,21 +46,23 @@ public class NPC_Merchant extends Entity {
   }
 
   public void setDialogue() {
-    dialogues[0][0] = "Hehe, então me encontrou.\nTenho mercadorias de primeira.\nQuer fazer negócio?";
-    dialogues[1][0] = "Volte sempre, hehe!";
-    dialogues[2][0] = "Você precisa de mais moedas para comprar isso!";
-    dialogues[3][0] = "Você não pode carregar mais itens!";
-    dialogues[4][0] = "Você não pode vender um item equipado!";
+    String[][] d = getDialogues();
+    d[0][0] = "Hehe, então me encontrou.\nTenho mercadorias de primeira.\nQuer fazer negócio?";
+    d[1][0] = "Volte sempre, hehe!";
+    d[2][0] = "Você precisa de mais moedas para comprar isso!";
+    d[3][0] = "Você não pode carregar mais itens!";
+    d[4][0] = "Você não pode vender um item equipado!";
   }
 
   public void setItems() {
-    inventory.add(new OBJ_Potion_Red(gp));
-    inventory.add(new OBJ_Key(gp));
-    inventory.add(new OBJ_Sword_Normal(gp));
-    inventory.add(new OBJ_Axe(gp));
-    inventory.add(new OBJ_Shield_Wood(gp));
-    inventory.add(new OBJ_Shield_Blue(gp));
-    inventory.add(new OBJ_Lantern(gp));
+    var inv = getInventory();
+    inv.add(new OBJ_Potion_Red(gp));
+    inv.add(new OBJ_Key(gp));
+    inv.add(new OBJ_Sword_Normal(gp));
+    inv.add(new OBJ_Axe(gp));
+    inv.add(new OBJ_Shield_Wood(gp));
+    inv.add(new OBJ_Shield_Blue(gp));
+    inv.add(new OBJ_Lantern(gp));
   }
 
   @Override
