@@ -1,56 +1,66 @@
 package object;
 
+import java.awt.Rectangle;
+
 import entity.Entity;
 import main.GamePanel;
 
 public class OBJ_Chest extends Entity {
 
-  GamePanel gp;
   public static final String objName = "Baú";
 
   public OBJ_Chest(GamePanel gp) {
     super(gp);
-    this.gp = gp;
 
-    type = TYPE_OBSTACLE;
-    name = objName;
+    setType(TYPE_OBSTACLE);
+    setName(objName);
+
+    // sprites (protegidos em Entity)
     image = setup("/objects/chest", gp.tileSize, gp.tileSize);
     image2 = setup("/objects/chest_opened", gp.tileSize, gp.tileSize);
     down1 = image;
-    collision = true;
 
-    solidArea.x = 4;
-    solidArea.y = 16;
-    solidArea.width = 40;
-    solidArea.height = 32;
-    solidAreaDefaultX = solidArea.x;
-    solidAreaDefaultY = solidArea.y;
+    setCollision(true);
+
+    // solidArea via getter + defaults via setters
+    Rectangle sa = getSolidArea();
+    sa.x = 4;
+    sa.y = 16;
+    sa.width = 40;
+    sa.height = 32;
+    setSolidAreaDefaultX(sa.x);
+    setSolidAreaDefaultY(sa.y);
   }
 
+  @Override
   public void setLoot(Entity loot) {
-    this.loot = loot;
-
+    super.setLoot(loot);
     setDialogue();
   }
 
   public void setDialogue() {
+    String lootName = (getLoot() != null) ? getLoot().getName() : "???";
+    String[][] d = getDialogues();
 
-    dialogues[0][0] = "Você abre o baú e encontra um " + loot.name + "!" + "\n...Mas você não pode carregar mais nada!";
-    dialogues[1][0] = "Você abre o baú e encontra um " + loot.name + "!" + "\nVocê obteve " + loot.name + "!";
-    dialogues[2][0] = "Está vazio.";
+    d[0][0] = "Você abre o baú e encontra um " + lootName + "!" +
+        "\n...Mas você não pode carregar mais nada!";
+    d[1][0] = "Você abre o baú e encontra um " + lootName + "!" +
+        "\nVocê obteve " + lootName + "!";
+    d[2][0] = "Está vazio.";
   }
 
+  @Override
   public void interact() {
-
-    if (opened == false) {
+    if (!isOpened()) {
       gp.playSE(3);
 
-      if (gp.player.canObtainItem(loot) == false) {
+      if (!gp.player.canObtainItem(getLoot())) {
         startDialogue(this, 0);
       } else {
         startDialogue(this, 1);
-        down1 = image2;
-        opened = true;
+        // aplica aparência aberta
+        down1 = image2; // campos protegidos em Entity
+        setOpened(true);
       }
     } else {
       startDialogue(this, 2);

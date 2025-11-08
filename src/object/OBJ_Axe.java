@@ -1,5 +1,7 @@
 package object;
 
+import java.awt.Rectangle;
+
 import entity.Entity;
 import main.GamePanel;
 
@@ -10,16 +12,23 @@ public class OBJ_Axe extends Entity {
   public OBJ_Axe(GamePanel gp) {
     super(gp);
 
-    type = TYPE_AXE;
-    name = objName;
+    setType(TYPE_AXE);
+    setName(objName);
+
+    // sprite
     down1 = setup("/objects/axe", gp.tileSize, gp.tileSize);
-    attackValue = 2;
-    attackArea.width = 30;
-    attackArea.height = 30;
-    description = "[" + name + "]\nUm pouco enferrujado, \nmas ainda corta algumas \nárvores.";
-    price = 75;
-    knockBackPower = 10;
-    motion1Duration = 20;
-    motion2Duration = 40;
+
+    // atributos de combate
+    setAttackValue(2);
+    Rectangle ar = getAttackArea();
+    ar.width = 30;
+    ar.height = 30;
+
+    setDescription("[" + getName() + "]\nUm pouco enferrujado, \nmas ainda corta algumas \nárvores.");
+    setPrice(75);
+    setKnockBackPower(10);
+
+    setMotion1Duration(20);
+    setMotion2Duration(40);
   }
 }
