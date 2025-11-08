@@ -255,6 +255,10 @@ public class Entity {
     return down1;
   }
 
+  public void getImage() {
+    // no-op
+  }
+
   public void resetCounter() {
     actionLockCounter = 0;
     invincibleCounter = 0;
