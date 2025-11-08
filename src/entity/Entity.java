@@ -265,6 +265,25 @@ public class Entity {
   public void interact() {
   } // hook
 
+  public void facePlayer() {
+    switch (gp.player.direction) {
+      case DIR_UP:
+        direction = DIR_DOWN;
+        break;
+      case DIR_DOWN:
+        direction = DIR_UP;
+        break;
+      case DIR_LEFT:
+        direction = DIR_RIGHT;
+        break;
+      case DIR_RIGHT:
+        direction = DIR_LEFT;
+        break;
+      default:
+        break;
+    }
+  }
+
   public void startDialogue(Entity entity, int setNum) {
     gp.gameState = gp.dialogueState;
     gp.ui.npc = entity;
