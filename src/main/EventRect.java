@@ -21,4 +21,13 @@ public class EventRect extends Rectangle {
         && this.eventRectDefaultY == other.eventRectDefaultY
         && this.eventDone == other.eventDone;
   }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + eventRectDefaultX;
+    result = 31 * result + eventRectDefaultY;
+    result = 31 * result + (eventDone ? 1 : 0);
+    return result;
+  }
 }
