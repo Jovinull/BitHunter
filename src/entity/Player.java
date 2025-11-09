@@ -22,10 +22,11 @@ public class Player extends Entity {
   public final int screenX;
   public final int screenY;
   private int standCounter = 0;
-  public boolean attackCanceled = false;
-  public boolean lightUpdated = false;
 
-  public boolean debugCollision = false;
+  // S1104: tornar não-público; fornecer accessors se necessário
+  private boolean attackCanceled = false;
+  private boolean lightUpdated = false;
+  private boolean debugCollision = false;
 
   public Player(GamePanel gp, KeyHandler keyH) {
     super(gp);
@@ -104,7 +105,7 @@ public class Player extends Entity {
     setAttacking(false);
     setGuarding(false);
     setKnockBack(false);
-    lightUpdated = true;
+    setLightUpdated(true);
   }
 
   public void setItems() {
@@ -158,6 +159,8 @@ public class Player extends Entity {
     return currentShieldSlot;
   }
 
+  // S1161
+  @Override
   public void getImage() {
     up1 = setup("/player/Walking sprites/boy_up_1", gp.tileSize, gp.tileSize);
     up2 = setup("/player/Walking sprites/boy_up_2", gp.tileSize, gp.tileSize);
@@ -222,137 +225,161 @@ public class Player extends Entity {
     guardRight = setup("/player/Guarding sprites/boy_guard_right", gp.tileSize, gp.tileSize);
   }
 
+  // =========================
+  // UPDATE (S3776 reduzida)
+  // =========================
   @Override
   public void update() {
 
     if (isKnockBack()) {
-
-      setCollisionOn(false);
-      gp.cChecker.checkTile(this);
-      gp.cChecker.checkObject(this, true);
-      gp.cChecker.checkEntity(this, gp.npc);
-      gp.cChecker.checkEntity(this, gp.monster);
-      gp.cChecker.checkEntity(this, gp.iTile);
-
-      if (isCollisionOn()) {
-        setKnockBackCounter(0);
-        setKnockBack(false);
-        setSpeed(getDefaultSpeed());
-      } else {
-        switch (getKnockBackDirection()) {
-          case DIR_UP:
-            setWorldY(getWorldY() - getSpeed());
-            break;
-          case DIR_DOWN:
-            setWorldY(getWorldY() + getSpeed());
-            break;
-          case DIR_LEFT:
-            setWorldX(getWorldX() - getSpeed());
-            break;
-          case DIR_RIGHT:
-            setWorldX(getWorldX() + getSpeed());
-            break;
-          default:
-            break;
-        }
-      }
-
-      setKnockBackCounter(getKnockBackCounter() + 1);
-      if (getKnockBackCounter() == 10) {
-        setKnockBackCounter(0);
-        setKnockBack(false);
-        setSpeed(getDefaultSpeed());
-      }
-    }
-
-    else if (isAttacking()) {
+      handleKnockBack();
+    } else if (isAttacking()) {
       performAttack();
-    }
-
-    else if (keyH.spacePressed) {
-      setGuarding(true);
-      setGuardCounter(getGuardCounter() + 1);
-    }
-
-    else if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed || keyH.enterPressed) {
-
-      if (keyH.upPressed) {
-        setDirection(DIR_UP);
-      } else if (keyH.downPressed) {
-        setDirection(DIR_DOWN);
-      } else if (keyH.leftPressed) {
-        setDirection(DIR_LEFT);
-      } else if (keyH.rightPressed) {
-        setDirection(DIR_RIGHT);
-      }
-
-      // CHECK TILE COLLISION
-      setCollisionOn(false);
-      gp.cChecker.checkTile(this);
-
-      // CHECK OBJECT COLLISION
-      int objIndex = gp.cChecker.checkObject(this, true);
-      pickUpObject(objIndex);
-
-      // CHECK NPC COLLISION
-      int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
-      interactNPC(npcIndex);
-
-      // CHECK MONSTER COLLISION
-      int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
-      contactMonster(monsterIndex);
-
-      gp.cChecker.checkEntity(this, gp.iTile);
-
-      // CHECK EVENT
-      gp.eHandler.checkEvent();
-
-      if (!isCollisionOn() && !keyH.enterPressed) {
-        switch (getDirection()) {
-          case DIR_UP:
-            setWorldY(getWorldY() - getSpeed());
-            break;
-          case DIR_DOWN:
-            setWorldY(getWorldY() + getSpeed());
-            break;
-          case DIR_LEFT:
-            setWorldX(getWorldX() - getSpeed());
-            break;
-          case DIR_RIGHT:
-            setWorldX(getWorldX() + getSpeed());
-            break;
-          default:
-            break;
-        }
-      }
-
-      if (keyH.enterPressed && !attackCanceled) {
-        gp.playSE(7);
-        setAttacking(true);
-        setSpriteCounter(0);
-      }
-
-      attackCanceled = false;
-      gp.keyH.enterPressed = false;
-      setGuarding(false);
-      setGuardCounter(0);
-
-      setSpriteCounter(getSpriteCounter() + 1);
-      if (getSpriteCounter() > 12) {
-        setSpriteNum(getSpriteNum() == 1 ? 2 : 1);
-        setSpriteCounter(0);
-      }
+    } else if (keyH.spacePressed) {
+      handleGuard();
+    } else if (isMovementOrActionPressed()) {
+      handleMovementAndInteractions();
     } else {
-      standCounter++;
-      if (standCounter >= 20) {
-        setSpriteNum(1);
-        standCounter = 0;
-      }
-      setGuarding(false);
-      setGuardCounter(0);
+      handleIdle();
     }
 
-    // Disparo
+    handleShooting();
+    handleInvincibilityFrames();
+    updateShotCounter();
+    clampVitals();
+    handleDeath();
+  }
+
+  private boolean isMovementOrActionPressed() {
+    return keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed || keyH.enterPressed;
+  }
+
+  private void handleKnockBack() {
+    setCollisionOn(false);
+    gp.cChecker.checkTile(this);
+    gp.cChecker.checkObject(this, true);
+    gp.cChecker.checkEntity(this, gp.npc);
+    gp.cChecker.checkEntity(this, gp.monster);
+    gp.cChecker.checkEntity(this, gp.iTile);
+
+    if (isCollisionOn()) {
+      setKnockBackCounter(0);
+      setKnockBack(false);
+      setSpeed(getDefaultSpeed());
+    } else {
+      switch (getKnockBackDirection()) {
+        case DIR_UP:
+          setWorldY(getWorldY() - getSpeed());
+          break;
+        case DIR_DOWN:
+          setWorldY(getWorldY() + getSpeed());
+          break;
+        case DIR_LEFT:
+          setWorldX(getWorldX() - getSpeed());
+          break;
+        case DIR_RIGHT:
+          setWorldX(getWorldX() + getSpeed());
+          break;
+        default:
+          break;
+      }
+    }
+
+    setKnockBackCounter(getKnockBackCounter() + 1);
+    if (getKnockBackCounter() == 10) {
+      setKnockBackCounter(0);
+      setKnockBack(false);
+      setSpeed(getDefaultSpeed());
+    }
+  }
+
+  private void handleGuard() {
+    setGuarding(true);
+    setGuardCounter(getGuardCounter() + 1);
+  }
+
+  private void handleMovementAndInteractions() {
+    // Direção
+    if (keyH.upPressed)
+      setDirection(DIR_UP);
+    else if (keyH.downPressed)
+      setDirection(DIR_DOWN);
+    else if (keyH.leftPressed)
+      setDirection(DIR_LEFT);
+    else if (keyH.rightPressed)
+      setDirection(DIR_RIGHT);
+
+    // Colisões base
+    setCollisionOn(false);
+    gp.cChecker.checkTile(this);
+
+    // Objetos/NPCs/Monstros
+    int objIndex = gp.cChecker.checkObject(this, true);
+    pickUpObject(objIndex);
+
+    int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
+    interactNPC(npcIndex);
+
+    int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
+    contactMonster(monsterIndex);
+
+    gp.cChecker.checkEntity(this, gp.iTile);
+
+    // Eventos
+    gp.eHandler.checkEvent();
+
+    // Movimento se não colidiu e não está usando ENTER
+    if (!isCollisionOn() && !keyH.enterPressed) {
+      switch (getDirection()) {
+        case DIR_UP:
+          setWorldY(getWorldY() - getSpeed());
+          break;
+        case DIR_DOWN:
+          setWorldY(getWorldY() + getSpeed());
+          break;
+        case DIR_LEFT:
+          setWorldX(getWorldX() - getSpeed());
+          break;
+        case DIR_RIGHT:
+          setWorldX(getWorldX() + getSpeed());
+          break;
+        default:
+          break;
+      }
+    }
+
+    // Ataque
+    if (keyH.enterPressed && !attackCanceled) {
+      gp.playSE(7);
+      setAttacking(true);
+      setSpriteCounter(0);
+    }
+
+    // Reset de flags por quadro
+    attackCanceled = false;
+    gp.keyH.enterPressed = false;
+    setGuarding(false);
+    setGuardCounter(0);
+
+    // Animação
+    setSpriteCounter(getSpriteCounter() + 1);
+    if (getSpriteCounter() > 12) {
+      setSpriteNum(getSpriteNum() == 1 ? 2 : 1);
+      setSpriteCounter(0);
+    }
+  }
+
+  private void handleIdle() {
+    standCounter++;
+    if (standCounter >= 20) {
+      setSpriteNum(1);
+      standCounter = 0;
+    }
+    setGuarding(false);
+    setGuardCounter(0);
+  }
+
+  private void handleShooting() {
     if (gp.keyH.shotKeyPressed
         && getProjectile() != null
         && !getProjectile().isAlive()
@@ -372,7 +399,9 @@ public class Player extends Entity {
       setShotAvailableCounter(0);
       gp.playSE(10);
     }
+  }
 
+  private void handleInvincibilityFrames() {
     if (isInvincible()) {
       setInvincibleCounter(getInvincibleCounter() + 1);
       if (getInvincibleCounter() > 60) {
@@ -381,16 +410,22 @@ public class Player extends Entity {
         setInvincibleCounter(0);
       }
     }
+  }
 
+  private void updateShotCounter() {
     if (getShotAvailableCounter() < 30) {
       setShotAvailableCounter(getShotAvailableCounter() + 1);
     }
+  }
 
+  private void clampVitals() {
     if (getLife() > getMaxLife())
       setLife(getMaxLife());
     if (getMana() > getMaxMana())
       setMana(getMaxMana());
+  }
 
+  private void handleDeath() {
     if (!keyH.godModeOn && getLife() <= 0) {
       gp.stopMusic();
       gp.gameState = gp.gameOverState;
@@ -542,30 +577,39 @@ public class Player extends Entity {
     }
   }
 
+  // =========================
+  // SELECT ITEM (S3776 reduzida)
+  // =========================
   public void selectItem() {
     int itemIndex = gp.ui.getItemIndexOnSlot(gp.ui.playerSlotCol, gp.ui.playerSlotRow);
     var inv = getInventory();
 
-    if (itemIndex < inv.size()) {
-      Entity selectedItem = inv.get(itemIndex);
+    if (itemIndex >= inv.size())
+      return;
 
-      int t = selectedItem.getType();
-      if (t == TYPE_SWORD || t == TYPE_AXE || t == TYPE_PICKAXE) {
+    Entity selectedItem = inv.get(itemIndex);
+    int t = selectedItem.getType();
+
+    switch (t) {
+      case TYPE_SWORD:
+      case TYPE_AXE:
+      case TYPE_PICKAXE:
         setCurrentWeapon(selectedItem);
         setAttack(getAttack());
         getAttackImage();
-      }
-      if (t == TYPE_SHIELD) {
+        break;
+
+      case TYPE_SHIELD:
         setCurrentShield(selectedItem);
         setDefense(getDefense());
-      }
+        break;
 
-      if (t == TYPE_LIGHT) {
+      case TYPE_LIGHT:
         setCurrentLight(getCurrentLight() == selectedItem ? null : selectedItem);
-        lightUpdated = true;
-      }
+        setLightUpdated(true);
+        break;
 
-      if (t == TYPE_CONSUMABLE) {
+      case TYPE_CONSUMABLE:
         if (selectedItem.use(this)) {
           if (selectedItem.getAmount() > 1) {
             selectedItem.setAmount(selectedItem.getAmount() - 1);
@@ -573,7 +617,11 @@ public class Player extends Entity {
             inv.remove(itemIndex);
           }
         }
-      }
+        break;
+
+      default:
+        // sem ação
+        break;
     }
   }
 
@@ -609,6 +657,9 @@ public class Player extends Entity {
     return canObtain;
   }
 
+  // =========================
+  // DRAW (S3776 / S3358 reduzidas)
+  // =========================
   @Override
   public void draw(Graphics2D g2) {
     BufferedImage image = null;
@@ -623,15 +674,29 @@ public class Player extends Entity {
         } else {
           image = (getSpriteNum() == 1) ? up1 : up2;
         }
-        if (isGuarding())
+        if (isGuarding()) {
           image = guardUp;
+        }
         break;
 
       case DIR_DOWN:
-        image = isAttacking() ? ((getSpriteNum() == 1) ? attackDown1 : attackDown2)
-            : ((getSpriteNum() == 1) ? down1 : down2);
-        if (isGuarding())
+        if (isAttacking()) {
+          // remove ternário aninhado
+          if (getSpriteNum() == 1) {
+            image = attackDown1;
+          } else {
+            image = attackDown2;
+          }
+        } else {
+          if (getSpriteNum() == 1) {
+            image = down1;
+          } else {
+            image = down2;
+          }
+        }
+        if (isGuarding()) {
           image = guardDown;
+        }
         break;
 
       case DIR_LEFT:
@@ -641,15 +706,28 @@ public class Player extends Entity {
         } else {
           image = (getSpriteNum() == 1) ? left1 : left2;
         }
-        if (isGuarding())
+        if (isGuarding()) {
           image = guardLeft;
+        }
         break;
 
       case DIR_RIGHT:
-        image = isAttacking() ? ((getSpriteNum() == 1) ? attackRight1 : attackRight2)
-            : ((getSpriteNum() == 1) ? right1 : right2);
-        if (isGuarding())
+        if (isAttacking()) {
+          if (getSpriteNum() == 1) {
+            image = attackRight1;
+          } else {
+            image = attackRight2;
+          }
+        } else {
+          if (getSpriteNum() == 1) {
+            image = right1;
+          } else {
+            image = right2;
+          }
+        }
+        if (isGuarding()) {
           image = guardRight;
+        }
         break;
 
       default:
@@ -666,10 +744,35 @@ public class Player extends Entity {
 
     g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 
-    if (debugCollision) {
+    if (isDebugCollision()) {
       Rectangle sa = getSolidArea();
       g2.setColor(Color.red);
       g2.drawRect(screenX + sa.x, screenY + sa.y, sa.width, sa.height);
     }
+  }
+
+  // ===== Accessors para campos privados (se algum código externo precisar) =====
+  public boolean isAttackCanceled() {
+    return attackCanceled;
+  }
+
+  public void setAttackCanceled(boolean attackCanceled) {
+    this.attackCanceled = attackCanceled;
+  }
+
+  public boolean isLightUpdated() {
+    return lightUpdated;
+  }
+
+  public void setLightUpdated(boolean lightUpdated) {
+    this.lightUpdated = lightUpdated;
+  }
+
+  public boolean isDebugCollision() {
+    return debugCollision;
+  }
+
+  public void setDebugCollision(boolean debugCollision) {
+    this.debugCollision = debugCollision;
   }
 }
