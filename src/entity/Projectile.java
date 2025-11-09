@@ -22,37 +22,55 @@ public class Projectile extends Entity {
 
   @Override
   public void update() {
-
-    // Se o dono do projétil for o player, colide em monstros
+    // Colisão (player -> monstros) ou (inimigo -> player)
     if (user == gp.player) {
-      int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
-      if (monsterIndex != 999) {
-        gp.player.damageMonster(
-            monsterIndex,
-            this,
-            getAttack() * Math.max(1, gp.player.getLevel() / 2),
-            getKnockBackPower());
-        // partículas usando o projétil do "user" (mesmo comportamento antigo)
-        if (user.getProjectile() != null) {
-          generateParticle(user.getProjectile(), gp.monster[gp.currentMap][monsterIndex]);
-        }
-        setAlive(false);
-      }
+      handleHitMonster();
+    } else {
+      handleHitPlayer();
     }
 
-    // Se o dono NÃO for o player, colide no player
-    if (user != gp.player) {
-      boolean contactPlayer = gp.cChecker.checKPlayer(this);
-      if (!gp.player.isInvincible() && contactPlayer) {
-        damagePlayer(getAttack());
-        if (user.getProjectile() != null) {
-          generateParticle(user.getProjectile(), user.getProjectile());
-        }
-        setAlive(false);
-      }
-    }
+    // Movimento, vida e animação
+    moveByDirection();
+    tickLifeAndMaybeDie();
+    updateAnimation();
+  }
 
-    // Movimento
+  // ===== Helpers para reduzir complexidade (S3776) =====
+
+  /** Projétil do player acerta monstros. */
+  private void handleHitMonster() {
+    int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
+    if (monsterIndex == 999)
+      return;
+
+    gp.player.damageMonster(
+        monsterIndex,
+        this,
+        getAttack() * Math.max(1, gp.player.getLevel() / 2),
+        getKnockBackPower());
+
+    // partículas usando o projétil do "user" (comportamento anterior)
+    if (user.getProjectile() != null) {
+      generateParticle(user.getProjectile(), gp.monster[gp.currentMap][monsterIndex]);
+    }
+    setAlive(false);
+  }
+
+  /** Projétil de inimigo acerta o player. */
+  private void handleHitPlayer() {
+    boolean contactPlayer = gp.cChecker.checKPlayer(this);
+    if (gp.player.isInvincible() || !contactPlayer)
+      return;
+
+    damagePlayer(getAttack());
+    if (user.getProjectile() != null) {
+      generateParticle(user.getProjectile(), user.getProjectile());
+    }
+    setAlive(false);
+  }
+
+  /** Aplica deslocamento conforme direção atual. */
+  private void moveByDirection() {
     switch (getDirection()) {
       case DIR_UP:
         setWorldY(getWorldY() - getSpeed());
@@ -69,14 +87,18 @@ public class Projectile extends Entity {
       default:
         break;
     }
+  }
 
-    // Vida do projétil
+  /** Decrementa vida e marca como morto quando expira. */
+  private void tickLifeAndMaybeDie() {
     setLife(getLife() - 1);
     if (getLife() <= 0) {
       setAlive(false);
     }
+  }
 
-    // Animação
+  /** Atualiza animação (spriteNum alternando a cada 12 ticks). */
+  private void updateAnimation() {
     setSpriteCounter(getSpriteCounter() + 1);
     if (getSpriteCounter() > 12) {
       setSpriteNum(getSpriteNum() == 1 ? 2 : 1);
