@@ -6,8 +6,24 @@ import main.GamePanel;
 
 public class NpcOldMan extends Entity {
 
+  // Objetivo do pathfinder
   private static final int GOAL_COL = 23;
   private static final int GOAL_ROW = 13;
+
+  // Sprites
+  private static final String BASE_SPRITE_PATH = "/npc/oldman/";
+  private static final String SPRITE_UP_1 = BASE_SPRITE_PATH + "oldman_up_1";
+  private static final String SPRITE_UP_2 = BASE_SPRITE_PATH + "oldman_up_2";
+  private static final String SPRITE_DOWN_1 = BASE_SPRITE_PATH + "oldman_down_1";
+  private static final String SPRITE_DOWN_2 = BASE_SPRITE_PATH + "oldman_down_2";
+  private static final String SPRITE_LEFT_1 = BASE_SPRITE_PATH + "oldman_left_1";
+  private static final String SPRITE_LEFT_2 = BASE_SPRITE_PATH + "oldman_left_2";
+  private static final String SPRITE_RIGHT_1 = BASE_SPRITE_PATH + "oldman_right_1";
+  private static final String SPRITE_RIGHT_2 = BASE_SPRITE_PATH + "oldman_right_2";
+
+  // Parâmetros de comportamento
+  private static final int RANDOM_DIR_INTERVAL_TICKS = 120;
+  private static final int LOW_LIFE_DIVISOR = 3;
 
   private boolean startedWalkToGoal = false;
 
@@ -33,15 +49,16 @@ public class NpcOldMan extends Entity {
     setDialogue();
   }
 
+  @Override
   public void getImage() {
-    up1 = setup("/npc/oldman/oldman_up_1", gp.tileSize, gp.tileSize);
-    up2 = setup("/npc/oldman/oldman_up_2", gp.tileSize, gp.tileSize);
-    down1 = setup("/npc/oldman/oldman_down_1", gp.tileSize, gp.tileSize);
-    down2 = setup("/npc/oldman/oldman_down_2", gp.tileSize, gp.tileSize);
-    left1 = setup("/npc/oldman/oldman_left_1", gp.tileSize, gp.tileSize);
-    left2 = setup("/npc/oldman/oldman_left_2", gp.tileSize, gp.tileSize);
-    right1 = setup("/npc/oldman/oldman_right_1", gp.tileSize, gp.tileSize);
-    right2 = setup("/npc/oldman/oldman_right_2", gp.tileSize, gp.tileSize);
+    up1 = setup(SPRITE_UP_1, gp.tileSize, gp.tileSize);
+    up2 = setup(SPRITE_UP_2, gp.tileSize, gp.tileSize);
+    down1 = setup(SPRITE_DOWN_1, gp.tileSize, gp.tileSize);
+    down2 = setup(SPRITE_DOWN_2, gp.tileSize, gp.tileSize);
+    left1 = setup(SPRITE_LEFT_1, gp.tileSize, gp.tileSize);
+    left2 = setup(SPRITE_LEFT_2, gp.tileSize, gp.tileSize);
+    right1 = setup(SPRITE_RIGHT_1, gp.tileSize, gp.tileSize);
+    right2 = setup(SPRITE_RIGHT_2, gp.tileSize, gp.tileSize);
   }
 
   public void setDialogue() {
@@ -74,7 +91,7 @@ public class NpcOldMan extends Entity {
       }
       return;
     }
-    getRandomDirection(120);
+    getRandomDirection(RANDOM_DIR_INTERVAL_TICKS);
   }
 
   @Override
@@ -83,8 +100,8 @@ public class NpcOldMan extends Entity {
     startDialogue(this, getDialogueSet());
     setDialogueSet(getDialogueSet() + 1);
 
-    // Reage ao HP do player (encapsulado)
-    if (gp.player.getLife() < gp.player.getMaxLife() / 3) {
+    // Reage ao HP do player
+    if (gp.player.getLife() < gp.player.getMaxLife() / LOW_LIFE_DIVISOR) {
       setDialogueSet(1);
       startDialogue(this, getDialogueSet());
     }
