@@ -4,7 +4,7 @@ import java.awt.Graphics2D;
 
 import entity.PlayerDummy;
 import monster.MON_SkeletonLord;
-import object.OBJ_Door_Iron;
+import object.ObjDoorIron;
 
 public class CutsceneManager {
 
@@ -108,7 +108,7 @@ public class CutsceneManager {
     // Fechar a porta de ferro
     for (int i = 0; i < gp.obj[gp.currentMap].length; i++) {
       if (gp.obj[gp.currentMap][i] == null) {
-        gp.obj[gp.currentMap][i] = new OBJ_Door_Iron(gp);
+        gp.obj[gp.currentMap][i] = new ObjDoorIron(gp);
         gp.obj[gp.currentMap][i].setWorldX(gp.tileSize * 25);
         gp.obj[gp.currentMap][i].setWorldY(gp.tileSize * 28);
         gp.obj[gp.currentMap][i].setTemp(true);

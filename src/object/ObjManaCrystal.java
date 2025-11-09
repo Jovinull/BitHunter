@@ -3,15 +3,15 @@ package object;
 import entity.Entity;
 import main.GamePanel;
 
-public class OBJ_ManaCrystal extends Entity {
+public class ObjManaCrystal extends Entity {
 
-  public static final String objName = "Cristal de Mana";
+  public static final String OBJ_NAME = "Cristal de Mana";
 
-  public OBJ_ManaCrystal(GamePanel gp) {
+  public ObjManaCrystal(GamePanel gp) {
     super(gp);
 
     setType(TYPE_PICKUP_ONLY);
-    setName(objName);
+    setName(OBJ_NAME);
     setValue(1);
 
     down1 = setup("/objects/manacrystal_full", gp.tileSize, gp.tileSize);

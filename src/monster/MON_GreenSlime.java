@@ -4,10 +4,10 @@ import java.util.Random;
 
 import entity.Entity;
 import main.GamePanel;
-import object.OBJ_Coin_Bronze;
-import object.OBJ_Heart;
-import object.OBJ_ManaCrystal;
-import object.OBJ_Rock;
+import object.ObjCoinBronze;
+import object.ObjHeart;
+import object.ObjManaCrystal;
+import object.ObjRock;
 
 public class MON_GreenSlime extends Entity {
 
@@ -23,7 +23,7 @@ public class MON_GreenSlime extends Entity {
     setAttack(5);
     setDefense(0);
     setExp(2);
-    setProjectile(new OBJ_Rock(gp));
+    setProjectile(new ObjRock(gp));
 
     // solidArea (usar o objeto via getter, Rectangle tem campos públicos)
     getSolidArea().x = 3;
@@ -84,11 +84,11 @@ public class MON_GreenSlime extends Entity {
     int i = new Random().nextInt(100) + 1;
 
     if (i < 50) {
-      dropItem(new OBJ_Coin_Bronze(gp));
+      dropItem(new ObjCoinBronze(gp));
     } else if (i < 75) {
-      dropItem(new OBJ_Heart(gp));
+      dropItem(new ObjHeart(gp));
     } else {
-      dropItem(new OBJ_ManaCrystal(gp));
+      dropItem(new ObjManaCrystal(gp));
     }
   }
 }

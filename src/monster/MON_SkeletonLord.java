@@ -5,10 +5,10 @@ import java.util.Random;
 import data.Progress;
 import entity.Entity;
 import main.GamePanel;
-import object.OBJ_Coin_Bronze;
-import object.OBJ_Door_Iron;
-import object.OBJ_Heart;
-import object.OBJ_ManaCrystal;
+import object.ObjCoinBronze;
+import object.ObjDoorIron;
+import object.ObjHeart;
+import object.ObjManaCrystal;
 
 public class MON_SkeletonLord extends Entity {
 
@@ -153,7 +153,7 @@ public class MON_SkeletonLord extends Entity {
     // Remove portas de ferro do mapa atual
     for (int i = 0; i < gp.obj[gp.currentMap].length; i++) {
       if (gp.obj[gp.currentMap][i] != null
-          && OBJ_Door_Iron.objName.equals(gp.obj[gp.currentMap][i].getName())) {
+          && ObjDoorIron.OBJ_NAME.equals(gp.obj[gp.currentMap][i].getName())) {
         gp.playSE(21);
         gp.obj[gp.currentMap][i] = null;
       }
@@ -163,11 +163,11 @@ public class MON_SkeletonLord extends Entity {
     int roll = new Random().nextInt(100) + 1;
 
     if (roll < 50) {
-      dropItem(new OBJ_Coin_Bronze(gp));
+      dropItem(new ObjCoinBronze(gp));
     } else if (roll < 75) {
-      dropItem(new OBJ_Heart(gp));
+      dropItem(new ObjHeart(gp));
     } else {
-      dropItem(new OBJ_ManaCrystal(gp));
+      dropItem(new ObjManaCrystal(gp));
     }
   }
 }

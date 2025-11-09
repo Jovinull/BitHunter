@@ -3,15 +3,15 @@ package object;
 import entity.Entity;
 import main.GamePanel;
 
-public class OBJ_Key extends Entity {
+public class ObjKey extends Entity {
 
-  public static final String objName = "Chave";
+  public static final String OBJ_NAME = "Chave";
 
-  public OBJ_Key(GamePanel gp) {
+  public ObjKey(GamePanel gp) {
     super(gp);
 
     setType(TYPE_CONSUMABLE);
-    setName(objName);
+    setName(OBJ_NAME);
     down1 = setup("/objects/key", gp.tileSize, gp.tileSize);
     setDescription("[" + getName() + "]\nAbre portas trancadas.");
     setPrice(100);
@@ -28,8 +28,8 @@ public class OBJ_Key extends Entity {
 
   @Override
   public boolean use(Entity entity) {
-    // procure por uma porta à frente do usuário
-    int objIndex = getDetected(entity, gp.obj, OBJ_Door.objName);
+    // procura por uma porta à frente do usuário
+    int objIndex = getDetected(entity, gp.obj, ObjDoor.OBJ_NAME);
 
     if (objIndex != 999) {
       startDialogue(this, 0);

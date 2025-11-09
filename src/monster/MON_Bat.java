@@ -4,9 +4,9 @@ import java.util.Random;
 
 import entity.Entity;
 import main.GamePanel;
-import object.OBJ_Coin_Bronze;
-import object.OBJ_Heart;
-import object.OBJ_ManaCrystal;
+import object.ObjCoinBronze;
+import object.ObjHeart;
+import object.ObjManaCrystal;
 
 public class MON_Bat extends Entity {
 
@@ -66,11 +66,11 @@ public class MON_Bat extends Entity {
     int i = new Random().nextInt(100) + 1;
 
     if (i < 50) {
-      dropItem(new OBJ_Coin_Bronze(gp));
+      dropItem(new ObjCoinBronze(gp));
     } else if (i < 75) {
-      dropItem(new OBJ_Heart(gp));
+      dropItem(new ObjHeart(gp));
     } else {
-      dropItem(new OBJ_ManaCrystal(gp));
+      dropItem(new ObjManaCrystal(gp));
     }
   }
 }

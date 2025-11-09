@@ -12,9 +12,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 import entity.Entity;
-import object.OBJ_Coin_Bronze;
-import object.OBJ_Heart;
-import object.OBJ_ManaCrystal;
+import object.ObjCoinBronze;
+import object.ObjHeart;
+import object.ObjManaCrystal;
 
 public class UI {
 
@@ -78,16 +78,16 @@ public class UI {
     }
 
     // HUD (via getters, sem acessar campos diretamente)
-    Entity heart = new OBJ_Heart(gp);
+    Entity heart = new ObjHeart(gp);
     heart_full = heart.getBaseImage();
     heart_half = heart.getAltImage1();
     heart_blank = heart.getAltImage2();
 
-    Entity crystal = new OBJ_ManaCrystal(gp);
+    Entity crystal = new ObjManaCrystal(gp);
     crystal_full = crystal.getBaseImage();
     crystal_blank = crystal.getAltImage1();
 
-    Entity bronzeCoin = new OBJ_Coin_Bronze(gp);
+    Entity bronzeCoin = new ObjCoinBronze(gp);
     coin = bronzeCoin.getDown1();
   }
 

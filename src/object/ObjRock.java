@@ -6,14 +6,14 @@ import entity.Entity;
 import entity.Projectile;
 import main.GamePanel;
 
-public class OBJ_Rock extends Projectile {
+public class ObjRock extends Projectile {
 
-  public static final String objName = "Pedra";
+  public static final String OBJ_NAME = "Pedra";
 
-  public OBJ_Rock(GamePanel gp) {
+  public ObjRock(GamePanel gp) {
     super(gp);
 
-    setName(objName);
+    setName(OBJ_NAME);
     setSpeed(8);
     setMaxLife(80);
     setLife(getMaxLife());

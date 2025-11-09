@@ -10,18 +10,18 @@ import monster.MON_GreenSlime;
 import monster.MON_Orc;
 import monster.MON_RedSlime;
 import monster.MON_SkeletonLord;
-import object.OBJ_Axe;
-import object.OBJ_Chest;
-import object.OBJ_Coin_Bronze;
-import object.OBJ_Door;
-import object.OBJ_Door_Iron;
-import object.OBJ_Heart;
-import object.OBJ_Key;
-import object.OBJ_ManaCrystal;
-import object.OBJ_Pickaxe;
-import object.OBJ_Potion_Red;
-import object.OBJ_Shield_Blue;
+import object.ObjCoinBronze;
+import object.ObjDoor;
+import object.ObjDoorIron;
+import object.ObjHeart;
+import object.ObjKey;
+import object.ObjManaCrystal;
+import object.ObjPickaxe;
+import object.ObjPotionRed;
+import object.ObjShieldBlue;
 import object.OBJ_Tent;
+import object.ObjAxe;
+import object.ObjChest;
 import tile_interactive.IT_DestructibleWall;
 import tile_interactive.IT_DryTree;
 import tile_interactive.IT_MetalPlate;
@@ -38,71 +38,71 @@ public class AssetSetter {
     int mapNum = 0;
     int i = 0;
 
-    gp.obj[mapNum][i] = new OBJ_Coin_Bronze(gp);
+    gp.obj[mapNum][i] = new ObjCoinBronze(gp);
     place(gp.obj[mapNum][i++], 25, 23);
 
-    gp.obj[mapNum][i] = new OBJ_Coin_Bronze(gp);
+    gp.obj[mapNum][i] = new ObjCoinBronze(gp);
     place(gp.obj[mapNum][i++], 21, 19);
 
-    gp.obj[mapNum][i] = new OBJ_Key(gp);
+    gp.obj[mapNum][i] = new ObjKey(gp);
     place(gp.obj[mapNum][i++], 26, 21);
 
-    gp.obj[mapNum][i] = new OBJ_Axe(gp);
+    gp.obj[mapNum][i] = new ObjAxe(gp);
     place(gp.obj[mapNum][i++], 33, 21);
 
-    gp.obj[mapNum][i] = new OBJ_Shield_Blue(gp);
+    gp.obj[mapNum][i] = new ObjShieldBlue(gp);
     place(gp.obj[mapNum][i++], 35, 21);
 
     gp.obj[mapNum][i] = new OBJ_Tent(gp);
     place(gp.obj[mapNum][i++], 19, 20);
 
-    gp.obj[mapNum][i] = new OBJ_Potion_Red(gp);
+    gp.obj[mapNum][i] = new ObjPotionRed(gp);
     place(gp.obj[mapNum][i++], 22, 27);
 
-    gp.obj[mapNum][i] = new OBJ_Heart(gp);
+    gp.obj[mapNum][i] = new ObjHeart(gp);
     place(gp.obj[mapNum][i++], 22, 29);
 
-    gp.obj[mapNum][i] = new OBJ_ManaCrystal(gp);
+    gp.obj[mapNum][i] = new ObjManaCrystal(gp);
     place(gp.obj[mapNum][i++], 22, 31);
 
-    gp.obj[mapNum][i] = new OBJ_Door(gp);
+    gp.obj[mapNum][i] = new ObjDoor(gp);
     place(gp.obj[mapNum][i++], 14, 28);
 
-    gp.obj[mapNum][i] = new OBJ_Door(gp);
+    gp.obj[mapNum][i] = new ObjDoor(gp);
     place(gp.obj[mapNum][i++], 12, 12);
 
-    gp.obj[mapNum][i] = new OBJ_Chest(gp);
-    gp.obj[mapNum][i].setLoot(new OBJ_Key(gp));
+    gp.obj[mapNum][i] = new ObjChest(gp);
+    gp.obj[mapNum][i].setLoot(new ObjKey(gp));
     place(gp.obj[mapNum][i], 12, 8);
 
     // MAP 2
     mapNum = 2;
     i = 0;
 
-    gp.obj[mapNum][i] = new OBJ_Chest(gp);
-    gp.obj[mapNum][i].setLoot(new OBJ_Pickaxe(gp));
+    gp.obj[mapNum][i] = new ObjChest(gp);
+    gp.obj[mapNum][i].setLoot(new ObjPickaxe(gp));
     place(gp.obj[mapNum][i++], 40, 41);
 
-    gp.obj[mapNum][i] = new OBJ_Chest(gp);
-    gp.obj[mapNum][i].setLoot(new OBJ_Potion_Red(gp));
+    gp.obj[mapNum][i] = new ObjChest(gp);
+    gp.obj[mapNum][i].setLoot(new ObjPotionRed(gp));
     place(gp.obj[mapNum][i++], 13, 16);
 
-    gp.obj[mapNum][i] = new OBJ_Chest(gp);
-    gp.obj[mapNum][i].setLoot(new OBJ_Potion_Red(gp));
+    gp.obj[mapNum][i] = new ObjChest(gp);
+    gp.obj[mapNum][i].setLoot(new ObjPotionRed(gp));
     place(gp.obj[mapNum][i++], 26, 34);
 
-    gp.obj[mapNum][i] = new OBJ_Chest(gp);
-    gp.obj[mapNum][i].setLoot(new OBJ_Potion_Red(gp));
+    gp.obj[mapNum][i] = new ObjChest(gp);
+    gp.obj[mapNum][i].setLoot(new ObjPotionRed(gp));
     place(gp.obj[mapNum][i++], 27, 15);
 
-    gp.obj[mapNum][i] = new OBJ_Door_Iron(gp);
+    gp.obj[mapNum][i] = new ObjDoorIron(gp);
     place(gp.obj[mapNum][i], 18, 23);
 
     // MAP 3
     mapNum = 3;
     i = 0;
 
-    gp.obj[mapNum][i] = new OBJ_Door_Iron(gp);
+    gp.obj[mapNum][i] = new ObjDoorIron(gp);
     place(gp.obj[mapNum][i], 25, 15);
   }
 

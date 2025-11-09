@@ -5,7 +5,7 @@ import java.util.Random;
 
 import entity.Entity;
 import main.GamePanel;
-import object.OBJ_Coin_Bronze;
+import object.ObjCoinBronze;
 
 public class IT_DestructibleWall extends InteractiveTile {
 
@@ -65,7 +65,7 @@ public class IT_DestructibleWall extends InteractiveTile {
   public void checkDrop() {
     int i = new Random().nextInt(100) + 1;
     if (i < 20) {
-      dropItem(new OBJ_Coin_Bronze(gp));
+      dropItem(new ObjCoinBronze(gp));
     }
   }
 }

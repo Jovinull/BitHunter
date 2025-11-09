@@ -3,15 +3,15 @@ package object;
 import entity.Entity;
 import main.GamePanel;
 
-public class OBJ_Shield_Blue extends Entity {
+public class ObjShieldBlue extends Entity {
 
-  public static final String objName = "Escudo Azul";
+  public static final String OBJ_NAME = "Escudo Azul";
 
-  public OBJ_Shield_Blue(GamePanel gp) {
+  public ObjShieldBlue(GamePanel gp) {
     super(gp);
 
     setType(TYPE_SHIELD);
-    setName(objName);
+    setName(OBJ_NAME);
 
     down1 = setup("/objects/shield_blue", gp.tileSize, gp.tileSize);
 

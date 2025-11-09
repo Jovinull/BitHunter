@@ -3,15 +3,15 @@ package object;
 import entity.Entity;
 import main.GamePanel;
 
-public class OBJ_Pickaxe extends Entity {
+public class ObjPickaxe extends Entity {
 
-  public static final String objName = "Picareta";
+  public static final String OBJ_NAME = "Picareta";
 
-  public OBJ_Pickaxe(GamePanel gp) {
+  public ObjPickaxe(GamePanel gp) {
     super(gp);
 
     setType(TYPE_PICKAXE);
-    setName(objName);
+    setName(OBJ_NAME);
 
     down1 = setup("/objects/pickaxe", gp.tileSize, gp.tileSize);
 
