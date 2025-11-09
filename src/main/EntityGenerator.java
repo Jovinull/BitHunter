@@ -87,6 +87,9 @@ public class EntityGenerator {
       case OBJ_Tent.objName:
         obj = new OBJ_Tent(gp);
         break;
+      default:
+        // no-op: itemName desconhecido; obj permanece null
+        break;
     }
 
     return obj;
