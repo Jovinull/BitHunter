@@ -23,7 +23,6 @@ public class Player extends Entity {
   public final int screenY;
   private int standCounter = 0;
 
-  // S1104: tornar não-público; fornecer accessors se necessário
   private boolean attackCanceled = false;
   private boolean lightUpdated = false;
   private boolean debugCollision = false;
@@ -119,7 +118,6 @@ public class Player extends Entity {
 
   @Override
   public int getAttack() {
-    // attackArea é final -> copia dimensões via getter
     Rectangle a = getAttackArea();
     a.width = getCurrentWeapon().getAttackArea().width;
     a.height = getCurrentWeapon().getAttackArea().height;
@@ -159,7 +157,6 @@ public class Player extends Entity {
     return currentShieldSlot;
   }
 
-  // S1161
   @Override
   public void getImage() {
     up1 = setup("/player/Walking sprites/boy_up_1", gp.tileSize, gp.tileSize);
@@ -225,14 +222,10 @@ public class Player extends Entity {
     guardRight = setup("/player/Guarding sprites/boy_guard_right", gp.tileSize, gp.tileSize);
   }
 
-  // =========================
-  // UPDATE (S3776 reduzida)
-  // =========================
   @Override
   public void update() {
-
     if (isKnockBack()) {
-      handleKnockBack();
+      processKnockBack(); // renomeado para evitar S2177
     } else if (isAttacking()) {
       performAttack();
     } else if (keyH.spacePressed) {
@@ -254,7 +247,8 @@ public class Player extends Entity {
     return keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed || keyH.enterPressed;
   }
 
-  private void handleKnockBack() {
+  // renomeado (S2177)
+  private void processKnockBack() {
     setCollisionOn(false);
     gp.cChecker.checkTile(this);
     gp.cChecker.checkObject(this, true);
@@ -299,7 +293,6 @@ public class Player extends Entity {
   }
 
   private void handleMovementAndInteractions() {
-    // Direção
     if (keyH.upPressed)
       setDirection(DIR_UP);
     else if (keyH.downPressed)
@@ -309,11 +302,9 @@ public class Player extends Entity {
     else if (keyH.rightPressed)
       setDirection(DIR_RIGHT);
 
-    // Colisões base
     setCollisionOn(false);
     gp.cChecker.checkTile(this);
 
-    // Objetos/NPCs/Monstros
     int objIndex = gp.cChecker.checkObject(this, true);
     pickUpObject(objIndex);
 
@@ -324,11 +315,8 @@ public class Player extends Entity {
     contactMonster(monsterIndex);
 
     gp.cChecker.checkEntity(this, gp.iTile);
-
-    // Eventos
     gp.eHandler.checkEvent();
 
-    // Movimento se não colidiu e não está usando ENTER
     if (!isCollisionOn() && !keyH.enterPressed) {
       switch (getDirection()) {
         case DIR_UP:
@@ -348,20 +336,17 @@ public class Player extends Entity {
       }
     }
 
-    // Ataque
     if (keyH.enterPressed && !attackCanceled) {
       gp.playSE(7);
       setAttacking(true);
       setSpriteCounter(0);
     }
 
-    // Reset de flags por quadro
     attackCanceled = false;
     gp.keyH.enterPressed = false;
     setGuarding(false);
     setGuardCounter(0);
 
-    // Animação
     setSpriteCounter(getSpriteCounter() + 1);
     if (getSpriteCounter() > 12) {
       setSpriteNum(getSpriteNum() == 1 ? 2 : 1);
@@ -577,9 +562,7 @@ public class Player extends Entity {
     }
   }
 
-  // =========================
-  // SELECT ITEM (S3776 reduzida)
-  // =========================
+  // SELECT ITEM (S6208 em labels combinados)
   public void selectItem() {
     int itemIndex = gp.ui.getItemIndexOnSlot(gp.ui.playerSlotCol, gp.ui.playerSlotRow);
     var inv = getInventory();
@@ -591,9 +574,7 @@ public class Player extends Entity {
     int t = selectedItem.getType();
 
     switch (t) {
-      case TYPE_SWORD:
-      case TYPE_AXE:
-      case TYPE_PICKAXE:
+      case TYPE_SWORD, TYPE_AXE, TYPE_PICKAXE:
         setCurrentWeapon(selectedItem);
         setAttack(getAttack());
         getAttackImage();
@@ -620,7 +601,6 @@ public class Player extends Entity {
         break;
 
       default:
-        // sem ação
         break;
     }
   }
@@ -657,82 +637,21 @@ public class Player extends Entity {
     return canObtain;
   }
 
-  // =========================
-  // DRAW (S3776 / S3358 reduzidas)
-  // =========================
+  // DRAW (S3776 reduzida via helper)
   @Override
   public void draw(Graphics2D g2) {
-    BufferedImage image = null;
     int tempScreenX = screenX;
     int tempScreenY = screenY;
 
-    switch (getDirection()) {
-      case DIR_UP:
-        if (isAttacking()) {
-          tempScreenY = screenY - gp.tileSize;
-          image = (getSpriteNum() == 1) ? attackUp1 : attackUp2;
-        } else {
-          image = (getSpriteNum() == 1) ? up1 : up2;
-        }
-        if (isGuarding()) {
-          image = guardUp;
-        }
-        break;
-
-      case DIR_DOWN:
-        if (isAttacking()) {
-          // remove ternário aninhado
-          if (getSpriteNum() == 1) {
-            image = attackDown1;
-          } else {
-            image = attackDown2;
-          }
-        } else {
-          if (getSpriteNum() == 1) {
-            image = down1;
-          } else {
-            image = down2;
-          }
-        }
-        if (isGuarding()) {
-          image = guardDown;
-        }
-        break;
-
-      case DIR_LEFT:
-        if (isAttacking()) {
-          tempScreenX = screenX - gp.tileSize;
-          image = (getSpriteNum() == 1) ? attackLeft1 : attackLeft2;
-        } else {
-          image = (getSpriteNum() == 1) ? left1 : left2;
-        }
-        if (isGuarding()) {
-          image = guardLeft;
-        }
-        break;
-
-      case DIR_RIGHT:
-        if (isAttacking()) {
-          if (getSpriteNum() == 1) {
-            image = attackRight1;
-          } else {
-            image = attackRight2;
-          }
-        } else {
-          if (getSpriteNum() == 1) {
-            image = right1;
-          } else {
-            image = right2;
-          }
-        }
-        if (isGuarding()) {
-          image = guardRight;
-        }
-        break;
-
-      default:
-        break;
+    // Ajuste de posição para ataques UP/LEFT
+    if (isAttacking()) {
+      if (DIR_UP.equals(getDirection()))
+        tempScreenY = screenY - gp.tileSize;
+      if (DIR_LEFT.equals(getDirection()))
+        tempScreenX = screenX - gp.tileSize;
     }
+
+    BufferedImage image = resolveSprite(getDirection(), isAttacking(), isGuarding(), getSpriteNum());
 
     if (isTransparent()) {
       g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
@@ -751,7 +670,55 @@ public class Player extends Entity {
     }
   }
 
-  // ===== Accessors para campos privados (se algum código externo precisar) =====
+  // Helper único para seleção de sprite (reduz complexidade do draw)
+  private BufferedImage resolveSprite(String dir, boolean attacking, boolean guarding, int spriteNum) {
+    if (guarding) {
+      switch (dir) {
+        case DIR_UP:
+          return guardUp;
+        case DIR_DOWN:
+          return guardDown;
+        case DIR_LEFT:
+          return guardLeft;
+        case DIR_RIGHT:
+          return guardRight;
+        default:
+          return down1;
+      }
+    }
+
+    boolean first = (spriteNum == 1);
+
+    if (attacking) {
+      switch (dir) {
+        case DIR_UP:
+          return first ? attackUp1 : attackUp2;
+        case DIR_DOWN:
+          return first ? attackDown1 : attackDown2;
+        case DIR_LEFT:
+          return first ? attackLeft1 : attackLeft2;
+        case DIR_RIGHT:
+          return first ? attackRight1 : attackRight2;
+        default:
+          return down1;
+      }
+    } else {
+      switch (dir) {
+        case DIR_UP:
+          return first ? up1 : up2;
+        case DIR_DOWN:
+          return first ? down1 : down2;
+        case DIR_LEFT:
+          return first ? left1 : left2;
+        case DIR_RIGHT:
+          return first ? right1 : right2;
+        default:
+          return down1;
+      }
+    }
+  }
+
+  // ===== Accessors =====
   public boolean isAttackCanceled() {
     return attackCanceled;
   }

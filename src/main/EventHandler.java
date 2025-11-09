@@ -47,7 +47,6 @@ public class EventHandler {
   }
 
   public void setDialogue() {
-    // Usar o getter para acessar a matriz de diálogos encapsulada
     String[][] d = eventMaster.getDialogues();
     d[0][0] = "Você caiu em um buraco!!";
     d[1][0] = "Você bebe a água.\nSua vida e mana foi restaurada.\n(O progresso foi salvo)";
@@ -58,7 +57,6 @@ public class EventHandler {
     boolean hit = false;
 
     if (map == gp.currentMap) {
-      // Posiciona áreas sólidas no mundo (usando getters)
       var playerArea = gp.player.getSolidArea();
       int playerDefaultX = gp.player.getSolidAreaDefaultX();
       int playerDefaultY = gp.player.getSolidAreaDefaultY();
@@ -79,7 +77,6 @@ public class EventHandler {
         }
       }
 
-      // Restaura posições
       playerArea.x = playerDefaultX;
       playerArea.y = playerDefaultY;
       eventRect[map][col][row].x = eventRect[map][col][row].eventRectDefaultX;
@@ -103,19 +100,19 @@ public class EventHandler {
       } else if (hit(0, 23, 12, Entity.DIR_UP)) {
         healingPool(gp.dialogueState);
       } else if (hit(0, 10, 39, "any")) {
-        teleport(1, 12, 13, gp.indoor); // para a casa do mercador
+        teleport(1, 12, 13, gp.indoor);
       } else if (hit(1, 12, 13, "any")) {
-        teleport(0, 10, 39, gp.outside); // para fora
+        teleport(0, 10, 39, gp.outside);
       } else if (hit(1, 12, 9, Entity.DIR_UP)) {
         speak(gp.npc[1][0]);
       } else if (hit(0, 12, 9, "any")) {
-        teleport(2, 9, 41, gp.dungeon); // para a dungeon
+        teleport(2, 9, 41, gp.dungeon);
       } else if (hit(2, 9, 41, "any")) {
-        teleport(0, 12, 9, gp.outside); // para fora
+        teleport(0, 12, 9, gp.outside);
       } else if (hit(2, 8, 7, "any")) {
-        teleport(3, 26, 41, gp.dungeon); // B2
+        teleport(3, 26, 41, gp.dungeon);
       } else if (hit(3, 26, 41, "any")) {
-        teleport(2, 8, 7, gp.dungeon); // B1
+        teleport(2, 8, 7, gp.dungeon);
       } else if (hit(3, 25, 27, "any")) {
         skeletonLord();
       }
@@ -145,14 +142,12 @@ public class EventHandler {
       gp.keyH.enterPressed = false;
 
       gp.gameState = gameState;
-      gp.player.attackCanceled = true;
+      gp.player.setAttackCanceled(true); // usar accessor
 
       gp.playSE(2);
 
-      // Mostra texto
       eventMaster.startDialogue(eventMaster, 1);
 
-      // Efeito
       gp.player.setLife(gp.player.getMaxLife());
       gp.player.setMana(gp.player.getMaxMana());
 
@@ -167,7 +162,7 @@ public class EventHandler {
   public void speak(Entity entity) {
     if (gp.keyH.enterPressed) {
       gp.gameState = gp.dialogueState;
-      gp.player.attackCanceled = true;
+      gp.player.setAttackCanceled(true); // usar accessor
       entity.speak();
     }
   }

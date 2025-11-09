@@ -35,11 +35,9 @@ public class Lighting {
     if (gp.player.getCurrentLight() == null) {
       g2.setColor(new Color(0, 0, 0.1f, 0.97f));
     } else {
-      // Centro do círculo de luz
       int centerX = gp.player.screenX + (gp.tileSize) / 2;
       int centerY = gp.player.screenY + (gp.tileSize) / 2;
 
-      // Gradiente radial
       Color[] color = new Color[12];
       float[] fraction = new float[12];
 
@@ -85,24 +83,23 @@ public class Lighting {
   }
 
   public void update() {
-    // Atualiza o filtro quando a lanterna/iluminação muda
-    if (gp.player.lightUpdated) {
+    // Atualiza quando a iluminação do player muda (usar accessors)
+    if (gp.player.isLightUpdated()) {
       setLightSource();
-      gp.player.lightUpdated = false;
+      gp.player.setLightUpdated(false);
     }
 
-    // Máquina de estados do ciclo dia/noite
     switch (dayPhase) {
       case DAY:
         dayCounter++;
-        if (dayCounter > 18000) { // ~5 min a 60 FPS
+        if (dayCounter > 18000) {
           dayPhase = DayPhase.DUSK;
           dayCounter = 0;
         }
         break;
 
       case DUSK:
-        filterAlpha += 1f / 1800f; // transição ~30s
+        filterAlpha += 1f / 1800f;
         if (filterAlpha > 1f) {
           filterAlpha = 1f;
           dayPhase = DayPhase.NIGHT;
@@ -111,14 +108,14 @@ public class Lighting {
 
       case NIGHT:
         dayCounter++;
-        if (dayCounter > 10800) { // ~3 min
+        if (dayCounter > 10800) {
           dayPhase = DayPhase.DAWN;
           dayCounter = 0;
         }
         break;
 
       case DAWN:
-        filterAlpha -= 1f / 1800f; // transição ~30s
+        filterAlpha -= 1f / 1800f;
         if (filterAlpha < 0f) {
           filterAlpha = 0f;
           dayPhase = DayPhase.DAY;
@@ -168,14 +165,10 @@ public class Lighting {
     }
   }
 
-  // ===== API pública usada pela UI =====
-
-  /** Retorna o alpha atual do filtro de iluminação (0..1). */
   public float getFilterAlpha() {
     return filterAlpha;
   }
 
-  /** Define o alpha do filtro de iluminação (valor é clampado para 0..1). */
   public void setFilterAlpha(float alpha) {
     if (alpha < 0f)
       alpha = 0f;
@@ -184,22 +177,18 @@ public class Lighting {
     this.filterAlpha = alpha;
   }
 
-  /** Retorna o contador interno do ciclo dia/noite. */
   public int getDayCounter() {
     return dayCounter;
   }
 
-  /** Define o contador interno do ciclo dia/noite (mínimo 0). */
   public void setDayCounter(int value) {
     this.dayCounter = Math.max(0, value);
   }
 
-  /** Atalho para colocar imediatamente no estado "dia". */
   public void setDayStateToDay() {
     this.dayPhase = DayPhase.DAY;
   }
 
-  // (Opcional) getter do estado atual caso precise debugar fora:
   public String getDayPhaseName() {
     return dayPhase.name();
   }
