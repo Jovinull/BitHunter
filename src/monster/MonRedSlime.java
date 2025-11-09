@@ -1,6 +1,6 @@
 package monster;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import entity.Entity;
 import main.GamePanel;
@@ -9,9 +9,13 @@ import object.ObjHeart;
 import object.ObjManaCrystal;
 import object.ObjRock;
 
-public class MON_RedSlime extends Entity {
+public class MonRedSlime extends Entity {
 
-  public MON_RedSlime(GamePanel gp) {
+  // Evita duplicação de literais (S1192)
+  private static final String SLIME_DOWN_1 = "/monster/redslime_down_1";
+  private static final String SLIME_DOWN_2 = "/monster/redslime_down_2";
+
+  public MonRedSlime(GamePanel gp) {
     super(gp);
 
     // Atributos base
@@ -39,29 +43,24 @@ public class MON_RedSlime extends Entity {
 
   @Override
   public void getImage() {
-    up1 = setup("/monster/redslime_down_1", gp.tileSize, gp.tileSize);
-    up2 = setup("/monster/redslime_down_2", gp.tileSize, gp.tileSize);
-    down1 = setup("/monster/redslime_down_1", gp.tileSize, gp.tileSize);
-    down2 = setup("/monster/redslime_down_2", gp.tileSize, gp.tileSize);
-    left1 = setup("/monster/redslime_down_1", gp.tileSize, gp.tileSize);
-    left2 = setup("/monster/redslime_down_2", gp.tileSize, gp.tileSize);
-    right1 = setup("/monster/redslime_down_1", gp.tileSize, gp.tileSize);
-    right2 = setup("/monster/redslime_down_2", gp.tileSize, gp.tileSize);
+    up1 = setup(SLIME_DOWN_1, gp.tileSize, gp.tileSize);
+    up2 = setup(SLIME_DOWN_2, gp.tileSize, gp.tileSize);
+    down1 = setup(SLIME_DOWN_1, gp.tileSize, gp.tileSize);
+    down2 = setup(SLIME_DOWN_2, gp.tileSize, gp.tileSize);
+    left1 = setup(SLIME_DOWN_1, gp.tileSize, gp.tileSize);
+    left2 = setup(SLIME_DOWN_2, gp.tileSize, gp.tileSize);
+    right1 = setup(SLIME_DOWN_1, gp.tileSize, gp.tileSize);
+    right2 = setup(SLIME_DOWN_2, gp.tileSize, gp.tileSize);
   }
 
   @Override
   public void setAction() {
     if (isOnPath()) {
-      // Verifica se para de perseguir
       checkStopChasingOrNot(gp.player, 15, 100);
-      // Persegue o jogador
       searchPath(getGoalCol(gp.player), getGoalRow(gp.player));
-      // Dispara projétil com mais frequência
       checkShootOrNot(150, 30);
     } else {
-      // Verifica se começa a perseguir
       checkStartChasingOrNot(gp.player, 5, 100);
-      // Direção aleatória
       getRandomDirection(120);
     }
   }
@@ -69,12 +68,13 @@ public class MON_RedSlime extends Entity {
   @Override
   public void damageReaction() {
     setActionLockCounter(0);
-    setOnPath(true); // Começa a perseguir ao ser atingido
+    setOnPath(true);
   }
 
   @Override
   public void checkDrop() {
-    int i = new Random().nextInt(100) + 1;
+    // (S2119) Reusar Random -> ThreadLocalRandom
+    int i = ThreadLocalRandom.current().nextInt(1, 101);
 
     if (i < 40) {
       dropItem(new ObjCoinBronze(gp));

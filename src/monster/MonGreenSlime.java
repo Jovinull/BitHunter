@@ -1,6 +1,6 @@
 package monster;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import entity.Entity;
 import main.GamePanel;
@@ -9,9 +9,13 @@ import object.ObjHeart;
 import object.ObjManaCrystal;
 import object.ObjRock;
 
-public class MON_GreenSlime extends Entity {
+public class MonGreenSlime extends Entity {
 
-  public MON_GreenSlime(GamePanel gp) {
+  // Evita duplicação de literais (S1192)
+  private static final String SLIME_DOWN_1 = "/monster/greenslime_down_1";
+  private static final String SLIME_DOWN_2 = "/monster/greenslime_down_2";
+
+  public MonGreenSlime(GamePanel gp) {
     super(gp);
 
     setType(TYPE_MONSTER);
@@ -39,34 +43,26 @@ public class MON_GreenSlime extends Entity {
   @Override
   public void getImage() {
     // Sprites em todas as direções (slime usa os mesmos frames do "down")
-    up1 = setup("/monster/greenslime_down_1", gp.tileSize, gp.tileSize);
-    up2 = setup("/monster/greenslime_down_2", gp.tileSize, gp.tileSize);
-    down1 = setup("/monster/greenslime_down_1", gp.tileSize, gp.tileSize);
-    down2 = setup("/monster/greenslime_down_2", gp.tileSize, gp.tileSize);
-    left1 = setup("/monster/greenslime_down_1", gp.tileSize, gp.tileSize);
-    left2 = setup("/monster/greenslime_down_2", gp.tileSize, gp.tileSize);
-    right1 = setup("/monster/greenslime_down_1", gp.tileSize, gp.tileSize);
-    right2 = setup("/monster/greenslime_down_2", gp.tileSize, gp.tileSize);
+    up1 = setup(SLIME_DOWN_1, gp.tileSize, gp.tileSize);
+    up2 = setup(SLIME_DOWN_2, gp.tileSize, gp.tileSize);
+    down1 = setup(SLIME_DOWN_1, gp.tileSize, gp.tileSize);
+    down2 = setup(SLIME_DOWN_2, gp.tileSize, gp.tileSize);
+    left1 = setup(SLIME_DOWN_1, gp.tileSize, gp.tileSize);
+    left2 = setup(SLIME_DOWN_2, gp.tileSize, gp.tileSize);
+    right1 = setup(SLIME_DOWN_1, gp.tileSize, gp.tileSize);
+    right2 = setup(SLIME_DOWN_2, gp.tileSize, gp.tileSize);
   }
 
   @Override
   public void setAction() {
 
     if (isOnPath()) {
-      // Para de perseguir?
       checkStopChasingOrNot(gp.player, 15, 100);
-
-      // Vai até a posição do jogador
       searchPath(getGoalCol(gp.player), getGoalRow(gp.player));
-
-      // Tentar atirar projetil
       checkShootOrNot(200, 30);
 
     } else {
-      // Começa a perseguir?
       checkStartChasingOrNot(gp.player, 5, 100);
-
-      // Anda aleatoriamente
       getRandomDirection(120);
     }
   }
@@ -74,14 +70,14 @@ public class MON_GreenSlime extends Entity {
   @Override
   public void damageReaction() {
     setActionLockCounter(0); // Reseta o contador de ações
-    // direction = gp.player.getDirection(); // se quiser reagir olhando p/ jogador
+    // (S125) remover código comentado
     setOnPath(true);
   }
 
   @Override
   public void checkDrop() {
-    // Dado 1..100
-    int i = new Random().nextInt(100) + 1;
+    // (S2119) Reusar Random -> ThreadLocalRandom
+    int i = ThreadLocalRandom.current().nextInt(1, 101);
 
     if (i < 50) {
       dropItem(new ObjCoinBronze(gp));

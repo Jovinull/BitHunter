@@ -1,6 +1,6 @@
 package monster;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import data.Progress;
 import entity.Entity;
@@ -10,17 +10,17 @@ import object.ObjDoorIron;
 import object.ObjHeart;
 import object.ObjManaCrystal;
 
-public class MON_SkeletonLord extends Entity {
+public class MonSkeletonLord extends Entity {
 
-  public static final String monName = "Lorde Esqueleto";
+  public static final String MON_NAME = "Lorde Esqueleto";
 
-  public MON_SkeletonLord(GamePanel gp) {
+  public MonSkeletonLord(GamePanel gp) {
     super(gp);
 
     // Atributos-base
     setType(TYPE_MONSTER);
     setBoss(true);
-    setName(monName);
+    setName(MON_NAME);
     setDefaultSpeed(1);
     setSpeed(getDefaultSpeed());
     setMaxLife(50);
@@ -122,15 +122,12 @@ public class MON_SkeletonLord extends Entity {
       setAttack(getAttack() * 2);
     }
 
-    // Aproxima se o jogador estiver por perto
     if (getTileDistance(gp.player) < 10) {
       moveTowardPlayer(60);
     } else {
-      // Direção aleatória
       getRandomDirection(120);
     }
 
-    // Ataque
     if (!isAttacking()) {
       checkAttackOrNot(60, gp.tileSize * 7, gp.tileSize * 5);
     }
@@ -146,7 +143,6 @@ public class MON_SkeletonLord extends Entity {
     gp.bossBattleOn = false;
     Progress.setSkeletonLordDefeated(true);
 
-    // Música
     gp.stopMusic();
     gp.playMusic(19);
 
@@ -159,8 +155,8 @@ public class MON_SkeletonLord extends Entity {
       }
     }
 
-    // Sorteio de drop
-    int roll = new Random().nextInt(100) + 1;
+    // (S2119) Reusar Random -> ThreadLocalRandom
+    int roll = ThreadLocalRandom.current().nextInt(1, 101);
 
     if (roll < 50) {
       dropItem(new ObjCoinBronze(gp));

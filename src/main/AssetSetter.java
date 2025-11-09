@@ -5,11 +5,11 @@ import entity.Entity;
 import entity.NpcBigRock;
 import entity.NpcMerchant;
 import entity.NpcOldMan;
-import monster.MON_Bat;
-import monster.MON_GreenSlime;
-import monster.MON_Orc;
-import monster.MON_RedSlime;
-import monster.MON_SkeletonLord;
+import monster.MonBat;
+import monster.MonGreenSlime;
+import monster.MonOrc;
+import monster.MonRedSlime;
+import monster.MonSkeletonLord;
 import object.ObjCoinBronze;
 import object.ObjDoor;
 import object.ObjDoorIron;
@@ -138,62 +138,62 @@ public class AssetSetter {
     int mapNum = 0;
     int i = 0;
 
-    gp.monster[mapNum][i] = new MON_GreenSlime(gp);
+    gp.monster[mapNum][i] = new MonGreenSlime(gp);
     place(gp.monster[mapNum][i++], 21, 38);
 
-    gp.monster[mapNum][i] = new MON_GreenSlime(gp);
+    gp.monster[mapNum][i] = new MonGreenSlime(gp);
     place(gp.monster[mapNum][i++], 23, 42);
 
-    gp.monster[mapNum][i] = new MON_GreenSlime(gp);
+    gp.monster[mapNum][i] = new MonGreenSlime(gp);
     place(gp.monster[mapNum][i++], 24, 37);
 
-    gp.monster[mapNum][i] = new MON_GreenSlime(gp);
+    gp.monster[mapNum][i] = new MonGreenSlime(gp);
     place(gp.monster[mapNum][i++], 34, 42);
 
-    gp.monster[mapNum][i] = new MON_GreenSlime(gp);
+    gp.monster[mapNum][i] = new MonGreenSlime(gp);
     place(gp.monster[mapNum][i++], 38, 42);
 
-    gp.monster[mapNum][i] = new MON_Orc(gp);
+    gp.monster[mapNum][i] = new MonOrc(gp);
     place(gp.monster[mapNum][i++], 12, 33);
 
-    gp.monster[mapNum][i] = new MON_RedSlime(gp);
+    gp.monster[mapNum][i] = new MonRedSlime(gp);
     place(gp.monster[mapNum][i++], 35, 9);
 
-    gp.monster[mapNum][i] = new MON_RedSlime(gp);
+    gp.monster[mapNum][i] = new MonRedSlime(gp);
     place(gp.monster[mapNum][i++], 37, 9);
 
-    gp.monster[mapNum][i] = new MON_RedSlime(gp);
+    gp.monster[mapNum][i] = new MonRedSlime(gp);
     place(gp.monster[mapNum][i], 39, 9);
 
     // MAP 1
     mapNum = 1;
     i = 0;
-    gp.monster[mapNum][i] = new MON_GreenSlime(gp);
+    gp.monster[mapNum][i] = new MonGreenSlime(gp);
     place(gp.monster[mapNum][i], 38, 42);
 
     // MAP 2
     mapNum = 2;
     i = 0;
-    gp.monster[mapNum][i] = new MON_Bat(gp);
+    gp.monster[mapNum][i] = new MonBat(gp);
     place(gp.monster[mapNum][i++], 34, 39);
 
-    gp.monster[mapNum][i] = new MON_Bat(gp);
+    gp.monster[mapNum][i] = new MonBat(gp);
     place(gp.monster[mapNum][i++], 36, 25);
 
-    gp.monster[mapNum][i] = new MON_Bat(gp);
+    gp.monster[mapNum][i] = new MonBat(gp);
     place(gp.monster[mapNum][i++], 39, 26);
 
-    gp.monster[mapNum][i] = new MON_Bat(gp);
+    gp.monster[mapNum][i] = new MonBat(gp);
     place(gp.monster[mapNum][i++], 28, 11);
 
-    gp.monster[mapNum][i] = new MON_Bat(gp);
+    gp.monster[mapNum][i] = new MonBat(gp);
     place(gp.monster[mapNum][i], 10, 19);
 
     // MAP 3
     mapNum = 3;
     i = 0;
     if (!Progress.isSkeletonLordDefeated()) {
-      gp.monster[mapNum][i] = new MON_SkeletonLord(gp);
+      gp.monster[mapNum][i] = new MonSkeletonLord(gp);
       place(gp.monster[mapNum][i], 23, 16);
     }
   }

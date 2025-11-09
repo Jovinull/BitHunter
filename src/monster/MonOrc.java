@@ -1,6 +1,6 @@
 package monster;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import entity.Entity;
 import main.GamePanel;
@@ -8,9 +8,9 @@ import object.ObjCoinBronze;
 import object.ObjHeart;
 import object.ObjManaCrystal;
 
-public class MON_Orc extends Entity {
+public class MonOrc extends Entity {
 
-  public MON_Orc(GamePanel gp) {
+  public MonOrc(GamePanel gp) {
     super(gp);
 
     // Atributos base
@@ -69,18 +69,13 @@ public class MON_Orc extends Entity {
   @Override
   public void setAction() {
     if (isOnPath()) {
-      // Para de perseguir?
       checkStopChasingOrNot(gp.player, 15, 100);
-      // Vai até a posição do jogador
       searchPath(getGoalCol(gp.player), getGoalRow(gp.player));
     } else {
-      // Começa a perseguir?
       checkStartChasingOrNot(gp.player, 5, 100);
-      // Direção aleatória
       getRandomDirection(120);
     }
 
-    // Ataca se estiver apto
     if (!isAttacking()) {
       checkAttackOrNot(30, gp.tileSize * 4, gp.tileSize);
     }
@@ -94,8 +89,8 @@ public class MON_Orc extends Entity {
 
   @Override
   public void checkDrop() {
-    // 1..100
-    int i = new Random().nextInt(100) + 1;
+    // (S2119) Reusar Random -> ThreadLocalRandom
+    int i = ThreadLocalRandom.current().nextInt(1, 101);
 
     if (i < 50) {
       dropItem(new ObjCoinBronze(gp));

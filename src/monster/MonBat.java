@@ -1,6 +1,6 @@
 package monster;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import entity.Entity;
 import main.GamePanel;
@@ -8,9 +8,13 @@ import object.ObjCoinBronze;
 import object.ObjHeart;
 import object.ObjManaCrystal;
 
-public class MON_Bat extends Entity {
+public class MonBat extends Entity {
 
-  public MON_Bat(GamePanel gp) {
+  // Evita duplicação de literais (S1192)
+  private static final String BAT_DOWN_1 = "/monster/bat_down_1";
+  private static final String BAT_DOWN_2 = "/monster/bat_down_2";
+
+  public MonBat(GamePanel gp) {
     super(gp);
 
     setType(TYPE_MONSTER);
@@ -36,15 +40,16 @@ public class MON_Bat extends Entity {
   }
 
   /** Carrega sprites do morcego (padrão antigo: manter nome getImage()). */
+  @Override // (S1161)
   public void getImage() {
-    up1 = setup("/monster/bat_down_1", gp.tileSize, gp.tileSize);
-    up2 = setup("/monster/bat_down_2", gp.tileSize, gp.tileSize);
-    down1 = setup("/monster/bat_down_1", gp.tileSize, gp.tileSize);
-    down2 = setup("/monster/bat_down_2", gp.tileSize, gp.tileSize);
-    left1 = setup("/monster/bat_down_1", gp.tileSize, gp.tileSize);
-    left2 = setup("/monster/bat_down_2", gp.tileSize, gp.tileSize);
-    right1 = setup("/monster/bat_down_1", gp.tileSize, gp.tileSize);
-    right2 = setup("/monster/bat_down_2", gp.tileSize, gp.tileSize);
+    up1 = setup(BAT_DOWN_1, gp.tileSize, gp.tileSize);
+    up2 = setup(BAT_DOWN_2, gp.tileSize, gp.tileSize);
+    down1 = setup(BAT_DOWN_1, gp.tileSize, gp.tileSize);
+    down2 = setup(BAT_DOWN_2, gp.tileSize, gp.tileSize);
+    left1 = setup(BAT_DOWN_1, gp.tileSize, gp.tileSize);
+    left2 = setup(BAT_DOWN_2, gp.tileSize, gp.tileSize);
+    right1 = setup(BAT_DOWN_1, gp.tileSize, gp.tileSize);
+    right2 = setup(BAT_DOWN_2, gp.tileSize, gp.tileSize);
   }
 
   @Override
@@ -56,14 +61,12 @@ public class MON_Bat extends Entity {
   public void damageReaction() {
     // Reseta o contador de ações para reagir imediatamente
     setActionLockCounter(0);
-    // Se quiser perseguir o jogador ao ser atingido, você pode:
-    // setOnPath(true);
   }
 
   @Override
   public void checkDrop() {
-    // 1..100
-    int i = new Random().nextInt(100) + 1;
+    // (S2119) Reusar Random -> ThreadLocalRandom
+    int i = ThreadLocalRandom.current().nextInt(1, 101);
 
     if (i < 50) {
       dropItem(new ObjCoinBronze(gp));

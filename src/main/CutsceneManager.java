@@ -3,7 +3,7 @@ package main;
 import java.awt.Graphics2D;
 
 import entity.PlayerDummy;
-import monster.MON_SkeletonLord;
+import monster.MonSkeletonLord;
 import object.ObjDoorIron;
 
 public class CutsceneManager {
@@ -76,7 +76,7 @@ public class CutsceneManager {
     // Procurar o boss
     for (int i = 0; i < gp.monster[gp.currentMap].length; i++) {
       if (gp.monster[gp.currentMap][i] != null
-          && MON_SkeletonLord.monName.equals(gp.monster[gp.currentMap][i].getName())) {
+          && MonSkeletonLord.MON_NAME.equals(gp.monster[gp.currentMap][i].getName())) {
         gp.monster[gp.currentMap][i].setSleep(false);
         gp.ui.npc = gp.monster[gp.currentMap][i];
         scenePhase++;
