@@ -19,7 +19,7 @@ import object.ObjManaCrystal;
 import object.ObjPickaxe;
 import object.ObjPotionRed;
 import object.ObjShieldBlue;
-import object.OBJ_Tent;
+import object.ObjTent;
 import object.ObjAxe;
 import object.ObjChest;
 import tile_interactive.IT_DestructibleWall;
@@ -53,7 +53,7 @@ public class AssetSetter {
     gp.obj[mapNum][i] = new ObjShieldBlue(gp);
     place(gp.obj[mapNum][i++], 35, 21);
 
-    gp.obj[mapNum][i] = new OBJ_Tent(gp);
+    gp.obj[mapNum][i] = new ObjTent(gp);
     place(gp.obj[mapNum][i++], 19, 20);
 
     gp.obj[mapNum][i] = new ObjPotionRed(gp);

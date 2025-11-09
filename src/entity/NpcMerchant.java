@@ -3,13 +3,13 @@ package entity;
 import java.awt.Rectangle;
 
 import main.GamePanel;
-import object.OBJ_Axe;
-import object.OBJ_Key;
-import object.OBJ_Lantern;
-import object.OBJ_Potion_Red;
-import object.OBJ_Shield_Blue;
-import object.OBJ_Shield_Wood;
-import object.OBJ_Sword_Normal;
+import object.ObjAxe;
+import object.ObjKey;
+import object.ObjLantern;
+import object.ObjPotionRed;
+import object.ObjShieldBlue;
+import object.ObjShieldWood;
+import object.ObjSwordNormal;
 
 public class NpcMerchant extends Entity {
 
@@ -60,13 +60,13 @@ public class NpcMerchant extends Entity {
 
   public void setItems() {
     var inv = getInventory();
-    inv.add(new OBJ_Potion_Red(gp));
-    inv.add(new OBJ_Key(gp));
-    inv.add(new OBJ_Sword_Normal(gp));
-    inv.add(new OBJ_Axe(gp));
-    inv.add(new OBJ_Shield_Wood(gp));
-    inv.add(new OBJ_Shield_Blue(gp));
-    inv.add(new OBJ_Lantern(gp));
+    inv.add(new ObjPotionRed(gp));
+    inv.add(new ObjKey(gp));
+    inv.add(new ObjSwordNormal(gp));
+    inv.add(new ObjAxe(gp));
+    inv.add(new ObjShieldWood(gp));
+    inv.add(new ObjShieldBlue(gp));
+    inv.add(new ObjLantern(gp));
   }
 
   @Override

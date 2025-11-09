@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import main.GamePanel;
-import object.OBJ_Door_Iron;
+import object.ObjDoorIron;
 import tile_interactive.IT_MetalPlate;
 import tile_interactive.InteractiveTile;
 
@@ -188,7 +188,7 @@ public class NpcBigRock extends Entity {
 
     for (int i = 0; i < objects.length; i++) {
       Entity obj = objects[i];
-      if (obj != null && OBJ_Door_Iron.objName.equals(obj.getName())) {
+      if (obj != null && ObjDoorIron.OBJ_NAME.equals(obj.getName())) {
         objects[i] = null;
         opened = true;
       }

@@ -8,11 +8,11 @@ import java.awt.image.BufferedImage;
 
 import main.GamePanel;
 import main.KeyHandler;
-import object.OBJ_Fireball;
-import object.OBJ_Key;
-import object.OBJ_Lantern;
-import object.OBJ_Shield_Wood;
-import object.OBJ_Sword_Normal;
+import object.ObjFireball;
+import object.ObjKey;
+import object.ObjLantern;
+import object.ObjShieldWood;
+import object.ObjSwordNormal;
 import tile_interactive.InteractiveTile;
 
 public class Player extends Entity {
@@ -67,10 +67,10 @@ public class Player extends Entity {
     setNextLevelExp(5);
     setCoin(500);
 
-    setCurrentWeapon(new OBJ_Sword_Normal(gp));
-    setCurrentShield(new OBJ_Shield_Wood(gp));
+    setCurrentWeapon(new ObjSwordNormal(gp));
+    setCurrentShield(new ObjShieldWood(gp));
     setCurrentLight(null);
-    setProjectile(new OBJ_Fireball(gp));
+    setProjectile(new ObjFireball(gp));
 
     setAttack(getAttack());
     setDefense(getDefense());
@@ -112,8 +112,8 @@ public class Player extends Entity {
     inv.clear();
     inv.add(getCurrentWeapon());
     inv.add(getCurrentShield());
-    inv.add(new OBJ_Key(gp));
-    inv.add(new OBJ_Lantern(gp));
+    inv.add(new ObjKey(gp));
+    inv.add(new ObjLantern(gp));
   }
 
   @Override
