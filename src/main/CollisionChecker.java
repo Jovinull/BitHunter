@@ -29,7 +29,8 @@ public class CollisionChecker {
     int entityTopRow = entityTopWorldY / gp.tileSize;
     int entityBottomRow = entityBottomWorldY / gp.tileSize;
 
-    int tileNum1, tileNum2;
+    int tileNum1;
+    int tileNum2;
 
     // Direção temporal quando em knockback
     String direction = entity.isKnockBack() ? entity.getKnockBackDirection() : entity.getDirection();
@@ -79,7 +80,7 @@ public class CollisionChecker {
     }
   }
 
-  public int checkObject(Entity entity, boolean player) {
+  public int checkObject(Entity entity) {
     int index = 999;
 
     String direction = entity.isKnockBack() ? entity.getKnockBackDirection() : entity.getDirection();

@@ -251,7 +251,7 @@ public class Player extends Entity {
   private void processKnockBack() {
     setCollisionOn(false);
     gp.cChecker.checkTile(this);
-    gp.cChecker.checkObject(this, true);
+    gp.cChecker.checkObject(this);
     gp.cChecker.checkEntity(this, gp.npc);
     gp.cChecker.checkEntity(this, gp.monster);
     gp.cChecker.checkEntity(this, gp.iTile);
@@ -305,7 +305,7 @@ public class Player extends Entity {
     setCollisionOn(false);
     gp.cChecker.checkTile(this);
 
-    int objIndex = gp.cChecker.checkObject(this, true);
+    int objIndex = gp.cChecker.checkObject(this);
     pickUpObject(objIndex);
 
     int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
