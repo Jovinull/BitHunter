@@ -2,8 +2,8 @@ package main;
 
 import data.Progress;
 import entity.Entity;
-import entity.NPC_BigRock;
-import entity.NPC_Merchant;
+import entity.NpcBigRock;
+import entity.NpcMerchant;
 import entity.NpcOldMan;
 import monster.MON_Bat;
 import monster.MON_GreenSlime;
@@ -117,19 +117,19 @@ public class AssetSetter {
     // MAP 1
     mapNum = 1;
     i = 0;
-    gp.npc[mapNum][i] = new NPC_Merchant(gp);
+    gp.npc[mapNum][i] = new NpcMerchant(gp);
     place(gp.npc[mapNum][i], 12, 7);
 
     // MAP 2
     mapNum = 2;
     i = 0;
-    gp.npc[mapNum][i] = new NPC_BigRock(gp);
+    gp.npc[mapNum][i] = new NpcBigRock(gp);
     place(gp.npc[mapNum][i++], 20, 25);
 
-    gp.npc[mapNum][i] = new NPC_BigRock(gp);
+    gp.npc[mapNum][i] = new NpcBigRock(gp);
     place(gp.npc[mapNum][i++], 11, 18);
 
-    gp.npc[mapNum][i] = new NPC_BigRock(gp);
+    gp.npc[mapNum][i] = new NpcBigRock(gp);
     place(gp.npc[mapNum][i], 23, 14);
   }
 
