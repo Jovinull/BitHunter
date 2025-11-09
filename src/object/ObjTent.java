@@ -3,15 +3,15 @@ package object;
 import entity.Entity;
 import main.GamePanel;
 
-public class OBJ_Tent extends Entity {
+public class ObjTent extends Entity {
 
-  public static final String objName = "Tenda";
+  public static final String OBJ_NAME = "Tenda";
 
-  public OBJ_Tent(GamePanel gp) {
+  public ObjTent(GamePanel gp) {
     super(gp);
 
     setType(TYPE_CONSUMABLE);
-    setName(objName);
+    setName(OBJ_NAME);
 
     down1 = setup("/objects/tent", gp.tileSize, gp.tileSize);
 

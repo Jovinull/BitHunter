@@ -3,15 +3,15 @@ package object;
 import entity.Entity;
 import main.GamePanel;
 
-public class OBJ_Sword_Normal extends Entity {
+public class ObjSwordNormal extends Entity {
 
-  public static final String objName = "Espada Comum";
+  public static final String OBJ_NAME = "Espada Comum";
 
-  public OBJ_Sword_Normal(GamePanel gp) {
+  public ObjSwordNormal(GamePanel gp) {
     super(gp);
 
     setType(TYPE_SWORD);
-    setName(objName);
+    setName(OBJ_NAME);
 
     down1 = setup("/objects/sword_normal", gp.tileSize, gp.tileSize);
 
