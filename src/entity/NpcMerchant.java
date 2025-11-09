@@ -11,15 +11,18 @@ import object.OBJ_Shield_Blue;
 import object.OBJ_Shield_Wood;
 import object.OBJ_Sword_Normal;
 
-public class NPC_Merchant extends Entity {
+public class NpcMerchant extends Entity {
 
-  public NPC_Merchant(GamePanel gp) {
+  private static final String SPRITE_DOWN_1 = "/npc/merchant/merchant_down_1";
+  private static final String SPRITE_DOWN_2 = "/npc/merchant/merchant_down_2";
+
+  public NpcMerchant(GamePanel gp) {
     super(gp);
 
     setDirection(DIR_DOWN);
     setSpeed(1);
 
-    // solidArea é final -> apenas configurar via getter
+    // solidArea é final -> configurar via getter
     Rectangle sa = getSolidArea();
     sa.x = 8;
     sa.y = 16;
@@ -33,16 +36,17 @@ public class NPC_Merchant extends Entity {
     setItems();
   }
 
+  @Override
   public void getImage() {
-    // Sprites continuam protegidos na Entity, então pode usar direto
-    up1 = setup("/npc/merchant/merchant_down_1", gp.tileSize, gp.tileSize);
-    up2 = setup("/npc/merchant/merchant_down_2", gp.tileSize, gp.tileSize);
-    down1 = setup("/npc/merchant/merchant_down_1", gp.tileSize, gp.tileSize);
-    down2 = setup("/npc/merchant/merchant_down_2", gp.tileSize, gp.tileSize);
-    left1 = setup("/npc/merchant/merchant_down_1", gp.tileSize, gp.tileSize);
-    left2 = setup("/npc/merchant/merchant_down_2", gp.tileSize, gp.tileSize);
-    right1 = setup("/npc/merchant/merchant_down_1", gp.tileSize, gp.tileSize);
-    right2 = setup("/npc/merchant/merchant_down_2", gp.tileSize, gp.tileSize);
+    // O sprite do comerciante usa as variações "down" para todas as direções
+    up1 = setup(SPRITE_DOWN_1, gp.tileSize, gp.tileSize);
+    up2 = setup(SPRITE_DOWN_2, gp.tileSize, gp.tileSize);
+    down1 = setup(SPRITE_DOWN_1, gp.tileSize, gp.tileSize);
+    down2 = setup(SPRITE_DOWN_2, gp.tileSize, gp.tileSize);
+    left1 = setup(SPRITE_DOWN_1, gp.tileSize, gp.tileSize);
+    left2 = setup(SPRITE_DOWN_2, gp.tileSize, gp.tileSize);
+    right1 = setup(SPRITE_DOWN_1, gp.tileSize, gp.tileSize);
+    right2 = setup(SPRITE_DOWN_2, gp.tileSize, gp.tileSize);
   }
 
   public void setDialogue() {
