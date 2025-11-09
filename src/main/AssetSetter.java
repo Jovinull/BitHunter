@@ -1,6 +1,7 @@
 package main;
 
 import data.Progress;
+import entity.Entity;
 import entity.NPC_BigRock;
 import entity.NPC_Merchant;
 import entity.NpcOldMan;
@@ -38,69 +39,71 @@ public class AssetSetter {
     int i = 0;
 
     gp.obj[mapNum][i] = new OBJ_Coin_Bronze(gp);
-    placeEntity(mapNum, i++, 25, 23);
+    place(gp.obj[mapNum][i++], 25, 23);
 
     gp.obj[mapNum][i] = new OBJ_Coin_Bronze(gp);
-    placeEntity(mapNum, i++, 21, 19);
+    place(gp.obj[mapNum][i++], 21, 19);
 
     gp.obj[mapNum][i] = new OBJ_Key(gp);
-    placeEntity(mapNum, i++, 26, 21);
+    place(gp.obj[mapNum][i++], 26, 21);
 
     gp.obj[mapNum][i] = new OBJ_Axe(gp);
-    placeEntity(mapNum, i++, 33, 21);
+    place(gp.obj[mapNum][i++], 33, 21);
 
     gp.obj[mapNum][i] = new OBJ_Shield_Blue(gp);
-    placeEntity(mapNum, i++, 35, 21);
+    place(gp.obj[mapNum][i++], 35, 21);
 
     gp.obj[mapNum][i] = new OBJ_Tent(gp);
-    placeEntity(mapNum, i++, 19, 20);
+    place(gp.obj[mapNum][i++], 19, 20);
 
     gp.obj[mapNum][i] = new OBJ_Potion_Red(gp);
-    placeEntity(mapNum, i++, 22, 27);
+    place(gp.obj[mapNum][i++], 22, 27);
 
     gp.obj[mapNum][i] = new OBJ_Heart(gp);
-    placeEntity(mapNum, i++, 22, 29);
+    place(gp.obj[mapNum][i++], 22, 29);
 
     gp.obj[mapNum][i] = new OBJ_ManaCrystal(gp);
-    placeEntity(mapNum, i++, 22, 31);
+    place(gp.obj[mapNum][i++], 22, 31);
 
     gp.obj[mapNum][i] = new OBJ_Door(gp);
-    placeEntity(mapNum, i++, 14, 28);
+    place(gp.obj[mapNum][i++], 14, 28);
 
     gp.obj[mapNum][i] = new OBJ_Door(gp);
-    placeEntity(mapNum, i++, 12, 12);
+    place(gp.obj[mapNum][i++], 12, 12);
 
     gp.obj[mapNum][i] = new OBJ_Chest(gp);
     gp.obj[mapNum][i].setLoot(new OBJ_Key(gp));
-    placeEntity(mapNum, i, 12, 8);
+    place(gp.obj[mapNum][i], 12, 8);
 
+    // MAP 2
     mapNum = 2;
     i = 0;
 
     gp.obj[mapNum][i] = new OBJ_Chest(gp);
     gp.obj[mapNum][i].setLoot(new OBJ_Pickaxe(gp));
-    placeEntity(mapNum, i++, 40, 41);
+    place(gp.obj[mapNum][i++], 40, 41);
 
     gp.obj[mapNum][i] = new OBJ_Chest(gp);
     gp.obj[mapNum][i].setLoot(new OBJ_Potion_Red(gp));
-    placeEntity(mapNum, i++, 13, 16);
+    place(gp.obj[mapNum][i++], 13, 16);
 
     gp.obj[mapNum][i] = new OBJ_Chest(gp);
     gp.obj[mapNum][i].setLoot(new OBJ_Potion_Red(gp));
-    placeEntity(mapNum, i++, 26, 34);
+    place(gp.obj[mapNum][i++], 26, 34);
 
     gp.obj[mapNum][i] = new OBJ_Chest(gp);
     gp.obj[mapNum][i].setLoot(new OBJ_Potion_Red(gp));
-    placeEntity(mapNum, i++, 27, 15);
+    place(gp.obj[mapNum][i++], 27, 15);
 
     gp.obj[mapNum][i] = new OBJ_Door_Iron(gp);
-    placeEntity(mapNum, i, 18, 23);
+    place(gp.obj[mapNum][i], 18, 23);
 
+    // MAP 3
     mapNum = 3;
     i = 0;
 
     gp.obj[mapNum][i] = new OBJ_Door_Iron(gp);
-    placeEntity(mapNum, i, 25, 15);
+    place(gp.obj[mapNum][i], 25, 15);
   }
 
   public void setNPC() {
@@ -109,85 +112,89 @@ public class AssetSetter {
 
     // MAP 0
     gp.npc[mapNum][i] = new NpcOldMan(gp);
-    placeEntity(mapNum, i++, 21, 21);
+    place(gp.npc[mapNum][i++], 21, 21);
 
     // MAP 1
     mapNum = 1;
     i = 0;
     gp.npc[mapNum][i] = new NPC_Merchant(gp);
-    placeEntity(mapNum, i, 12, 7);
+    place(gp.npc[mapNum][i], 12, 7);
 
     // MAP 2
     mapNum = 2;
     i = 0;
     gp.npc[mapNum][i] = new NPC_BigRock(gp);
-    placeEntity(mapNum, i++, 20, 25);
+    place(gp.npc[mapNum][i++], 20, 25);
 
     gp.npc[mapNum][i] = new NPC_BigRock(gp);
-    placeEntity(mapNum, i++, 11, 18);
+    place(gp.npc[mapNum][i++], 11, 18);
 
     gp.npc[mapNum][i] = new NPC_BigRock(gp);
-    placeEntity(mapNum, i, 23, 14);
+    place(gp.npc[mapNum][i], 23, 14);
   }
 
   public void setMonster() {
+    // MAP 0
     int mapNum = 0;
     int i = 0;
 
     gp.monster[mapNum][i] = new MON_GreenSlime(gp);
-    placeEntity(mapNum, i++, 21, 38);
+    place(gp.monster[mapNum][i++], 21, 38);
 
     gp.monster[mapNum][i] = new MON_GreenSlime(gp);
-    placeEntity(mapNum, i++, 23, 42);
+    place(gp.monster[mapNum][i++], 23, 42);
 
     gp.monster[mapNum][i] = new MON_GreenSlime(gp);
-    placeEntity(mapNum, i++, 24, 37);
+    place(gp.monster[mapNum][i++], 24, 37);
 
     gp.monster[mapNum][i] = new MON_GreenSlime(gp);
-    placeEntity(mapNum, i++, 34, 42);
+    place(gp.monster[mapNum][i++], 34, 42);
 
     gp.monster[mapNum][i] = new MON_GreenSlime(gp);
-    placeEntity(mapNum, i++, 38, 42);
+    place(gp.monster[mapNum][i++], 38, 42);
 
     gp.monster[mapNum][i] = new MON_Orc(gp);
-    placeEntity(mapNum, i++, 12, 33);
+    place(gp.monster[mapNum][i++], 12, 33);
 
     gp.monster[mapNum][i] = new MON_RedSlime(gp);
-    placeEntity(mapNum, i++, 35, 9);
+    place(gp.monster[mapNum][i++], 35, 9);
 
     gp.monster[mapNum][i] = new MON_RedSlime(gp);
-    placeEntity(mapNum, i++, 37, 9);
+    place(gp.monster[mapNum][i++], 37, 9);
 
     gp.monster[mapNum][i] = new MON_RedSlime(gp);
-    placeEntity(mapNum, i, 39, 9);
+    place(gp.monster[mapNum][i], 39, 9);
 
+    // MAP 1
     mapNum = 1;
+    i = 0;
     gp.monster[mapNum][i] = new MON_GreenSlime(gp);
-    placeEntity(mapNum, i, 38, 42);
+    place(gp.monster[mapNum][i], 38, 42);
 
+    // MAP 2
     mapNum = 2;
-
-    i++;
+    i = 0;
     gp.monster[mapNum][i] = new MON_Bat(gp);
-    placeEntity(mapNum, i++, 34, 39);
-
-    gp.monster[mapNum][i] = new MON_Bat(gp);
-    placeEntity(mapNum, i++, 36, 25);
+    place(gp.monster[mapNum][i++], 34, 39);
 
     gp.monster[mapNum][i] = new MON_Bat(gp);
-    placeEntity(mapNum, i++, 39, 26);
+    place(gp.monster[mapNum][i++], 36, 25);
 
     gp.monster[mapNum][i] = new MON_Bat(gp);
-    placeEntity(mapNum, i++, 28, 11);
+    place(gp.monster[mapNum][i++], 39, 26);
 
     gp.monster[mapNum][i] = new MON_Bat(gp);
-    placeEntity(mapNum, i, 10, 19);
+    place(gp.monster[mapNum][i++], 28, 11);
 
+    gp.monster[mapNum][i] = new MON_Bat(gp);
+    place(gp.monster[mapNum][i], 10, 19);
+
+    // MAP 3
     mapNum = 3;
-
+    i = 0;
     if (!Progress.isSkeletonLordDefeated()) {
       gp.monster[mapNum][i] = new MON_SkeletonLord(gp);
-      placeEntity(mapNum, i, 23, 16);
+      place(gp.monster[mapNum][i], 23, 16);
     }
   }
 
@@ -206,6 +213,7 @@ public class AssetSetter {
     gp.iTile[mapNum][i++] = new IT_DryTree(gp, 17, 40);
     gp.iTile[mapNum][i] = new IT_DryTree(gp, 12, 41);
 
+    // MAP 2
     mapNum = 2;
     i = 0;
 
@@ -231,20 +239,9 @@ public class AssetSetter {
     gp.iTile[mapNum][i] = new IT_MetalPlate(gp, 39, 31);
   }
 
-  /**
-   * Posiciona uma entidade em col/row, convertendo para worldX/worldY via
-   * tileSize.
-   */
-  private void placeEntity(int mapNum, int index, int col, int row) {
-    var e = gp.obj.length > mapNum && gp.obj[mapNum] != null && index < gp.obj[mapNum].length ? gp.obj[mapNum][index]
-        : gp.npc.length > mapNum && gp.npc[mapNum] != null && index < gp.npc[mapNum].length ? gp.npc[mapNum][index]
-            : gp.monster.length > mapNum && gp.monster[mapNum] != null && index < gp.monster[mapNum].length
-                ? gp.monster[mapNum][index]
-                : null;
-
-    if (e != null) {
-      e.setWorldX(gp.tileSize * col);
-      e.setWorldY(gp.tileSize * row);
-    }
+  /** Posiciona uma entidade em (col,row) -> (worldX, worldY). */
+  private void place(Entity e, int col, int row) {
+    e.setWorldX(gp.tileSize * col);
+    e.setWorldY(gp.tileSize * row);
   }
 }
