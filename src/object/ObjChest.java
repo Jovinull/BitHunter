@@ -5,15 +5,15 @@ import java.awt.Rectangle;
 import entity.Entity;
 import main.GamePanel;
 
-public class OBJ_Chest extends Entity {
+public class ObjChest extends Entity {
 
-  public static final String objName = "Baú";
+  public static final String OBJ_NAME = "Baú";
 
-  public OBJ_Chest(GamePanel gp) {
+  public ObjChest(GamePanel gp) {
     super(gp);
 
     setType(TYPE_OBSTACLE);
-    setName(objName);
+    setName(OBJ_NAME);
 
     // sprites (protegidos em Entity)
     image = setup("/objects/chest", gp.tileSize, gp.tileSize);

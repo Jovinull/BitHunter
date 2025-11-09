@@ -3,15 +3,15 @@ package object;
 import entity.Entity;
 import main.GamePanel;
 
-public class OBJ_Heart extends Entity {
+public class ObjHeart extends Entity {
 
-  public static final String objName = "Coração";
+  public static final String OBJ_NAME = "Coração";
 
-  public OBJ_Heart(GamePanel gp) {
+  public ObjHeart(GamePanel gp) {
     super(gp);
 
     setType(TYPE_PICKUP_ONLY);
-    setName(objName);
+    setName(OBJ_NAME);
     setValue(2);
 
     down1 = setup("/objects/heart_full", gp.tileSize, gp.tileSize);

@@ -5,17 +5,17 @@ import java.awt.Rectangle;
 import entity.Entity;
 import main.GamePanel;
 
-public class OBJ_Door_Iron extends Entity {
+public class ObjDoor extends Entity {
 
-  public static final String objName = "Porta de Ferro";
+  public static final String OBJ_NAME = "Porta";
 
-  public OBJ_Door_Iron(GamePanel gp) {
+  public ObjDoor(GamePanel gp) {
     super(gp);
 
     setType(TYPE_OBSTACLE);
-    setName(objName);
+    setName(OBJ_NAME);
 
-    down1 = setup("/objects/door_iron", gp.tileSize, gp.tileSize);
+    down1 = setup("/objects/door", gp.tileSize, gp.tileSize);
     setCollision(true);
 
     Rectangle sa = getSolidArea();
@@ -31,7 +31,7 @@ public class OBJ_Door_Iron extends Entity {
 
   public void setDialogue() {
     String[][] d = getDialogues();
-    d[0][0] = "Isso não vai se mexer.";
+    d[0][0] = "Uma porta trancada. Você precisa de uma \nchave para abri-la.";
   }
 
   @Override

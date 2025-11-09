@@ -3,15 +3,15 @@ package object;
 import entity.Entity;
 import main.GamePanel;
 
-public class OBJ_Coin_Bronze extends Entity {
+public class ObjCoinBronze extends Entity {
 
-  public static final String objName = "Moeda de Bronze";
+  public static final String OBJ_NAME = "Moeda de Bronze";
 
-  public OBJ_Coin_Bronze(GamePanel gp) {
+  public ObjCoinBronze(GamePanel gp) {
     super(gp);
 
     setType(TYPE_PICKUP_ONLY);
-    setName(objName);
+    setName(OBJ_NAME);
     setValue(1);
     down1 = setup("/objects/coin_bronze", gp.tileSize, gp.tileSize);
   }

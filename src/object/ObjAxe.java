@@ -5,15 +5,15 @@ import java.awt.Rectangle;
 import entity.Entity;
 import main.GamePanel;
 
-public class OBJ_Axe extends Entity {
+public class ObjAxe extends Entity {
 
-  public static final String objName = "Machado de Lenhador";
+  public static final String OBJ_NAME = "Machado de Lenhador";
 
-  public OBJ_Axe(GamePanel gp) {
+  public ObjAxe(GamePanel gp) {
     super(gp);
 
     setType(TYPE_AXE);
-    setName(objName);
+    setName(OBJ_NAME);
 
     // sprite
     down1 = setup("/objects/axe", gp.tileSize, gp.tileSize);
