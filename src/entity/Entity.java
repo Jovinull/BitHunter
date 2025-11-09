@@ -3,6 +3,7 @@ package entity;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -385,10 +386,10 @@ public class Entity {
     int speedVal = generator.getParticleSpeed();
     int maxLifeVal = generator.getParticleMaxLife();
 
-    Particle p1 = new Particle(gp, target, color, size, speedVal, maxLifeVal, -2, -1);
-    Particle p2 = new Particle(gp, target, color, size, speedVal, maxLifeVal, 2, -1);
-    Particle p3 = new Particle(gp, target, color, size, speedVal, maxLifeVal, -2, 1);
-    Particle p4 = new Particle(gp, target, color, size, speedVal, maxLifeVal, 2, 1);
+    Particle p1 = new Particle(gp, target, color, size, speedVal, maxLifeVal, new Point(-2, -1));
+    Particle p2 = new Particle(gp, target, color, size, speedVal, maxLifeVal, new Point(2, -1));
+    Particle p3 = new Particle(gp, target, color, size, speedVal, maxLifeVal, new Point(-2, 1));
+    Particle p4 = new Particle(gp, target, color, size, speedVal, maxLifeVal, new Point(2, 1));
 
     gp.particleList.add(p1);
     gp.particleList.add(p2);

@@ -2,23 +2,33 @@ package entity;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Point;
 
 import main.GamePanel;
 
 public class Particle extends Entity {
+
+  private static final int LOW_LIFE_DIVISOR = 3;
 
   private final Color color;
   private final int size;
   private int xd;
   private int yd;
 
-  public Particle(GamePanel gp, Entity generator, Color color, int size, int speed, int maxLife, int xd, int yd) {
+  public Particle(
+      GamePanel gp,
+      Entity generator,
+      Color color,
+      int size,
+      int speed,
+      int maxLife,
+      Point velocity) {
     super(gp);
 
     this.color = color;
     this.size = size;
-    this.xd = xd;
-    this.yd = yd;
+    this.xd = velocity.x;
+    this.yd = velocity.y;
 
     setSpeed(speed);
     setMaxLife(maxLife);
@@ -31,10 +41,9 @@ public class Particle extends Entity {
 
   @Override
   public void update() {
-
     setLife(getLife() - 1);
 
-    if (getLife() < getMaxLife() / 3) {
+    if (getLife() < getMaxLife() / LOW_LIFE_DIVISOR) {
       yd++;
     }
 
