@@ -9,9 +9,12 @@ public class EventHandler {
   EventRect[][][] eventRect;
   Entity eventMaster;
 
-  int previousEventX, previousEventY;
+  int previousEventX;
+  int previousEventY; // S1659: declarar em linha separada
   boolean canTouchEvent = true;
-  int tempMap, tempCol, tempRow;
+  int tempMap;
+  int tempCol; // S1659: declarar em linhas separadas
+  int tempRow;
 
   public EventHandler(GamePanel gp) {
     this.gp = gp;
@@ -69,12 +72,13 @@ public class EventHandler {
 
       String playerDir = gp.player.getDirection();
 
-      if (playerArea.intersects(eventRect[map][col][row]) && !eventRect[map][col][row].eventDone) {
-        if (playerDir.equals(reqDirection) || "any".equals(reqDirection)) {
-          hit = true;
-          previousEventX = gp.player.getWorldX();
-          previousEventY = gp.player.getWorldY();
-        }
+      // S1066: mesclar o if interno com o if adjacente
+      if (playerArea.intersects(eventRect[map][col][row])
+          && !eventRect[map][col][row].eventDone
+          && (playerDir.equals(reqDirection) || "any".equals(reqDirection))) {
+        hit = true;
+        previousEventX = gp.player.getWorldX();
+        previousEventY = gp.player.getWorldY();
       }
 
       playerArea.x = playerDefaultX;
@@ -94,28 +98,49 @@ public class EventHandler {
       canTouchEvent = true;
     }
 
-    if (canTouchEvent) {
-      if (hit(0, 27, 16, Entity.DIR_RIGHT)) {
-        damagePit(gp.dialogueState);
-      } else if (hit(0, 23, 12, Entity.DIR_UP)) {
-        healingPool(gp.dialogueState);
-      } else if (hit(0, 10, 39, "any")) {
-        teleport(1, 12, 13, gp.indoor);
-      } else if (hit(1, 12, 13, "any")) {
-        teleport(0, 10, 39, gp.outside);
-      } else if (hit(1, 12, 9, Entity.DIR_UP)) {
-        speak(gp.npc[1][0]);
-      } else if (hit(0, 12, 9, "any")) {
-        teleport(2, 9, 41, gp.dungeon);
-      } else if (hit(2, 9, 41, "any")) {
-        teleport(0, 12, 9, gp.outside);
-      } else if (hit(2, 8, 7, "any")) {
-        teleport(3, 26, 41, gp.dungeon);
-      } else if (hit(3, 26, 41, "any")) {
-        teleport(2, 8, 7, gp.dungeon);
-      } else if (hit(3, 25, 27, "any")) {
-        skeletonLord();
-      }
+    // Guard clause para reduzir aninhamento e complexidade
+    if (!canTouchEvent) {
+      return;
+    }
+
+    if (hit(0, 27, 16, Entity.DIR_RIGHT)) {
+      damagePit(gp.dialogueState);
+      return;
+    }
+    if (hit(0, 23, 12, Entity.DIR_UP)) {
+      healingPool(gp.dialogueState);
+      return;
+    }
+    if (hit(0, 10, 39, "any")) {
+      teleport(1, 12, 13, gp.indoor);
+      return;
+    }
+    if (hit(1, 12, 13, "any")) {
+      teleport(0, 10, 39, gp.outside);
+      return;
+    }
+    if (hit(1, 12, 9, Entity.DIR_UP)) {
+      speak(gp.npc[1][0]);
+      return;
+    }
+    if (hit(0, 12, 9, "any")) {
+      teleport(2, 9, 41, gp.dungeon);
+      return;
+    }
+    if (hit(2, 9, 41, "any")) {
+      teleport(0, 12, 9, gp.outside);
+      return;
+    }
+    if (hit(2, 8, 7, "any")) {
+      teleport(3, 26, 41, gp.dungeon);
+      return;
+    }
+    if (hit(3, 26, 41, "any")) {
+      teleport(2, 8, 7, gp.dungeon);
+      return;
+    }
+    if (hit(3, 25, 27, "any")) {
+      skeletonLord();
     }
   }
 
