@@ -670,52 +670,42 @@ public class Player extends Entity {
     }
   }
 
-  // Helper único para seleção de sprite (reduz complexidade do draw)
+  // Helper único para escolher imagem por direção (reduz complexidade do
+  // resolveSprite)
+  private BufferedImage byDir(String dir, BufferedImage up, BufferedImage down, BufferedImage left,
+      BufferedImage right) {
+    if (dir == null)
+      return down; // fallback seguro
+    switch (dir) {
+      case DIR_UP:
+        return up;
+      case DIR_DOWN:
+        return down;
+      case DIR_LEFT:
+        return left;
+      case DIR_RIGHT:
+        return right;
+      default:
+        return down;
+    }
+  }
+
   private BufferedImage resolveSprite(String dir, boolean attacking, boolean guarding, int spriteNum) {
     if (guarding) {
-      switch (dir) {
-        case DIR_UP:
-          return guardUp;
-        case DIR_DOWN:
-          return guardDown;
-        case DIR_LEFT:
-          return guardLeft;
-        case DIR_RIGHT:
-          return guardRight;
-        default:
-          return down1;
-      }
+      return byDir(dir, guardUp, guardDown, guardLeft, guardRight);
     }
 
-    boolean first = (spriteNum == 1);
+    final boolean first = (spriteNum == 1);
 
     if (attacking) {
-      switch (dir) {
-        case DIR_UP:
-          return first ? attackUp1 : attackUp2;
-        case DIR_DOWN:
-          return first ? attackDown1 : attackDown2;
-        case DIR_LEFT:
-          return first ? attackLeft1 : attackLeft2;
-        case DIR_RIGHT:
-          return first ? attackRight1 : attackRight2;
-        default:
-          return down1;
-      }
-    } else {
-      switch (dir) {
-        case DIR_UP:
-          return first ? up1 : up2;
-        case DIR_DOWN:
-          return first ? down1 : down2;
-        case DIR_LEFT:
-          return first ? left1 : left2;
-        case DIR_RIGHT:
-          return first ? right1 : right2;
-        default:
-          return down1;
-      }
+      BufferedImage firstImg = byDir(dir, attackUp1, attackDown1, attackLeft1, attackRight1);
+      BufferedImage secondImg = byDir(dir, attackUp2, attackDown2, attackLeft2, attackRight2);
+      return first ? firstImg : secondImg;
     }
+
+    BufferedImage firstImg = byDir(dir, up1, down1, left1, right1);
+    BufferedImage secondImg = byDir(dir, up2, down2, left2, right2);
+    return first ? firstImg : secondImg;
   }
 
   // ===== Accessors =====
