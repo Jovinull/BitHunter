@@ -112,7 +112,7 @@ public class AssetSetter {
 
     // MAP 0
     gp.npc[mapNum][i] = new NpcOldMan(gp);
-    place(gp.npc[mapNum][i++], 21, 21);
+    place(gp.npc[mapNum][i], 21, 21);
 
     // MAP 1
     mapNum = 1;
