@@ -10,16 +10,14 @@ public class NpcOldMan extends Entity {
   private static final int GOAL_COL = 23;
   private static final int GOAL_ROW = 13;
 
-  // Sprites
-  private static final String BASE_SPRITE_PATH = "/npc/oldman/";
-  private static final String SPRITE_UP_1 = BASE_SPRITE_PATH + "oldman_up_1";
-  private static final String SPRITE_UP_2 = BASE_SPRITE_PATH + "oldman_up_2";
-  private static final String SPRITE_DOWN_1 = BASE_SPRITE_PATH + "oldman_down_1";
-  private static final String SPRITE_DOWN_2 = BASE_SPRITE_PATH + "oldman_down_2";
-  private static final String SPRITE_LEFT_1 = BASE_SPRITE_PATH + "oldman_left_1";
-  private static final String SPRITE_LEFT_2 = BASE_SPRITE_PATH + "oldman_left_2";
-  private static final String SPRITE_RIGHT_1 = BASE_SPRITE_PATH + "oldman_right_1";
-  private static final String SPRITE_RIGHT_2 = BASE_SPRITE_PATH + "oldman_right_2";
+  private static final String SPRITE_UP_1 = "/npc/oldman/oldman_up_1";
+  private static final String SPRITE_UP_2 = "/npc/oldman/oldman_up_2";
+  private static final String SPRITE_DOWN_1 = "/npc/oldman/oldman_down_1";
+  private static final String SPRITE_DOWN_2 = "/npc/oldman/oldman_down_2";
+  private static final String SPRITE_LEFT_1 = "/npc/oldman/oldman_left_1";
+  private static final String SPRITE_LEFT_2 = "/npc/oldman/oldman_left_2";
+  private static final String SPRITE_RIGHT_1 = "/npc/oldman/oldman_right_1";
+  private static final String SPRITE_RIGHT_2 = "/npc/oldman/oldman_right_2";
 
   // Parâmetros de comportamento
   private static final int RANDOM_DIR_INTERVAL_TICKS = 120;
