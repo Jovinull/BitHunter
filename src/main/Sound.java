@@ -11,7 +11,7 @@ import javax.sound.sampled.FloatControl;
 public class Sound {
 
   Clip clip; // Controla o áudio que está sendo reproduzido
-  URL soundURL[] = new URL[30]; // Armazena os caminhos dos arquivos de som
+  URL[] soundURL = new URL[30]; // Armazena os caminhos dos arquivos de som
   FloatControl fc; // Controla o volume do áudio
   int volumeScale = 3; // Nível de volume (0 a 5)
   float volume; // Volume calculado com base no volumeScale
@@ -90,6 +90,9 @@ public class Sound {
         break;
       case 5:
         volume = 6f; // Muito alto
+        break;
+      default:
+        volume = -5f; // Valor padrão
         break;
     }
     fc.setValue(volume); // Aplica o volume calculado

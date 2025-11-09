@@ -2,18 +2,18 @@ package main;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 // Classe principal que inicia o jogo
 public class Main {
 
-  public static JFrame window; // Janela principal do jogo
+  public static final JFrame window = new JFrame(); // Janela principal do jogo
 
   public static void main(String[] args) {
     // Criação da janela principal do jogo
-    window = new JFrame();
 
     // Define o comportamento ao fechar a janela: termina o programa
-    window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
     // Impede o redimensionamento da janela pelo usuário
     window.setResizable(false);
@@ -28,7 +28,7 @@ public class Main {
     window.add(gamePanel);
 
     gamePanel.config.loadConfig(); // Carrega as configurações do jogo
-    if (gamePanel.fullScreenOn == true) {
+    if (gamePanel.fullScreenOn) {
       window.setUndecorated(true);
     }
 
@@ -49,7 +49,6 @@ public class Main {
   }
 
   public void setIcon() {
-
     ImageIcon icon = new ImageIcon(getClass().getClassLoader().getResource("objects/blueheart.png"));
     window.setIconImage(icon.getImage());
   }
