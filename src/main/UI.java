@@ -1006,24 +1006,27 @@ public class UI {
   public void drawSleepScreen() {
     counter++;
 
-    if (counter < 120) {
-      float a = gp.eManager.lighting.getFilterAlpha() + 0.01f;
-      gp.eManager.lighting.setFilterAlpha(a);
-      if (gp.eManager.lighting.getFilterAlpha() > 1f) {
-        gp.eManager.lighting.setFilterAlpha(1f);
-      }
+    final var lighting = gp.eManager.getLighting();
+    if (lighting == null) {
+      // fallback defensivo
+      counter = 0;
+      gp.gameState = gp.playState;
+      return;
     }
 
-    if (counter >= 120) {
-      float a = gp.eManager.lighting.getFilterAlpha() - 0.01f;
-      gp.eManager.lighting.setFilterAlpha(a);
-      if (gp.eManager.lighting.getFilterAlpha() <= 0f) {
-        gp.eManager.lighting.setFilterAlpha(0f);
+    final int TRANSITION_TICKS = 120;
+    final float STEP = 0.01f;
+
+    if (counter < TRANSITION_TICKS) {
+      lighting.setFilterAlpha(lighting.getFilterAlpha() + STEP); // clamp já no setter
+    } else {
+      lighting.setFilterAlpha(lighting.getFilterAlpha() - STEP); // clamp já no setter
+      if (lighting.getFilterAlpha() <= 0f) {
         counter = 0;
-        gp.eManager.lighting.setDayStateToDay();
-        gp.eManager.lighting.setDayCounter(0);
+        lighting.setDayStateToDay();
+        lighting.setDayCounter(0);
         gp.gameState = gp.playState;
-        gp.player.getImage(); // método void existente nas entidades
+        gp.player.getImage();
       }
     }
   }

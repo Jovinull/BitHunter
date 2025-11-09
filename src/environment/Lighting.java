@@ -139,8 +139,8 @@ public class Lighting {
 
     g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 
-    // DEBUG
-    if (gp != null && gp.keyH != null && gp.keyH.showDebugText) {
+    // DEBUG — remover checagem sempre verdadeira (gp != null)
+    if (gp.keyH != null && gp.keyH.showDebugText) {
       String situation;
       switch (dayPhase) {
         case DAY:
