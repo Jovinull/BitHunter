@@ -10,11 +10,13 @@ public class OBJ_Shield_Blue extends Entity {
   public OBJ_Shield_Blue(GamePanel gp) {
     super(gp);
 
-    type = TYPE_SHIELD;
-    name = objName;
+    setType(TYPE_SHIELD);
+    setName(objName);
+
     down1 = setup("/objects/shield_blue", gp.tileSize, gp.tileSize);
-    defenseValue = 2;
-    description = "[" + name + "]\nUm escudo azul reluzente.";
-    price = 250;
+
+    setDefenseValue(2);
+    setDescription("[" + getName() + "]\nUm escudo azul reluzente.");
+    setPrice(250);
   }
 }

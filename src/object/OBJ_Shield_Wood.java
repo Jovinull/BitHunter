@@ -10,11 +10,13 @@ public class OBJ_Shield_Wood extends Entity {
   public OBJ_Shield_Wood(GamePanel gp) {
     super(gp);
 
-    type = TYPE_SHIELD;
-    name = objName;
+    setType(TYPE_SHIELD);
+    setName(objName);
+
     down1 = setup("/objects/shield_wood", gp.tileSize, gp.tileSize);
-    defenseValue = 1;
-    description = "[" + name + "]\nUm escudo simples de \nmadeira.";
-    price = 35;
+
+    setDefenseValue(1);
+    setDescription("[" + getName() + "]\nUm escudo simples de \nmadeira.");
+    setPrice(35);
   }
 }

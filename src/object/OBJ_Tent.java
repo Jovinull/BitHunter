@@ -5,27 +5,30 @@ import main.GamePanel;
 
 public class OBJ_Tent extends Entity {
 
-  GamePanel gp;
   public static final String objName = "Tenda";
 
   public OBJ_Tent(GamePanel gp) {
     super(gp);
-    this.gp = gp;
 
-    type = TYPE_CONSUMABLE;
-    name = objName;
+    setType(TYPE_CONSUMABLE);
+    setName(objName);
+
     down1 = setup("/objects/tent", gp.tileSize, gp.tileSize);
-    description = "[" + name + "]\nVocê pode dormir até \na manhã seguinte.";
-    price = 300;
-    stackable = true;
+
+    setDescription("[" + getName() + "]\nVocê pode dormir até \na manhã seguinte.");
+    setPrice(300);
+    setStackable(true);
   }
 
+  @Override
   public boolean use(Entity entity) {
-
     gp.gameState = gp.sleepState;
     gp.playSE(14);
-    gp.player.life = gp.player.maxLife;
-    gp.player.mana = gp.player.maxMana;
+
+    gp.player.setLife(gp.player.getMaxLife());
+    gp.player.setMana(gp.player.getMaxMana());
+
+    // mantém o comportamento existente
     gp.player.getSleepingImage(down1);
     return true;
   }
