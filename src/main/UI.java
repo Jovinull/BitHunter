@@ -442,7 +442,7 @@ public class UI {
       }
 
       if (gp.gameState == gp.cutsceneState) {
-        gp.csManager.scenePhase++;
+        gp.csManager.nextPhase();
       }
     }
 

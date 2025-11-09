@@ -162,7 +162,7 @@ public class EventHandler {
   public void speak(Entity entity) {
     if (gp.keyH.enterPressed) {
       gp.gameState = gp.dialogueState;
-      gp.player.setAttackCanceled(true); // usar accessor
+      gp.player.setAttackCanceled(true);
       entity.speak();
     }
   }
@@ -170,7 +170,7 @@ public class EventHandler {
   public void skeletonLord() {
     if (!gp.bossBattleOn && !Progress.isSkeletonLordDefeated()) {
       gp.gameState = gp.cutsceneState;
-      gp.csManager.sceneNum = gp.csManager.skeletonLord;
+      gp.csManager.startSkeletonLordScene();
     }
   }
 }
