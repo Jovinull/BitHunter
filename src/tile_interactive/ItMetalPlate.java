@@ -4,11 +4,11 @@ import java.awt.Rectangle;
 
 import main.GamePanel;
 
-public class IT_MetalPlate extends InteractiveTile {
+public class ItMetalPlate extends InteractiveTile {
 
-  public static final String itName = "Placa de Metal";
+  public static final String IT_NAME = "Placa de Metal";
 
-  public IT_MetalPlate(GamePanel gp, int col, int row) {
+  public ItMetalPlate(GamePanel gp, int col, int row) {
     super(gp, col, row);
 
     // Posição via setters
@@ -16,12 +16,12 @@ public class IT_MetalPlate extends InteractiveTile {
     setWorldY(gp.tileSize * row);
 
     // Nome via setter
-    setName(itName);
+    setName(IT_NAME);
 
     // Sprite
     down1 = setup("/tiles_interactive/metalplate", gp.tileSize, gp.tileSize);
 
-    // Área sólida zerada usando getters/setters (sem acessar campos privados)
+    // Área sólida zerada usando getters/setters
     Rectangle sa = getSolidArea();
     sa.x = 0;
     sa.y = 0;
@@ -31,5 +31,11 @@ public class IT_MetalPlate extends InteractiveTile {
     // Defaults da área sólida
     setSolidAreaDefaultX(sa.x);
     setSolidAreaDefaultY(sa.y);
+  }
+
+  @Override
+  public boolean isCorrectItem(entity.Entity entity) {
+    // Por padrão, metal plate não requer item (pode ajustar conforme regra)
+    return false;
   }
 }

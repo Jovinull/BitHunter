@@ -10,6 +10,8 @@ import monster.MonGreenSlime;
 import monster.MonOrc;
 import monster.MonRedSlime;
 import monster.MonSkeletonLord;
+import object.ObjAxe;
+import object.ObjChest;
 import object.ObjCoinBronze;
 import object.ObjDoor;
 import object.ObjDoorIron;
@@ -20,11 +22,9 @@ import object.ObjPickaxe;
 import object.ObjPotionRed;
 import object.ObjShieldBlue;
 import object.ObjTent;
-import object.ObjAxe;
-import object.ObjChest;
-import tile_interactive.IT_DestructibleWall;
-import tile_interactive.IT_DryTree;
-import tile_interactive.IT_MetalPlate;
+import tile_interactive.ItDestructibleWall;
+import tile_interactive.ItDryTree;
+import tile_interactive.ItMetalPlate;
 
 public class AssetSetter {
 
@@ -202,41 +202,41 @@ public class AssetSetter {
     int mapNum = 0;
     int i = 0;
 
-    gp.iTile[mapNum][i++] = new IT_DryTree(gp, 27, 12);
-    gp.iTile[mapNum][i++] = new IT_DryTree(gp, 28, 12);
-    gp.iTile[mapNum][i++] = new IT_DryTree(gp, 29, 12);
-    gp.iTile[mapNum][i++] = new IT_DryTree(gp, 30, 12);
-    gp.iTile[mapNum][i++] = new IT_DryTree(gp, 31, 12);
-    gp.iTile[mapNum][i++] = new IT_DryTree(gp, 32, 12);
-    gp.iTile[mapNum][i++] = new IT_DryTree(gp, 33, 12);
-    gp.iTile[mapNum][i++] = new IT_DryTree(gp, 31, 21);
-    gp.iTile[mapNum][i++] = new IT_DryTree(gp, 17, 40);
-    gp.iTile[mapNum][i] = new IT_DryTree(gp, 12, 41);
+    gp.iTile[mapNum][i++] = new ItDryTree(gp, 27, 12);
+    gp.iTile[mapNum][i++] = new ItDryTree(gp, 28, 12);
+    gp.iTile[mapNum][i++] = new ItDryTree(gp, 29, 12);
+    gp.iTile[mapNum][i++] = new ItDryTree(gp, 30, 12);
+    gp.iTile[mapNum][i++] = new ItDryTree(gp, 31, 12);
+    gp.iTile[mapNum][i++] = new ItDryTree(gp, 32, 12);
+    gp.iTile[mapNum][i++] = new ItDryTree(gp, 33, 12);
+    gp.iTile[mapNum][i++] = new ItDryTree(gp, 31, 21);
+    gp.iTile[mapNum][i++] = new ItDryTree(gp, 17, 40);
+    gp.iTile[mapNum][i] = new ItDryTree(gp, 12, 41);
 
     // MAP 2
     mapNum = 2;
     i = 0;
 
-    gp.iTile[mapNum][i++] = new IT_DestructibleWall(gp, 18, 30);
-    gp.iTile[mapNum][i++] = new IT_DestructibleWall(gp, 17, 31);
-    gp.iTile[mapNum][i++] = new IT_DestructibleWall(gp, 17, 32);
-    gp.iTile[mapNum][i++] = new IT_DestructibleWall(gp, 17, 34);
-    gp.iTile[mapNum][i++] = new IT_DestructibleWall(gp, 18, 34);
-    gp.iTile[mapNum][i++] = new IT_DestructibleWall(gp, 18, 33);
-    gp.iTile[mapNum][i++] = new IT_DestructibleWall(gp, 10, 22);
-    gp.iTile[mapNum][i++] = new IT_DestructibleWall(gp, 10, 24);
-    gp.iTile[mapNum][i++] = new IT_DestructibleWall(gp, 38, 18);
-    gp.iTile[mapNum][i++] = new IT_DestructibleWall(gp, 38, 19);
-    gp.iTile[mapNum][i++] = new IT_DestructibleWall(gp, 38, 20);
-    gp.iTile[mapNum][i++] = new IT_DestructibleWall(gp, 38, 21);
-    gp.iTile[mapNum][i++] = new IT_DestructibleWall(gp, 11, 34);
-    gp.iTile[mapNum][i++] = new IT_DestructibleWall(gp, 22, 28);
-    gp.iTile[mapNum][i++] = new IT_DestructibleWall(gp, 30, 28);
-    gp.iTile[mapNum][i++] = new IT_DestructibleWall(gp, 32, 28);
+    gp.iTile[mapNum][i++] = new ItDestructibleWall(gp, 18, 30);
+    gp.iTile[mapNum][i++] = new ItDestructibleWall(gp, 17, 31);
+    gp.iTile[mapNum][i++] = new ItDestructibleWall(gp, 17, 32);
+    gp.iTile[mapNum][i++] = new ItDestructibleWall(gp, 17, 34);
+    gp.iTile[mapNum][i++] = new ItDestructibleWall(gp, 18, 34);
+    gp.iTile[mapNum][i++] = new ItDestructibleWall(gp, 18, 33);
+    gp.iTile[mapNum][i++] = new ItDestructibleWall(gp, 10, 22);
+    gp.iTile[mapNum][i++] = new ItDestructibleWall(gp, 10, 24);
+    gp.iTile[mapNum][i++] = new ItDestructibleWall(gp, 38, 18);
+    gp.iTile[mapNum][i++] = new ItDestructibleWall(gp, 38, 19);
+    gp.iTile[mapNum][i++] = new ItDestructibleWall(gp, 38, 20);
+    gp.iTile[mapNum][i++] = new ItDestructibleWall(gp, 38, 21);
+    gp.iTile[mapNum][i++] = new ItDestructibleWall(gp, 11, 34);
+    gp.iTile[mapNum][i++] = new ItDestructibleWall(gp, 22, 28);
+    gp.iTile[mapNum][i++] = new ItDestructibleWall(gp, 30, 28);
+    gp.iTile[mapNum][i++] = new ItDestructibleWall(gp, 32, 28);
 
-    gp.iTile[mapNum][i++] = new IT_MetalPlate(gp, 20, 22);
-    gp.iTile[mapNum][i++] = new IT_MetalPlate(gp, 8, 17);
-    gp.iTile[mapNum][i] = new IT_MetalPlate(gp, 39, 31);
+    gp.iTile[mapNum][i++] = new ItMetalPlate(gp, 20, 22);
+    gp.iTile[mapNum][i++] = new ItMetalPlate(gp, 8, 17);
+    gp.iTile[mapNum][i] = new ItMetalPlate(gp, 39, 31);
   }
 
   /** Posiciona uma entidade em (col,row) -> (worldX, worldY). */

@@ -5,9 +5,9 @@ import java.awt.Color;
 import entity.Entity;
 import main.GamePanel;
 
-public class IT_DryTree extends InteractiveTile {
+public class ItDryTree extends InteractiveTile {
 
-  public IT_DryTree(GamePanel gp, int col, int row) {
+  public ItDryTree(GamePanel gp, int col, int row) {
     super(gp, col, row);
 
     // Posiciona via setters (sem acessar worldX/worldY diretamente)
@@ -18,7 +18,7 @@ public class IT_DryTree extends InteractiveTile {
     down1 = setup("/tiles_interactive/drytree", gp.tileSize, gp.tileSize);
 
     // Comportamento
-    destructible = true;
+    setDestructible(true);
     setMaxLife(3);
     setLife(3);
   }
@@ -39,7 +39,7 @@ public class IT_DryTree extends InteractiveTile {
   public InteractiveTile getDestroyedForm() {
     int col = getWorldX() / gp.tileSize;
     int row = getWorldY() / gp.tileSize;
-    return new IT_Trunk(gp, col, row);
+    return new ItTrunk(gp, col, row);
   }
 
   // Aparência das partículas ao ser atingido

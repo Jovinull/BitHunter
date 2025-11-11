@@ -518,7 +518,7 @@ public class Player extends Entity {
 
     InteractiveTile tile = gp.iTile[gp.currentMap][i];
     if (tile != null
-        && tile.destructible
+        && tile.isDestructible()
         && tile.isCorrectItem(this)
         && !tile.isInvincible()) {
 
@@ -530,7 +530,8 @@ public class Player extends Entity {
 
       if (tile.getLife() == 0) {
         tile.checkDrop();
-        gp.iTile[gp.currentMap][i] = tile.getDestroyedForm();
+        InteractiveTile destroyed = tile.getDestroyedForm();
+        gp.iTile[gp.currentMap][i] = destroyed;
       }
     }
   }

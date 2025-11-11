@@ -5,21 +5,18 @@ import java.awt.Graphics2D;
 import entity.Entity;
 import main.GamePanel;
 
-public class InteractiveTile extends Entity {
+public abstract class InteractiveTile extends Entity {
 
-  public boolean destructible = false;
+  private boolean destructible = false;
 
-  public InteractiveTile(GamePanel gp, int col, int row) {
+  protected InteractiveTile(GamePanel gp, int col, int row) {
     super(gp);
     // posiciona o tile no mundo com base no grid
     setWorldX(col * gp.tileSize);
     setWorldY(row * gp.tileSize);
   }
 
-  public boolean isCorrectItem(Entity entity) {
-    // Por padrão, nenhum item é o correto; subclasses podem sobrescrever
-    return false;
-  }
+  public abstract boolean isCorrectItem(Entity entity);
 
   public void playSE() {
     // hook: som ao interagir/quebrar; sobrescreva nas subclasses
@@ -28,6 +25,14 @@ public class InteractiveTile extends Entity {
   public InteractiveTile getDestroyedForm() {
     // hook: retorna a forma destruída; por padrão não há
     return null;
+  }
+
+  public boolean isDestructible() {
+    return destructible;
+  }
+
+  protected void setDestructible(boolean value) {
+    this.destructible = value;
   }
 
   @Override
@@ -43,14 +48,11 @@ public class InteractiveTile extends Entity {
 
   @Override
   public void draw(Graphics2D g2) {
-    // Desenha apenas se dentro da câmera (usa cálculo do Entity)
-    if (!inCamera()) {
+    if (!inCamera())
       return;
-    }
+
     int screenX = getScreenX();
     int screenY = getScreenY();
-
-    // Desenha a sprite base do tile interativo
     g2.drawImage(getDown1(), screenX, screenY, null);
   }
 }

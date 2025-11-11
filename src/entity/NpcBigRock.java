@@ -6,8 +6,8 @@ import java.util.List;
 
 import main.GamePanel;
 import object.ObjDoorIron;
-import tile_interactive.IT_MetalPlate;
 import tile_interactive.InteractiveTile;
+import tile_interactive.ItMetalPlate;
 
 public class NpcBigRock extends Entity {
 
@@ -134,7 +134,7 @@ public class NpcBigRock extends Entity {
     List<InteractiveTile> plates = new ArrayList<>();
     InteractiveTile[] tiles = gp.iTile[gp.currentMap];
     for (InteractiveTile tile : tiles) {
-      if (tile != null && IT_MetalPlate.itName.equals(tile.getName())) {
+      if (tile != null && ItMetalPlate.IT_NAME.equals(tile.getName())) {
         plates.add(tile);
       }
     }

@@ -4,9 +4,9 @@ import java.awt.Rectangle;
 
 import main.GamePanel;
 
-public class IT_Trunk extends InteractiveTile {
+public class ItTrunk extends InteractiveTile {
 
-  public IT_Trunk(GamePanel gp, int col, int row) {
+  public ItTrunk(GamePanel gp, int col, int row) {
     super(gp, col, row);
 
     // Posição via setters
@@ -30,5 +30,11 @@ public class IT_Trunk extends InteractiveTile {
   @Override
   public void playSE() {
     gp.playSE(11);
+  }
+
+  @Override
+  public boolean isCorrectItem(entity.Entity entity) {
+    // Tronco (forma destruída) normalmente não requer item
+    return false;
   }
 }
