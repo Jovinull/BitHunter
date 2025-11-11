@@ -7,66 +7,85 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
 import main.GamePanel;
 import main.UtilityTool;
 
-// Classe responsável por gerenciar os tiles (blocos do mapa)
+/**
+ * Classe responsável por gerenciar os tiles (blocos do mapa)
+ */
 public class TileManager {
 
-  public final GamePanel gp; // Referência ao painel principal do jogo (mantido público se outros usam)
-  public Tile[] tile; // Vetor que armazena os tipos de tiles disponíveis (grama, parede, etc.)
-  public int mapTileNum[][][]; // Matriz que representa o mapa (cada número corresponde a um tile)
-  public boolean drawPath = false;
+  private static final Logger LOGGER = Logger.getLogger(TileManager.class.getName());
 
-  ArrayList<String> fileNames = new ArrayList<>();
-  ArrayList<String> collisionStatus = new ArrayList<>();
+  // Mantido público (final) pois é uma dependência externa compartilhada
+  public final GamePanel gp;
 
-  // Construtor: carrega as imagens dos tiles e o mapa a partir de um arquivo .txt
+  // S1104: encapsular campos em vez de expor como públicos
+  private Tile[] tile; // Vetor de tipos de tiles disponíveis
+  private int[][][] mapTileNum; // Matriz do mapa (IDs de tiles)
+  private boolean drawPath = false; // Flag para desenhar pathfinding
+
+  private final List<String> fileNames = new ArrayList<>();
+  private final List<String> collisionStatus = new ArrayList<>();
+
+  /**
+   * Construtor: carrega metadados de tiles e inicializa o mundo
+   */
   public TileManager(GamePanel gp) {
     this.gp = gp;
 
-    // READ TILE DATA FILE (usa try-with-resources)
+    // Lê nomes e colisões dos tiles
     try (InputStream is = getClass().getResourceAsStream("/maps/tiledata.txt");
         BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+
       String line;
-      // GETTING TILE NAMES AND COLLISION INFO FROM THE FILE
       while ((line = br.readLine()) != null) {
         fileNames.add(line);
         collisionStatus.add(br.readLine());
       }
-    } catch (IOException e) {
-      e.printStackTrace();
+    } catch (IOException ex) {
+      // S106: usar logger em vez de System.out/printStackTrace
+      LOGGER.log(Level.SEVERE, "Falha ao ler /maps/tiledata.txt", ex);
     }
 
-    // INITIALIZE THE TILE ARRAY BASED ON THE fileNames SIZE
+    // Inicializa o array de tiles com base no arquivo de metadados
     tile = new Tile[fileNames.size()];
-    getTileImage(); // Carrega as imagens dos tiles
+    getTileImage();
 
-    // GET THE maxWorldCol & Row (mantém a lógica original para não quebrar layout)
+    // Obtém dimensões iniciais do mundo a partir do primeiro mapa
     try (InputStream is = getClass().getResourceAsStream("/maps/world01.txt");
         BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
 
-      String line2 = br.readLine();
-      String maxTile[] = line2.split(" ");
-
-      gp.maxWorldCol = maxTile.length;
-      gp.maxWorldRow = maxTile.length; // Mantido como no original
-      mapTileNum = new int[gp.maxMap][gp.maxWorldCol][gp.maxWorldRow];
-
-    } catch (Exception e) {
-      System.out.println("Erro ao ler o arquivo do mapa para obter maxWorldCol e maxWorldRow");
+      String firstLine = br.readLine();
+      if (firstLine == null || firstLine.isEmpty()) {
+        LOGGER.severe("Arquivo de mapa vazio: /maps/world01.txt");
+      } else {
+        // S1197: colchetes no tipo, não no nome da variável
+        String[] maxTile = firstLine.split(" ");
+        gp.maxWorldCol = maxTile.length;
+        gp.maxWorldRow = maxTile.length; // Mantido como no original
+        mapTileNum = new int[gp.maxMap][gp.maxWorldCol][gp.maxWorldRow];
+      }
+    } catch (Exception _) { // S7467: padrão não nomeado, exceção não utilizada
+      LOGGER.severe("Erro ao obter maxWorldCol/maxWorldRow de /maps/world01.txt");
     }
 
+    // Carrega mapas
     loadMap("/maps/world01.txt", 0);
     loadMap("/maps/indoor01.txt", 1);
     loadMap("/maps/dungeon01.txt", 2);
     loadMap("/maps/dungeon02.txt", 3);
   }
 
-  // Carrega as imagens e solidez correspondentes a cada tipo de tile
+  /**
+   * Carrega as imagens e a flag de colisão de cada tile
+   */
   public void getTileImage() {
     for (int i = 0; i < fileNames.size(); i++) {
       String fileName = fileNames.get(i);
@@ -75,6 +94,9 @@ public class TileManager {
     }
   }
 
+  /**
+   * Configura um tile individual
+   */
   public void setup(int index, String imageName, boolean collision) {
     UtilityTool uTool = new UtilityTool();
     try {
@@ -83,12 +105,15 @@ public class TileManager {
       t.setImage(uTool.scaleImage(t.getImage(), gp.tileSize, gp.tileSize));
       t.setCollision(collision);
       tile[index] = t;
-    } catch (IOException e) {
-      e.printStackTrace();
+    } catch (IOException ex) {
+      // S106: logger
+      LOGGER.log(Level.SEVERE, "Falha ao carregar tile '" + imageName + "'", ex);
     }
   }
 
-  // Lê o layout do mapa de um arquivo de texto e preenche a matriz mapTileNum
+  /**
+   * Lê o layout do mapa de um arquivo de texto e preenche a matriz mapTileNum
+   */
   public void loadMap(String filePath, int map) {
     try (InputStream is = getClass().getResourceAsStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
@@ -96,77 +121,94 @@ public class TileManager {
       int col = 0;
       int row = 0;
 
-      // Lê o arquivo linha por linha e converte os números em IDs de tiles
+      // Percorre o arquivo linha a linha
       while (col < gp.maxWorldCol && row < gp.maxWorldRow) {
-        String line = br.readLine(); // Lê uma linha do mapa
-        String numbers[] = line.split(" "); // Divide a linha em números
+        String line = br.readLine();
+        if (line == null) {
+          break; // Linha ausente: encerra para evitar NPE
+        }
+
+        // S1197: colchetes no tipo
+        String[] numbers = line.split(" ");
 
         while (col < gp.maxWorldCol) {
-          int num = Integer.parseInt(numbers[col]); // Converte para inteiro
-          mapTileNum[map][col][row] = num; // Armazena na posição [col][row]
+          // Evita ArrayIndexOutOfBounds se a linha tiver menos colunas
+          int num = (col < numbers.length) ? Integer.parseInt(numbers[col]) : 0;
+          mapTileNum[map][col][row] = num;
           col++;
         }
 
-        // Avança para a próxima linha
         if (col == gp.maxWorldCol) {
           col = 0;
           row++;
         }
       }
-
-    } catch (Exception e) {
-      e.printStackTrace(); // Exibe erro se houver falha na leitura
+    } catch (Exception ex) {
+      // S106: logger
+      LOGGER.log(Level.SEVERE, "Erro ao carregar mapa: " + filePath, ex);
     }
   }
 
-  // Desenha apenas os tiles visíveis na tela com base na posição do jogador
-  // (câmera)
+  /**
+   * Desenha apenas os tiles visíveis na tela com base na posição do jogador
+   */
   public void draw(Graphics2D g2) {
 
     int worldCol = 0;
     int worldRow = 0;
 
-    // Percorre cada tile do mundo
     while (worldCol < gp.maxWorldCol && worldRow < gp.maxWorldRow) {
 
-      int tileNum = mapTileNum[gp.currentMap][worldCol][worldRow]; // Identifica o tipo de tile naquela posição
+      int tileNum = mapTileNum[gp.currentMap][worldCol][worldRow];
 
-      // Calcula a posição absoluta do tile no mundo
       int worldX = worldCol * gp.tileSize;
       int worldY = worldRow * gp.tileSize;
 
-      // Converte a posição do mundo para posição relativa na tela (scrolling/câmera)
       int screenX = worldX - gp.player.getWorldX() + gp.player.screenX;
       int screenY = worldY - gp.player.getWorldY() + gp.player.screenY;
 
-      // Verifica se o tile está dentro da área visível da tela
       if (worldX + gp.tileSize > gp.player.getWorldX() - gp.player.screenX &&
           worldX - gp.tileSize < gp.player.getWorldX() + gp.player.screenX &&
           worldY + gp.tileSize > gp.player.getWorldY() - gp.player.screenY &&
           worldY - gp.tileSize < gp.player.getWorldY() + gp.player.screenY) {
 
-        // Se estiver visível, desenha o tile na tela
         g2.drawImage(tile[tileNum].getImage(), screenX, screenY, null);
       }
 
       worldCol++;
-
-      // Avança para a próxima linha ao fim da coluna
       if (worldCol == gp.maxWorldCol) {
         worldCol = 0;
         worldRow++;
       }
     }
 
-    if (drawPath) {
+    if (drawPath && gp.pFinder != null && gp.pFinder.pathList != null) {
       g2.setColor(new Color(255, 0, 0, 70));
       for (int i = 0; i < gp.pFinder.pathList.size(); i++) {
-        int worldX = gp.pFinder.pathList.get(i).getCol() * gp.tileSize;
-        int worldY = gp.pFinder.pathList.get(i).getRow() * gp.tileSize;
-        int screenX = worldX - gp.player.getWorldX() + gp.player.screenX;
-        int screenY = worldY - gp.player.getWorldY() + gp.player.screenY;
-        g2.fillRect(screenX, screenY, gp.tileSize, gp.tileSize);
+        int pathWorldX = gp.pFinder.pathList.get(i).getCol() * gp.tileSize;
+        int pathWorldY = gp.pFinder.pathList.get(i).getRow() * gp.tileSize;
+        int pathScreenX = pathWorldX - gp.player.getWorldX() + gp.player.screenX;
+        int pathScreenY = pathWorldY - gp.player.getWorldY() + gp.player.screenY;
+        g2.fillRect(pathScreenX, pathScreenY, gp.tileSize, gp.tileSize);
       }
     }
+  }
+
+  // ====== ACESSORES (encapsulamento para S1104) ======
+
+  public Tile[] getTiles() {
+    return tile;
+  }
+
+  public int[][][] getMapTileNum() {
+    return mapTileNum;
+  }
+
+  public boolean isDrawPath() {
+    return drawPath;
+  }
+
+  public void setDrawPath(boolean drawPath) {
+    this.drawPath = drawPath;
   }
 }
