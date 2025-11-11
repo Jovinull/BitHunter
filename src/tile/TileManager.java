@@ -26,7 +26,7 @@ public class TileManager {
   // Mantido público (final) pois é uma dependência externa compartilhada
   public final GamePanel gp;
 
-  // S1104: encapsular campos em vez de expor como públicos
+  // Encapsulados (S1104)
   private Tile[] tile; // Vetor de tipos de tiles disponíveis
   private int[][][] mapTileNum; // Matriz do mapa (IDs de tiles)
   private boolean drawPath = false; // Flag para desenhar pathfinding
@@ -50,7 +50,7 @@ public class TileManager {
         collisionStatus.add(br.readLine());
       }
     } catch (IOException ex) {
-      // S106: usar logger em vez de System.out/printStackTrace
+      // S106 com S3457 OK (string constante, sem concatenação)
       LOGGER.log(Level.SEVERE, "Falha ao ler /maps/tiledata.txt", ex);
     }
 
@@ -66,13 +66,12 @@ public class TileManager {
       if (firstLine == null || firstLine.isEmpty()) {
         LOGGER.severe("Arquivo de mapa vazio: /maps/world01.txt");
       } else {
-        // S1197: colchetes no tipo, não no nome da variável
-        String[] maxTile = firstLine.split(" ");
+        String[] maxTile = firstLine.split(" "); // S1197 ok
         gp.maxWorldCol = maxTile.length;
         gp.maxWorldRow = maxTile.length; // Mantido como no original
         mapTileNum = new int[gp.maxMap][gp.maxWorldCol][gp.maxWorldRow];
       }
-    } catch (Exception _) { // S7467: padrão não nomeado, exceção não utilizada
+    } catch (Exception _) { // S7467: padrão não nomeado
       LOGGER.severe("Erro ao obter maxWorldCol/maxWorldRow de /maps/world01.txt");
     }
 
@@ -106,8 +105,8 @@ public class TileManager {
       t.setCollision(collision);
       tile[index] = t;
     } catch (IOException ex) {
-      // S106: logger
-      LOGGER.log(Level.SEVERE, "Falha ao carregar tile '" + imageName + "'", ex);
+      // S3457: adia concatenação com Supplier + preserva throwable (JDK 9+)
+      LOGGER.log(Level.SEVERE, ex, () -> "Falha ao carregar tile '" + imageName + "'");
     }
   }
 
@@ -125,14 +124,12 @@ public class TileManager {
       while (col < gp.maxWorldCol && row < gp.maxWorldRow) {
         String line = br.readLine();
         if (line == null) {
-          break; // Linha ausente: encerra para evitar NPE
+          break;
         }
 
-        // S1197: colchetes no tipo
-        String[] numbers = line.split(" ");
+        String[] numbers = line.split(" "); // S1197 ok
 
         while (col < gp.maxWorldCol) {
-          // Evita ArrayIndexOutOfBounds se a linha tiver menos colunas
           int num = (col < numbers.length) ? Integer.parseInt(numbers[col]) : 0;
           mapTileNum[map][col][row] = num;
           col++;
@@ -144,8 +141,8 @@ public class TileManager {
         }
       }
     } catch (Exception ex) {
-      // S106: logger
-      LOGGER.log(Level.SEVERE, "Erro ao carregar mapa: " + filePath, ex);
+      // S3457 com throwable: usa Supplier para montar mensagem
+      LOGGER.log(Level.SEVERE, ex, () -> "Erro ao carregar mapa: " + filePath);
     }
   }
 
@@ -194,7 +191,7 @@ public class TileManager {
     }
   }
 
-  // ====== ACESSORES (encapsulamento para S1104) ======
+  // ====== ACESSORES ======
 
   public Tile[] getTiles() {
     return tile;
