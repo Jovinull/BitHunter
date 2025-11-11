@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import main.GamePanel;
+import tile.Tile;
 
 public class PathFinder {
 
@@ -74,23 +75,32 @@ public class PathFinder {
     goalNode = node[goalCol][goalRow];
     openList.add(currentNode);
 
+    // Atalhos locais para evitar acessos repetidos
+    final int[][][] map = gp.tileM.getMapTileNum();
+    final Tile[] tiles = gp.tileM.getTiles();
+
     int col = 0;
     int row = 0;
 
     while (col < gp.maxWorldCol && row < gp.maxWorldRow) {
 
-      // tiles sólidos
-      int tileNum = gp.tileM.mapTileNum[gp.currentMap][col][row];
-      if (gp.tileM.tile[tileNum].collision) {
+      // tiles sólidos (usar Tile.isCollision())
+      int tileNum = map[gp.currentMap][col][row];
+      if (tiles[tileNum].isCollision()) {
         node[col][row].setSolid(true);
       }
 
-      // iTiles sólidos
-      for (int i = 0; i < gp.iTile[gp.currentMap].length; i++) {
-        if (gp.iTile[gp.currentMap][i] != null && gp.iTile[gp.currentMap][i].destructible) {
-          int itCol = gp.iTile[gp.currentMap][i].getWorldX() / gp.tileSize;
-          int itRow = gp.iTile[gp.currentMap][i].getWorldY() / gp.tileSize;
-          node[itCol][itRow].setSolid(true);
+      // iTiles sólidos (usar isDestructible() e proteger bounds)
+      if (gp.iTile != null && gp.iTile[gp.currentMap] != null) {
+        for (int i = 0; i < gp.iTile[gp.currentMap].length; i++) {
+          var it = gp.iTile[gp.currentMap][i];
+          if (it != null && it.isDestructible()) {
+            int itCol = it.getWorldX() / gp.tileSize;
+            int itRow = it.getWorldY() / gp.tileSize;
+            if (itCol >= 0 && itRow >= 0 && itCol < gp.maxWorldCol && itRow < gp.maxWorldRow) {
+              node[itCol][itRow].setSolid(true);
+            }
+          }
         }
       }
 
@@ -161,7 +171,6 @@ public class PathFinder {
       int g = n.getGCost();
       int bestG = openList.get(bestIdx).getGCost();
 
-      // if aninhado fundido
       if (f < bestF || (f == bestF && g < bestG)) {
         bestIdx = i;
         bestF = f;
