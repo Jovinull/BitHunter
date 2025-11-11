@@ -225,10 +225,10 @@ public class Player extends Entity {
   @Override
   public void update() {
     if (isKnockBack()) {
-      processKnockBack(); // renomeado para evitar S2177
+      processKnockBack();
     } else if (isAttacking()) {
       performAttack();
-    } else if (keyH.spacePressed) {
+    } else if (keyH.isSpacePressed()) {
       handleGuard();
     } else if (isMovementOrActionPressed()) {
       handleMovementAndInteractions();
@@ -244,7 +244,8 @@ public class Player extends Entity {
   }
 
   private boolean isMovementOrActionPressed() {
-    return keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed || keyH.enterPressed;
+    return keyH.isUpPressed() || keyH.isDownPressed() || keyH.isLeftPressed()
+        || keyH.isRightPressed() || keyH.isEnterPressed();
   }
 
   // renomeado (S2177)
@@ -262,20 +263,12 @@ public class Player extends Entity {
       setSpeed(getDefaultSpeed());
     } else {
       switch (getKnockBackDirection()) {
-        case DIR_UP:
-          setWorldY(getWorldY() - getSpeed());
-          break;
-        case DIR_DOWN:
-          setWorldY(getWorldY() + getSpeed());
-          break;
-        case DIR_LEFT:
-          setWorldX(getWorldX() - getSpeed());
-          break;
-        case DIR_RIGHT:
-          setWorldX(getWorldX() + getSpeed());
-          break;
-        default:
-          break;
+        case DIR_UP -> setWorldY(getWorldY() - getSpeed());
+        case DIR_DOWN -> setWorldY(getWorldY() + getSpeed());
+        case DIR_LEFT -> setWorldX(getWorldX() - getSpeed());
+        case DIR_RIGHT -> setWorldX(getWorldX() + getSpeed());
+        default -> {
+          /* no-op: direção desconhecida ou nula */ }
       }
     }
 
@@ -293,13 +286,13 @@ public class Player extends Entity {
   }
 
   private void handleMovementAndInteractions() {
-    if (keyH.upPressed)
+    if (keyH.isUpPressed())
       setDirection(DIR_UP);
-    else if (keyH.downPressed)
+    else if (keyH.isDownPressed())
       setDirection(DIR_DOWN);
-    else if (keyH.leftPressed)
+    else if (keyH.isLeftPressed())
       setDirection(DIR_LEFT);
-    else if (keyH.rightPressed)
+    else if (keyH.isRightPressed())
       setDirection(DIR_RIGHT);
 
     setCollisionOn(false);
@@ -317,33 +310,26 @@ public class Player extends Entity {
     gp.cChecker.checkEntity(this, gp.iTile);
     gp.eHandler.checkEvent();
 
-    if (!isCollisionOn() && !keyH.enterPressed) {
+    if (!isCollisionOn() && !keyH.isEnterPressed()) {
       switch (getDirection()) {
-        case DIR_UP:
-          setWorldY(getWorldY() - getSpeed());
-          break;
-        case DIR_DOWN:
-          setWorldY(getWorldY() + getSpeed());
-          break;
-        case DIR_LEFT:
-          setWorldX(getWorldX() - getSpeed());
-          break;
-        case DIR_RIGHT:
-          setWorldX(getWorldX() + getSpeed());
-          break;
-        default:
-          break;
+        case DIR_UP -> setWorldY(getWorldY() - getSpeed());
+        case DIR_DOWN -> setWorldY(getWorldY() + getSpeed());
+        case DIR_LEFT -> setWorldX(getWorldX() - getSpeed());
+        case DIR_RIGHT -> setWorldX(getWorldX() + getSpeed());
+        default -> {
+          /* no-op intencional: direção desconhecida/nula não move */ }
       }
     }
 
-    if (keyH.enterPressed && !attackCanceled) {
+    if (keyH.isEnterPressed() && !attackCanceled) {
       gp.playSE(7);
       setAttacking(true);
       setSpriteCounter(0);
     }
 
     attackCanceled = false;
-    gp.keyH.enterPressed = false;
+    gp.keyH.setEnterPressed(false);
+
     setGuarding(false);
     setGuardCounter(0);
 
@@ -365,7 +351,7 @@ public class Player extends Entity {
   }
 
   private void handleShooting() {
-    if (gp.keyH.shotKeyPressed
+    if (gp.keyH.isShotKeyPressed()
         && getProjectile() != null
         && !getProjectile().isAlive()
         && getShotAvailableCounter() == 30
@@ -411,7 +397,7 @@ public class Player extends Entity {
   }
 
   private void handleDeath() {
-    if (!keyH.godModeOn && getLife() <= 0) {
+    if (!keyH.isGodModeOn() && getLife() <= 0) {
       gp.stopMusic();
       gp.gameState = gp.gameOverState;
       gp.ui.commandNum = -1;
@@ -429,7 +415,7 @@ public class Player extends Entity {
       obj.use(this);
       gp.obj[gp.currentMap][i] = null;
     } else if (obj.getType() == TYPE_OBSTACLE) {
-      if (keyH.enterPressed) {
+      if (keyH.isEnterPressed()) {
         attackCanceled = true;
         obj.interact();
       }
@@ -451,7 +437,7 @@ public class Player extends Entity {
       return;
 
     Entity npc = gp.npc[gp.currentMap][i];
-    if (gp.keyH.enterPressed) {
+    if (gp.keyH.isEnterPressed()) {
       attackCanceled = true;
       npc.speak();
     }
@@ -563,46 +549,44 @@ public class Player extends Entity {
     }
   }
 
-  // SELECT ITEM (S6208 em labels combinados)
+  // SELECT ITEM
+  // SELECT ITEM
   public void selectItem() {
     int itemIndex = gp.ui.getItemIndexOnSlot(gp.ui.playerSlotCol, gp.ui.playerSlotRow);
     var inv = getInventory();
-
     if (itemIndex >= inv.size())
       return;
 
     Entity selectedItem = inv.get(itemIndex);
-    int t = selectedItem.getType();
 
-    switch (t) {
-      case TYPE_SWORD, TYPE_AXE, TYPE_PICKAXE:
+    switch (selectedItem.getType()) {
+      case TYPE_SWORD, TYPE_AXE, TYPE_PICKAXE -> {
         setCurrentWeapon(selectedItem);
         setAttack(getAttack());
         getAttackImage();
-        break;
-
-      case TYPE_SHIELD:
+      }
+      case TYPE_SHIELD -> {
         setCurrentShield(selectedItem);
         setDefense(getDefense());
-        break;
-
-      case TYPE_LIGHT:
+      }
+      case TYPE_LIGHT -> {
         setCurrentLight(getCurrentLight() == selectedItem ? null : selectedItem);
         setLightUpdated(true);
-        break;
+      }
+      case TYPE_CONSUMABLE -> handleConsumableSelection(selectedItem, itemIndex);
+      default -> {
+        /* no-op: tipo de item não suportado */ }
+    }
+  }
 
-      case TYPE_CONSUMABLE:
-        if (selectedItem.use(this)) {
-          if (selectedItem.getAmount() > 1) {
-            selectedItem.setAmount(selectedItem.getAmount() - 1);
-          } else {
-            inv.remove(itemIndex);
-          }
-        }
-        break;
+  private void handleConsumableSelection(Entity selectedItem, int itemIndex) {
+    if (!selectedItem.use(this))
+      return;
 
-      default:
-        break;
+    if (selectedItem.getAmount() > 1) {
+      selectedItem.setAmount(selectedItem.getAmount() - 1);
+    } else {
+      getInventory().remove(itemIndex);
     }
   }
 
@@ -638,7 +622,6 @@ public class Player extends Entity {
     return canObtain;
   }
 
-  // DRAW (S3776 reduzida via helper)
   @Override
   public void draw(Graphics2D g2) {
     int tempScreenX = screenX;
@@ -671,24 +654,17 @@ public class Player extends Entity {
     }
   }
 
-  // Helper único para escolher imagem por direção (reduz complexidade do
-  // resolveSprite)
   private BufferedImage byDir(String dir, BufferedImage up, BufferedImage down, BufferedImage left,
       BufferedImage right) {
     if (dir == null)
       return down; // fallback seguro
-    switch (dir) {
-      case DIR_UP:
-        return up;
-      case DIR_DOWN:
-        return down;
-      case DIR_LEFT:
-        return left;
-      case DIR_RIGHT:
-        return right;
-      default:
-        return down;
-    }
+    return switch (dir) {
+      case DIR_UP -> up;
+      case DIR_DOWN -> down;
+      case DIR_LEFT -> left;
+      case DIR_RIGHT -> right;
+      default -> down;
+    };
   }
 
   private BufferedImage resolveSprite(String dir, boolean attacking, boolean guarding, int spriteNum) {
