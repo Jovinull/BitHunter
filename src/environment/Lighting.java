@@ -90,41 +90,35 @@ public class Lighting {
     }
 
     switch (dayPhase) {
-      case DAY:
+      case DAY -> {
         dayCounter++;
         if (dayCounter > 18000) {
           dayPhase = DayPhase.DUSK;
           dayCounter = 0;
         }
-        break;
-
-      case DUSK:
+      }
+      case DUSK -> {
         filterAlpha += 1f / 1800f;
         if (filterAlpha > 1f) {
           filterAlpha = 1f;
           dayPhase = DayPhase.NIGHT;
         }
-        break;
-
-      case NIGHT:
+      }
+      case NIGHT -> {
         dayCounter++;
         if (dayCounter > 10800) {
           dayPhase = DayPhase.DAWN;
           dayCounter = 0;
         }
-        break;
-
-      case DAWN:
+      }
+      case DAWN -> {
         filterAlpha -= 1f / 1800f;
         if (filterAlpha < 0f) {
           filterAlpha = 0f;
           dayPhase = DayPhase.DAY;
         }
         dayCounter++;
-        break;
-
-      default:
-        break;
+      }
     }
   }
 
@@ -139,25 +133,15 @@ public class Lighting {
 
     g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 
-    // DEBUG — remover checagem sempre verdadeira (gp != null)
-    if (gp.keyH != null && gp.keyH.showDebugText) {
+    // DEBUG
+    if (gp.keyH != null && gp.keyH.isShowDebugText()) {
       String situation;
       switch (dayPhase) {
-        case DAY:
-          situation = "Day";
-          break;
-        case DUSK:
-          situation = "Dusk";
-          break;
-        case NIGHT:
-          situation = "Night";
-          break;
-        case DAWN:
-          situation = "Dawn";
-          break;
-        default:
-          situation = "";
-          break;
+        case DAY -> situation = "Day";
+        case DUSK -> situation = "Dusk";
+        case NIGHT -> situation = "Night";
+        case DAWN -> situation = "Dawn";
+        default -> situation = "";
       }
       g2.setColor(Color.white);
       g2.setFont(g2.getFont().deriveFont(50f));
