@@ -204,7 +204,7 @@ public class KeyHandler implements KeyListener {
     // DEBUG (alternar exibição do texto de debug)
     if (key == KeyEvent.VK_T) {
       showDebugText = !showDebugText;
-      gp.tileM.drawPath = showDebugText;
+      gp.tileM.setDrawPath(showDebugText);
     }
 
     // Recarregar mapa (atalho de dev)

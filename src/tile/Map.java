@@ -20,7 +20,7 @@ public class Map extends TileManager {
     createWorldMap();
   }
 
-  // Getters/Setters públicos (evita acesso direto a fields)
+  // Getters/Setters públicos
   public boolean isMiniMapOn() {
     return miniMapOn;
   }
@@ -48,13 +48,11 @@ public class Map extends TileManager {
 
       while (col < gp.maxWorldCol && row < gp.maxWorldRow) {
 
-        // Se o TileManager/Tile expuserem getters, use-os
-        int tileNum = mapTileNum[i][col][row];
+        int tileNum = getMapTileNum()[i][col][row];
         int x = gp.tileSize * col;
         int y = gp.tileSize * row;
 
-        // Preferir getter do Tile, se existir (ex.: tile[tileNum].getImage())
-        g2.drawImage(tile[tileNum].getImage(), x, y, null);
+        g2.drawImage(getTiles()[tileNum].getImage(), x, y, null);
 
         col++;
         if (col == gp.maxWorldCol) {
@@ -79,7 +77,7 @@ public class Map extends TileManager {
     int y = gp.screenHeight / 2 - height / 2;
     g2.drawImage(worldMap[gp.currentMap], x, y, width, height, null);
 
-    // Draw Player (usando getters)
+    // Draw Player
     double scale = (double) (gp.tileSize * gp.maxWorldCol) / width;
     int playerX = (int) (x + gp.player.getWorldX() / scale);
     int playerY = (int) (y + gp.player.getWorldY() / scale);
@@ -90,7 +88,6 @@ public class Map extends TileManager {
   public void drawMiniMap(Graphics2D g2) {
 
     if (miniMapOn) {
-      // Draw Map
       int width = 300;
       int height = 300;
       int x = gp.screenWidth - width - 50;
@@ -98,7 +95,6 @@ public class Map extends TileManager {
       g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8f));
       g2.drawImage(worldMap[gp.currentMap], x, y, width, height, null);
 
-      // Draw Player (usando getters)
       double scale = (double) (gp.tileSize * gp.maxWorldCol) / width;
       int playerX = (int) (x + gp.player.getWorldX() / scale);
       int playerY = (int) (y + gp.player.getWorldY() / scale);
