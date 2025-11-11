@@ -16,7 +16,12 @@ public class KeyHandler implements KeyListener {
   // Flags de input contínuo (consumidas no update do jogo)
   // Encapsuladas conforme Sonar (S1104)
   private boolean upPressed;
-  public boolean downPressed, leftPressed, rightPressed, enterPressed, shotKeyPressed, spacePressed;
+  private boolean downPressed;
+  private boolean leftPressed;
+  private boolean rightPressed;
+  private boolean enterPressed;
+  private boolean shotKeyPressed;
+  private boolean spacePressed;
 
   // DEBUG/God mode encapsulados (S1104)
   private boolean showDebugText = false;
@@ -387,50 +392,34 @@ public class KeyHandler implements KeyListener {
   }
 
   public void playerInventory(int code) {
-    if (code == KeyEvent.VK_W) {
-      if (gp.ui.playerSlotRow != 0) {
-        gp.ui.playerSlotRow--;
-        gp.playSE(9);
-      }
-    } else if (code == KeyEvent.VK_A) {
-      if (gp.ui.playerSlotCol != 0) {
-        gp.ui.playerSlotCol--;
-        gp.playSE(9);
-      }
-    } else if (code == KeyEvent.VK_S) {
-      if (gp.ui.playerSlotRow != SLOT_ROW_MAX) {
-        gp.ui.playerSlotRow++;
-        gp.playSE(9);
-      }
-    } else if (code == KeyEvent.VK_D) {
-      if (gp.ui.playerSlotCol != SLOT_COL_MAX) {
-        gp.ui.playerSlotCol++;
-        gp.playSE(9);
-      }
+    if (code == KeyEvent.VK_W && gp.ui.playerSlotRow != 0) {
+      gp.ui.playerSlotRow--;
+      gp.playSE(9);
+    } else if (code == KeyEvent.VK_A && gp.ui.playerSlotCol != 0) {
+      gp.ui.playerSlotCol--;
+      gp.playSE(9);
+    } else if (code == KeyEvent.VK_S && gp.ui.playerSlotRow != SLOT_ROW_MAX) {
+      gp.ui.playerSlotRow++;
+      gp.playSE(9);
+    } else if (code == KeyEvent.VK_D && gp.ui.playerSlotCol != SLOT_COL_MAX) {
+      gp.ui.playerSlotCol++;
+      gp.playSE(9);
     }
   }
 
   public void npcInventory(int code) {
-    if (code == KeyEvent.VK_W) {
-      if (gp.ui.npcSlotRow != 0) {
-        gp.ui.npcSlotRow--;
-        gp.playSE(9);
-      }
-    } else if (code == KeyEvent.VK_A) {
-      if (gp.ui.npcSlotCol != 0) {
-        gp.ui.npcSlotCol--;
-        gp.playSE(9);
-      }
-    } else if (code == KeyEvent.VK_S) {
-      if (gp.ui.npcSlotRow != SLOT_ROW_MAX) {
-        gp.ui.npcSlotRow++;
-        gp.playSE(9);
-      }
-    } else if (code == KeyEvent.VK_D) {
-      if (gp.ui.npcSlotCol != SLOT_COL_MAX) {
-        gp.ui.npcSlotCol++;
-        gp.playSE(9);
-      }
+    if (code == KeyEvent.VK_W && gp.ui.npcSlotRow != 0) {
+      gp.ui.npcSlotRow--;
+      gp.playSE(9);
+    } else if (code == KeyEvent.VK_A && gp.ui.npcSlotCol != 0) {
+      gp.ui.npcSlotCol--;
+      gp.playSE(9);
+    } else if (code == KeyEvent.VK_S && gp.ui.npcSlotRow != SLOT_ROW_MAX) {
+      gp.ui.npcSlotRow++;
+      gp.playSE(9);
+    } else if (code == KeyEvent.VK_D && gp.ui.npcSlotCol != SLOT_COL_MAX) {
+      gp.ui.npcSlotCol++;
+      gp.playSE(9);
     }
   }
 
@@ -474,10 +463,34 @@ public class KeyHandler implements KeyListener {
   }
 
   // -----------------------
-  // Acessors (S1104) — se outro componente precisar ler estas flags
+  // Acessors (S1104) — caso outros componentes precisem ler estas flags
   // -----------------------
   public boolean isUpPressed() {
     return upPressed;
+  }
+
+  public boolean isDownPressed() {
+    return downPressed;
+  }
+
+  public boolean isLeftPressed() {
+    return leftPressed;
+  }
+
+  public boolean isRightPressed() {
+    return rightPressed;
+  }
+
+  public boolean isEnterPressed() {
+    return enterPressed;
+  }
+
+  public boolean isShotKeyPressed() {
+    return shotKeyPressed;
+  }
+
+  public boolean isSpacePressed() {
+    return spacePressed;
   }
 
   public boolean isShowDebugText() {
