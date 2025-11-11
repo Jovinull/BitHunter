@@ -98,7 +98,6 @@ public class EventHandler {
       canTouchEvent = true;
     }
 
-    // Guard clause para reduzir aninhamento e complexidade
     if (!canTouchEvent) {
       return;
     }
@@ -163,11 +162,11 @@ public class EventHandler {
   }
 
   public void healingPool(int gameState) {
-    if (gp.keyH.enterPressed) {
-      gp.keyH.enterPressed = false;
+    if (gp.keyH.isEnterPressed()) {
+      gp.keyH.setEnterPressed(false);
 
       gp.gameState = gameState;
-      gp.player.setAttackCanceled(true); // usar accessor
+      gp.player.setAttackCanceled(true);
 
       gp.playSE(2);
 
@@ -185,7 +184,7 @@ public class EventHandler {
   }
 
   public void speak(Entity entity) {
-    if (gp.keyH.enterPressed) {
+    if (gp.keyH.isEnterPressed()) {
       gp.gameState = gp.dialogueState;
       gp.player.setAttackCanceled(true);
       entity.speak();

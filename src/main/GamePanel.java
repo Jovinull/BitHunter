@@ -59,8 +59,8 @@ public class GamePanel extends JPanel implements Runnable {
   public KeyHandler keyH = new KeyHandler(this); // Captura entrada de teclado
   Sound music = new Sound(); // Gerencia a música do jogo
   Sound se = new Sound(); // Gerencia os efeitos sonoros do jogo
-  public CollisionChecker cChecker = new CollisionChecker(this); // Verifica colisões entre entidades e tiles
-  public AssetSetter aSetter = new AssetSetter(this); // Configura os objetos do jogo (itens, inimigos, etc.)
+  public CollisionChecker cChecker = new CollisionChecker(this); // Verifica colisões
+  public AssetSetter aSetter = new AssetSetter(this); // Configura os objetos do jogo
   public UI ui = new UI(this); // Interface do usuário (HUD, mensagens, etc.)
   public EventHandler eHandler = new EventHandler(this);
   Config config = new Config(this);
@@ -74,27 +74,26 @@ public class GamePanel extends JPanel implements Runnable {
 
   // ENTITY AND OBJECTS
   public Player player = new Player(this, keyH); // Jogador principal do jogo
-  public Entity obj[][] = new Entity[maxMap][20]; // Array para armazenar objetos do jogo
-  public Entity npc[][] = new Entity[maxMap][10]; // Array para armazenar NPCs (personagens não jogáveis)
+  public Entity obj[][] = new Entity[maxMap][20]; // Objetos
+  public Entity npc[][] = new Entity[maxMap][10]; // NPCs
   public Entity monster[][] = new Entity[maxMap][20];
   public InteractiveTile iTile[][] = new InteractiveTile[maxMap][50];
   public Entity projectile[][] = new Entity[maxMap][20];
-  // public ArrayList<Entity> projectileList = new ArrayList<>();
   public ArrayList<Entity> particleList = new ArrayList<>();
-  ArrayList<Entity> entityList = new ArrayList<>(); // Lista dinâmica para armazenar entidades
+  ArrayList<Entity> entityList = new ArrayList<>(); // Lista dinâmica para ordenação por profundidade
 
   // ==== GAME STATE ====
   public int gameState; // Estado atual do jogo
-  public final int titleState = 0; // Estado do título (menu inicial)
-  public final int playState = 1; // Estado de jogo (jogando)
-  public final int pauseState = 2; // Estado de pausa
-  public final int dialogueState = 3; // Estado de diálogo (interações com NPCs)
-  public final int characterState = 4; // Estado de status do personagem
-  public final int optionsState = 5; // Estado de opções (configurações do jogo)
-  public final int gameOverState = 6; // Estado de game over
-  public final int transitionState = 7; // Estado de transição entre cenas
-  public final int tradeState = 8; // Estado de comércio com NPCs
-  public final int sleepState = 9; // Estado de sono
+  public final int titleState = 0;
+  public final int playState = 1;
+  public final int pauseState = 2;
+  public final int dialogueState = 3;
+  public final int characterState = 4;
+  public final int optionsState = 5;
+  public final int gameOverState = 6;
+  public final int transitionState = 7;
+  public final int tradeState = 8;
+  public final int sleepState = 9;
   public final int mapState = 10;
   public final int cutsceneState = 11;
 
@@ -110,24 +109,23 @@ public class GamePanel extends JPanel implements Runnable {
 
   // ==== CONSTRUTOR ====
   public GamePanel() {
-    this.setPreferredSize(new Dimension(screenWidth, screenHeight)); // Define tamanho da tela
-    this.setBackground(Color.black); // Cor de fundo
-    this.setDoubleBuffered(true); // Habilita buffer duplo para evitar flickering
+    this.setPreferredSize(new Dimension(screenWidth, screenHeight));
+    this.setBackground(Color.black);
+    this.setDoubleBuffered(true);
 
-    this.addKeyListener(keyH); // Liga o controle de teclado ao painel
-    this.setFocusable(true); // Permite que o painel receba foco do teclado
+    this.addKeyListener(keyH);
+    this.setFocusable(true);
   }
 
   // Prepara e inicializa elementos principais do jogo antes de começar o loop
   public void setupGame() {
-    // Instancia e posiciona todos os objetos (chaves, portas, baús)
     aSetter.setObject();
     aSetter.setNPC();
     aSetter.setMonster();
     aSetter.setInteractiveTile();
     eManager.setup();
 
-    gameState = titleState; // Define o estado inicial do jogo como "menu de título"
+    gameState = titleState;
     currentArea = outside;
 
     tempScreen = new BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_ARGB);
@@ -163,31 +161,27 @@ public class GamePanel extends JPanel implements Runnable {
   }
 
   public void setFullScreen() {
-
-    // GET LOCAL SCREEN DEVICE
     GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
     GraphicsDevice gd = ge.getDefaultScreenDevice();
     gd.setFullScreenWindow(Main.window);
 
-    // GET FULL SCREEN WIDTH AND HEIGHT
     screenWidth2 = Main.window.getWidth();
     screenHeight2 = Main.window.getHeight();
   }
 
   // ==== INICIALIZA A THREAD DO JOGO ====
   public void startGameThread() {
-    gameThread = new Thread(this); // Cria a thread com o próprio painel como Runnable
-    gameThread.start(); // Inicia o método run() na thread
+    gameThread = new Thread(this);
+    gameThread.start();
   }
 
   // ==== LOOP PRINCIPAL DO JOGO ====
   @Override
   public void run() {
 
-    // Controla o tempo entre os frames com base no FPS
-    double drawInterval = 1_000_000_000.0 / FPS; // Tempo alvo entre cada frame (em nanossegundos)
+    double drawInterval = 1_000_000_000.0 / FPS;
     double delta = 0;
-    long lastTime = System.nanoTime(); // Marca o tempo do frame anterior
+    long lastTime = System.nanoTime();
     long currentTime;
     long timer = 0;
     int drawCount = 0;
@@ -200,14 +194,13 @@ public class GamePanel extends JPanel implements Runnable {
       lastTime = currentTime;
 
       if (delta >= 1) {
-        update(); // Atualiza lógica do jogo (movimento, eventos, etc.)
-        drawToTempScreen(); // Desenha o jogo na tela temporária
-        drawToScreen(); // Desenha a tela temporária na tela real
+        update();
+        drawToTempScreen();
+        drawToScreen();
         delta--;
         drawCount++;
       }
 
-      // A cada segundo, mostra o FPS no console e reinicia o contador
       if (timer >= 1_000_000_000) {
         System.out.println("FPS: " + drawCount);
         drawCount = 0;
@@ -290,11 +283,11 @@ public class GamePanel extends JPanel implements Runnable {
 
     // DEBUG
     long drawStart = 0;
-    if (keyH.showDebugText) {
+    if (keyH.isShowDebugText()) {
       drawStart = System.nanoTime();
     }
 
-    // Tela de título (menu inicial)
+    // Tela de título
     if (gameState == titleState) {
       ui.draw(g2);
     }
@@ -372,7 +365,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     // DEBUG
-    if (keyH.showDebugText) {
+    if (keyH.isShowDebugText()) {
       long drawEnd = System.nanoTime();
       long passed = drawEnd - drawStart;
 
@@ -392,7 +385,7 @@ public class GamePanel extends JPanel implements Runnable {
       y += lineHeight;
       g2.drawString("Draw Time: " + passed, x, y);
       y += lineHeight;
-      g2.drawString("God Mode: " + keyH.godModeOn, x, y);
+      g2.drawString("God Mode: " + keyH.isGodModeOn(), x, y);
     }
   }
 

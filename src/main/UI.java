@@ -54,13 +54,11 @@ public class UI {
   private static final Color COL_HIGHLIGHT_BG = new Color(0x2A, 0x34, 0x43);
   private static final Color COL_ACCENT = new Color(0xE0, 0xB5, 0x66);
 
-  // Altura de linha padrão de menus
   private static final int MENU_LINE = 48;
 
   public UI(GamePanel gp) {
     this.gp = gp;
 
-    // Carrega fontes com try-with-resources
     try (InputStream is = getClass().getResourceAsStream("/font/x12y16pxMaruMonica.ttf")) {
       if (is != null) {
         maruMonica = Font.createFont(Font.TRUETYPE_FONT, is);
@@ -77,7 +75,7 @@ public class UI {
       System.err.println("Falha ao carregar fonte Purisa Bold: " + e.getMessage());
     }
 
-    // HUD (via getters, sem acessar campos diretamente)
+    // HUD (via getters)
     Entity heart = new ObjHeart(gp);
     heart_full = heart.getBaseImage();
     heart_half = heart.getAltImage1();
@@ -312,7 +310,7 @@ public class UI {
     for (int i = 0; i < message.size(); i++) {
       String m = message.get(i);
       if (m != null) {
-        // sombra simples
+        // sombra
         g2.setColor(Color.black);
         g2.drawString(m, messageX + 2, messageY + 2);
         // texto
@@ -356,7 +354,7 @@ public class UI {
       drawMenuItem("CARREGAR JOGO", yMenuStart + MENU_LINE, commandNum == 1);
       drawMenuItem("SAIR", yMenuStart + MENU_LINE * 2, commandNum == 2);
 
-      // Dica em MaruMonica
+      // Dica
       useCrispPixelText(g2);
       if (maruMonica != null) {
         g2.setFont(maruMonica.deriveFont(Font.PLAIN, 16F));
@@ -425,13 +423,13 @@ public class UI {
         charIndex++;
       }
 
-      if (gp.keyH.enterPressed) {
+      if (gp.keyH.isEnterPressed()) {
         charIndex = 0;
         combinedText = "";
 
         if (gp.gameState == gp.dialogueState || gp.gameState == gp.cutsceneState) {
           npc.setDialogueIndex(idx + 1);
-          gp.keyH.enterPressed = false;
+          gp.keyH.setEnterPressed(false);
         }
       }
     } else {
@@ -592,7 +590,7 @@ public class UI {
         /* no-op */ }
     }
 
-    gp.keyH.enterPressed = false;
+    gp.keyH.setEnterPressed(false);
   }
 
   public void optionsTop(int frameX, int frameY) {
@@ -611,7 +609,7 @@ public class UI {
     g2.drawString("Tela cheia", textX, textY);
     if (commandNum == 0) {
       g2.drawString(">", textX - 25, textY);
-      if (gp.keyH.enterPressed) {
+      if (gp.keyH.isEnterPressed()) {
         gp.fullScreenOn = !gp.fullScreenOn;
         subState = 1;
       }
@@ -636,7 +634,7 @@ public class UI {
     g2.drawString("Controles", textX, textY);
     if (commandNum == 3) {
       g2.drawString(">", textX - 25, textY);
-      if (gp.keyH.enterPressed) {
+      if (gp.keyH.isEnterPressed()) {
         subState = 2;
         commandNum = 0;
       }
@@ -647,7 +645,7 @@ public class UI {
     g2.drawString("Encerrar jogo", textX, textY);
     if (commandNum == 4) {
       g2.drawString(">", textX - 25, textY);
-      if (gp.keyH.enterPressed) {
+      if (gp.keyH.isEnterPressed()) {
         subState = 3;
         commandNum = 0;
       }
@@ -658,7 +656,7 @@ public class UI {
     g2.drawString("Voltar", textX, textY);
     if (commandNum == 5) {
       g2.drawString(">", textX - 25, textY);
-      if (gp.keyH.enterPressed) {
+      if (gp.keyH.isEnterPressed()) {
         gp.gameState = gp.playState;
         commandNum = 0;
       }
@@ -710,7 +708,7 @@ public class UI {
     g2.drawString("Voltar", textX, textY);
     if (commandNum == 0) {
       g2.drawString(">", textX - 25, textY);
-      if (gp.keyH.enterPressed) {
+      if (gp.keyH.isEnterPressed()) {
         subState = 0;
       }
     }
@@ -760,7 +758,7 @@ public class UI {
     g2.drawString("Voltar", textX, textY);
     if (commandNum == 0) {
       g2.drawString(">", textX - 25, textY);
-      if (gp.keyH.enterPressed) {
+      if (gp.keyH.isEnterPressed()) {
         subState = 0;
         commandNum = 3;
       }
@@ -786,13 +784,13 @@ public class UI {
     g2.drawString(text, textX, textY);
     if (commandNum == 0) {
       g2.drawString(">", textX - 25, textY);
-      if (gp.keyH.enterPressed) {
+      if (gp.keyH.isEnterPressed()) {
         subState = 0;
         commandNum = 0;
         titleScreenState = 0;
         gp.music.stop();
         gp.gameState = gp.titleState;
-        gp.keyH.enterPressed = false;
+        gp.keyH.setEnterPressed(false);
         gp.resetGame(true);
       }
     }
@@ -804,10 +802,10 @@ public class UI {
     g2.drawString(text, textX, textY);
     if (commandNum == 1) {
       g2.drawString(">", textX - 25, textY);
-      if (gp.keyH.enterPressed) {
+      if (gp.keyH.isEnterPressed()) {
         subState = 0;
         commandNum = 4;
-        gp.keyH.enterPressed = false;
+        gp.keyH.setEnterPressed(false);
       }
     }
   }
@@ -820,7 +818,7 @@ public class UI {
       default -> {
         /* no-op */ }
     }
-    gp.keyH.enterPressed = false;
+    gp.keyH.setEnterPressed(false);
   }
 
   public void tradeSelect() {
@@ -841,7 +839,7 @@ public class UI {
     g2.drawString("Comprar", x, y);
     if (commandNum == 0) {
       g2.drawString(">", x - 24, y);
-      if (gp.keyH.enterPressed) {
+      if (gp.keyH.isEnterPressed()) {
         subState = 1;
       }
     }
@@ -850,7 +848,7 @@ public class UI {
     g2.drawString("Vender", x, y);
     if (commandNum == 1) {
       g2.drawString(">", x - 24, y);
-      if (gp.keyH.enterPressed) {
+      if (gp.keyH.isEnterPressed()) {
         subState = 2;
       }
     }
@@ -859,7 +857,7 @@ public class UI {
     g2.drawString("Sair", x, y);
     if (commandNum == 2) {
       g2.drawString(">", x - 24, y);
-      if (gp.keyH.enterPressed) {
+      if (gp.keyH.isEnterPressed()) {
         commandNum = 0;
         npc.startDialogue(npc, 1);
       }
@@ -905,7 +903,7 @@ public class UI {
       g2.drawString(text, x, y + 34);
 
       // COMPRAR UM ITEM
-      if (gp.keyH.enterPressed) {
+      if (gp.keyH.isEnterPressed()) {
         if (price > gp.player.getCoin()) {
           subState = 0;
           npc.startDialogue(npc, 2);
@@ -962,7 +960,7 @@ public class UI {
       g2.drawString(text, x, y + 34);
 
       // VENDER UM ITEM
-      if (gp.keyH.enterPressed) {
+      if (gp.keyH.isEnterPressed()) {
 
         if (gp.player.getInventory().get(itemIndex) == gp.player.getCurrentWeapon()
             || gp.player.getInventory().get(itemIndex) == gp.player.getCurrentShield()) {
@@ -1008,7 +1006,6 @@ public class UI {
 
     final var lighting = gp.eManager.getLighting();
     if (lighting == null) {
-      // fallback defensivo
       counter = 0;
       gp.gameState = gp.playState;
       return;
@@ -1018,9 +1015,9 @@ public class UI {
     final float STEP = 0.01f;
 
     if (counter < TRANSITION_TICKS) {
-      lighting.setFilterAlpha(lighting.getFilterAlpha() + STEP); // clamp já no setter
+      lighting.setFilterAlpha(lighting.getFilterAlpha() + STEP);
     } else {
-      lighting.setFilterAlpha(lighting.getFilterAlpha() - STEP); // clamp já no setter
+      lighting.setFilterAlpha(lighting.getFilterAlpha() - STEP);
       if (lighting.getFilterAlpha() <= 0f) {
         counter = 0;
         lighting.setDayStateToDay();
@@ -1036,9 +1033,9 @@ public class UI {
     return slotCol + (slotRow * 5);
   }
 
-  // --- Subjanela leve (sem gradiente) ---
+  // --- Subjanela leve ---
   public void drawSubWindow(int x, int y, int width, int height) {
-    Graphics2D g = (Graphics2D) g2.create(); // snapshot do estado
+    Graphics2D g = (Graphics2D) g2.create();
 
     g.setColor(COL_PANEL);
     g.fillRoundRect(x, y, width, height, 14, 14);
@@ -1047,7 +1044,7 @@ public class UI {
     g.setColor(COL_PANEL_BORDER);
     g.drawRoundRect(x, y, width, height, 14, 14);
 
-    g.dispose(); // restaura o estado do g2 original
+    g.dispose();
   }
 
   // Centralizada por tamanho
@@ -1057,7 +1054,7 @@ public class UI {
     drawSubWindow(x, y, w, h);
   }
 
-  // --- Helpers visuais leves ---
+  // --- Helpers visuais ---
   private void drawMenuItem(String text, int centerY, boolean selected) {
     int w = Math.min((int) (gp.screenWidth * 0.6), 800);
     int x = (gp.screenWidth - w) / 2;
@@ -1073,13 +1070,11 @@ public class UI {
 
     int tx = getXforCenteredText(text);
     g2.setColor(selected ? COL_ACCENT : COL_TEXT);
-    // sombra leve
     g2.setColor(Color.black);
     g2.drawString(text, tx + 2, centerY + 2);
     g2.setColor(selected ? COL_ACCENT : COL_TEXT);
     g2.drawString(text, tx, centerY);
 
-    // indicador esquerdo
     if (selected) {
       int triX = x - (int) (gp.tileSize * 0.3);
       int triY = centerY - (int) (gp.tileSize * 0.60);
@@ -1091,7 +1086,6 @@ public class UI {
     }
   }
 
-  // --- Helpers de render ---
   private void useCrispPixelText(Graphics2D g) {
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
     g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF);

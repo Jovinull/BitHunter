@@ -5,8 +5,7 @@ import java.awt.event.KeyListener;
 
 /**
  * Lida com eventos de teclado e delega o comportamento conforme o estado atual
- * do jogo.
- * Mantém flags de input para o loop principal (GamePanel) consumir.
+ * do jogo. Mantém flags de input para o loop principal (GamePanel) consumir.
  */
 public class KeyHandler implements KeyListener {
 
@@ -16,12 +15,7 @@ public class KeyHandler implements KeyListener {
   // Flags de input contínuo (consumidas no update do jogo)
   // Encapsuladas conforme Sonar (S1104)
   private boolean upPressed;
-  private boolean downPressed;
-  private boolean leftPressed;
-  private boolean rightPressed;
-  private boolean enterPressed;
-  private boolean shotKeyPressed;
-  private boolean spacePressed;
+  private boolean downPressed, leftPressed, rightPressed, enterPressed, shotKeyPressed, spacePressed;
 
   // DEBUG/God mode encapsulados (S1104)
   private boolean showDebugText = false;
@@ -232,8 +226,7 @@ public class KeyHandler implements KeyListener {
   }
 
   /**
-   * Estado: Opções.
-   * Reduzido com helpers e flatten das condicionais (S3776 + S1066).
+   * Estado: Opções. Reduzido com helpers e flatten das condicionais (S3776 + S1066).
    */
   public void optionsState(int code) {
     if (code == KeyEvent.VK_ESCAPE) {
@@ -268,16 +261,13 @@ public class KeyHandler implements KeyListener {
 
   private void moveCommandNum(int delta, int max) {
     gp.ui.commandNum += delta;
-    if (gp.ui.commandNum < 0)
-      gp.ui.commandNum = max;
-    if (gp.ui.commandNum > max)
-      gp.ui.commandNum = 0;
+    if (gp.ui.commandNum < 0) gp.ui.commandNum = max;
+    if (gp.ui.commandNum > max) gp.ui.commandNum = 0;
     gp.playSE(9);
   }
 
   private void adjustVolume(int direction) {
-    if (gp.ui.subState != 0)
-      return;
+    if (gp.ui.subState != 0) return;
 
     switch (gp.ui.commandNum) {
       case 1 -> { // música
@@ -302,7 +292,7 @@ public class KeyHandler implements KeyListener {
   }
 
   /**
-   * Estado: Game Over (mantido funcional; já é simples).
+   * Estado: Game Over.
    */
   public void gameOverState(int code) {
     if (code == KeyEvent.VK_W) {
@@ -338,8 +328,7 @@ public class KeyHandler implements KeyListener {
   }
 
   /**
-   * Estado: Comércio (trade).
-   * Reduzido com dispatch por subState (S3776).
+   * Estado: Comércio (trade). Reduzido com dispatch por subState (S3776).
    */
   public void tradeState(int code) {
     if (code == KeyEvent.VK_ENTER) {
@@ -351,13 +340,11 @@ public class KeyHandler implements KeyListener {
       case 0 -> handleTradeMenuNavigation(code);
       case 1 -> {
         npcInventory(code);
-        if (code == KeyEvent.VK_ESCAPE)
-          gp.ui.subState = 0;
+        if (code == KeyEvent.VK_ESCAPE) gp.ui.subState = 0;
       }
       case 2 -> {
         playerInventory(code);
-        if (code == KeyEvent.VK_ESCAPE)
-          gp.ui.subState = 0;
+        if (code == KeyEvent.VK_ESCAPE) gp.ui.subState = 0;
       }
       default -> {
         // noop
@@ -369,14 +356,12 @@ public class KeyHandler implements KeyListener {
     switch (code) {
       case KeyEvent.VK_W -> {
         gp.ui.commandNum--;
-        if (gp.ui.commandNum < 0)
-          gp.ui.commandNum = 2;
+        if (gp.ui.commandNum < 0) gp.ui.commandNum = 2;
         gp.playSE(9);
       }
       case KeyEvent.VK_S -> {
         gp.ui.commandNum++;
-        if (gp.ui.commandNum > 2)
-          gp.ui.commandNum = 0;
+        if (gp.ui.commandNum > 2) gp.ui.commandNum = 0;
         gp.playSE(9);
       }
       default -> {
@@ -437,8 +422,7 @@ public class KeyHandler implements KeyListener {
       case KeyEvent.VK_F -> shotKeyPressed = false;
       case KeyEvent.VK_ENTER -> enterPressed = false;
       case KeyEvent.VK_SPACE -> spacePressed = false;
-      default -> {
-        /* noop */ }
+      default -> { /* noop */ }
     }
   }
 
@@ -463,41 +447,18 @@ public class KeyHandler implements KeyListener {
   }
 
   // -----------------------
-  // Acessors (S1104) — caso outros componentes precisem ler estas flags
+  // Accessors (S1104)
   // -----------------------
-  public boolean isUpPressed() {
-    return upPressed;
-  }
+  public boolean isUpPressed() { return upPressed; }
+  public boolean isDownPressed() { return downPressed; }
+  public boolean isLeftPressed() { return leftPressed; }
+  public boolean isRightPressed() { return rightPressed; }
+  public boolean isEnterPressed() { return enterPressed; }
+  public boolean isShotKeyPressed() { return shotKeyPressed; }
+  public boolean isSpacePressed() { return spacePressed; }
+  public boolean isShowDebugText() { return showDebugText; }
+  public boolean isGodModeOn() { return godModeOn; }
 
-  public boolean isDownPressed() {
-    return downPressed;
-  }
-
-  public boolean isLeftPressed() {
-    return leftPressed;
-  }
-
-  public boolean isRightPressed() {
-    return rightPressed;
-  }
-
-  public boolean isEnterPressed() {
-    return enterPressed;
-  }
-
-  public boolean isShotKeyPressed() {
-    return shotKeyPressed;
-  }
-
-  public boolean isSpacePressed() {
-    return spacePressed;
-  }
-
-  public boolean isShowDebugText() {
-    return showDebugText;
-  }
-
-  public boolean isGodModeOn() {
-    return godModeOn;
-  }
+  // Setter necessário para consumo de ENTER pela UI/Player
+  public void setEnterPressed(boolean value) { this.enterPressed = value; }
 }
