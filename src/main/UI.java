@@ -10,6 +10,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import entity.Entity;
 import object.ObjCoinBronze;
@@ -17,6 +19,9 @@ import object.ObjHeart;
 import object.ObjManaCrystal;
 
 public class UI {
+
+  // --- Logger ---
+  private static final Logger LOGGER = Logger.getLogger(UI.class.getName());
 
   // --- Referências do jogo ---
   private final GamePanel gp;
@@ -32,7 +37,7 @@ public class UI {
   private final ArrayList<String> message = new ArrayList<>();
   private final ArrayList<Integer> messageCounter = new ArrayList<>();
   public boolean gameFinished = false;
-  public String currentDialogue = "";
+  private String currentDialogue = "";
   public int commandNum = 0;
   public int titleScreenState = 0;
   public int playerSlotCol = 0;
@@ -55,6 +60,7 @@ public class UI {
   private static final Color COL_ACCENT = new Color(0xE0, 0xB5, 0x66);
 
   private static final int MENU_LINE = 48;
+  private static final String LABEL_BACK = "Voltar";
 
   public UI(GamePanel gp) {
     this.gp = gp;
@@ -64,7 +70,7 @@ public class UI {
         maruMonica = Font.createFont(Font.TRUETYPE_FONT, is);
       }
     } catch (FontFormatException | IOException e) {
-      System.err.println("Falha ao carregar fonte MaruMonica: " + e.getMessage());
+      LOGGER.log(Level.WARNING, "Falha ao carregar fonte MaruMonica", e);
     }
 
     try (InputStream is = getClass().getResourceAsStream("/font/Purisa Bold.ttf")) {
@@ -72,7 +78,7 @@ public class UI {
         purisaB = Font.createFont(Font.TRUETYPE_FONT, is);
       }
     } catch (FontFormatException | IOException e) {
-      System.err.println("Falha ao carregar fonte Purisa Bold: " + e.getMessage());
+      LOGGER.log(Level.WARNING, "Falha ao carregar fonte Purisa Bold", e);
     }
 
     // HUD (via getters)
@@ -99,6 +105,12 @@ public class UI {
   public void draw(Graphics2D g2) {
     this.g2 = g2;
 
+    configureTextRendering();
+    g2.setColor(COL_TEXT);
+    drawByGameState();
+  }
+
+  private void configureTextRendering() {
     boolean smoothUi = gp.gameState == gp.titleState ||
         gp.gameState == gp.pauseState ||
         gp.gameState == gp.gameOverState;
@@ -114,56 +126,32 @@ public class UI {
         g2.setFont(maruMonica.deriveFont(Font.PLAIN, 16F));
       }
     }
+  }
 
-    g2.setColor(COL_TEXT);
-
+  private void drawByGameState() {
     if (gp.gameState == gp.titleState) {
       drawTitleScreen();
-      return;
-    }
-
-    if (gp.gameState == gp.playState) {
+    } else if (gp.gameState == gp.playState) {
       drawPlayerLife();
       drawMonsterLife();
       drawMessage();
-      return;
-    }
-
-    if (gp.gameState == gp.pauseState) {
+    } else if (gp.gameState == gp.pauseState) {
       drawPlayerLife();
       drawPauseScreen();
-      return;
-    }
-
-    if (gp.gameState == gp.dialogueState) {
+    } else if (gp.gameState == gp.dialogueState) {
       drawDialogueScreen();
-      return;
-    }
-
-    if (gp.gameState == gp.characterState) {
+    } else if (gp.gameState == gp.characterState) {
       drawCharacterScreen();
       drawInventory(gp.player, true);
-      return;
-    }
-
-    if (gp.gameState == gp.optionsState) {
+    } else if (gp.gameState == gp.optionsState) {
       drawOptionsScreen();
-      return;
-    }
-
-    if (gp.gameState == gp.gameOverState) {
+    } else if (gp.gameState == gp.gameOverState) {
       drawGameOverScreen();
-    }
-
-    if (gp.gameState == gp.transitionState) {
+    } else if (gp.gameState == gp.transitionState) {
       drawTransition();
-    }
-
-    if (gp.gameState == gp.tradeState) {
+    } else if (gp.gameState == gp.tradeState) {
       drawTradeScreen();
-    }
-
-    if (gp.gameState == gp.sleepState) {
+    } else if (gp.gameState == gp.sleepState) {
       drawSleepScreen();
     }
   }
@@ -217,11 +205,6 @@ public class UI {
 
     if (halfHeart == 1) {
       g2.drawImage(heart_half, x, y, iconSize, iconSize, null);
-      x += iconSize;
-      if (((fullHearts + 1) % colsPerRow) == 0) {
-        x = startX;
-        y += iconSize;
-      }
     }
 
     // --- MANA (vazio) ---
@@ -307,7 +290,8 @@ public class UI {
 
     g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32F));
 
-    for (int i = 0; i < message.size(); i++) {
+    int i = 0;
+    while (i < message.size()) {
       String m = message.get(i);
       if (m != null) {
         // sombra
@@ -324,9 +308,10 @@ public class UI {
         if (messageCounter.get(i) > 180) {
           message.remove(i);
           messageCounter.remove(i);
-          i--;
+          continue;
         }
       }
+      i++;
     }
   }
 
@@ -374,7 +359,7 @@ public class UI {
       drawMenuItem("Guerreiro", cy, commandNum == 0);
       drawMenuItem("Ladrão", cy + MENU_LINE, commandNum == 1);
       drawMenuItem("Feiticeiro", cy + MENU_LINE * 2, commandNum == 2);
-      drawMenuItem("Voltar", cy + MENU_LINE * 4, commandNum == 3);
+      drawMenuItem(LABEL_BACK, cy + MENU_LINE * 4, commandNum == 3);
     }
   }
 
@@ -413,37 +398,47 @@ public class UI {
     int idx = npc.getDialogueIndex();
 
     if (ds[set][idx] != null) {
-      char[] characters = ds[set][idx].toCharArray();
-
-      if (charIndex < characters.length) {
-        gp.playSE(17);
-        String s = String.valueOf(characters[charIndex]);
-        combinedText = combinedText + s;
-        currentDialogue = combinedText;
-        charIndex++;
-      }
-
-      if (gp.keyH.isEnterPressed()) {
-        charIndex = 0;
-        combinedText = "";
-
-        if (gp.gameState == gp.dialogueState || gp.gameState == gp.cutsceneState) {
-          npc.setDialogueIndex(idx + 1);
-          gp.keyH.setEnterPressed(false);
-        }
-      }
+      updateDialogueCharacters(ds[set][idx], set, idx);
     } else {
-      npc.setDialogueIndex(0);
-
-      if (gp.gameState == gp.dialogueState) {
-        gp.gameState = gp.playState;
-      }
-
-      if (gp.gameState == gp.cutsceneState) {
-        gp.csManager.nextPhase();
-      }
+      handleDialogueEnd();
     }
 
+    drawCurrentDialogueLines(x, y);
+  }
+
+  private void updateDialogueCharacters(String dialogueLine, int set, int idx) {
+    char[] characters = dialogueLine.toCharArray();
+
+    if (charIndex < characters.length) {
+      gp.playSE(17);
+      String s = String.valueOf(characters[charIndex]);
+      combinedText = combinedText + s;
+      currentDialogue = combinedText;
+      charIndex++;
+    }
+
+    if (gp.keyH.isEnterPressed()) {
+      charIndex = 0;
+      combinedText = "";
+
+      if (gp.gameState == gp.dialogueState || gp.gameState == gp.cutsceneState) {
+        npc.setDialogueIndex(idx + 1);
+        gp.keyH.setEnterPressed(false);
+      }
+    }
+  }
+
+  private void handleDialogueEnd() {
+    npc.setDialogueIndex(0);
+
+    if (gp.gameState == gp.dialogueState) {
+      gp.gameState = gp.playState;
+    } else if (gp.gameState == gp.cutsceneState) {
+      gp.csManager.nextPhase();
+    }
+  }
+
+  private void drawCurrentDialogueLines(int x, int y) {
     for (String line : currentDialogue.split("\n")) {
       g2.drawString(line, x, y);
       y += 40;
@@ -479,9 +474,19 @@ public class UI {
 
     final int slotXstart = frameX + 20;
     final int slotYstart = frameY + 20;
+    int slotSize = gp.tileSize + 3;
+
+    drawInventoryItems(entity, slotXstart, slotYstart, slotSize);
+
+    if (cursor) {
+      drawInventoryCursorAndDescription(entity, frameX, frameY, frameWidth, frameHeight,
+          slotXstart, slotYstart, slotSize, slotCol, slotRow);
+    }
+  }
+
+  private void drawInventoryItems(Entity entity, int slotXstart, int slotYstart, int slotSize) {
     int slotX = slotXstart;
     int slotY = slotYstart;
-    int slotSize = gp.tileSize + 3;
 
     for (int i = 0; i < entity.getInventory().size(); i++) {
 
@@ -517,37 +522,47 @@ public class UI {
         slotY += gp.tileSize;
       }
     }
+  }
 
-    // Cursor
-    if (cursor) {
-      int cursorX = slotXstart + (slotSize * slotCol);
-      int cursorY = slotYstart + (slotSize * slotRow);
-      int cursorWidth = gp.tileSize;
-      int cursorHeight = gp.tileSize;
+  private void drawInventoryCursorAndDescription(
+      Entity entity,
+      int frameX,
+      int frameY,
+      int frameWidth,
+      int frameHeight,
+      int slotXstart,
+      int slotYstart,
+      int slotSize,
+      int slotCol,
+      int slotRow) {
 
+    int cursorX = slotXstart + (slotSize * slotCol);
+    int cursorY = slotYstart + (slotSize * slotRow);
+    int cursorWidth = gp.tileSize;
+    int cursorHeight = gp.tileSize;
+
+    g2.setColor(COL_TEXT);
+    g2.setStroke(new BasicStroke(3));
+    g2.drawRoundRect(cursorX, cursorY, cursorWidth, cursorHeight, 8, 8);
+
+    // Descrição
+    int dFrameX = frameX;
+    int dFrameY = frameY + frameHeight;
+    int dFrameWidth = frameWidth;
+    int dFrameHeight = gp.tileSize * 3;
+
+    int itemIndex = getItemIndexOnSlot(slotCol, slotRow);
+    if (itemIndex < entity.getInventory().size()) {
+      drawSubWindow(dFrameX, dFrameY, dFrameWidth, dFrameHeight);
+
+      int textX = dFrameX + 20;
+      int textY = dFrameY + gp.tileSize;
       g2.setColor(COL_TEXT);
-      g2.setStroke(new BasicStroke(3));
-      g2.drawRoundRect(cursorX, cursorY, cursorWidth, cursorHeight, 8, 8);
+      g2.setFont(g2.getFont().deriveFont(28F));
 
-      // Descrição
-      int dFrameX = frameX;
-      int dFrameY = frameY + frameHeight;
-      int dFrameWidth = frameWidth;
-      int dFrameHeight = gp.tileSize * 3;
-
-      int itemIndex = getItemIndexOnSlot(slotCol, slotRow);
-      if (itemIndex < entity.getInventory().size()) {
-        drawSubWindow(dFrameX, dFrameY, dFrameWidth, dFrameHeight);
-
-        int textX = dFrameX + 20;
-        int textY = dFrameY + gp.tileSize;
-        g2.setColor(COL_TEXT);
-        g2.setFont(g2.getFont().deriveFont(28F));
-
-        for (String line : entity.getInventory().get(itemIndex).getDescription().split("\n")) {
-          g2.drawString(line, textX, textY);
-          textY += 28;
-        }
+      for (String line : entity.getInventory().get(itemIndex).getDescription().split("\n")) {
+        g2.drawString(line, textX, textY);
+        textY += 28;
       }
     }
   }
@@ -653,7 +668,7 @@ public class UI {
 
     // VOLTAR
     textY += gp.tileSize * 3;
-    g2.drawString("Voltar", textX, textY);
+    g2.drawString(LABEL_BACK, textX, textY);
     if (commandNum == 5) {
       g2.drawString(">", textX - 25, textY);
       if (gp.keyH.isEnterPressed()) {
@@ -705,7 +720,7 @@ public class UI {
     }
 
     textY = frameY + gp.tileSize * 9;
-    g2.drawString("Voltar", textX, textY);
+    g2.drawString(LABEL_BACK, textX, textY);
     if (commandNum == 0) {
       g2.drawString(">", textX - 25, textY);
       if (gp.keyH.isEnterPressed()) {
@@ -755,7 +770,7 @@ public class UI {
     // Voltar
     textX = frameX + gp.tileSize;
     textY = frameY + gp.tileSize * 9;
-    g2.drawString("Voltar", textX, textY);
+    g2.drawString(LABEL_BACK, textX, textY);
     if (commandNum == 0) {
       g2.drawString(">", textX - 25, textY);
       if (gp.keyH.isEnterPressed()) {
@@ -1069,7 +1084,6 @@ public class UI {
     }
 
     int tx = getXforCenteredText(text);
-    g2.setColor(selected ? COL_ACCENT : COL_TEXT);
     g2.setColor(Color.black);
     g2.drawString(text, tx + 2, centerY + 2);
     g2.setColor(selected ? COL_ACCENT : COL_TEXT);
