@@ -43,52 +43,52 @@ public class GamePanel extends JPanel implements Runnable {
   public static final int screenHeight = tileSize * maxScreenRow; // Altura total da tela (576 px)
 
   public static final int maxMap = 10;
-  public int currentMap = 0;
+  private int currentMap = 0;
 
   // FOR FULL SCREEN
   int screenWidth2 = screenWidth;
   int screenHeight2 = screenHeight;
   private transient BufferedImage tempScreen;
   private transient Graphics2D g2;
-  public boolean fullScreenOn = false;
+  private boolean fullScreenOn = false;
 
   // ==== CONFIGURAÇÕES DO MUNDO ====
-  public int maxWorldCol;
-  public int maxWorldRow;
+  private int maxWorldCol;
+  private int maxWorldRow;
 
   // ==== CONFIGURAÇÃO DE FPS ====
   int fps = 60; // Quadros por segundo
 
   // ==== COMPONENTES DO JOGO ====
-  public transient TileManager tileM = new TileManager(this); // Gerencia o carregamento e desenho dos tiles
-  public transient KeyHandler keyH = new KeyHandler(this); // Captura entrada de teclado
+  private transient TileManager tileM = new TileManager(this); // Gerencia o carregamento e desenho dos tiles
+  private transient KeyHandler keyH = new KeyHandler(this); // Captura entrada de teclado
   transient Sound music = new Sound(); // Gerencia a música do jogo
   transient Sound se = new Sound(); // Gerencia os efeitos sonoros do jogo
-  public transient CollisionChecker cChecker = new CollisionChecker(this); // Verifica colisões
-  public transient AssetSetter aSetter = new AssetSetter(this); // Configura os objetos do jogo
-  public transient UI gameUi = new UI(this); // Interface do usuário (HUD, mensagens, etc.)
-  public transient EventHandler eHandler = new EventHandler(this);
+  private transient CollisionChecker cChecker = new CollisionChecker(this); // Verifica colisões
+  private transient AssetSetter aSetter = new AssetSetter(this); // Configura os objetos do jogo
+  private transient UI gameUi = new UI(this); // Interface do usuário (HUD, mensagens, etc.)
+  private transient EventHandler eHandler = new EventHandler(this);
   transient Config config = new Config(this);
-  public transient PathFinder pFinder = new PathFinder(this);
+  private transient PathFinder pFinder = new PathFinder(this);
   transient EnvironmentManager eManager = new EnvironmentManager(this);
   transient Map map = new Map(this);
   transient SaveLoad saveLoad = new SaveLoad(this);
-  public transient EntityGenerator eGenerator = new EntityGenerator(this);
-  public transient CutsceneManager csManager = new CutsceneManager(this);
+  private transient EntityGenerator eGenerator = new EntityGenerator(this);
+  private transient CutsceneManager csManager = new CutsceneManager(this);
   transient Thread gameThread; // Thread para rodar o loop do jogo
 
   // ENTITY AND OBJECTS
-  public transient Player player = new Player(this, keyH); // Jogador principal do jogo
-  public transient Entity[][] obj = new Entity[maxMap][20]; // Objetos
-  public transient Entity[][] npc = new Entity[maxMap][10]; // NPCs
-  public transient Entity[][] monster = new Entity[maxMap][20];
-  public transient InteractiveTile[][] iTile = new InteractiveTile[maxMap][50];
-  public transient Entity[][] projectile = new Entity[maxMap][20];
-  public transient List<Entity> particleList = new ArrayList<>();
+  private transient Player player = new Player(this, keyH); // Jogador principal do jogo
+  private transient Entity[][] obj = new Entity[maxMap][20]; // Objetos
+  private transient Entity[][] npc = new Entity[maxMap][10]; // NPCs
+  private transient Entity[][] monster = new Entity[maxMap][20];
+  private transient InteractiveTile[][] iTile = new InteractiveTile[maxMap][50];
+  private transient Entity[][] projectile = new Entity[maxMap][20];
+  private transient List<Entity> particleList = new ArrayList<>();
   transient List<Entity> entityList = new ArrayList<>(); // Lista dinâmica para ordenação por profundidade
 
   // ==== GAME STATE ====
-  public int gameState; // Estado atual do jogo
+  private int gameState; // Estado atual do jogo
   public static final int titleState = 0;
   public static final int playState = 1;
   public static final int pauseState = 2;
@@ -103,11 +103,11 @@ public class GamePanel extends JPanel implements Runnable {
   public static final int cutsceneState = 11;
 
   // others
-  public boolean bossBattleOn = false;
+  private boolean bossBattleOn = false;
 
   // AREA
-  public int currentArea;
-  public int nextArea;
+  private int currentArea;
+  private int nextArea;
   public static final int outside = 50;
   public static final int indoor = 51;
   public static final int dungeon = 52;
@@ -311,12 +311,10 @@ public class GamePanel extends JPanel implements Runnable {
 
     long drawStart = startDebugTimerIfNeeded();
 
-    if (gameState == titleState) {
-      drawTitleScreen();
-    } else if (gameState == mapState) {
-      drawMapScreen();
-    } else {
-      drawGameScenes();
+    switch (gameState) {
+      case titleState -> drawTitleScreen();
+      case mapState -> drawMapScreen();
+      default -> drawGameScenes();
     }
 
     if (keyH.isShowDebugText()) {
@@ -484,5 +482,135 @@ public class GamePanel extends JPanel implements Runnable {
         }
       }
     }
+  }
+
+  // ==== GETTERS / SETTERS PARA CAMPOS ENCAPSULADOS ====
+
+  public int getCurrentMap() {
+    return currentMap;
+  }
+
+  public void setCurrentMap(int currentMap) {
+    this.currentMap = currentMap;
+  }
+
+  public boolean isFullScreenOn() {
+    return fullScreenOn;
+  }
+
+  public void setFullScreenOn(boolean fullScreenOn) {
+    this.fullScreenOn = fullScreenOn;
+  }
+
+  public int getMaxWorldCol() {
+    return maxWorldCol;
+  }
+
+  public void setMaxWorldCol(int maxWorldCol) {
+    this.maxWorldCol = maxWorldCol;
+  }
+
+  public int getMaxWorldRow() {
+    return maxWorldRow;
+  }
+
+  public void setMaxWorldRow(int maxWorldRow) {
+    this.maxWorldRow = maxWorldRow;
+  }
+
+  public TileManager getTileM() {
+    return tileM;
+  }
+
+  public KeyHandler getKeyH() {
+    return keyH;
+  }
+
+  public CollisionChecker getcChecker() {
+    return cChecker;
+  }
+
+  public AssetSetter getaSetter() {
+    return aSetter;
+  }
+
+  public UI getGameUi() {
+    return gameUi;
+  }
+
+  public EventHandler geteHandler() {
+    return eHandler;
+  }
+
+  public PathFinder getpFinder() {
+    return pFinder;
+  }
+
+  public EntityGenerator geteGenerator() {
+    return eGenerator;
+  }
+
+  public CutsceneManager getCsManager() {
+    return csManager;
+  }
+
+  public Player getPlayer() {
+    return player;
+  }
+
+  public Entity[][] getObj() {
+    return obj;
+  }
+
+  public Entity[][] getNpc() {
+    return npc;
+  }
+
+  public Entity[][] getMonster() {
+    return monster;
+  }
+
+  public InteractiveTile[][] getiTile() {
+    return iTile;
+  }
+
+  public Entity[][] getProjectile() {
+    return projectile;
+  }
+
+  public List<Entity> getParticleList() {
+    return particleList;
+  }
+
+  public int getGameState() {
+    return gameState;
+  }
+
+  public void setGameState(int gameState) {
+    this.gameState = gameState;
+  }
+
+  public boolean isBossBattleOn() {
+    return bossBattleOn;
+  }
+
+  public void setBossBattleOn(boolean bossBattleOn) {
+    this.bossBattleOn = bossBattleOn;
+  }
+
+  public int getCurrentArea() {
+    return currentArea;
+  }
+
+  public void setCurrentArea(int currentArea) {
+    this.currentArea = currentArea;
+  }
+
+  public int getNextArea() {
+    return nextArea;
+  }
+
+  public void setNextArea(int nextArea) {
+    this.nextArea = nextArea;
   }
 }
