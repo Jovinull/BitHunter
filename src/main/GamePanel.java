@@ -33,21 +33,21 @@ public class GamePanel extends JPanel implements Runnable {
   private static final Logger LOGGER = Logger.getLogger(GamePanel.class.getName());
 
   // ==== CONFIGURAÇÕES DE TELA (visível) ====
-  private static final int originalTileSize = 16; // Tamanho base de um tile (16x16 pixels)
-  private static final int scale = 3; // Fator de escala aplicado ao tile
+  private static final int ORIGINAL_TILE_SIZE = 16; // Tamanho base de um tile (16x16 pixels)
+  private static final int SCALE = 3; // Fator de escala aplicado ao tile
 
-  public static final int tileSize = originalTileSize * scale; // Tile final com escala (48x48 pixels)
-  public static final int maxScreenCol = 20; // Número de colunas visíveis na tela
-  public static final int maxScreenRow = 12; // Número de linhas visíveis na tela
-  public static final int screenWidth = tileSize * maxScreenCol; // Largura total da tela (960 px)
-  public static final int screenHeight = tileSize * maxScreenRow; // Altura total da tela (576 px)
+  public static final int TILE_SIZE = ORIGINAL_TILE_SIZE * SCALE; // Tile final com escala (48x48 pixels)
+  public static final int MAX_SCREEN_COL = 20; // Número de colunas visíveis na tela
+  public static final int MAX_SCREEN_ROW = 12; // Número de linhas visíveis na tela
+  public static final int SCREEN_WIDTH = TILE_SIZE * MAX_SCREEN_COL; // Largura total da tela (960 px)
+  public static final int SCREEN_HEIGHT = TILE_SIZE * MAX_SCREEN_ROW; // Altura total da tela (576 px)
 
-  public static final int maxMap = 10;
+  public static final int MAX_MAP = 10;
   private int currentMap = 0;
 
   // FOR FULL SCREEN
-  int screenWidth2 = screenWidth;
-  int screenHeight2 = screenHeight;
+  int screenWidth2 = SCREEN_WIDTH;
+  int screenHeight2 = SCREEN_HEIGHT;
   private transient BufferedImage tempScreen;
   private transient Graphics2D g2;
   private boolean fullScreenOn = false;
@@ -79,28 +79,28 @@ public class GamePanel extends JPanel implements Runnable {
 
   // ENTITY AND OBJECTS
   private transient Player player = new Player(this, keyH); // Jogador principal do jogo
-  private transient Entity[][] obj = new Entity[maxMap][20]; // Objetos
-  private transient Entity[][] npc = new Entity[maxMap][10]; // NPCs
-  private transient Entity[][] monster = new Entity[maxMap][20];
-  private transient InteractiveTile[][] iTile = new InteractiveTile[maxMap][50];
-  private transient Entity[][] projectile = new Entity[maxMap][20];
+  private transient Entity[][] obj = new Entity[MAX_MAP][20]; // Objetos
+  private transient Entity[][] npc = new Entity[MAX_MAP][10]; // NPCs
+  private transient Entity[][] monster = new Entity[MAX_MAP][20];
+  private transient InteractiveTile[][] iTile = new InteractiveTile[MAX_MAP][50];
+  private transient Entity[][] projectile = new Entity[MAX_MAP][20];
   private transient List<Entity> particleList = new ArrayList<>();
   transient List<Entity> entityList = new ArrayList<>(); // Lista dinâmica para ordenação por profundidade
 
   // ==== GAME STATE ====
   private int gameState; // Estado atual do jogo
-  public static final int titleState = 0;
-  public static final int playState = 1;
-  public static final int pauseState = 2;
-  public static final int dialogueState = 3;
-  public static final int characterState = 4;
-  public static final int optionsState = 5;
-  public static final int gameOverState = 6;
-  public static final int transitionState = 7;
-  public static final int tradeState = 8;
-  public static final int sleepState = 9;
-  public static final int mapState = 10;
-  public static final int cutsceneState = 11;
+  public static final int TITLE_STATE = 0;
+  public static final int PLAY_STATE = 1;
+  public static final int PAUSE_STATE = 2;
+  public static final int DIALOGUE_STATE = 3;
+  public static final int CHARACTER_STATE = 4;
+  public static final int OPTIONS_STATE = 5;
+  public static final int GAME_OVER_STATE = 6;
+  public static final int TRANSITION_STATE = 7;
+  public static final int TRADE_STATE = 8;
+  public static final int SLEEP_STATE = 9;
+  public static final int MAP_STATE = 10;
+  public static final int CUTSCENE_STATE = 11;
 
   // others
   private boolean bossBattleOn = false;
@@ -108,13 +108,13 @@ public class GamePanel extends JPanel implements Runnable {
   // AREA
   private int currentArea;
   private int nextArea;
-  public static final int outside = 50;
-  public static final int indoor = 51;
-  public static final int dungeon = 52;
+  public static final int OUTSIDE = 50;
+  public static final int INDOOR = 51;
+  public static final int DUNGEON = 52;
 
   // ==== CONSTRUTOR ====
   public GamePanel() {
-    this.setPreferredSize(new Dimension(screenWidth, screenHeight));
+    this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
     this.setBackground(Color.black);
     this.setDoubleBuffered(true);
 
@@ -130,10 +130,10 @@ public class GamePanel extends JPanel implements Runnable {
     aSetter.setInteractiveTile();
     eManager.setup();
 
-    gameState = titleState;
-    currentArea = outside;
+    gameState = TITLE_STATE;
+    currentArea = OUTSIDE;
 
-    tempScreen = new BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_ARGB);
+    tempScreen = new BufferedImage(SCREEN_WIDTH, SCREEN_HEIGHT, BufferedImage.TYPE_INT_ARGB);
     g2 = (Graphics2D) tempScreen.getGraphics();
 
     if (fullScreenOn) {
@@ -144,7 +144,7 @@ public class GamePanel extends JPanel implements Runnable {
   public void resetGame(boolean restart) {
 
     stopMusic();
-    currentArea = outside;
+    currentArea = OUTSIDE;
     removeTempEntity();
     bossBattleOn = false;
     player.setDefaultPositions();
@@ -217,9 +217,9 @@ public class GamePanel extends JPanel implements Runnable {
   // ==== ATUALIZA A LÓGICA DO JOGO ====
   public void update() {
 
-    if (gameState == playState) {
+    if (gameState == PLAY_STATE) {
       updatePlayState();
-    } else if (gameState == pauseState) {
+    } else if (gameState == PAUSE_STATE) {
       updatePauseState();
     }
   }
@@ -312,8 +312,8 @@ public class GamePanel extends JPanel implements Runnable {
     long drawStart = startDebugTimerIfNeeded();
 
     switch (gameState) {
-      case titleState -> drawTitleScreen();
-      case mapState -> drawMapScreen();
+      case TITLE_STATE -> drawTitleScreen();
+      case MAP_STATE -> drawMapScreen();
       default -> drawGameScenes();
     }
 
@@ -459,11 +459,11 @@ public class GamePanel extends JPanel implements Runnable {
     if (nextArea != currentArea) {
       stopMusic();
 
-      if (nextArea == outside) {
+      if (nextArea == OUTSIDE) {
         playMusic(0);
-      } else if (nextArea == indoor) {
+      } else if (nextArea == INDOOR) {
         playMusic(18);
-      } else if (nextArea == dungeon) {
+      } else if (nextArea == DUNGEON) {
         playMusic(19);
       }
 
@@ -475,7 +475,7 @@ public class GamePanel extends JPanel implements Runnable {
   }
 
   public void removeTempEntity() {
-    for (int mapNum = 0; mapNum < maxMap; mapNum++) {
+    for (int mapNum = 0; mapNum < MAX_MAP; mapNum++) {
       for (int i = 0; i < obj[mapNum].length; i++) {
         if (obj[mapNum][i] != null && obj[mapNum][i].isTemp()) {
           obj[mapNum][i] = null;
