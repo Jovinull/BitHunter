@@ -38,20 +38,20 @@ public class UI {
   BufferedImage coin;
 
   // --- Estado de UI ---
-  public boolean messageOn = false;
+  private boolean messageOn = false;
   private final ArrayList<String> message = new ArrayList<>();
   private final ArrayList<Integer> messageCounter = new ArrayList<>();
-  public boolean gameFinished = false;
+  private boolean gameFinished = false;
   private String currentDialogue = "";
-  public int commandNum = 0;
-  public int titleScreenState = 0;
-  public int playerSlotCol = 0;
-  public int playerSlotRow = 0;
-  public int npcSlotCol = 0;
-  public int npcSlotRow = 0;
+  private int commandNum = 0;
+  private int titleScreenState = 0;
+  private int playerSlotCol = 0;
+  private int playerSlotRow = 0;
+  private int npcSlotCol = 0;
+  private int npcSlotRow = 0;
   int subState = 0;
   int counter = 0;
-  public Entity npc;
+  private Entity npc;
   int charIndex = 0;
   String combinedText = "";
 
@@ -1238,7 +1238,80 @@ public class UI {
     return tailX - length;
   }
 
+  // --- Getters específicos ---
   public Font getMaruMonica() {
     return maruMonica;
+  }
+
+  public boolean isMessageOn() {
+    return messageOn;
+  }
+
+  public void setMessageOn(boolean messageOn) {
+    this.messageOn = messageOn;
+  }
+
+  public boolean isGameFinished() {
+    return gameFinished;
+  }
+
+  public void setGameFinished(boolean gameFinished) {
+    this.gameFinished = gameFinished;
+  }
+
+  public int getCommandNum() {
+    return commandNum;
+  }
+
+  public void setCommandNum(int commandNum) {
+    this.commandNum = commandNum;
+  }
+
+  public int getTitleScreenState() {
+    return titleScreenState;
+  }
+
+  public void setTitleScreenState(int titleScreenState) {
+    this.titleScreenState = titleScreenState;
+  }
+
+  public int getPlayerSlotCol() {
+    return playerSlotCol;
+  }
+
+  public void setPlayerSlotCol(int playerSlotCol) {
+    this.playerSlotCol = playerSlotCol;
+  }
+
+  public int getPlayerSlotRow() {
+    return playerSlotRow;
+  }
+
+  public void setPlayerSlotRow(int playerSlotRow) {
+    this.playerSlotRow = playerSlotRow;
+  }
+
+  public int getNpcSlotCol() {
+    return npcSlotCol;
+  }
+
+  public void setNpcSlotCol(int npcSlotCol) {
+    this.npcSlotCol = npcSlotCol;
+  }
+
+  public int getNpcSlotRow() {
+    return npcSlotRow;
+  }
+
+  public void setNpcSlotRow(int npcSlotRow) {
+    this.npcSlotRow = npcSlotRow;
+  }
+
+  public Entity getNpc() {
+    return npc;
+  }
+
+  public void setNpc(Entity npc) {
+    this.npc = npc;
   }
 }

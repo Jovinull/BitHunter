@@ -89,7 +89,7 @@ public class KeyHandler implements KeyListener {
    * titleScreenState 0 = menu principal; 1 = seleção de classe/personagem.
    */
   public void titleState(int code) {
-    switch (gp.ui.titleScreenState) {
+    switch (gp.ui.getTitleScreenState()) {
       case 0 -> handleTitleMainMenu(code);
       case 1 -> handleTitleClassSelect(code);
       default -> {
@@ -110,10 +110,10 @@ public class KeyHandler implements KeyListener {
   }
 
   private void handleTitleMainEnter() {
-    switch (gp.ui.commandNum) {
+    switch (gp.ui.getCommandNum()) {
       case 0 -> { // Novo jogo -> vai para seleção de classe
-        gp.ui.titleScreenState = 1;
-        gp.ui.commandNum = 0;
+        gp.ui.setTitleScreenState(1);
+        gp.ui.setCommandNum(0);
       }
       case 1 -> { // Carregar jogo
         gp.saveLoad.load();
@@ -132,17 +132,17 @@ public class KeyHandler implements KeyListener {
       case KeyEvent.VK_W -> navigateUp(MENU_CLASS_MAX_INDEX);
       case KeyEvent.VK_S -> navigateDown(MENU_CLASS_MAX_INDEX);
       case KeyEvent.VK_ENTER -> {
-        if (gp.ui.commandNum == 3) { // Voltar
-          gp.ui.titleScreenState = 0;
-          gp.ui.commandNum = 0;
+        if (gp.ui.getCommandNum() == 3) { // Voltar
+          gp.ui.setTitleScreenState(0);
+          gp.ui.setCommandNum(0);
         } else {
           gp.gameState = gp.playState;
           gp.playMusic(0);
         }
       }
       case KeyEvent.VK_ESCAPE -> {
-        gp.ui.titleScreenState = 0;
-        gp.ui.commandNum = 0;
+        gp.ui.setTitleScreenState(0);
+        gp.ui.setCommandNum(0);
       }
       default -> {
         // noop
@@ -266,11 +266,15 @@ public class KeyHandler implements KeyListener {
   }
 
   private void moveCommandNum(int delta, int max) {
-    gp.ui.commandNum += delta;
-    if (gp.ui.commandNum < 0)
-      gp.ui.commandNum = max;
-    if (gp.ui.commandNum > max)
-      gp.ui.commandNum = 0;
+    int commandNum = gp.ui.getCommandNum();
+    commandNum += delta;
+    if (commandNum < 0) {
+      commandNum = max;
+    }
+    if (commandNum > max) {
+      commandNum = 0;
+    }
+    gp.ui.setCommandNum(commandNum);
     gp.playSE(9);
   }
 
@@ -278,7 +282,7 @@ public class KeyHandler implements KeyListener {
     if (gp.ui.subState != 0)
       return;
 
-    switch (gp.ui.commandNum) {
+    switch (gp.ui.getCommandNum()) {
       case 1 -> { // música
         final int next = gp.music.volumeScale + direction;
         if (next >= 0 && next <= 5) {
@@ -305,31 +309,36 @@ public class KeyHandler implements KeyListener {
    */
   public void gameOverState(int code) {
     if (code == KeyEvent.VK_W) {
-      gp.ui.commandNum--;
-      if (gp.ui.commandNum < 0) {
-        gp.ui.commandNum = 1;
+      int commandNum = gp.ui.getCommandNum();
+      commandNum--;
+      if (commandNum < 0) {
+        commandNum = 1;
       }
+      gp.ui.setCommandNum(commandNum);
       gp.playSE(9);
     }
 
     if (code == KeyEvent.VK_S) {
-      gp.ui.commandNum++;
-      if (gp.ui.commandNum > 1) {
-        gp.ui.commandNum = 0;
+      int commandNum = gp.ui.getCommandNum();
+      commandNum++;
+      if (commandNum > 1) {
+        commandNum = 0;
       }
+      gp.ui.setCommandNum(commandNum);
       gp.playSE(9);
     }
 
     if (code == KeyEvent.VK_ENTER) {
-      if (gp.ui.commandNum == 0) {
+      int commandNum = gp.ui.getCommandNum();
+      if (commandNum == 0) {
         gp.gameState = gp.playState;
         gp.resetGame(false);
         gp.playMusic(0);
-      } else if (gp.ui.commandNum == 1) {
+      } else if (commandNum == 1) {
         gp.stopMusic();
         gp.resetGame(true);
-        gp.ui.titleScreenState = 0;
-        gp.ui.commandNum = 0;
+        gp.ui.setTitleScreenState(0);
+        gp.ui.setCommandNum(0);
         gp.ui.subState = 0;
         gp.gameState = gp.titleState;
       }
@@ -366,15 +375,21 @@ public class KeyHandler implements KeyListener {
   private void handleTradeMenuNavigation(int code) {
     switch (code) {
       case KeyEvent.VK_W -> {
-        gp.ui.commandNum--;
-        if (gp.ui.commandNum < 0)
-          gp.ui.commandNum = 2;
+        int commandNum = gp.ui.getCommandNum();
+        commandNum--;
+        if (commandNum < 0) {
+          commandNum = 2;
+        }
+        gp.ui.setCommandNum(commandNum);
         gp.playSE(9);
       }
       case KeyEvent.VK_S -> {
-        gp.ui.commandNum++;
-        if (gp.ui.commandNum > 2)
-          gp.ui.commandNum = 0;
+        int commandNum = gp.ui.getCommandNum();
+        commandNum++;
+        if (commandNum > 2) {
+          commandNum = 0;
+        }
+        gp.ui.setCommandNum(commandNum);
         gp.playSE(9);
       }
       default -> {
@@ -390,33 +405,39 @@ public class KeyHandler implements KeyListener {
   }
 
   public void playerInventory(int code) {
-    if (code == KeyEvent.VK_W && gp.ui.playerSlotRow != 0) {
-      gp.ui.playerSlotRow--;
+    int row = gp.ui.getPlayerSlotRow();
+    int col = gp.ui.getPlayerSlotCol();
+
+    if (code == KeyEvent.VK_W && row != 0) {
+      gp.ui.setPlayerSlotRow(row - 1);
       gp.playSE(9);
-    } else if (code == KeyEvent.VK_A && gp.ui.playerSlotCol != 0) {
-      gp.ui.playerSlotCol--;
+    } else if (code == KeyEvent.VK_A && col != 0) {
+      gp.ui.setPlayerSlotCol(col - 1);
       gp.playSE(9);
-    } else if (code == KeyEvent.VK_S && gp.ui.playerSlotRow != SLOT_ROW_MAX) {
-      gp.ui.playerSlotRow++;
+    } else if (code == KeyEvent.VK_S && row != SLOT_ROW_MAX) {
+      gp.ui.setPlayerSlotRow(row + 1);
       gp.playSE(9);
-    } else if (code == KeyEvent.VK_D && gp.ui.playerSlotCol != SLOT_COL_MAX) {
-      gp.ui.playerSlotCol++;
+    } else if (code == KeyEvent.VK_D && col != SLOT_COL_MAX) {
+      gp.ui.setPlayerSlotCol(col + 1);
       gp.playSE(9);
     }
   }
 
   public void npcInventory(int code) {
-    if (code == KeyEvent.VK_W && gp.ui.npcSlotRow != 0) {
-      gp.ui.npcSlotRow--;
+    int row = gp.ui.getNpcSlotRow();
+    int col = gp.ui.getNpcSlotCol();
+
+    if (code == KeyEvent.VK_W && row != 0) {
+      gp.ui.setNpcSlotRow(row - 1);
       gp.playSE(9);
-    } else if (code == KeyEvent.VK_A && gp.ui.npcSlotCol != 0) {
-      gp.ui.npcSlotCol--;
+    } else if (code == KeyEvent.VK_A && col != 0) {
+      gp.ui.setNpcSlotCol(col - 1);
       gp.playSE(9);
-    } else if (code == KeyEvent.VK_S && gp.ui.npcSlotRow != SLOT_ROW_MAX) {
-      gp.ui.npcSlotRow++;
+    } else if (code == KeyEvent.VK_S && row != SLOT_ROW_MAX) {
+      gp.ui.setNpcSlotRow(row + 1);
       gp.playSE(9);
-    } else if (code == KeyEvent.VK_D && gp.ui.npcSlotCol != SLOT_COL_MAX) {
-      gp.ui.npcSlotCol++;
+    } else if (code == KeyEvent.VK_D && col != SLOT_COL_MAX) {
+      gp.ui.setNpcSlotCol(col + 1);
       gp.playSE(9);
     }
   }
@@ -446,18 +467,22 @@ public class KeyHandler implements KeyListener {
 
   /** Move seleção para cima no menu com wrap-around. */
   private void navigateUp(int maxIndex) {
-    gp.ui.commandNum--;
-    if (gp.ui.commandNum < 0) {
-      gp.ui.commandNum = maxIndex;
+    int commandNum = gp.ui.getCommandNum();
+    commandNum--;
+    if (commandNum < 0) {
+      commandNum = maxIndex;
     }
+    gp.ui.setCommandNum(commandNum);
   }
 
   /** Move seleção para baixo no menu com wrap-around. */
   private void navigateDown(int maxIndex) {
-    gp.ui.commandNum++;
-    if (gp.ui.commandNum > maxIndex) {
-      gp.ui.commandNum = 0;
+    int commandNum = gp.ui.getCommandNum();
+    commandNum++;
+    if (commandNum > maxIndex) {
+      commandNum = 0;
     }
+    gp.ui.setCommandNum(commandNum);
   }
 
   // -----------------------

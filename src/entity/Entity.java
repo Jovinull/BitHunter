@@ -323,7 +323,7 @@ public class Entity {
 
   public void startDialogue(Entity entity, int setNum) {
     gp.gameState = gp.dialogueState;
-    gp.ui.npc = entity;
+    gp.ui.setNpc(entity);
     dialogueSet = setNum;
   }
 

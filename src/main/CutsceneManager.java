@@ -78,7 +78,7 @@ public class CutsceneManager {
       if (gp.monster[gp.currentMap][i] != null
           && MonSkeletonLord.MON_NAME.equals(gp.monster[gp.currentMap][i].getName())) {
         gp.monster[gp.currentMap][i].setSleep(false);
-        gp.ui.npc = gp.monster[gp.currentMap][i];
+        gp.ui.setNpc(gp.monster[gp.currentMap][i]);
         scenePhase++;
         break;
       }

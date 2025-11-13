@@ -28,6 +28,11 @@ import tile_interactive.ItMetalPlate;
 
 public class AssetSetter {
 
+  private static final int MAP_WORLD = 0;
+  private static final int MAP_HOUSE = 1;
+  private static final int MAP_DUNGEON = 2;
+  private static final int MAP_BOSS_ROOM = 3;
+
   private final GamePanel gp;
 
   public AssetSetter(GamePanel gp) {
@@ -35,7 +40,7 @@ public class AssetSetter {
   }
 
   public void setObject() {
-    int mapNum = 0;
+    int mapNum = MAP_WORLD;
     int i = 0;
 
     gp.obj[mapNum][i] = new ObjCoinBronze(gp);
@@ -75,8 +80,8 @@ public class AssetSetter {
     gp.obj[mapNum][i].setLoot(new ObjKey(gp));
     place(gp.obj[mapNum][i], 12, 8);
 
-    // MAP 2
-    mapNum = 2;
+    // MAP DUNGEON
+    mapNum = MAP_DUNGEON;
     i = 0;
 
     gp.obj[mapNum][i] = new ObjChest(gp);
@@ -98,8 +103,8 @@ public class AssetSetter {
     gp.obj[mapNum][i] = new ObjDoorIron(gp);
     place(gp.obj[mapNum][i], 18, 23);
 
-    // MAP 3
-    mapNum = 3;
+    // MAP BOSS ROOM
+    mapNum = MAP_BOSS_ROOM;
     i = 0;
 
     gp.obj[mapNum][i] = new ObjDoorIron(gp);
@@ -107,21 +112,21 @@ public class AssetSetter {
   }
 
   public void setNPC() {
-    int mapNum = 0;
+    int mapNum = MAP_WORLD;
     int i = 0;
 
-    // MAP 0
+    // MAP WORLD
     gp.npc[mapNum][i] = new NpcOldMan(gp);
     place(gp.npc[mapNum][i], 21, 21);
 
-    // MAP 1
-    mapNum = 1;
+    // MAP HOUSE
+    mapNum = MAP_HOUSE;
     i = 0;
     gp.npc[mapNum][i] = new NpcMerchant(gp);
     place(gp.npc[mapNum][i], 12, 7);
 
-    // MAP 2
-    mapNum = 2;
+    // MAP DUNGEON
+    mapNum = MAP_DUNGEON;
     i = 0;
     gp.npc[mapNum][i] = new NpcBigRock(gp);
     place(gp.npc[mapNum][i++], 20, 25);
@@ -134,8 +139,8 @@ public class AssetSetter {
   }
 
   public void setMonster() {
-    // MAP 0
-    int mapNum = 0;
+    // MAP WORLD
+    int mapNum = MAP_WORLD;
     int i = 0;
 
     gp.monster[mapNum][i] = new MonGreenSlime(gp);
@@ -165,14 +170,14 @@ public class AssetSetter {
     gp.monster[mapNum][i] = new MonRedSlime(gp);
     place(gp.monster[mapNum][i], 39, 9);
 
-    // MAP 1
-    mapNum = 1;
+    // MAP HOUSE
+    mapNum = MAP_HOUSE;
     i = 0;
     gp.monster[mapNum][i] = new MonGreenSlime(gp);
     place(gp.monster[mapNum][i], 38, 42);
 
-    // MAP 2
-    mapNum = 2;
+    // MAP DUNGEON
+    mapNum = MAP_DUNGEON;
     i = 0;
     gp.monster[mapNum][i] = new MonBat(gp);
     place(gp.monster[mapNum][i++], 34, 39);
@@ -189,8 +194,8 @@ public class AssetSetter {
     gp.monster[mapNum][i] = new MonBat(gp);
     place(gp.monster[mapNum][i], 10, 19);
 
-    // MAP 3
-    mapNum = 3;
+    // MAP BOSS ROOM
+    mapNum = MAP_BOSS_ROOM;
     i = 0;
     if (!Progress.isSkeletonLordDefeated()) {
       gp.monster[mapNum][i] = new MonSkeletonLord(gp);
@@ -199,7 +204,7 @@ public class AssetSetter {
   }
 
   public void setInteractiveTile() {
-    int mapNum = 0;
+    int mapNum = MAP_WORLD;
     int i = 0;
 
     gp.iTile[mapNum][i++] = new ItDryTree(gp, 27, 12);
@@ -213,8 +218,8 @@ public class AssetSetter {
     gp.iTile[mapNum][i++] = new ItDryTree(gp, 17, 40);
     gp.iTile[mapNum][i] = new ItDryTree(gp, 12, 41);
 
-    // MAP 2
-    mapNum = 2;
+    // MAP DUNGEON
+    mapNum = MAP_DUNGEON;
     i = 0;
 
     gp.iTile[mapNum][i++] = new ItDestructibleWall(gp, 18, 30);
@@ -240,8 +245,8 @@ public class AssetSetter {
   }
 
   /** Posiciona uma entidade em (col,row) -> (worldX, worldY). */
-  private void place(Entity e, int col, int row) {
-    e.setWorldX(gp.tileSize * col);
-    e.setWorldY(gp.tileSize * row);
+  private void place(Entity entity, int col, int row) {
+    entity.setWorldX(gp.tileSize * col);
+    entity.setWorldY(gp.tileSize * row);
   }
 }

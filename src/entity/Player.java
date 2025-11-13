@@ -400,7 +400,7 @@ public class Player extends Entity {
     if (!keyH.isGodModeOn() && getLife() <= 0) {
       gp.stopMusic();
       gp.gameState = gp.gameOverState;
-      gp.ui.commandNum = -1;
+      gp.ui.setCommandNum(-1);
       gp.playSE(12);
     }
   }
@@ -552,7 +552,9 @@ public class Player extends Entity {
   // SELECT ITEM
   // SELECT ITEM
   public void selectItem() {
-    int itemIndex = gp.ui.getItemIndexOnSlot(gp.ui.playerSlotCol, gp.ui.playerSlotRow);
+    int itemIndex = gp.ui.getItemIndexOnSlot(
+        gp.ui.getPlayerSlotCol(),
+        gp.ui.getPlayerSlotRow());
     var inv = getInventory();
     if (itemIndex >= inv.size())
       return;

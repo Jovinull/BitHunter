@@ -73,6 +73,6 @@ public class NpcMerchant extends Entity {
   public void speak() {
     facePlayer();
     gp.gameState = gp.tradeState;
-    gp.ui.npc = this;
+    gp.ui.setNpc(this);
   }
 }
