@@ -11,6 +11,9 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JPanel;
 
@@ -27,24 +30,26 @@ import tile_interactive.InteractiveTile;
 // Implementa Runnable para rodar o loop de jogo em uma thread separada.
 public class GamePanel extends JPanel implements Runnable {
 
+  private static final Logger LOGGER = Logger.getLogger(GamePanel.class.getName());
+
   // ==== CONFIGURAÇÕES DE TELA (visível) ====
-  final int originalTileSize = 16; // Tamanho base de um tile (16x16 pixels)
-  final int scale = 3; // Fator de escala aplicado ao tile
+  private static final int originalTileSize = 16; // Tamanho base de um tile (16x16 pixels)
+  private static final int scale = 3; // Fator de escala aplicado ao tile
 
-  public final int tileSize = originalTileSize * scale; // Tile final com escala (48x48 pixels)
-  public final int maxScreenCol = 20; // Número de colunas visíveis na tela
-  public final int maxScreenRow = 12; // Número de linhas visíveis na tela
-  public final int screenWidth = tileSize * maxScreenCol; // Largura total da tela (960 px)
-  public final int screenHeight = tileSize * maxScreenRow; // Altura total da tela (576 px)
+  public static final int tileSize = originalTileSize * scale; // Tile final com escala (48x48 pixels)
+  public static final int maxScreenCol = 20; // Número de colunas visíveis na tela
+  public static final int maxScreenRow = 12; // Número de linhas visíveis na tela
+  public static final int screenWidth = tileSize * maxScreenCol; // Largura total da tela (960 px)
+  public static final int screenHeight = tileSize * maxScreenRow; // Altura total da tela (576 px)
 
-  public final int maxMap = 10;
+  public static final int maxMap = 10;
   public int currentMap = 0;
 
   // FOR FULL SCREEN
   int screenWidth2 = screenWidth;
   int screenHeight2 = screenHeight;
-  BufferedImage tempScreen;
-  Graphics2D g2;
+  private transient BufferedImage tempScreen;
+  private transient Graphics2D g2;
   public boolean fullScreenOn = false;
 
   // ==== CONFIGURAÇÕES DO MUNDO ====
@@ -52,50 +57,50 @@ public class GamePanel extends JPanel implements Runnable {
   public int maxWorldRow;
 
   // ==== CONFIGURAÇÃO DE FPS ====
-  int FPS = 60; // Quadros por segundo
+  int fps = 60; // Quadros por segundo
 
   // ==== COMPONENTES DO JOGO ====
-  public TileManager tileM = new TileManager(this); // Gerencia o carregamento e desenho dos tiles
-  public KeyHandler keyH = new KeyHandler(this); // Captura entrada de teclado
-  Sound music = new Sound(); // Gerencia a música do jogo
-  Sound se = new Sound(); // Gerencia os efeitos sonoros do jogo
-  public CollisionChecker cChecker = new CollisionChecker(this); // Verifica colisões
-  public AssetSetter aSetter = new AssetSetter(this); // Configura os objetos do jogo
-  public UI ui = new UI(this); // Interface do usuário (HUD, mensagens, etc.)
-  public EventHandler eHandler = new EventHandler(this);
-  Config config = new Config(this);
-  public PathFinder pFinder = new PathFinder(this);
-  EnvironmentManager eManager = new EnvironmentManager(this);
-  Map map = new Map(this);
-  SaveLoad saveLoad = new SaveLoad(this);
-  public EntityGenerator eGenerator = new EntityGenerator(this);
-  public CutsceneManager csManager = new CutsceneManager(this);
-  Thread gameThread; // Thread para rodar o loop do jogo
+  public transient TileManager tileM = new TileManager(this); // Gerencia o carregamento e desenho dos tiles
+  public transient KeyHandler keyH = new KeyHandler(this); // Captura entrada de teclado
+  transient Sound music = new Sound(); // Gerencia a música do jogo
+  transient Sound se = new Sound(); // Gerencia os efeitos sonoros do jogo
+  public transient CollisionChecker cChecker = new CollisionChecker(this); // Verifica colisões
+  public transient AssetSetter aSetter = new AssetSetter(this); // Configura os objetos do jogo
+  public transient UI gameUi = new UI(this); // Interface do usuário (HUD, mensagens, etc.)
+  public transient EventHandler eHandler = new EventHandler(this);
+  transient Config config = new Config(this);
+  public transient PathFinder pFinder = new PathFinder(this);
+  transient EnvironmentManager eManager = new EnvironmentManager(this);
+  transient Map map = new Map(this);
+  transient SaveLoad saveLoad = new SaveLoad(this);
+  public transient EntityGenerator eGenerator = new EntityGenerator(this);
+  public transient CutsceneManager csManager = new CutsceneManager(this);
+  transient Thread gameThread; // Thread para rodar o loop do jogo
 
   // ENTITY AND OBJECTS
-  public Player player = new Player(this, keyH); // Jogador principal do jogo
-  public Entity obj[][] = new Entity[maxMap][20]; // Objetos
-  public Entity npc[][] = new Entity[maxMap][10]; // NPCs
-  public Entity monster[][] = new Entity[maxMap][20];
-  public InteractiveTile iTile[][] = new InteractiveTile[maxMap][50];
-  public Entity projectile[][] = new Entity[maxMap][20];
-  public ArrayList<Entity> particleList = new ArrayList<>();
-  ArrayList<Entity> entityList = new ArrayList<>(); // Lista dinâmica para ordenação por profundidade
+  public transient Player player = new Player(this, keyH); // Jogador principal do jogo
+  public transient Entity[][] obj = new Entity[maxMap][20]; // Objetos
+  public transient Entity[][] npc = new Entity[maxMap][10]; // NPCs
+  public transient Entity[][] monster = new Entity[maxMap][20];
+  public transient InteractiveTile[][] iTile = new InteractiveTile[maxMap][50];
+  public transient Entity[][] projectile = new Entity[maxMap][20];
+  public transient List<Entity> particleList = new ArrayList<>();
+  transient List<Entity> entityList = new ArrayList<>(); // Lista dinâmica para ordenação por profundidade
 
   // ==== GAME STATE ====
   public int gameState; // Estado atual do jogo
-  public final int titleState = 0;
-  public final int playState = 1;
-  public final int pauseState = 2;
-  public final int dialogueState = 3;
-  public final int characterState = 4;
-  public final int optionsState = 5;
-  public final int gameOverState = 6;
-  public final int transitionState = 7;
-  public final int tradeState = 8;
-  public final int sleepState = 9;
-  public final int mapState = 10;
-  public final int cutsceneState = 11;
+  public static final int titleState = 0;
+  public static final int playState = 1;
+  public static final int pauseState = 2;
+  public static final int dialogueState = 3;
+  public static final int characterState = 4;
+  public static final int optionsState = 5;
+  public static final int gameOverState = 6;
+  public static final int transitionState = 7;
+  public static final int tradeState = 8;
+  public static final int sleepState = 9;
+  public static final int mapState = 10;
+  public static final int cutsceneState = 11;
 
   // others
   public boolean bossBattleOn = false;
@@ -103,9 +108,9 @@ public class GamePanel extends JPanel implements Runnable {
   // AREA
   public int currentArea;
   public int nextArea;
-  public final int outside = 50;
-  public final int indoor = 51;
-  public final int dungeon = 52;
+  public static final int outside = 50;
+  public static final int indoor = 51;
+  public static final int dungeon = 52;
 
   // ==== CONSTRUTOR ====
   public GamePanel() {
@@ -179,7 +184,7 @@ public class GamePanel extends JPanel implements Runnable {
   @Override
   public void run() {
 
-    double drawInterval = 1_000_000_000.0 / FPS;
+    double drawInterval = 1_000_000_000.0 / fps;
     double delta = 0;
     long lastTime = System.nanoTime();
     long currentTime;
@@ -202,7 +207,7 @@ public class GamePanel extends JPanel implements Runnable {
       }
 
       if (timer >= 1_000_000_000) {
-        System.out.println("FPS: " + drawCount);
+        LOGGER.log(Level.INFO, "FPS: {0}", drawCount);
         drawCount = 0;
         timer = 0;
       }
@@ -213,180 +218,222 @@ public class GamePanel extends JPanel implements Runnable {
   public void update() {
 
     if (gameState == playState) {
-      // Player
-      player.update();
-
-      // NPCs
-      for (int i = 0; i < npc[1].length; i++) {
-        if (npc[currentMap][i] != null) {
-          npc[currentMap][i].update();
-        }
-      }
-
-      // Monstros
-      for (int i = 0; i < monster[1].length; i++) {
-        Entity m = monster[currentMap][i];
-        if (m != null) {
-          if (m.isAlive() && !m.isDying()) {
-            m.update();
-          }
-          if (!m.isAlive()) {
-            m.checkDrop();
-            monster[currentMap][i] = null;
-          }
-        }
-      }
-
-      // Projetis
-      for (int i = 0; i < projectile[1].length; i++) {
-        Entity p = projectile[currentMap][i];
-        if (p != null) {
-          if (p.isAlive()) {
-            p.update();
-          }
-          if (!p.isAlive()) {
-            projectile[currentMap][i] = null;
-          }
-        }
-      }
-
-      // Partículas
-      for (int i = 0; i < particleList.size(); i++) {
-        Entity p = particleList.get(i);
-        if (p != null) {
-          if (p.isAlive()) {
-            p.update();
-          }
-          if (!p.isAlive()) {
-            particleList.remove(i);
-            i--;
-          }
-        }
-      }
-
-      // Interactive Tiles
-      for (int i = 0; i < iTile[1].length; i++) {
-        if (iTile[currentMap][i] != null) {
-          iTile[currentMap][i].update();
-        }
-      }
-
-      eManager.update();
+      updatePlayState();
+    } else if (gameState == pauseState) {
+      updatePauseState();
     }
+  }
 
-    if (gameState == pauseState) {
-      // Lógica opcional para o estado de pausa
+  private void updatePlayState() {
+    updatePlayer();
+    updateNpcs();
+    updateMonsters();
+    updateProjectiles();
+    updateParticles();
+    updateInteractiveTiles();
+    eManager.update();
+  }
+
+  private void updatePlayer() {
+    player.update();
+  }
+
+  private void updateNpcs() {
+    Entity[] currentNpcs = npc[currentMap];
+    for (int i = 0; i < currentNpcs.length; i++) {
+      Entity currentNpc = currentNpcs[i];
+      if (currentNpc != null) {
+        currentNpc.update();
+      }
     }
+  }
+
+  private void updateMonsters() {
+    Entity[] currentMonsters = monster[currentMap];
+    for (int i = 0; i < currentMonsters.length; i++) {
+      Entity currentMonster = currentMonsters[i];
+      if (currentMonster != null) {
+        if (currentMonster.isAlive() && !currentMonster.isDying()) {
+          currentMonster.update();
+        }
+        if (!currentMonster.isAlive()) {
+          currentMonster.checkDrop();
+          currentMonsters[i] = null;
+        }
+      }
+    }
+  }
+
+  private void updateProjectiles() {
+    Entity[] currentProjectiles = projectile[currentMap];
+    for (int i = 0; i < currentProjectiles.length; i++) {
+      Entity currentProjectile = currentProjectiles[i];
+      if (currentProjectile != null) {
+        if (currentProjectile.isAlive()) {
+          currentProjectile.update();
+        }
+        if (!currentProjectile.isAlive()) {
+          currentProjectiles[i] = null;
+        }
+      }
+    }
+  }
+
+  private void updateParticles() {
+    for (int i = particleList.size() - 1; i >= 0; i--) {
+      Entity particle = particleList.get(i);
+      if (particle != null) {
+        if (particle.isAlive()) {
+          particle.update();
+        }
+        if (!particle.isAlive()) {
+          particleList.remove(i);
+        }
+      }
+    }
+  }
+
+  private void updateInteractiveTiles() {
+    InteractiveTile[] currentTiles = iTile[currentMap];
+    for (int i = 0; i < currentTiles.length; i++) {
+      InteractiveTile interactiveTile = currentTiles[i];
+      if (interactiveTile != null) {
+        interactiveTile.update();
+      }
+    }
+  }
+
+  private void updatePauseState() {
+    // Lógica opcional para o estado de pausa
   }
 
   public void drawToTempScreen() {
 
-    // DEBUG
-    long drawStart = 0;
-    if (keyH.isShowDebugText()) {
-      drawStart = System.nanoTime();
-    }
+    long drawStart = startDebugTimerIfNeeded();
 
-    // Tela de título
     if (gameState == titleState) {
-      ui.draw(g2);
+      drawTitleScreen();
+    } else if (gameState == mapState) {
+      drawMapScreen();
+    } else {
+      drawGameScenes();
     }
 
-    // MAP SCREEN
-    else if (gameState == mapState) {
-      map.drawFullMapScreen(g2);
-    }
-
-    // OTHERS
-    else {
-      // TILE
-      tileM.draw(g2);
-
-      // INTERACTIVE TILES
-      for (int i = 0; i < iTile[1].length; i++) {
-        if (iTile[currentMap][i] != null) {
-          iTile[currentMap][i].draw(g2);
-        }
-      }
-
-      // ADD ENTITIES TO THE LIST
-      entityList.add(player);
-
-      for (int i = 0; i < npc[1].length; i++) {
-        if (npc[currentMap][i] != null) {
-          entityList.add(npc[currentMap][i]);
-        }
-      }
-
-      for (int i = 0; i < obj[1].length; i++) {
-        if (obj[currentMap][i] != null) {
-          entityList.add(obj[currentMap][i]);
-        }
-      }
-
-      for (int i = 0; i < monster[1].length; i++) {
-        if (monster[currentMap][i] != null) {
-          entityList.add(monster[currentMap][i]);
-        }
-      }
-
-      for (int i = 0; i < projectile[1].length; i++) {
-        if (projectile[currentMap][i] != null) {
-          entityList.add(projectile[currentMap][i]);
-        }
-      }
-
-      for (int i = 0; i < particleList.size(); i++) {
-        if (particleList.get(i) != null) {
-          entityList.add(particleList.get(i));
-        }
-      }
-
-      // SORT (ordena por worldY para dar efeito de profundidade)
-      Collections.sort(entityList, Comparator.comparingInt(Entity::getWorldY));
-
-      // DRAW
-      for (int i = 0; i < entityList.size(); i++) {
-        entityList.get(i).draw(g2);
-      }
-      entityList.clear();
-
-      // ENVIRONMENT
-      eManager.draw(g2);
-
-      // MINI MAP
-      map.drawMiniMap(g2);
-
-      // CUTSCENE
-      csManager.draw(g2);
-
-      // UI
-      ui.draw(g2);
-    }
-
-    // DEBUG
     if (keyH.isShowDebugText()) {
-      long drawEnd = System.nanoTime();
-      long passed = drawEnd - drawStart;
-
-      g2.setFont(new Font("Arial", Font.PLAIN, 20));
-      g2.setColor(Color.white);
-      int x = 10;
-      int y = 400;
-      int lineHeight = 20;
-
-      g2.drawString("WorldX " + player.getWorldX(), x, y);
-      y += lineHeight;
-      g2.drawString("WorldY " + player.getWorldY(), x, y);
-      y += lineHeight;
-      g2.drawString("Col " + player.getCol(), x, y);
-      y += lineHeight;
-      g2.drawString("Row " + player.getRow(), x, y);
-      y += lineHeight;
-      g2.drawString("Draw Time: " + passed, x, y);
-      y += lineHeight;
-      g2.drawString("God Mode: " + keyH.isGodModeOn(), x, y);
+      drawDebugInfo(drawStart);
     }
+  }
+
+  private long startDebugTimerIfNeeded() {
+    if (keyH.isShowDebugText()) {
+      return System.nanoTime();
+    }
+    return 0L;
+  }
+
+  private void drawTitleScreen() {
+    gameUi.draw(g2);
+  }
+
+  private void drawMapScreen() {
+    map.drawFullMapScreen(g2);
+  }
+
+  private void drawGameScenes() {
+    drawTiles();
+    drawInteractiveTilesGraphics();
+    addEntitiesToList();
+    sortAndDrawEntities();
+    drawEnvironment();
+    drawMiniMap();
+    drawCutscene();
+    drawUi();
+  }
+
+  private void drawTiles() {
+    tileM.draw(g2);
+  }
+
+  private void drawInteractiveTilesGraphics() {
+    InteractiveTile[] currentTiles = iTile[currentMap];
+    for (int i = 0; i < currentTiles.length; i++) {
+      InteractiveTile interactiveTile = currentTiles[i];
+      if (interactiveTile != null) {
+        interactiveTile.draw(g2);
+      }
+    }
+  }
+
+  private void addEntitiesToList() {
+    entityList.add(player);
+    addEntities(npc[currentMap]);
+    addEntities(obj[currentMap]);
+    addEntities(monster[currentMap]);
+    addEntities(projectile[currentMap]);
+    addParticlesToEntityList();
+  }
+
+  private void addEntities(Entity[] entities) {
+    for (Entity entity : entities) {
+      if (entity != null) {
+        entityList.add(entity);
+      }
+    }
+  }
+
+  private void addParticlesToEntityList() {
+    for (Entity particle : particleList) {
+      if (particle != null) {
+        entityList.add(particle);
+      }
+    }
+  }
+
+  private void sortAndDrawEntities() {
+    Collections.sort(entityList, Comparator.comparingInt(Entity::getWorldY));
+    for (Entity entity : entityList) {
+      entity.draw(g2);
+    }
+    entityList.clear();
+  }
+
+  private void drawEnvironment() {
+    eManager.draw(g2);
+  }
+
+  private void drawMiniMap() {
+    map.drawMiniMap(g2);
+  }
+
+  private void drawCutscene() {
+    csManager.draw(g2);
+  }
+
+  private void drawUi() {
+    gameUi.draw(g2);
+  }
+
+  private void drawDebugInfo(long drawStart) {
+    long drawEnd = System.nanoTime();
+    long passed = drawEnd - drawStart;
+
+    g2.setFont(new Font("Arial", Font.PLAIN, 20));
+    g2.setColor(Color.white);
+    int x = 10;
+    int y = 400;
+    int lineHeight = 20;
+
+    g2.drawString("WorldX " + player.getWorldX(), x, y);
+    y += lineHeight;
+    g2.drawString("WorldY " + player.getWorldY(), x, y);
+    y += lineHeight;
+    g2.drawString("Col " + player.getCol(), x, y);
+    y += lineHeight;
+    g2.drawString("Row " + player.getRow(), x, y);
+    y += lineHeight;
+    g2.drawString("Draw Time: " + passed, x, y);
+    y += lineHeight;
+    g2.drawString("God Mode: " + keyH.isGodModeOn(), x, y);
   }
 
   public void drawToScreen() {
@@ -431,7 +478,7 @@ public class GamePanel extends JPanel implements Runnable {
 
   public void removeTempEntity() {
     for (int mapNum = 0; mapNum < maxMap; mapNum++) {
-      for (int i = 0; i < obj[1].length; i++) {
+      for (int i = 0; i < obj[mapNum].length; i++) {
         if (obj[mapNum][i] != null && obj[mapNum][i].isTemp()) {
           obj[mapNum][i] = null;
         }
