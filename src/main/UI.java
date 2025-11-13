@@ -28,9 +28,14 @@ public class UI {
   Graphics2D g2;
 
   // --- Fontes & HUD ---
-  public Font maruMonica;
+  private Font maruMonica;
   Font purisaB;
-  BufferedImage heart_full, heart_half, heart_blank, crystal_full, crystal_blank, coin;
+  BufferedImage heartFull;
+  BufferedImage heartHalf;
+  BufferedImage heartBlank;
+  BufferedImage crystalFull;
+  BufferedImage crystalBlank;
+  BufferedImage coin;
 
   // --- Estado de UI ---
   public boolean messageOn = false;
@@ -83,13 +88,13 @@ public class UI {
 
     // HUD (via getters)
     Entity heart = new ObjHeart(gp);
-    heart_full = heart.getBaseImage();
-    heart_half = heart.getAltImage1();
-    heart_blank = heart.getAltImage2();
+    heartFull = heart.getBaseImage();
+    heartHalf = heart.getAltImage1();
+    heartBlank = heart.getAltImage2();
 
     Entity crystal = new ObjManaCrystal(gp);
-    crystal_full = crystal.getBaseImage();
-    crystal_blank = crystal.getAltImage1();
+    crystalFull = crystal.getBaseImage();
+    crystalBlank = crystal.getAltImage1();
 
     Entity bronzeCoin = new ObjCoinBronze(gp);
     coin = bronzeCoin.getDown1();
@@ -174,7 +179,7 @@ public class UI {
     // --- MAX LIFE (corações vazios) ---
     int maxHearts = gp.player.getMaxLife() / 2;
     while (i < maxHearts) {
-      g2.drawImage(heart_blank, x, y, iconSize, iconSize, null);
+      g2.drawImage(heartBlank, x, y, iconSize, iconSize, null);
       i++;
       x += iconSize;
 
@@ -195,7 +200,7 @@ public class UI {
     int halfHeart = gp.player.getLife() % 2;
 
     for (int idx = 0; idx < fullHearts; idx++) {
-      g2.drawImage(heart_full, x, y, iconSize, iconSize, null);
+      g2.drawImage(heartFull, x, y, iconSize, iconSize, null);
       x += iconSize;
       if ((idx + 1) % colsPerRow == 0) {
         x = startX;
@@ -204,7 +209,7 @@ public class UI {
     }
 
     if (halfHeart == 1) {
-      g2.drawImage(heart_half, x, y, iconSize, iconSize, null);
+      g2.drawImage(heartHalf, x, y, iconSize, iconSize, null);
     }
 
     // --- MANA (vazio) ---
@@ -214,7 +219,7 @@ public class UI {
     i = 0;
 
     while (i < gp.player.getMaxMana()) {
-      g2.drawImage(crystal_blank, x, y, iconSize, iconSize, null);
+      g2.drawImage(crystalBlank, x, y, iconSize, iconSize, null);
       i++;
       x += crystalStep;
 
@@ -230,7 +235,7 @@ public class UI {
     i = 0;
 
     while (i < gp.player.getMana()) {
-      g2.drawImage(crystal_full, x, y, iconSize, iconSize, null);
+      g2.drawImage(crystalFull, x, y, iconSize, iconSize, null);
       i++;
       x += crystalStep;
 
@@ -398,7 +403,7 @@ public class UI {
     int idx = npc.getDialogueIndex();
 
     if (ds[set][idx] != null) {
-      updateDialogueCharacters(ds[set][idx], set, idx);
+      updateDialogueCharacters(ds[set][idx], idx);
     } else {
       handleDialogueEnd();
     }
@@ -406,7 +411,7 @@ public class UI {
     drawCurrentDialogueLines(x, y);
   }
 
-  private void updateDialogueCharacters(String dialogueLine, int set, int idx) {
+  private void updateDialogueCharacters(String dialogueLine, int idx) {
     char[] characters = dialogueLine.toCharArray();
 
     if (charIndex < characters.length) {
@@ -479,8 +484,8 @@ public class UI {
     drawInventoryItems(entity, slotXstart, slotYstart, slotSize);
 
     if (cursor) {
-      drawInventoryCursorAndDescription(entity, frameX, frameY, frameWidth, frameHeight,
-          slotXstart, slotYstart, slotSize, slotCol, slotRow);
+      drawInventoryCursor(slotXstart, slotYstart, slotSize, slotCol, slotRow);
+      drawInventoryDescription(entity, frameX, frameY, frameWidth, frameHeight, slotCol, slotRow);
     }
   }
 
@@ -524,12 +529,7 @@ public class UI {
     }
   }
 
-  private void drawInventoryCursorAndDescription(
-      Entity entity,
-      int frameX,
-      int frameY,
-      int frameWidth,
-      int frameHeight,
+  private void drawInventoryCursor(
       int slotXstart,
       int slotYstart,
       int slotSize,
@@ -544,8 +544,17 @@ public class UI {
     g2.setColor(COL_TEXT);
     g2.setStroke(new BasicStroke(3));
     g2.drawRoundRect(cursorX, cursorY, cursorWidth, cursorHeight, 8, 8);
+  }
 
-    // Descrição
+  private void drawInventoryDescription(
+      Entity entity,
+      int frameX,
+      int frameY,
+      int frameWidth,
+      int frameHeight,
+      int slotCol,
+      int slotRow) {
+
     int dFrameX = frameX;
     int dFrameY = frameY + frameHeight;
     int dFrameWidth = frameWidth;
@@ -1168,7 +1177,6 @@ public class UI {
     g2.drawString("Arma", textX, textY);
     textY += lineHeight + 12;
     g2.drawString("Escudo", textX, textY);
-    textY += lineHeight;
 
     // Valores
     int tailX = (frameX + frameWidth) - 30;
@@ -1228,5 +1236,9 @@ public class UI {
   public int getXforAlignToRightText(String text, int tailX) {
     int length = (int) g2.getFontMetrics().getStringBounds(text, g2).getWidth();
     return tailX - length;
+  }
+
+  public Font getMaruMonica() {
+    return maruMonica;
   }
 }
