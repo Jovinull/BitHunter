@@ -23,8 +23,8 @@ public class TileManager {
 
   private static final Logger LOGGER = Logger.getLogger(TileManager.class.getName());
 
-  // Mantido público (final) pois é uma dependência externa compartilhada
-  public final GamePanel gp;
+  // Referência ao painel do jogo (agora protegida, não pública – S1104)
+  protected final GamePanel gp;
 
   // Encapsulados (S1104)
   private Tile[] tile; // Vetor de tipos de tiles disponíveis
@@ -50,7 +50,6 @@ public class TileManager {
         collisionStatus.add(br.readLine());
       }
     } catch (IOException ex) {
-      // S106 com S3457 OK (string constante, sem concatenação)
       LOGGER.log(Level.SEVERE, "Falha ao ler /maps/tiledata.txt", ex);
     }
 
@@ -67,11 +66,14 @@ public class TileManager {
         LOGGER.severe("Arquivo de mapa vazio: /maps/world01.txt");
       } else {
         String[] maxTile = firstLine.split(" "); // S1197 ok
-        gp.maxWorldCol = maxTile.length;
-        gp.maxWorldRow = maxTile.length; // Mantido como no original
-        mapTileNum = new int[gp.maxMap][gp.maxWorldCol][gp.maxWorldRow];
+        int worldSize = maxTile.length;
+
+        gp.setMaxWorldCol(worldSize);
+        gp.setMaxWorldRow(worldSize); // Mantido como no original
+
+        mapTileNum = new int[GamePanel.MAX_MAP][worldSize][worldSize];
       }
-    } catch (Exception _) { // S7467: padrão não nomeado
+    } catch (Exception _) {
       LOGGER.severe("Erro ao obter maxWorldCol/maxWorldRow de /maps/world01.txt");
     }
 
@@ -101,11 +103,10 @@ public class TileManager {
     try {
       Tile t = new Tile();
       t.setImage(ImageIO.read(getClass().getResourceAsStream("/tiles/" + imageName)));
-      t.setImage(uTool.scaleImage(t.getImage(), gp.tileSize, gp.tileSize));
+      t.setImage(uTool.scaleImage(t.getImage(), GamePanel.TILE_SIZE, GamePanel.TILE_SIZE));
       t.setCollision(collision);
       tile[index] = t;
     } catch (IOException ex) {
-      // S3457: adia concatenação com Supplier + preserva throwable (JDK 9+)
       LOGGER.log(Level.SEVERE, ex, () -> "Falha ao carregar tile '" + imageName + "'");
     }
   }
@@ -119,9 +120,11 @@ public class TileManager {
 
       int col = 0;
       int row = 0;
+      int maxWorldCol = gp.getMaxWorldCol();
+      int maxWorldRow = gp.getMaxWorldRow();
 
       // Percorre o arquivo linha a linha
-      while (col < gp.maxWorldCol && row < gp.maxWorldRow) {
+      while (col < maxWorldCol && row < maxWorldRow) {
         String line = br.readLine();
         if (line == null) {
           break;
@@ -129,19 +132,18 @@ public class TileManager {
 
         String[] numbers = line.split(" "); // S1197 ok
 
-        while (col < gp.maxWorldCol) {
+        while (col < maxWorldCol) {
           int num = (col < numbers.length) ? Integer.parseInt(numbers[col]) : 0;
           mapTileNum[map][col][row] = num;
           col++;
         }
 
-        if (col == gp.maxWorldCol) {
+        if (col == maxWorldCol) {
           col = 0;
           row++;
         }
       }
     } catch (Exception ex) {
-      // S3457 com throwable: usa Supplier para montar mensagem
       LOGGER.log(Level.SEVERE, ex, () -> "Erro ao carregar mapa: " + filePath);
     }
   }
@@ -153,40 +155,48 @@ public class TileManager {
 
     int worldCol = 0;
     int worldRow = 0;
+    int maxWorldCol = gp.getMaxWorldCol();
+    int maxWorldRow = gp.getMaxWorldRow();
 
-    while (worldCol < gp.maxWorldCol && worldRow < gp.maxWorldRow) {
+    var player = gp.getPlayer();
+    int currentMapIndex = gp.getCurrentMap();
 
-      int tileNum = mapTileNum[gp.currentMap][worldCol][worldRow];
+    while (worldCol < maxWorldCol && worldRow < maxWorldRow) {
 
-      int worldX = worldCol * gp.tileSize;
-      int worldY = worldRow * gp.tileSize;
+      int tileNum = mapTileNum[currentMapIndex][worldCol][worldRow];
 
-      int screenX = worldX - gp.player.getWorldX() + gp.player.screenX;
-      int screenY = worldY - gp.player.getWorldY() + gp.player.screenY;
+      int worldX = worldCol * GamePanel.TILE_SIZE;
+      int worldY = worldRow * GamePanel.TILE_SIZE;
 
-      if (worldX + gp.tileSize > gp.player.getWorldX() - gp.player.screenX &&
-          worldX - gp.tileSize < gp.player.getWorldX() + gp.player.screenX &&
-          worldY + gp.tileSize > gp.player.getWorldY() - gp.player.screenY &&
-          worldY - gp.tileSize < gp.player.getWorldY() + gp.player.screenY) {
+      int screenX = worldX - player.getWorldX() + player.screenX;
+      int screenY = worldY - player.getWorldY() + player.screenY;
+
+      if (worldX + GamePanel.TILE_SIZE > player.getWorldX() - player.screenX &&
+          worldX - GamePanel.TILE_SIZE < player.getWorldX() + player.screenX &&
+          worldY + GamePanel.TILE_SIZE > player.getWorldY() - player.screenY &&
+          worldY - GamePanel.TILE_SIZE < player.getWorldY() + player.screenY) {
 
         g2.drawImage(tile[tileNum].getImage(), screenX, screenY, null);
       }
 
       worldCol++;
-      if (worldCol == gp.maxWorldCol) {
+      if (worldCol == maxWorldCol) {
         worldCol = 0;
         worldRow++;
       }
     }
 
-    if (drawPath && gp.pFinder != null && gp.pFinder.pathList != null) {
+    var pathFinder = gp.getpFinder();
+    var pathList = (pathFinder != null) ? pathFinder.getPathList() : null;
+
+    if (drawPath && pathList != null) {
       g2.setColor(new Color(255, 0, 0, 70));
-      for (int i = 0; i < gp.pFinder.pathList.size(); i++) {
-        int pathWorldX = gp.pFinder.pathList.get(i).getCol() * gp.tileSize;
-        int pathWorldY = gp.pFinder.pathList.get(i).getRow() * gp.tileSize;
-        int pathScreenX = pathWorldX - gp.player.getWorldX() + gp.player.screenX;
-        int pathScreenY = pathWorldY - gp.player.getWorldY() + gp.player.screenY;
-        g2.fillRect(pathScreenX, pathScreenY, gp.tileSize, gp.tileSize);
+      for (var node : pathList) {
+        int pathWorldX = node.getCol() * GamePanel.TILE_SIZE;
+        int pathWorldY = node.getRow() * GamePanel.TILE_SIZE;
+        int pathScreenX = pathWorldX - player.getWorldX() + player.screenX;
+        int pathScreenY = pathWorldY - player.getWorldY() + player.screenY;
+        g2.fillRect(pathScreenX, pathScreenY, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
       }
     }
   }
