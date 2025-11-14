@@ -40,7 +40,11 @@ public class Projectile extends Entity {
 
   /** Projétil do player acerta monstros. */
   private void handleHitMonster() {
-    int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
+    var collisionChecker = gp.getcChecker();
+    Entity[][] monsters = gp.getMonster();
+    int currentMapIndex = gp.getCurrentMap();
+
+    int monsterIndex = collisionChecker.checkEntity(this, monsters);
     if (monsterIndex == 999) {
       return;
     }
@@ -55,15 +59,17 @@ public class Projectile extends Entity {
 
     // partículas usando o projétil do "user" (comportamento anterior)
     if (user.getProjectile() != null) {
-      generateParticle(user.getProjectile(), gp.monster[gp.currentMap][monsterIndex]);
+      generateParticle(user.getProjectile(), monsters[currentMapIndex][monsterIndex]);
     }
     setAlive(false);
   }
 
   /** Projétil de inimigo acerta o player. */
   private void handleHitPlayer() {
+    var collisionChecker = gp.getcChecker();
     var player = gp.getPlayer();
-    boolean contactPlayer = gp.cChecker.checKPlayer(this);
+
+    boolean contactPlayer = collisionChecker.checKPlayer(this);
     if (player.isInvincible() || !contactPlayer) {
       return;
     }
