@@ -11,6 +11,6 @@ public class ObjBoots extends Entity {
     super(gp);
 
     setName(OBJ_NAME);
-    down1 = setup("/objects/boots", gp.tileSize, gp.tileSize);
+    down1 = setup("/objects/boots", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
   }
 }

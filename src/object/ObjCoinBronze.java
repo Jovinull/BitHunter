@@ -13,14 +13,18 @@ public class ObjCoinBronze extends Entity {
     setType(TYPE_PICKUP_ONLY);
     setName(OBJ_NAME);
     setValue(1);
-    down1 = setup("/objects/coin_bronze", gp.tileSize, gp.tileSize);
+    down1 = setup("/objects/coin_bronze", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
   }
 
   @Override
   public boolean use(Entity entity) {
     gp.playSE(1);
-    gp.ui.addMessage("Moedas +" + getValue());
-    gp.player.setCoin(gp.player.getCoin() + getValue());
+
+    var ui = gp.getGameUi();
+    var player = gp.getPlayer();
+
+    ui.addMessage("Moedas +" + getValue());
+    player.setCoin(player.getCoin() + getValue());
     return true;
   }
 }

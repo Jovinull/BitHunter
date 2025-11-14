@@ -14,16 +14,20 @@ public class ObjManaCrystal extends Entity {
     setName(OBJ_NAME);
     setValue(1);
 
-    down1 = setup("/objects/manacrystal_full", gp.tileSize, gp.tileSize);
-    image = setup("/objects/manacrystal_full", gp.tileSize, gp.tileSize);
-    image2 = setup("/objects/manacrystal_blank", gp.tileSize, gp.tileSize);
+    down1 = setup("/objects/manacrystal_full", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    image = setup("/objects/manacrystal_full", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    image2 = setup("/objects/manacrystal_blank", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
   }
 
   @Override
   public boolean use(Entity entity) {
     gp.playSE(2);
-    gp.ui.addMessage("Mana +" + getValue());
-    gp.player.setMana(gp.player.getMana() + getValue());
+
+    var ui = gp.getGameUi();
+    var player = gp.getPlayer();
+
+    ui.addMessage("Mana +" + getValue());
+    player.setMana(player.getMana() + getValue());
     return true;
   }
 }

@@ -27,14 +27,14 @@ public class ObjRock extends Projectile {
 
   private void loadSprites() {
     // As sprites da pedra usam a mesma imagem para todas as direções
-    up1 = setup(ROCK_SPRITE_PATH, gp.tileSize, gp.tileSize);
-    up2 = setup(ROCK_SPRITE_PATH, gp.tileSize, gp.tileSize);
-    down1 = setup(ROCK_SPRITE_PATH, gp.tileSize, gp.tileSize);
-    down2 = setup(ROCK_SPRITE_PATH, gp.tileSize, gp.tileSize);
-    left1 = setup(ROCK_SPRITE_PATH, gp.tileSize, gp.tileSize);
-    left2 = setup(ROCK_SPRITE_PATH, gp.tileSize, gp.tileSize);
-    right1 = setup(ROCK_SPRITE_PATH, gp.tileSize, gp.tileSize);
-    right2 = setup(ROCK_SPRITE_PATH, gp.tileSize, gp.tileSize);
+    up1 = setup(ROCK_SPRITE_PATH, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    up2 = setup(ROCK_SPRITE_PATH, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    down1 = setup(ROCK_SPRITE_PATH, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    down2 = setup(ROCK_SPRITE_PATH, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    left1 = setup(ROCK_SPRITE_PATH, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    left2 = setup(ROCK_SPRITE_PATH, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    right1 = setup(ROCK_SPRITE_PATH, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    right2 = setup(ROCK_SPRITE_PATH, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
   }
 
   @Override

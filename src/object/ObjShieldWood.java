@@ -13,7 +13,7 @@ public class ObjShieldWood extends Entity {
     setType(TYPE_SHIELD);
     setName(OBJ_NAME);
 
-    down1 = setup("/objects/shield_wood", gp.tileSize, gp.tileSize);
+    down1 = setup("/objects/shield_wood", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
     setDefenseValue(1);
     setDescription("[" + getName() + "]\nUm escudo simples de \nmadeira.");

@@ -13,7 +13,7 @@ public class ObjPickaxe extends Entity {
     setType(TYPE_PICKAXE);
     setName(OBJ_NAME);
 
-    down1 = setup("/objects/pickaxe", gp.tileSize, gp.tileSize);
+    down1 = setup("/objects/pickaxe", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
     setAttackValue(2);
     getAttackArea().width = 30;

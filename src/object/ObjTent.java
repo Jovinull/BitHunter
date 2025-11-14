@@ -13,7 +13,7 @@ public class ObjTent extends Entity {
     setType(TYPE_CONSUMABLE);
     setName(OBJ_NAME);
 
-    down1 = setup("/objects/tent", gp.tileSize, gp.tileSize);
+    down1 = setup("/objects/tent", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
     setDescription("[" + getName() + "]\nVocê pode dormir até \na manhã seguinte.");
     setPrice(300);
@@ -22,14 +22,15 @@ public class ObjTent extends Entity {
 
   @Override
   public boolean use(Entity entity) {
-    gp.gameState = gp.sleepState;
+    gp.setGameState(GamePanel.SLEEP_STATE);
     gp.playSE(14);
 
-    gp.player.setLife(gp.player.getMaxLife());
-    gp.player.setMana(gp.player.getMaxMana());
+    var player = gp.getPlayer();
+    player.setLife(player.getMaxLife());
+    player.setMana(player.getMaxMana());
 
     // mantém o comportamento existente
-    gp.player.getSleepingImage(down1);
+    player.getSleepingImage(down1);
     return true;
   }
 }

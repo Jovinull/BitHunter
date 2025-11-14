@@ -16,10 +16,9 @@ public class ObjAxe extends Entity {
     setName(OBJ_NAME);
 
     // sprite
-    down1 = setup("/objects/axe", gp.tileSize, gp.tileSize);
+    down1 = setup("/objects/axe", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
     // atributos de combate
-    setAttackValue(2);
     Rectangle ar = getAttackArea();
     ar.width = 30;
     ar.height = 30;

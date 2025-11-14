@@ -14,7 +14,7 @@ public class ObjPotionRed extends Entity {
     setName(OBJ_NAME);
     setValue(5);
 
-    down1 = setup("/objects/potion_red", gp.tileSize, gp.tileSize);
+    down1 = setup("/objects/potion_red", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     setDescription("[" + getName() + "]\nRestaura sua vida em " + getValue() + ".");
     setPrice(25);
     setStackable(true);

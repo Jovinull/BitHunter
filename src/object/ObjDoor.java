@@ -15,7 +15,7 @@ public class ObjDoor extends Entity {
     setType(TYPE_OBSTACLE);
     setName(OBJ_NAME);
 
-    down1 = setup("/objects/door", gp.tileSize, gp.tileSize);
+    down1 = setup("/objects/door", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     setCollision(true);
 
     Rectangle sa = getSolidArea();

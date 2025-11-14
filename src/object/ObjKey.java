@@ -12,7 +12,7 @@ public class ObjKey extends Entity {
 
     setType(TYPE_CONSUMABLE);
     setName(OBJ_NAME);
-    down1 = setup("/objects/key", gp.tileSize, gp.tileSize);
+    down1 = setup("/objects/key", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     setDescription("[" + getName() + "]\nAbre portas trancadas.");
     setPrice(100);
     setStackable(true);
@@ -28,17 +28,20 @@ public class ObjKey extends Entity {
 
   @Override
   public boolean use(Entity entity) {
+    Entity[][] objects = gp.getObj();
+    int currentMapIndex = gp.getCurrentMap();
+
     // procura por uma porta à frente do usuário
-    int objIndex = getDetected(entity, gp.obj, ObjDoor.OBJ_NAME);
+    int objIndex = getDetected(entity, objects, ObjDoor.OBJ_NAME);
 
     if (objIndex != 999) {
       startDialogue(this, 0);
       gp.playSE(3);
-      gp.obj[gp.currentMap][objIndex] = null; // remove a porta
+      objects[currentMapIndex][objIndex] = null; // remove a porta
       return true;
-    } else {
-      startDialogue(this, 1);
-      return false;
     }
+
+    startDialogue(this, 1);
+    return false;
   }
 }

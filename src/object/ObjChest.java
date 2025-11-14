@@ -16,8 +16,8 @@ public class ObjChest extends Entity {
     setName(OBJ_NAME);
 
     // sprites (protegidos em Entity)
-    image = setup("/objects/chest", gp.tileSize, gp.tileSize);
-    image2 = setup("/objects/chest_opened", gp.tileSize, gp.tileSize);
+    image = setup("/objects/chest", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    image2 = setup("/objects/chest_opened", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     down1 = image;
 
     setCollision(true);
@@ -54,7 +54,9 @@ public class ObjChest extends Entity {
     if (!isOpened()) {
       gp.playSE(3);
 
-      if (!gp.player.canObtainItem(getLoot())) {
+      var player = gp.getPlayer();
+
+      if (!player.canObtainItem(getLoot())) {
         startDialogue(this, 0);
       } else {
         startDialogue(this, 1);

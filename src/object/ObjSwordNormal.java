@@ -13,7 +13,7 @@ public class ObjSwordNormal extends Entity {
     setType(TYPE_SWORD);
     setName(OBJ_NAME);
 
-    down1 = setup("/objects/sword_normal", gp.tileSize, gp.tileSize);
+    down1 = setup("/objects/sword_normal", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
     setAttackValue(1);
     getAttackArea().width = 36;
