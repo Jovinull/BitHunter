@@ -39,14 +39,15 @@ public class NpcMerchant extends Entity {
   @Override
   public void getImage() {
     // O sprite do comerciante usa as variações "down" para todas as direções
-    up1 = setup(SPRITE_DOWN_1, gp.tileSize, gp.tileSize);
-    up2 = setup(SPRITE_DOWN_2, gp.tileSize, gp.tileSize);
-    down1 = setup(SPRITE_DOWN_1, gp.tileSize, gp.tileSize);
-    down2 = setup(SPRITE_DOWN_2, gp.tileSize, gp.tileSize);
-    left1 = setup(SPRITE_DOWN_1, gp.tileSize, gp.tileSize);
-    left2 = setup(SPRITE_DOWN_2, gp.tileSize, gp.tileSize);
-    right1 = setup(SPRITE_DOWN_1, gp.tileSize, gp.tileSize);
-    right2 = setup(SPRITE_DOWN_2, gp.tileSize, gp.tileSize);
+    int tileSize = GamePanel.TILE_SIZE;
+    up1 = setup(SPRITE_DOWN_1, tileSize, tileSize);
+    up2 = setup(SPRITE_DOWN_2, tileSize, tileSize);
+    down1 = setup(SPRITE_DOWN_1, tileSize, tileSize);
+    down2 = setup(SPRITE_DOWN_2, tileSize, tileSize);
+    left1 = setup(SPRITE_DOWN_1, tileSize, tileSize);
+    left2 = setup(SPRITE_DOWN_2, tileSize, tileSize);
+    right1 = setup(SPRITE_DOWN_1, tileSize, tileSize);
+    right2 = setup(SPRITE_DOWN_2, tileSize, tileSize);
   }
 
   public void setDialogue() {
@@ -72,7 +73,7 @@ public class NpcMerchant extends Entity {
   @Override
   public void speak() {
     facePlayer();
-    gp.gameState = gp.tradeState;
-    gp.ui.setNpc(this);
+    gp.setGameState(GamePanel.TRADE_STATE);
+    gp.getGameUi().setNpc(this);
   }
 }

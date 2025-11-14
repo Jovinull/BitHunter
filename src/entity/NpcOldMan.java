@@ -49,14 +49,15 @@ public class NpcOldMan extends Entity {
 
   @Override
   public void getImage() {
-    up1 = setup(SPRITE_UP_1, gp.tileSize, gp.tileSize);
-    up2 = setup(SPRITE_UP_2, gp.tileSize, gp.tileSize);
-    down1 = setup(SPRITE_DOWN_1, gp.tileSize, gp.tileSize);
-    down2 = setup(SPRITE_DOWN_2, gp.tileSize, gp.tileSize);
-    left1 = setup(SPRITE_LEFT_1, gp.tileSize, gp.tileSize);
-    left2 = setup(SPRITE_LEFT_2, gp.tileSize, gp.tileSize);
-    right1 = setup(SPRITE_RIGHT_1, gp.tileSize, gp.tileSize);
-    right2 = setup(SPRITE_RIGHT_2, gp.tileSize, gp.tileSize);
+    int tileSize = GamePanel.TILE_SIZE;
+    up1 = setup(SPRITE_UP_1, tileSize, tileSize);
+    up2 = setup(SPRITE_UP_2, tileSize, tileSize);
+    down1 = setup(SPRITE_DOWN_1, tileSize, tileSize);
+    down2 = setup(SPRITE_DOWN_2, tileSize, tileSize);
+    left1 = setup(SPRITE_LEFT_1, tileSize, tileSize);
+    left2 = setup(SPRITE_LEFT_2, tileSize, tileSize);
+    right1 = setup(SPRITE_RIGHT_1, tileSize, tileSize);
+    right2 = setup(SPRITE_RIGHT_2, tileSize, tileSize);
   }
 
   public void setDialogue() {
@@ -98,8 +99,10 @@ public class NpcOldMan extends Entity {
     startDialogue(this, getDialogueSet());
     setDialogueSet(getDialogueSet() + 1);
 
+    var player = gp.getPlayer();
+
     // Reage ao HP do player
-    if (gp.player.getLife() < gp.player.getMaxLife() / LOW_LIFE_DIVISOR) {
+    if (player.getLife() < player.getMaxLife() / LOW_LIFE_DIVISOR) {
       setDialogueSet(1);
       startDialogue(this, getDialogueSet());
     }

@@ -46,14 +46,15 @@ public class NpcBigRock extends Entity {
 
   @Override
   public void getImage() {
-    up1 = setup(SPRITE_PATH, gp.tileSize, gp.tileSize);
-    up2 = setup(SPRITE_PATH, gp.tileSize, gp.tileSize);
-    down1 = setup(SPRITE_PATH, gp.tileSize, gp.tileSize);
-    down2 = setup(SPRITE_PATH, gp.tileSize, gp.tileSize);
-    left1 = setup(SPRITE_PATH, gp.tileSize, gp.tileSize);
-    left2 = setup(SPRITE_PATH, gp.tileSize, gp.tileSize);
-    right1 = setup(SPRITE_PATH, gp.tileSize, gp.tileSize);
-    right2 = setup(SPRITE_PATH, gp.tileSize, gp.tileSize);
+    int tileSize = GamePanel.TILE_SIZE;
+    up1 = setup(SPRITE_PATH, tileSize, tileSize);
+    up2 = setup(SPRITE_PATH, tileSize, tileSize);
+    down1 = setup(SPRITE_PATH, tileSize, tileSize);
+    down2 = setup(SPRITE_PATH, tileSize, tileSize);
+    left1 = setup(SPRITE_PATH, tileSize, tileSize);
+    left2 = setup(SPRITE_PATH, tileSize, tileSize);
+    right1 = setup(SPRITE_PATH, tileSize, tileSize);
+    right2 = setup(SPRITE_PATH, tileSize, tileSize);
   }
 
   public void setDialogue() {
@@ -132,7 +133,11 @@ public class NpcBigRock extends Entity {
 
   private List<InteractiveTile> findMetalPlatesOnCurrentMap() {
     List<InteractiveTile> plates = new ArrayList<>();
-    InteractiveTile[] tiles = gp.iTile[gp.currentMap];
+
+    InteractiveTile[][] allTiles = gp.getiTile();
+    int currentMapIndex = gp.getCurrentMap();
+    InteractiveTile[] tiles = allTiles[currentMapIndex];
+
     for (InteractiveTile tile : tiles) {
       if (tile != null && ItMetalPlate.IT_NAME.equals(tile.getName())) {
         plates.add(tile);
@@ -143,7 +148,11 @@ public class NpcBigRock extends Entity {
 
   private List<Entity> findRocksOnCurrentMap() {
     List<Entity> rocks = new ArrayList<>();
-    Entity[] npcs = gp.npc[gp.currentMap];
+
+    Entity[][] allNpcs = gp.getNpc();
+    int currentMapIndex = gp.getCurrentMap();
+    Entity[] npcs = allNpcs[currentMapIndex];
+
     for (Entity e : npcs) {
       if (e != null && NPC_NAME.equals(e.getName())) {
         rocks.add(e);
@@ -183,7 +192,10 @@ public class NpcBigRock extends Entity {
   }
 
   private void openAllIronDoors() {
-    Entity[] objects = gp.obj[gp.currentMap];
+    Entity[][] allObjects = gp.getObj();
+    int currentMapIndex = gp.getCurrentMap();
+    Entity[] objects = allObjects[currentMapIndex];
+
     boolean opened = false;
 
     for (int i = 0; i < objects.length; i++) {
