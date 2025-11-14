@@ -34,7 +34,7 @@ public class Particle extends Entity {
     setMaxLife(maxLife);
     setLife(maxLife);
 
-    int offset = (gp.tileSize / 2) - (size / 2);
+    int offset = (GamePanel.TILE_SIZE / 2) - (size / 2);
     setWorldX(generator.getWorldX() + offset);
     setWorldY(generator.getWorldY() + offset);
   }

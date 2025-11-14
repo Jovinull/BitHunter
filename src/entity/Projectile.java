@@ -1,6 +1,7 @@
 package entity;
 
 import java.util.Objects;
+
 import main.GamePanel;
 
 public class Projectile extends Entity {
@@ -23,7 +24,7 @@ public class Projectile extends Entity {
   @Override
   public void update() {
     // Colisão (player -> monstros) ou (inimigo -> player)
-    if (user == gp.player) {
+    if (user == gp.getPlayer()) {
       handleHitMonster();
     } else {
       handleHitPlayer();
@@ -40,13 +41,16 @@ public class Projectile extends Entity {
   /** Projétil do player acerta monstros. */
   private void handleHitMonster() {
     int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
-    if (monsterIndex == 999)
+    if (monsterIndex == 999) {
       return;
+    }
 
-    gp.player.damageMonster(
+    var player = gp.getPlayer();
+
+    player.damageMonster(
         monsterIndex,
         this,
-        getAttack() * Math.max(1, gp.player.getLevel() / 2),
+        getAttack() * Math.max(1, player.getLevel() / 2),
         getKnockBackPower());
 
     // partículas usando o projétil do "user" (comportamento anterior)
@@ -58,11 +62,14 @@ public class Projectile extends Entity {
 
   /** Projétil de inimigo acerta o player. */
   private void handleHitPlayer() {
+    var player = gp.getPlayer();
     boolean contactPlayer = gp.cChecker.checKPlayer(this);
-    if (gp.player.isInvincible() || !contactPlayer)
+    if (player.isInvincible() || !contactPlayer) {
       return;
+    }
 
     damagePlayer(getAttack());
+
     if (user.getProjectile() != null) {
       generateParticle(user.getProjectile(), user.getProjectile());
     }
