@@ -9,8 +9,8 @@ import java.io.ObjectOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import main.GamePanel;
 import entity.Entity;
+import main.GamePanel;
 
 public class SaveLoad {
 
@@ -71,11 +71,12 @@ public class SaveLoad {
     applyMapObjects(ds);
     applyEquipment(ds);
 
-    // Recalcular atributos derivados (mantém seu fluxo original)
+    // Recalcular atributos derivados
     var player = gp.getPlayer();
     player.getAttack();
     player.getDefense();
     player.getAttackImage();
+    player.recalculateSpeedFromEquipment();
   }
 
   /* ----- Copy to storage (SAVE) ----- */
@@ -108,6 +109,7 @@ public class SaveLoad {
     var player = gp.getPlayer();
     ds.setCurrentWeaponSlot(player.getCurrentWeaponSlot());
     ds.setCurrentShieldSlot(player.getCurrentShieldSlot());
+    ds.setCurrentBootsSlot(player.getCurrentBootsSlot());
   }
 
   private void copyMapObjectsToStorage(DataStorage ds) {
@@ -213,6 +215,7 @@ public class SaveLoad {
 
     int weaponSlot = ds.getCurrentWeaponSlot();
     int shieldSlot = ds.getCurrentShieldSlot();
+    int bootsSlot = ds.getCurrentBootsSlot();
 
     var inv = player.getInventory();
     if (weaponSlot >= 0 && weaponSlot < inv.size()) {
@@ -220,6 +223,9 @@ public class SaveLoad {
     }
     if (shieldSlot >= 0 && shieldSlot < inv.size()) {
       player.setCurrentShield(inv.get(shieldSlot));
+    }
+    if (bootsSlot >= 0 && bootsSlot < inv.size()) {
+      player.setCurrentBoots(inv.get(bootsSlot));
     }
   }
 }

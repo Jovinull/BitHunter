@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+
 import javax.imageio.ImageIO;
 
 import main.GamePanel;
@@ -40,6 +41,7 @@ public class Entity {
   public static final int TYPE_OBSTACLE = 8;
   public static final int TYPE_LIGHT = 9;
   public static final int TYPE_PICKAXE = 10;
+  public static final int TYPE_BOOTS = 11;
 
   public static final int MAX_INVENTORY_SIZE = 20;
 
@@ -152,6 +154,8 @@ public class Entity {
   private Entity currentWeapon;
   private Entity currentShield;
   private Entity currentLight;
+  private Entity currentBoots;
+
   private Projectile projectile;
   private boolean boss;
 
@@ -160,6 +164,7 @@ public class Entity {
   private int value;
   private int attackValue;
   private int defenseValue;
+  private int speedValue;
   private String description = "";
   private int useCost;
   private int price;
@@ -1499,6 +1504,14 @@ public class Entity {
     return currentShield;
   }
 
+  public Entity getCurrentBoots() {
+    return currentBoots;
+  }
+
+  public void setCurrentBoots(Entity currentBoots) {
+    this.currentBoots = currentBoots;
+  }
+
   public void setCurrentShield(Entity currentShield) {
     this.currentShield = currentShield;
   }
@@ -1545,6 +1558,14 @@ public class Entity {
 
   public void setAttackValue(int attackValue) {
     this.attackValue = attackValue;
+  }
+
+  public int getSpeedValue() {
+    return speedValue;
+  }
+
+  public void setSpeedValue(int speedValue) {
+    this.speedValue = speedValue;
   }
 
   public int getDefenseValue() {

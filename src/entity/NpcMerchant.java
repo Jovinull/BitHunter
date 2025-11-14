@@ -4,6 +4,7 @@ import java.awt.Rectangle;
 
 import main.GamePanel;
 import object.ObjAxe;
+import object.ObjBoots;
 import object.ObjKey;
 import object.ObjLantern;
 import object.ObjPotionRed;
@@ -68,6 +69,7 @@ public class NpcMerchant extends Entity {
     inv.add(new ObjShieldWood(gp));
     inv.add(new ObjShieldBlue(gp));
     inv.add(new ObjLantern(gp));
+    inv.add(new ObjBoots(gp));
   }
 
   @Override

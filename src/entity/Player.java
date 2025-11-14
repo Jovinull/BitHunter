@@ -51,7 +51,7 @@ public class Player extends Entity {
     setWorldY(GamePanel.TILE_SIZE * 21);
 
     setDefaultSpeed(3);
-    setSpeed(getDefaultSpeed());
+    recalculateSpeedFromEquipment();
     setDirection(DIR_DOWN);
 
     // PLAYER STATUS
@@ -98,7 +98,7 @@ public class Player extends Entity {
   public void restoreStatus() {
     setLife(getMaxLife());
     setMana(getMaxMana());
-    setSpeed(getDefaultSpeed());
+    recalculateSpeedFromEquipment();
     setInvincible(false);
     setTransparent(false);
     setAttacking(false);
@@ -114,6 +114,16 @@ public class Player extends Entity {
     inv.add(getCurrentShield());
     inv.add(new ObjKey(gp));
     inv.add(new ObjLantern(gp));
+  }
+
+  public void recalculateSpeedFromEquipment() {
+    int bonus = 0;
+
+    if (getCurrentBoots() != null) {
+      bonus += getCurrentBoots().getSpeedValue();
+    }
+
+    setSpeed(getDefaultSpeed() + bonus);
   }
 
   @Override
@@ -157,6 +167,18 @@ public class Player extends Entity {
       }
     }
     return currentShieldSlot;
+  }
+
+  public int getCurrentBootsSlot() {
+    int currentBootsSlot = -1;
+    var inv = getInventory();
+    for (int i = 0; i < inv.size(); i++) {
+      if (inv.get(i) == getCurrentBoots()) {
+        currentBootsSlot = i;
+        break;
+      }
+    }
+    return currentBootsSlot;
   }
 
   @Override
@@ -266,7 +288,7 @@ public class Player extends Entity {
     if (isCollisionOn()) {
       setKnockBackCounter(0);
       setKnockBack(false);
-      setSpeed(getDefaultSpeed());
+      recalculateSpeedFromEquipment();
     } else {
       switch (getKnockBackDirection()) {
         case DIR_UP -> setWorldY(getWorldY() - getSpeed());
@@ -282,7 +304,7 @@ public class Player extends Entity {
     if (getKnockBackCounter() == 10) {
       setKnockBackCounter(0);
       setKnockBack(false);
-      setSpeed(getDefaultSpeed());
+      recalculateSpeedFromEquipment();
     }
   }
 
@@ -614,6 +636,10 @@ public class Player extends Entity {
       case TYPE_LIGHT -> {
         setCurrentLight(getCurrentLight() == selectedItem ? null : selectedItem);
         setLightUpdated(true);
+      }
+      case TYPE_BOOTS -> {
+        setCurrentBoots(selectedItem);
+        recalculateSpeedFromEquipment();
       }
       case TYPE_CONSUMABLE -> handleConsumableSelection(selectedItem, itemIndex);
       default -> {

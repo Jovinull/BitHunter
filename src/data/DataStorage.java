@@ -27,6 +27,7 @@ public class DataStorage implements Serializable {
 
   private int currentWeaponSlot;
   private int currentShieldSlot;
+  private int currentBootsSlot;
 
   // OBJECT ON MAP
   private String[][] mapObjectNames;
@@ -177,5 +178,13 @@ public class DataStorage implements Serializable {
 
   public void setMapObjectOpened(boolean[][] mapObjectOpened) {
     this.mapObjectOpened = mapObjectOpened;
+  }
+
+  public int getCurrentBootsSlot() {
+    return currentBootsSlot;
+  }
+
+  public void setCurrentBootsSlot(int currentBootsSlot) {
+    this.currentBootsSlot = currentBootsSlot;
   }
 }
