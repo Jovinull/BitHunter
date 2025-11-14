@@ -14,16 +14,16 @@ public class PlayerDummy extends Entity {
 
   @Override
   public void getImage() {
-    up1 = setup("/player/Walking sprites/boy_up_1", gp.tileSize, gp.tileSize);
-    up2 = setup("/player/Walking sprites/boy_up_2", gp.tileSize, gp.tileSize);
+    up1 = setup("/player/Walking sprites/boy_up_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    up2 = setup("/player/Walking sprites/boy_up_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
-    down1 = setup("/player/Walking sprites/boy_down_1", gp.tileSize, gp.tileSize);
-    down2 = setup("/player/Walking sprites/boy_down_2", gp.tileSize, gp.tileSize);
+    down1 = setup("/player/Walking sprites/boy_down_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    down2 = setup("/player/Walking sprites/boy_down_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
-    left1 = setup("/player/Walking sprites/boy_left_1", gp.tileSize, gp.tileSize);
-    left2 = setup("/player/Walking sprites/boy_left_2", gp.tileSize, gp.tileSize);
+    left1 = setup("/player/Walking sprites/boy_left_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    left2 = setup("/player/Walking sprites/boy_left_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
-    right1 = setup("/player/Walking sprites/boy_right_1", gp.tileSize, gp.tileSize);
-    right2 = setup("/player/Walking sprites/boy_right_2", gp.tileSize, gp.tileSize);
+    right1 = setup("/player/Walking sprites/boy_right_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    right2 = setup("/player/Walking sprites/boy_right_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
   }
 }
