@@ -1,19 +1,23 @@
 package main;
 
+import java.net.URL;
+
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 // Classe principal que inicia o jogo
 public class Main {
 
-  public static JFrame window; // Janela principal do jogo
+  public static final JFrame window = new JFrame(); // Janela principal do jogo
+
+  private Main() {
+    // Evita instanciação acidental desta classe utilitária
+  }
 
   public static void main(String[] args) {
-    // Criação da janela principal do jogo
-    window = new JFrame();
-
     // Define o comportamento ao fechar a janela: termina o programa
-    window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
     // Impede o redimensionamento da janela pelo usuário
     window.setResizable(false);
@@ -21,14 +25,18 @@ public class Main {
     // Define o título da janela
     window.setTitle("Bit Hunter");
 
-    new Main().setIcon();
+    // Define o ícone da janela
+    setIcon();
 
     // Cria o painel do jogo e adiciona à janela
     GamePanel gamePanel = new GamePanel();
     window.add(gamePanel);
 
-    gamePanel.config.loadConfig(); // Carrega as configurações do jogo
-    if (gamePanel.fullScreenOn == true) {
+    // Carrega as configurações do jogo
+    gamePanel.config.loadConfig();
+
+    // Aplica modo tela cheia se configurado
+    if (gamePanel.isFullScreenOn()) {
       window.setUndecorated(true);
     }
 
@@ -48,9 +56,12 @@ public class Main {
     gamePanel.startGameThread();
   }
 
-  public void setIcon() {
-
-    ImageIcon icon = new ImageIcon(getClass().getClassLoader().getResource("objects/blueheart.png"));
-    window.setIconImage(icon.getImage());
+  private static void setIcon() {
+    URL iconUrl = Main.class.getClassLoader().getResource("objects/blueheart.png");
+    if (iconUrl != null) {
+      ImageIcon icon = new ImageIcon(iconUrl);
+      window.setIconImage(icon.getImage());
+    }
+    // Se for null, apenas não define o ícone (evita possível NullPointerException)
   }
 }

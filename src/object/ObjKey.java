@@ -3,16 +3,16 @@ package object;
 import entity.Entity;
 import main.GamePanel;
 
-public class OBJ_Key extends Entity {
+public class ObjKey extends Entity {
 
-  public static final String objName = "Chave";
+  public static final String OBJ_NAME = "Chave";
 
-  public OBJ_Key(GamePanel gp) {
+  public ObjKey(GamePanel gp) {
     super(gp);
 
     setType(TYPE_CONSUMABLE);
-    setName(objName);
-    down1 = setup("/objects/key", gp.tileSize, gp.tileSize);
+    setName(OBJ_NAME);
+    down1 = setup("/objects/key", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     setDescription("[" + getName() + "]\nAbre portas trancadas.");
     setPrice(100);
     setStackable(true);
@@ -28,17 +28,20 @@ public class OBJ_Key extends Entity {
 
   @Override
   public boolean use(Entity entity) {
-    // procure por uma porta à frente do usuário
-    int objIndex = getDetected(entity, gp.obj, OBJ_Door.objName);
+    Entity[][] objects = gp.getObj();
+    int currentMapIndex = gp.getCurrentMap();
+
+    // procura por uma porta à frente do usuário
+    int objIndex = getDetected(entity, objects, ObjDoor.OBJ_NAME);
 
     if (objIndex != 999) {
       startDialogue(this, 0);
       gp.playSE(3);
-      gp.obj[gp.currentMap][objIndex] = null; // remove a porta
+      objects[currentMapIndex][objIndex] = null; // remove a porta
       return true;
-    } else {
-      startDialogue(this, 1);
-      return false;
     }
+
+    startDialogue(this, 1);
+    return false;
   }
 }

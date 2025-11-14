@@ -5,18 +5,17 @@ import java.awt.Rectangle;
 import entity.Entity;
 import main.GamePanel;
 
-// Representa a porta do jogo; bloqueia passagem se collision=true
-public class OBJ_Door extends Entity {
+public class ObjDoorIron extends Entity {
 
-  public static final String objName = "Porta";
+  public static final String OBJ_NAME = "Porta de Ferro";
 
-  public OBJ_Door(GamePanel gp) {
+  public ObjDoorIron(GamePanel gp) {
     super(gp);
 
     setType(TYPE_OBSTACLE);
-    setName(objName);
+    setName(OBJ_NAME);
 
-    down1 = setup("/objects/door", gp.tileSize, gp.tileSize);
+    down1 = setup("/objects/door_iron", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     setCollision(true);
 
     Rectangle sa = getSolidArea();
@@ -32,7 +31,7 @@ public class OBJ_Door extends Entity {
 
   public void setDialogue() {
     String[][] d = getDialogues();
-    d[0][0] = "Uma porta trancada. Você precisa de uma \nchave para abri-la.";
+    d[0][0] = "Isso não vai se mexer.";
   }
 
   @Override

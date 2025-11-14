@@ -8,11 +8,11 @@ import java.awt.image.BufferedImage;
 
 import main.GamePanel;
 import main.KeyHandler;
-import object.OBJ_Fireball;
-import object.OBJ_Key;
-import object.OBJ_Lantern;
-import object.OBJ_Shield_Wood;
-import object.OBJ_Sword_Normal;
+import object.ObjFireball;
+import object.ObjKey;
+import object.ObjLantern;
+import object.ObjShieldWood;
+import object.ObjSwordNormal;
 import tile_interactive.InteractiveTile;
 
 public class Player extends Entity {
@@ -22,17 +22,17 @@ public class Player extends Entity {
   public final int screenX;
   public final int screenY;
   private int standCounter = 0;
-  public boolean attackCanceled = false;
-  public boolean lightUpdated = false;
 
-  public boolean debugCollision = false;
+  private boolean attackCanceled = false;
+  private boolean lightUpdated = false;
+  private boolean debugCollision = false;
 
   public Player(GamePanel gp, KeyHandler keyH) {
     super(gp);
     this.keyH = keyH;
 
-    screenX = gp.screenWidth / 2;
-    screenY = gp.screenHeight / 2;
+    screenX = GamePanel.SCREEN_WIDTH / 2;
+    screenY = GamePanel.SCREEN_HEIGHT / 2;
 
     // solidArea é final -> configurar via getter
     Rectangle sa = getSolidArea();
@@ -47,8 +47,8 @@ public class Player extends Entity {
   }
 
   public void setDefaultValues() {
-    setWorldX(gp.tileSize * 23);
-    setWorldY(gp.tileSize * 21);
+    setWorldX(GamePanel.TILE_SIZE * 23);
+    setWorldY(GamePanel.TILE_SIZE * 21);
 
     setDefaultSpeed(3);
     setSpeed(getDefaultSpeed());
@@ -67,10 +67,10 @@ public class Player extends Entity {
     setNextLevelExp(5);
     setCoin(500);
 
-    setCurrentWeapon(new OBJ_Sword_Normal(gp));
-    setCurrentShield(new OBJ_Shield_Wood(gp));
+    setCurrentWeapon(new ObjSwordNormal(gp));
+    setCurrentShield(new ObjShieldWood(gp));
     setCurrentLight(null);
-    setProjectile(new OBJ_Fireball(gp));
+    setProjectile(new ObjFireball(gp));
 
     setAttack(getAttack());
     setDefense(getDefense());
@@ -83,9 +83,9 @@ public class Player extends Entity {
   }
 
   public void setDefaultPositions() {
-    gp.currentMap = 0;
-    setWorldX(gp.tileSize * 23);
-    setWorldY(gp.tileSize * 21);
+    gp.setCurrentMap(0);
+    setWorldX(GamePanel.TILE_SIZE * 23);
+    setWorldY(GamePanel.TILE_SIZE * 21);
     setDirection(DIR_DOWN);
   }
 
@@ -104,7 +104,7 @@ public class Player extends Entity {
     setAttacking(false);
     setGuarding(false);
     setKnockBack(false);
-    lightUpdated = true;
+    setLightUpdated(true);
   }
 
   public void setItems() {
@@ -112,13 +112,12 @@ public class Player extends Entity {
     inv.clear();
     inv.add(getCurrentWeapon());
     inv.add(getCurrentShield());
-    inv.add(new OBJ_Key(gp));
-    inv.add(new OBJ_Lantern(gp));
+    inv.add(new ObjKey(gp));
+    inv.add(new ObjLantern(gp));
   }
 
   @Override
   public int getAttack() {
-    // attackArea é final -> copia dimensões via getter
     Rectangle a = getAttackArea();
     a.width = getCurrentWeapon().getAttackArea().width;
     a.height = getCurrentWeapon().getAttackArea().height;
@@ -142,8 +141,9 @@ public class Player extends Entity {
     int currentWeaponSlot = 0;
     var inv = getInventory();
     for (int i = 0; i < inv.size(); i++) {
-      if (inv.get(i) == getCurrentWeapon())
+      if (inv.get(i) == getCurrentWeapon()) {
         currentWeaponSlot = i;
+      }
     }
     return currentWeaponSlot;
   }
@@ -152,21 +152,23 @@ public class Player extends Entity {
     int currentShieldSlot = 0;
     var inv = getInventory();
     for (int i = 0; i < inv.size(); i++) {
-      if (inv.get(i) == getCurrentShield())
+      if (inv.get(i) == getCurrentShield()) {
         currentShieldSlot = i;
+      }
     }
     return currentShieldSlot;
   }
 
+  @Override
   public void getImage() {
-    up1 = setup("/player/Walking sprites/boy_up_1", gp.tileSize, gp.tileSize);
-    up2 = setup("/player/Walking sprites/boy_up_2", gp.tileSize, gp.tileSize);
-    down1 = setup("/player/Walking sprites/boy_down_1", gp.tileSize, gp.tileSize);
-    down2 = setup("/player/Walking sprites/boy_down_2", gp.tileSize, gp.tileSize);
-    left1 = setup("/player/Walking sprites/boy_left_1", gp.tileSize, gp.tileSize);
-    left2 = setup("/player/Walking sprites/boy_left_2", gp.tileSize, gp.tileSize);
-    right1 = setup("/player/Walking sprites/boy_right_1", gp.tileSize, gp.tileSize);
-    right2 = setup("/player/Walking sprites/boy_right_2", gp.tileSize, gp.tileSize);
+    up1 = setup("/player/Walking sprites/boy_up_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    up2 = setup("/player/Walking sprites/boy_up_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    down1 = setup("/player/Walking sprites/boy_down_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    down2 = setup("/player/Walking sprites/boy_down_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    left1 = setup("/player/Walking sprites/boy_left_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    left2 = setup("/player/Walking sprites/boy_left_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    right1 = setup("/player/Walking sprites/boy_right_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    right2 = setup("/player/Walking sprites/boy_right_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
   }
 
   public void getSleepingImage(BufferedImage image) {
@@ -182,178 +184,183 @@ public class Player extends Entity {
 
   public void getAttackImage() {
     if (getCurrentWeapon().getType() == TYPE_SWORD) {
-      attackUp1 = setup("/player/Attacking sprites/boy_attack_up_1", gp.tileSize, gp.tileSize * 2);
-      attackUp2 = setup("/player/Attacking sprites/boy_attack_up_2", gp.tileSize, gp.tileSize * 2);
-      attackDown1 = setup("/player/Attacking sprites/boy_attack_down_1", gp.tileSize, gp.tileSize * 2);
-      attackDown2 = setup("/player/Attacking sprites/boy_attack_down_2", gp.tileSize, gp.tileSize * 2);
-      attackLeft1 = setup("/player/Attacking sprites/boy_attack_left_1", gp.tileSize * 2, gp.tileSize);
-      attackLeft2 = setup("/player/Attacking sprites/boy_attack_left_2", gp.tileSize * 2, gp.tileSize);
-      attackRight1 = setup("/player/Attacking sprites/boy_attack_right_1", gp.tileSize * 2, gp.tileSize);
-      attackRight2 = setup("/player/Attacking sprites/boy_attack_right_2", gp.tileSize * 2, gp.tileSize);
+      attackUp1 = setup("/player/Attacking sprites/boy_attack_up_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+      attackUp2 = setup("/player/Attacking sprites/boy_attack_up_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+      attackDown1 = setup("/player/Attacking sprites/boy_attack_down_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+      attackDown2 = setup("/player/Attacking sprites/boy_attack_down_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+      attackLeft1 = setup("/player/Attacking sprites/boy_attack_left_1", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
+      attackLeft2 = setup("/player/Attacking sprites/boy_attack_left_2", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
+      attackRight1 = setup("/player/Attacking sprites/boy_attack_right_1", GamePanel.TILE_SIZE * 2,
+          GamePanel.TILE_SIZE);
+      attackRight2 = setup("/player/Attacking sprites/boy_attack_right_2", GamePanel.TILE_SIZE * 2,
+          GamePanel.TILE_SIZE);
     }
 
     if (getCurrentWeapon().getType() == TYPE_AXE) {
-      attackUp1 = setup("/player/Attacking sprites/boy_axe_up_1", gp.tileSize, gp.tileSize * 2);
-      attackUp2 = setup("/player/Attacking sprites/boy_axe_up_2", gp.tileSize, gp.tileSize * 2);
-      attackDown1 = setup("/player/Attacking sprites/boy_axe_down_1", gp.tileSize, gp.tileSize * 2);
-      attackDown2 = setup("/player/Attacking sprites/boy_axe_down_2", gp.tileSize, gp.tileSize * 2);
-      attackLeft1 = setup("/player/Attacking sprites/boy_axe_left_1", gp.tileSize * 2, gp.tileSize);
-      attackLeft2 = setup("/player/Attacking sprites/boy_axe_left_2", gp.tileSize * 2, gp.tileSize);
-      attackRight1 = setup("/player/Attacking sprites/boy_axe_right_1", gp.tileSize * 2, gp.tileSize);
-      attackRight2 = setup("/player/Attacking sprites/boy_axe_right_2", gp.tileSize * 2, gp.tileSize);
+      attackUp1 = setup("/player/Attacking sprites/boy_axe_up_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+      attackUp2 = setup("/player/Attacking sprites/boy_axe_up_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+      attackDown1 = setup("/player/Attacking sprites/boy_axe_down_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+      attackDown2 = setup("/player/Attacking sprites/boy_axe_down_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+      attackLeft1 = setup("/player/Attacking sprites/boy_axe_left_1", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
+      attackLeft2 = setup("/player/Attacking sprites/boy_axe_left_2", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
+      attackRight1 = setup("/player/Attacking sprites/boy_axe_right_1", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
+      attackRight2 = setup("/player/Attacking sprites/boy_axe_right_2", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
     }
 
     if (getCurrentWeapon().getType() == TYPE_PICKAXE) {
-      attackUp1 = setup("/player/Attacking sprites/boy_pick_up_1", gp.tileSize, gp.tileSize * 2);
-      attackUp2 = setup("/player/Attacking sprites/boy_pick_up_2", gp.tileSize, gp.tileSize * 2);
-      attackDown1 = setup("/player/Attacking sprites/boy_pick_down_1", gp.tileSize, gp.tileSize * 2);
-      attackDown2 = setup("/player/Attacking sprites/boy_pick_down_2", gp.tileSize, gp.tileSize * 2);
-      attackLeft1 = setup("/player/Attacking sprites/boy_pick_left_1", gp.tileSize * 2, gp.tileSize);
-      attackLeft2 = setup("/player/Attacking sprites/boy_pick_left_2", gp.tileSize * 2, gp.tileSize);
-      attackRight1 = setup("/player/Attacking sprites/boy_pick_right_1", gp.tileSize * 2, gp.tileSize);
-      attackRight2 = setup("/player/Attacking sprites/boy_pick_right_2", gp.tileSize * 2, gp.tileSize);
+      attackUp1 = setup("/player/Attacking sprites/boy_pick_up_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+      attackUp2 = setup("/player/Attacking sprites/boy_pick_up_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+      attackDown1 = setup("/player/Attacking sprites/boy_pick_down_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+      attackDown2 = setup("/player/Attacking sprites/boy_pick_down_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+      attackLeft1 = setup("/player/Attacking sprites/boy_pick_left_1", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
+      attackLeft2 = setup("/player/Attacking sprites/boy_pick_left_2", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
+      attackRight1 = setup("/player/Attacking sprites/boy_pick_right_1", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
+      attackRight2 = setup("/player/Attacking sprites/boy_pick_right_2", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
     }
   }
 
   public void getGuardImage() {
-    guardUp = setup("/player/Guarding sprites/boy_guard_up", gp.tileSize, gp.tileSize);
-    guardDown = setup("/player/Guarding sprites/boy_guard_down", gp.tileSize, gp.tileSize);
-    guardLeft = setup("/player/Guarding sprites/boy_guard_left", gp.tileSize, gp.tileSize);
-    guardRight = setup("/player/Guarding sprites/boy_guard_right", gp.tileSize, gp.tileSize);
+    guardUp = setup("/player/Guarding sprites/boy_guard_up", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    guardDown = setup("/player/Guarding sprites/boy_guard_down", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    guardLeft = setup("/player/Guarding sprites/boy_guard_left", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    guardRight = setup("/player/Guarding sprites/boy_guard_right", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
   }
 
   @Override
   public void update() {
-
     if (isKnockBack()) {
-
-      setCollisionOn(false);
-      gp.cChecker.checkTile(this);
-      gp.cChecker.checkObject(this, true);
-      gp.cChecker.checkEntity(this, gp.npc);
-      gp.cChecker.checkEntity(this, gp.monster);
-      gp.cChecker.checkEntity(this, gp.iTile);
-
-      if (isCollisionOn()) {
-        setKnockBackCounter(0);
-        setKnockBack(false);
-        setSpeed(getDefaultSpeed());
-      } else {
-        switch (getKnockBackDirection()) {
-          case DIR_UP:
-            setWorldY(getWorldY() - getSpeed());
-            break;
-          case DIR_DOWN:
-            setWorldY(getWorldY() + getSpeed());
-            break;
-          case DIR_LEFT:
-            setWorldX(getWorldX() - getSpeed());
-            break;
-          case DIR_RIGHT:
-            setWorldX(getWorldX() + getSpeed());
-            break;
-          default:
-            break;
-        }
-      }
-
-      setKnockBackCounter(getKnockBackCounter() + 1);
-      if (getKnockBackCounter() == 10) {
-        setKnockBackCounter(0);
-        setKnockBack(false);
-        setSpeed(getDefaultSpeed());
-      }
-    }
-
-    else if (isAttacking()) {
+      processKnockBack();
+    } else if (isAttacking()) {
       performAttack();
-    }
-
-    else if (keyH.spacePressed) {
-      setGuarding(true);
-      setGuardCounter(getGuardCounter() + 1);
-    }
-
-    else if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed || keyH.enterPressed) {
-
-      if (keyH.upPressed) {
-        setDirection(DIR_UP);
-      } else if (keyH.downPressed) {
-        setDirection(DIR_DOWN);
-      } else if (keyH.leftPressed) {
-        setDirection(DIR_LEFT);
-      } else if (keyH.rightPressed) {
-        setDirection(DIR_RIGHT);
-      }
-
-      // CHECK TILE COLLISION
-      setCollisionOn(false);
-      gp.cChecker.checkTile(this);
-
-      // CHECK OBJECT COLLISION
-      int objIndex = gp.cChecker.checkObject(this, true);
-      pickUpObject(objIndex);
-
-      // CHECK NPC COLLISION
-      int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
-      interactNPC(npcIndex);
-
-      // CHECK MONSTER COLLISION
-      int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
-      contactMonster(monsterIndex);
-
-      gp.cChecker.checkEntity(this, gp.iTile);
-
-      // CHECK EVENT
-      gp.eHandler.checkEvent();
-
-      if (!isCollisionOn() && !keyH.enterPressed) {
-        switch (getDirection()) {
-          case DIR_UP:
-            setWorldY(getWorldY() - getSpeed());
-            break;
-          case DIR_DOWN:
-            setWorldY(getWorldY() + getSpeed());
-            break;
-          case DIR_LEFT:
-            setWorldX(getWorldX() - getSpeed());
-            break;
-          case DIR_RIGHT:
-            setWorldX(getWorldX() + getSpeed());
-            break;
-          default:
-            break;
-        }
-      }
-
-      if (keyH.enterPressed && !attackCanceled) {
-        gp.playSE(7);
-        setAttacking(true);
-        setSpriteCounter(0);
-      }
-
-      attackCanceled = false;
-      gp.keyH.enterPressed = false;
-      setGuarding(false);
-      setGuardCounter(0);
-
-      setSpriteCounter(getSpriteCounter() + 1);
-      if (getSpriteCounter() > 12) {
-        setSpriteNum(getSpriteNum() == 1 ? 2 : 1);
-        setSpriteCounter(0);
-      }
+    } else if (keyH.isSpacePressed()) {
+      handleGuard();
+    } else if (isMovementOrActionPressed()) {
+      handleMovementAndInteractions();
     } else {
-      standCounter++;
-      if (standCounter >= 20) {
-        setSpriteNum(1);
-        standCounter = 0;
-      }
-      setGuarding(false);
-      setGuardCounter(0);
+      handleIdle();
     }
 
-    // Disparo
-    if (gp.keyH.shotKeyPressed
+    handleShooting();
+    handleInvincibilityFrames();
+    updateShotCounter();
+    clampVitals();
+    handleDeath();
+  }
+
+  private boolean isMovementOrActionPressed() {
+    return keyH.isUpPressed() || keyH.isDownPressed() || keyH.isLeftPressed()
+        || keyH.isRightPressed() || keyH.isEnterPressed();
+  }
+
+  // renomeado (S2177)
+  private void processKnockBack() {
+    setCollisionOn(false);
+
+    var collisionChecker = gp.getcChecker();
+    collisionChecker.checkTile(this);
+    collisionChecker.checkObject(this);
+    collisionChecker.checkEntity(this, gp.getNpc());
+    collisionChecker.checkEntity(this, gp.getMonster());
+    collisionChecker.checkEntity(this, gp.getiTile());
+
+    if (isCollisionOn()) {
+      setKnockBackCounter(0);
+      setKnockBack(false);
+      setSpeed(getDefaultSpeed());
+    } else {
+      switch (getKnockBackDirection()) {
+        case DIR_UP -> setWorldY(getWorldY() - getSpeed());
+        case DIR_DOWN -> setWorldY(getWorldY() + getSpeed());
+        case DIR_LEFT -> setWorldX(getWorldX() - getSpeed());
+        case DIR_RIGHT -> setWorldX(getWorldX() + getSpeed());
+        default -> {
+          /* no-op: direção desconhecida ou nula */ }
+      }
+    }
+
+    setKnockBackCounter(getKnockBackCounter() + 1);
+    if (getKnockBackCounter() == 10) {
+      setKnockBackCounter(0);
+      setKnockBack(false);
+      setSpeed(getDefaultSpeed());
+    }
+  }
+
+  private void handleGuard() {
+    setGuarding(true);
+    setGuardCounter(getGuardCounter() + 1);
+  }
+
+  private void handleMovementAndInteractions() {
+    if (keyH.isUpPressed()) {
+      setDirection(DIR_UP);
+    } else if (keyH.isDownPressed()) {
+      setDirection(DIR_DOWN);
+    } else if (keyH.isLeftPressed()) {
+      setDirection(DIR_LEFT);
+    } else if (keyH.isRightPressed()) {
+      setDirection(DIR_RIGHT);
+    }
+
+    setCollisionOn(false);
+
+    var collisionChecker = gp.getcChecker();
+    collisionChecker.checkTile(this);
+
+    int objIndex = collisionChecker.checkObject(this);
+    pickUpObject(objIndex);
+
+    int npcIndex = collisionChecker.checkEntity(this, gp.getNpc());
+    interactNPC(npcIndex);
+
+    int monsterIndex = collisionChecker.checkEntity(this, gp.getMonster());
+    contactMonster(monsterIndex);
+
+    collisionChecker.checkEntity(this, gp.getiTile());
+    gp.geteHandler().checkEvent();
+
+    if (!isCollisionOn() && !keyH.isEnterPressed()) {
+      switch (getDirection()) {
+        case DIR_UP -> setWorldY(getWorldY() - getSpeed());
+        case DIR_DOWN -> setWorldY(getWorldY() + getSpeed());
+        case DIR_LEFT -> setWorldX(getWorldX() - getSpeed());
+        case DIR_RIGHT -> setWorldX(getWorldX() + getSpeed());
+        default -> {
+          /* no-op intencional: direção desconhecida/nula não move */ }
+      }
+    }
+
+    if (keyH.isEnterPressed() && !attackCanceled) {
+      gp.playSE(7);
+      setAttacking(true);
+      setSpriteCounter(0);
+    }
+
+    attackCanceled = false;
+    keyH.setEnterPressed(false);
+
+    setGuarding(false);
+    setGuardCounter(0);
+
+    setSpriteCounter(getSpriteCounter() + 1);
+    if (getSpriteCounter() > 12) {
+      setSpriteNum(getSpriteNum() == 1 ? 2 : 1);
+      setSpriteCounter(0);
+    }
+  }
+
+  private void handleIdle() {
+    standCounter++;
+    if (standCounter >= 20) {
+      setSpriteNum(1);
+      standCounter = 0;
+    }
+    setGuarding(false);
+    setGuardCounter(0);
+  }
+
+  private void handleShooting() {
+    if (keyH.isShotKeyPressed()
         && getProjectile() != null
         && !getProjectile().isAlive()
         && getShotAvailableCounter() == 30
@@ -362,9 +369,12 @@ public class Player extends Entity {
       getProjectile().set(getWorldX(), getWorldY(), getDirection(), true, this);
       getProjectile().subtractResource(this);
 
-      for (int i = 0; i < gp.projectile[gp.currentMap].length; i++) {
-        if (gp.projectile[gp.currentMap][i] == null) {
-          gp.projectile[gp.currentMap][i] = getProjectile();
+      Entity[][] projectiles = gp.getProjectile();
+      int currentMapIndex = gp.getCurrentMap();
+
+      for (int i = 0; i < projectiles[currentMapIndex].length; i++) {
+        if (projectiles[currentMapIndex][i] == null) {
+          projectiles[currentMapIndex][i] = getProjectile();
           break;
         }
       }
@@ -372,7 +382,9 @@ public class Player extends Entity {
       setShotAvailableCounter(0);
       gp.playSE(10);
     }
+  }
 
+  private void handleInvincibilityFrames() {
     if (isInvincible()) {
       setInvincibleCounter(getInvincibleCounter() + 1);
       if (getInvincibleCounter() > 60) {
@@ -381,35 +393,46 @@ public class Player extends Entity {
         setInvincibleCounter(0);
       }
     }
+  }
 
+  private void updateShotCounter() {
     if (getShotAvailableCounter() < 30) {
       setShotAvailableCounter(getShotAvailableCounter() + 1);
     }
+  }
 
-    if (getLife() > getMaxLife())
+  private void clampVitals() {
+    if (getLife() > getMaxLife()) {
       setLife(getMaxLife());
-    if (getMana() > getMaxMana())
+    }
+    if (getMana() > getMaxMana()) {
       setMana(getMaxMana());
+    }
+  }
 
-    if (!keyH.godModeOn && getLife() <= 0) {
+  private void handleDeath() {
+    if (!keyH.isGodModeOn() && getLife() <= 0) {
       gp.stopMusic();
-      gp.gameState = gp.gameOverState;
-      gp.ui.commandNum = -1;
+      gp.setGameState(GamePanel.GAME_OVER_STATE);
+      gp.getGameUi().setCommandNum(-1);
       gp.playSE(12);
     }
   }
 
   public void pickUpObject(int i) {
-    if (i == 999)
+    if (i == 999) {
       return;
+    }
 
-    Entity obj = gp.obj[gp.currentMap][i];
+    Entity[][] objects = gp.getObj();
+    int currentMapIndex = gp.getCurrentMap();
+    Entity obj = objects[currentMapIndex][i];
 
     if (obj.getType() == TYPE_PICKUP_ONLY) {
       obj.use(this);
-      gp.obj[gp.currentMap][i] = null;
+      objects[currentMapIndex][i] = null;
     } else if (obj.getType() == TYPE_OBSTACLE) {
-      if (keyH.enterPressed) {
+      if (keyH.isEnterPressed()) {
         attackCanceled = true;
         obj.interact();
       }
@@ -421,17 +444,21 @@ public class Player extends Entity {
       } else {
         text = "Você não pode carregar mais nada!";
       }
-      gp.ui.addMessage(text);
-      gp.obj[gp.currentMap][i] = null;
+      gp.getGameUi().addMessage(text);
+      objects[currentMapIndex][i] = null;
     }
   }
 
   public void interactNPC(int i) {
-    if (i == 999)
+    if (i == 999) {
       return;
+    }
 
-    Entity npc = gp.npc[gp.currentMap][i];
-    if (gp.keyH.enterPressed) {
+    Entity[][] npcs = gp.getNpc();
+    int currentMapIndex = gp.getCurrentMap();
+    Entity npc = npcs[currentMapIndex][i];
+
+    if (keyH.isEnterPressed()) {
       attackCanceled = true;
       npc.speak();
     }
@@ -439,16 +466,20 @@ public class Player extends Entity {
   }
 
   public void contactMonster(int i) {
-    if (i == 999)
+    if (i == 999) {
       return;
+    }
 
-    Entity mon = gp.monster[gp.currentMap][i];
+    Entity[][] monsters = gp.getMonster();
+    int currentMapIndex = gp.getCurrentMap();
+    Entity mon = monsters[currentMapIndex][i];
 
     if (!isInvincible() && !mon.isDying()) {
       gp.playSE(6);
       int damage = mon.getAttack() - getDefense();
-      if (damage < 1)
+      if (damage < 1) {
         damage = 1;
+      }
       setLife(getLife() - damage);
       setInvincible(true);
       setTransparent(true);
@@ -456,10 +487,13 @@ public class Player extends Entity {
   }
 
   public void damageMonster(int i, Entity attacker, int attack, int knockBackPower) {
-    if (i == 999)
+    if (i == 999) {
       return;
+    }
 
-    Entity mon = gp.monster[gp.currentMap][i];
+    Entity[][] monsters = gp.getMonster();
+    int currentMapIndex = gp.getCurrentMap();
+    Entity mon = monsters[currentMapIndex][i];
 
     if (!mon.isInvincible()) {
       gp.playSE(5);
@@ -473,19 +507,20 @@ public class Player extends Entity {
       }
 
       int damage = attack - mon.getDefense();
-      if (damage < 0)
+      if (damage < 0) {
         damage = 0;
+      }
 
       mon.setLife(mon.getLife() - damage);
-      gp.ui.addMessage(damage + " de dano!");
+      gp.getGameUi().addMessage(damage + " de dano!");
 
       mon.setInvincible(true);
       mon.damageReaction();
 
       if (mon.getLife() <= 0) {
         mon.setDying(true);
-        gp.ui.addMessage("Matou o " + mon.getName() + "!");
-        gp.ui.addMessage("Exp + " + mon.getExp());
+        gp.getGameUi().addMessage("Matou o " + mon.getName() + "!");
+        gp.getGameUi().addMessage("Exp + " + mon.getExp());
         setExp(getExp() + mon.getExp());
         checkLevelUp();
       }
@@ -493,12 +528,16 @@ public class Player extends Entity {
   }
 
   public void damageInteractiveTile(int i) {
-    if (i == 999)
+    if (i == 999) {
       return;
+    }
 
-    InteractiveTile tile = gp.iTile[gp.currentMap][i];
+    InteractiveTile[][] tiles = gp.getiTile();
+    int currentMapIndex = gp.getCurrentMap();
+    InteractiveTile tile = tiles[currentMapIndex][i];
+
     if (tile != null
-        && tile.destructible
+        && tile.isDestructible()
         && tile.isCorrectItem(this)
         && !tile.isInvincible()) {
 
@@ -510,15 +549,21 @@ public class Player extends Entity {
 
       if (tile.getLife() == 0) {
         tile.checkDrop();
-        gp.iTile[gp.currentMap][i] = tile.getDestroyedForm();
+        InteractiveTile destroyed = tile.getDestroyedForm();
+        tiles[currentMapIndex][i] = destroyed;
       }
     }
   }
 
   public void damageProjectile(int i) {
-    if (i == 999)
+    if (i == 999) {
       return;
-    Entity proj = gp.projectile[gp.currentMap][i];
+    }
+
+    Entity[][] projectiles = gp.getProjectile();
+    int currentMapIndex = gp.getCurrentMap();
+    Entity proj = projectiles[currentMapIndex][i];
+
     proj.setAlive(false);
     generateParticle(proj, proj);
   }
@@ -535,60 +580,72 @@ public class Player extends Entity {
       setLife(getMaxLife());
 
       gp.playSE(8);
-      gp.gameState = gp.dialogueState;
+      gp.setGameState(GamePanel.DIALOGUE_STATE);
 
       setDialogue();
       startDialogue(this, 0);
     }
   }
 
+  // SELECT ITEM
   public void selectItem() {
-    int itemIndex = gp.ui.getItemIndexOnSlot(gp.ui.playerSlotCol, gp.ui.playerSlotRow);
+    var ui = gp.getGameUi();
+    int itemIndex = ui.getItemIndexOnSlot(
+        ui.getPlayerSlotCol(),
+        ui.getPlayerSlotRow());
+
     var inv = getInventory();
+    if (itemIndex >= inv.size()) {
+      return;
+    }
 
-    if (itemIndex < inv.size()) {
-      Entity selectedItem = inv.get(itemIndex);
+    Entity selectedItem = inv.get(itemIndex);
 
-      int t = selectedItem.getType();
-      if (t == TYPE_SWORD || t == TYPE_AXE || t == TYPE_PICKAXE) {
+    switch (selectedItem.getType()) {
+      case TYPE_SWORD, TYPE_AXE, TYPE_PICKAXE -> {
         setCurrentWeapon(selectedItem);
         setAttack(getAttack());
         getAttackImage();
       }
-      if (t == TYPE_SHIELD) {
+      case TYPE_SHIELD -> {
         setCurrentShield(selectedItem);
         setDefense(getDefense());
       }
-
-      if (t == TYPE_LIGHT) {
+      case TYPE_LIGHT -> {
         setCurrentLight(getCurrentLight() == selectedItem ? null : selectedItem);
-        lightUpdated = true;
+        setLightUpdated(true);
       }
+      case TYPE_CONSUMABLE -> handleConsumableSelection(selectedItem, itemIndex);
+      default -> {
+        /* no-op: tipo de item não suportado */ }
+    }
+  }
 
-      if (t == TYPE_CONSUMABLE) {
-        if (selectedItem.use(this)) {
-          if (selectedItem.getAmount() > 1) {
-            selectedItem.setAmount(selectedItem.getAmount() - 1);
-          } else {
-            inv.remove(itemIndex);
-          }
-        }
-      }
+  private void handleConsumableSelection(Entity selectedItem, int itemIndex) {
+    if (!selectedItem.use(this)) {
+      return;
+    }
+
+    if (selectedItem.getAmount() > 1) {
+      selectedItem.setAmount(selectedItem.getAmount() - 1);
+    } else {
+      getInventory().remove(itemIndex);
     }
   }
 
   public int searchItemInInventory(String itemName) {
     var inv = getInventory();
     for (int i = 0; i < inv.size(); i++) {
-      if (inv.get(i).getName().equals(itemName))
+      if (inv.get(i).getName().equals(itemName)) {
         return i;
+      }
     }
     return 999;
   }
 
   public boolean canObtainItem(Entity item) {
     boolean canObtain = false;
-    Entity newItem = gp.eGenerator.getObject(item.getName());
+    Entity newItem = gp.geteGenerator().getObject(item.getName());
     var inv = getInventory();
 
     if (newItem.isStackable()) {
@@ -611,50 +668,20 @@ public class Player extends Entity {
 
   @Override
   public void draw(Graphics2D g2) {
-    BufferedImage image = null;
     int tempScreenX = screenX;
     int tempScreenY = screenY;
 
-    switch (getDirection()) {
-      case DIR_UP:
-        if (isAttacking()) {
-          tempScreenY = screenY - gp.tileSize;
-          image = (getSpriteNum() == 1) ? attackUp1 : attackUp2;
-        } else {
-          image = (getSpriteNum() == 1) ? up1 : up2;
-        }
-        if (isGuarding())
-          image = guardUp;
-        break;
-
-      case DIR_DOWN:
-        image = isAttacking() ? ((getSpriteNum() == 1) ? attackDown1 : attackDown2)
-            : ((getSpriteNum() == 1) ? down1 : down2);
-        if (isGuarding())
-          image = guardDown;
-        break;
-
-      case DIR_LEFT:
-        if (isAttacking()) {
-          tempScreenX = screenX - gp.tileSize;
-          image = (getSpriteNum() == 1) ? attackLeft1 : attackLeft2;
-        } else {
-          image = (getSpriteNum() == 1) ? left1 : left2;
-        }
-        if (isGuarding())
-          image = guardLeft;
-        break;
-
-      case DIR_RIGHT:
-        image = isAttacking() ? ((getSpriteNum() == 1) ? attackRight1 : attackRight2)
-            : ((getSpriteNum() == 1) ? right1 : right2);
-        if (isGuarding())
-          image = guardRight;
-        break;
-
-      default:
-        break;
+    // Ajuste de posição para ataques UP/LEFT
+    if (isAttacking()) {
+      if (DIR_UP.equals(getDirection())) {
+        tempScreenY = screenY - GamePanel.TILE_SIZE;
+      }
+      if (DIR_LEFT.equals(getDirection())) {
+        tempScreenX = screenX - GamePanel.TILE_SIZE;
+      }
     }
+
+    BufferedImage image = resolveSprite(getDirection(), isAttacking(), isGuarding(), getSpriteNum());
 
     if (isTransparent()) {
       g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
@@ -666,10 +693,67 @@ public class Player extends Entity {
 
     g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 
-    if (debugCollision) {
+    if (isDebugCollision()) {
       Rectangle sa = getSolidArea();
       g2.setColor(Color.red);
       g2.drawRect(screenX + sa.x, screenY + sa.y, sa.width, sa.height);
     }
+  }
+
+  private BufferedImage byDir(String dir, BufferedImage up, BufferedImage down, BufferedImage left,
+      BufferedImage right) {
+    if (dir == null) {
+      return down; // fallback seguro
+    }
+    return switch (dir) {
+      case DIR_UP -> up;
+      case DIR_DOWN -> down;
+      case DIR_LEFT -> left;
+      case DIR_RIGHT -> right;
+      default -> down;
+    };
+  }
+
+  private BufferedImage resolveSprite(String dir, boolean attacking, boolean guarding, int spriteNum) {
+    if (guarding) {
+      return byDir(dir, guardUp, guardDown, guardLeft, guardRight);
+    }
+
+    final boolean first = (spriteNum == 1);
+
+    if (attacking) {
+      BufferedImage firstImg = byDir(dir, attackUp1, attackDown1, attackLeft1, attackRight1);
+      BufferedImage secondImg = byDir(dir, attackUp2, attackDown2, attackLeft2, attackRight2);
+      return first ? firstImg : secondImg;
+    }
+
+    BufferedImage firstImg = byDir(dir, up1, down1, left1, right1);
+    BufferedImage secondImg = byDir(dir, up2, down2, left2, right2);
+    return first ? firstImg : secondImg;
+  }
+
+  // ===== Accessors =====
+  public boolean isAttackCanceled() {
+    return attackCanceled;
+  }
+
+  public void setAttackCanceled(boolean attackCanceled) {
+    this.attackCanceled = attackCanceled;
+  }
+
+  public boolean isLightUpdated() {
+    return lightUpdated;
+  }
+
+  public void setLightUpdated(boolean lightUpdated) {
+    this.lightUpdated = lightUpdated;
+  }
+
+  public boolean isDebugCollision() {
+    return debugCollision;
+  }
+
+  public void setDebugCollision(boolean debugCollision) {
+    this.debugCollision = debugCollision;
   }
 }

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import main.GamePanel;
+import tile.Tile;
+import tile_interactive.InteractiveTile;
 
 public class PathFinder {
 
@@ -13,7 +15,7 @@ public class PathFinder {
   private Node[][] node;
 
   private final List<Node> openList = new ArrayList<>();
-  public final List<Node> pathList = new ArrayList<>();
+  private final List<Node> pathList = new ArrayList<>();
 
   private Node startNode;
   private Node goalNode;
@@ -28,35 +30,28 @@ public class PathFinder {
   }
 
   public void instantiateNodes() {
-    node = new Node[gp.maxWorldCol][gp.maxWorldRow];
+    int maxCol = gp.getMaxWorldCol();
+    int maxRow = gp.getMaxWorldRow();
 
-    int col = 0;
-    int row = 0;
+    node = new Node[maxCol][maxRow];
 
-    while (col < gp.maxWorldCol && row < gp.maxWorldRow) {
-      node[col][row] = new Node(col, row);
-
-      col++;
-      if (col == gp.maxWorldCol) {
-        col = 0;
-        row++;
+    for (int col = 0; col < maxCol; col++) {
+      for (int row = 0; row < maxRow; row++) {
+        node[col][row] = new Node(col, row);
       }
     }
   }
 
   public void resetNodes() {
-    int col = 0;
-    int row = 0;
+    int maxCol = gp.getMaxWorldCol();
+    int maxRow = gp.getMaxWorldRow();
 
-    while (col < gp.maxWorldCol && row < gp.maxWorldRow) {
-      node[col][row].setOpen(false);
-      node[col][row].setChecked(false);
-      node[col][row].setSolid(false);
-
-      col++;
-      if (col == gp.maxWorldCol) {
-        col = 0;
-        row++;
+    for (int col = 0; col < maxCol; col++) {
+      for (int row = 0; row < maxRow; row++) {
+        Node current = node[col][row];
+        current.setOpen(false);
+        current.setChecked(false);
+        current.setSolid(false);
       }
     }
 
@@ -74,35 +69,64 @@ public class PathFinder {
     goalNode = node[goalCol][goalRow];
     openList.add(currentNode);
 
-    int col = 0;
-    int row = 0;
+    final int[][][] map = gp.getTileM().getMapTileNum();
+    final Tile[] tiles = gp.getTileM().getTiles();
 
-    while (col < gp.maxWorldCol && row < gp.maxWorldRow) {
+    // Pré-computa as posições sólidas vindas de iTiles (reduz loops e complexidade)
+    final boolean[][] iTileMask = buildInteractiveSolidMask();
 
-      // tiles sólidos
-      int tileNum = gp.tileM.mapTileNum[gp.currentMap][col][row];
-      if (gp.tileM.tile[tileNum].collision) {
-        node[col][row].setSolid(true);
-      }
+    int maxCol = gp.getMaxWorldCol();
+    int maxRow = gp.getMaxWorldRow();
 
-      // iTiles sólidos
-      for (int i = 0; i < gp.iTile[gp.currentMap].length; i++) {
-        if (gp.iTile[gp.currentMap][i] != null && gp.iTile[gp.currentMap][i].destructible) {
-          int itCol = gp.iTile[gp.currentMap][i].getWorldX() / gp.tileSize;
-          int itRow = gp.iTile[gp.currentMap][i].getWorldY() / gp.tileSize;
-          node[itCol][itRow].setSolid(true);
+    for (int col = 0; col < maxCol; col++) {
+      for (int row = 0; row < maxRow; row++) {
+
+        if (isSolidCell(col, row, map, tiles, iTileMask)) {
+          node[col][row].setSolid(true);
         }
-      }
 
-      // custos
-      setCosts(node[col][row]);
-
-      col++;
-      if (col == gp.maxWorldCol) {
-        col = 0;
-        row++;
+        setCosts(node[col][row]);
       }
     }
+  }
+
+  private boolean[][] buildInteractiveSolidMask() {
+    int maxCol = gp.getMaxWorldCol();
+    int maxRow = gp.getMaxWorldRow();
+
+    boolean[][] mask = new boolean[maxCol][maxRow];
+
+    InteractiveTile[][] interactiveTiles = gp.getiTile();
+    int currentMapIndex = gp.getCurrentMap();
+
+    InteractiveTile[] layer = (interactiveTiles != null && interactiveTiles[currentMapIndex] != null)
+        ? interactiveTiles[currentMapIndex]
+        : null;
+
+    if (layer == null) {
+      return mask;
+    }
+
+    for (InteractiveTile it : layer) {
+      if (it == null || !it.isDestructible()) {
+        continue;
+      }
+      int itCol = it.getWorldX() / GamePanel.TILE_SIZE;
+      int itRow = it.getWorldY() / GamePanel.TILE_SIZE;
+      if (itCol >= 0 && itRow >= 0 && itCol < maxCol && itRow < maxRow) {
+        mask[itCol][itRow] = true;
+      }
+    }
+
+    return mask;
+  }
+
+  private boolean isSolidCell(int col, int row, int[][][] map, Tile[] tiles, boolean[][] iTileMask) {
+    int currentMapIndex = gp.getCurrentMap();
+    int id = map[currentMapIndex][col][row];
+    boolean solidFromTile = id >= 0 && id < tiles.length && tiles[id] != null && tiles[id].isCollision();
+    boolean solidFromInteractive = iTileMask[col][row];
+    return solidFromTile || solidFromInteractive;
   }
 
   private void setCosts(Node n) {
@@ -123,8 +147,9 @@ public class PathFinder {
 
       expandNeighbors(currentNode.getCol(), currentNode.getRow());
 
-      if (openList.isEmpty())
+      if (openList.isEmpty()) {
         break;
+      }
 
       currentNode = selectBestOpenNode();
 
@@ -141,14 +166,21 @@ public class PathFinder {
   // ---- helpers ----
 
   private void expandNeighbors(int col, int row) {
-    if (row > 0)
+    int maxRow = gp.getMaxWorldRow();
+    int maxCol = gp.getMaxWorldCol();
+
+    if (row > 0) {
       openNode(node[col][row - 1]); // up
-    if (col > 0)
+    }
+    if (col > 0) {
       openNode(node[col - 1][row]); // left
-    if (row + 1 < gp.maxWorldRow)
+    }
+    if (row + 1 < maxRow) {
       openNode(node[col][row + 1]); // down
-    if (col + 1 < gp.maxWorldCol)
+    }
+    if (col + 1 < maxCol) {
       openNode(node[col + 1][row]); // right
+    }
   }
 
   private Node selectBestOpenNode() {
@@ -161,7 +193,6 @@ public class PathFinder {
       int g = n.getGCost();
       int bestG = openList.get(bestIdx).getGCost();
 
-      // if aninhado fundido
       if (f < bestF || (f == bestF && g < bestG)) {
         bestIdx = i;
         bestF = f;
@@ -179,10 +210,14 @@ public class PathFinder {
   }
 
   private void trackThePath() {
-    Node current = goalNode;
-    while (current != startNode) {
-      pathList.add(0, current);
-      current = current.getParent();
+    Node cur = goalNode;
+    while (cur != startNode) {
+      pathList.add(0, cur);
+      cur = cur.getParent();
     }
+  }
+
+  public List<Node> getPathList() {
+    return pathList;
   }
 }

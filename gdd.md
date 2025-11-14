@@ -405,7 +405,7 @@ Aqui vai a seção reescrita com base direta no que o seu código já implementa
 
 * **Implementado (no código):**
 
-  * **Moedas** (`OBJ_Coin_Bronze`), **Corações** (`OBJ_Heart`), **Cristais de Mana** (`OBJ_ManaCrystal`) com HUD pronto e coleta.
+  * **Moedas** (`ObjCoinBronze`), **Corações** (`ObjHeart`), **Cristais de Mana** (`ObjManaCrystal`) com HUD pronto e coleta.
   * **Portas/Chaves**: `OBJ_Key` + `type_obstacle` com `interact()` (chaves consumíveis; portas/obstáculos destravados/abertos por ação).
   * **Baús** e pickups (`type_pickupOnly`) com uso instantâneo.
 * **Planejado:**
@@ -449,7 +449,7 @@ Aqui vai a seção reescrita com base direta no que o seu código já implementa
 * *The Legend of Zelda* (telegráfos legíveis, combate top-down)
 * *Hyper Light Drifter* (dash/combat feel)
 * *Enter the Gungeon* (padrões/variedade)
-* Seu próprio código: **UI** (HUD e mensagens), **Lighting/Environment** (overlay e transições), **OBJ_Coin_Bronze / OBJ_Heart / OBJ_ManaCrystal** (coleta/HUD), **PathFinder** (A*), **InteractiveTile** (destrutíveis).
+* Seu próprio código: **UI** (HUD e mensagens), **Lighting/Environment** (overlay e transições), **ObjCoinBronze / ObjHeart / ObjManaCrystal** (coleta/HUD), **PathFinder** (A*), **InteractiveTile** (destrutíveis).
 
 ---
 

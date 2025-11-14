@@ -5,18 +5,20 @@ import java.util.Random;
 
 import entity.Entity;
 import main.GamePanel;
-import object.OBJ_Coin_Bronze;
+import object.ObjCoinBronze;
 
-public class IT_DestructibleWall extends InteractiveTile {
+public class ItDestructibleWall extends InteractiveTile {
 
-  public IT_DestructibleWall(GamePanel gp, int col, int row) {
+  private static final Random RNG = new Random();
+
+  public ItDestructibleWall(GamePanel gp, int col, int row) {
     super(gp, col, row);
 
     // Sprite do bloco
-    down1 = setup("/tiles_interactive/destructiblewall", gp.tileSize, gp.tileSize);
+    down1 = setup("/tiles_interactive/destructiblewall", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
     // Comportamento de "quebrável" + vida
-    destructible = true;
+    setDestructible(true);
     setMaxLife(3);
     setLife(3);
   }
@@ -30,7 +32,7 @@ public class IT_DestructibleWall extends InteractiveTile {
 
   @Override
   public void playSE() {
-    // usa gp herdado de Entity (sem shadow)
+    // usa gp herdado de Entity
     gp.playSE(20);
   }
 
@@ -63,9 +65,9 @@ public class IT_DestructibleWall extends InteractiveTile {
 
   @Override
   public void checkDrop() {
-    int i = new Random().nextInt(100) + 1;
+    int i = RNG.nextInt(100) + 1;
     if (i < 20) {
-      dropItem(new OBJ_Coin_Bronze(gp));
+      dropItem(new ObjCoinBronze(gp));
     }
   }
 }

@@ -72,28 +72,31 @@ public class SaveLoad {
     applyEquipment(ds);
 
     // Recalcular atributos derivados (mantém seu fluxo original)
-    gp.player.getAttack();
-    gp.player.getDefense();
-    gp.player.getAttackImage();
+    var player = gp.getPlayer();
+    player.getAttack();
+    player.getDefense();
+    player.getAttackImage();
   }
 
   /* ----- Copy to storage (SAVE) ----- */
 
   private void copyPlayerStatsToStorage(DataStorage ds) {
-    ds.setLevel(gp.player.getLevel());
-    ds.setMaxLife(gp.player.getMaxLife());
-    ds.setLife(gp.player.getLife());
-    ds.setMaxMana(gp.player.getMaxMana());
-    ds.setMana(gp.player.getMana());
-    ds.setStrength(gp.player.getStrength());
-    ds.setDexterity(gp.player.getDexterity());
-    ds.setExp(gp.player.getExp());
-    ds.setNextLevelExp(gp.player.getNextLevelExp());
-    ds.setCoin(gp.player.getCoin());
+    var player = gp.getPlayer();
+    ds.setLevel(player.getLevel());
+    ds.setMaxLife(player.getMaxLife());
+    ds.setLife(player.getLife());
+    ds.setMaxMana(player.getMaxMana());
+    ds.setMana(player.getMana());
+    ds.setStrength(player.getStrength());
+    ds.setDexterity(player.getDexterity());
+    ds.setExp(player.getExp());
+    ds.setNextLevelExp(player.getNextLevelExp());
+    ds.setCoin(player.getCoin());
   }
 
   private void copyInventoryToStorage(DataStorage ds) {
-    var inv = gp.player.getInventory();
+    var player = gp.getPlayer();
+    var inv = player.getInventory();
     for (int i = 0; i < inv.size(); i++) {
       Entity item = inv.get(i);
       ds.getItemNames().add(item.getName());
@@ -102,13 +105,15 @@ public class SaveLoad {
   }
 
   private void copyEquipmentToStorage(DataStorage ds) {
-    ds.setCurrentWeaponSlot(gp.player.getCurrentWeaponSlot());
-    ds.setCurrentShieldSlot(gp.player.getCurrentShieldSlot());
+    var player = gp.getPlayer();
+    ds.setCurrentWeaponSlot(player.getCurrentWeaponSlot());
+    ds.setCurrentShieldSlot(player.getCurrentShieldSlot());
   }
 
   private void copyMapObjectsToStorage(DataStorage ds) {
-    int maps = gp.maxMap;
-    int slots = gp.obj[1].length;
+    Entity[][] objects = gp.getObj();
+    int maps = objects.length;
+    int slots = objects[0].length;
 
     ds.setMapObjectNames(new String[maps][slots]);
     ds.setMapObjectWorldX(new int[maps][slots]);
@@ -118,18 +123,18 @@ public class SaveLoad {
 
     for (int mapNum = 0; mapNum < maps; mapNum++) {
       for (int i = 0; i < slots; i++) {
-        Entity obj = gp.obj[mapNum][i];
-        if (obj == null) {
+        Entity objectEntity = objects[mapNum][i];
+        if (objectEntity == null) {
           ds.getMapObjectNames()[mapNum][i] = "NA";
         } else {
-          ds.getMapObjectNames()[mapNum][i] = obj.getName();
-          ds.getMapObjectWorldX()[mapNum][i] = obj.getWorldX();
-          ds.getMapObjectWorldY()[mapNum][i] = obj.getWorldY();
+          ds.getMapObjectNames()[mapNum][i] = objectEntity.getName();
+          ds.getMapObjectWorldX()[mapNum][i] = objectEntity.getWorldX();
+          ds.getMapObjectWorldY()[mapNum][i] = objectEntity.getWorldY();
 
-          if (obj.getLoot() != null) {
-            ds.getMapObjectLootNames()[mapNum][i] = obj.getLoot().getName();
+          if (objectEntity.getLoot() != null) {
+            ds.getMapObjectLootNames()[mapNum][i] = objectEntity.getLoot().getName();
           }
-          ds.getMapObjectOpened()[mapNum][i] = obj.isOpened();
+          ds.getMapObjectOpened()[mapNum][i] = objectEntity.isOpened();
         }
       }
     }
@@ -138,54 +143,65 @@ public class SaveLoad {
   /* ----- Apply from storage (LOAD) ----- */
 
   private void applyPlayerStats(DataStorage ds) {
-    gp.player.setLevel(ds.getLevel());
-    gp.player.setMaxLife(ds.getMaxLife());
-    gp.player.setLife(ds.getLife());
-    gp.player.setMaxMana(ds.getMaxMana());
-    gp.player.setMana(ds.getMana());
-    gp.player.setStrength(ds.getStrength());
-    gp.player.setDexterity(ds.getDexterity());
-    gp.player.setExp(ds.getExp());
-    gp.player.setNextLevelExp(ds.getNextLevelExp());
-    gp.player.setCoin(ds.getCoin());
+    var player = gp.getPlayer();
+    player.setLevel(ds.getLevel());
+    player.setMaxLife(ds.getMaxLife());
+    player.setLife(ds.getLife());
+    player.setMaxMana(ds.getMaxMana());
+    player.setMana(ds.getMana());
+    player.setStrength(ds.getStrength());
+    player.setDexterity(ds.getDexterity());
+    player.setExp(ds.getExp());
+    player.setNextLevelExp(ds.getNextLevelExp());
+    player.setCoin(ds.getCoin());
   }
 
   private void applyInventory(DataStorage ds) {
-    var inv = gp.player.getInventory();
+    var player = gp.getPlayer();
+    var inv = player.getInventory();
     inv.clear();
+
+    var generator = gp.geteGenerator();
+
     for (int i = 0; i < ds.getItemNames().size(); i++) {
       String itemName = ds.getItemNames().get(i);
       int amount = ds.getItemAmounts().get(i);
-      Entity item = gp.eGenerator.getObject(itemName);
+      Entity item = generator.getObject(itemName);
       item.setAmount(amount);
       inv.add(item);
     }
   }
 
   private void applyMapObjects(DataStorage ds) {
-    for (int mapNum = 0; mapNum < gp.maxMap; mapNum++) {
-      for (int i = 0; i < gp.obj[1].length; i++) {
+    Entity[][] objects = gp.getObj();
+    int maps = objects.length;
+
+    var generator = gp.geteGenerator();
+
+    for (int mapNum = 0; mapNum < maps; mapNum++) {
+      int slots = objects[mapNum].length;
+      for (int i = 0; i < slots; i++) {
         String name = ds.getMapObjectNames()[mapNum][i];
         if ("NA".equals(name)) {
-          gp.obj[mapNum][i] = null;
+          objects[mapNum][i] = null;
         } else {
-          Entity obj = gp.eGenerator.getObject(name);
-          gp.obj[mapNum][i] = obj;
+          Entity objectEntity = generator.getObject(name);
+          objects[mapNum][i] = objectEntity;
 
-          obj.setWorldX(ds.getMapObjectWorldX()[mapNum][i]);
-          obj.setWorldY(ds.getMapObjectWorldY()[mapNum][i]);
+          objectEntity.setWorldX(ds.getMapObjectWorldX()[mapNum][i]);
+          objectEntity.setWorldY(ds.getMapObjectWorldY()[mapNum][i]);
 
           String lootName = ds.getMapObjectLootNames()[mapNum][i];
           if (lootName != null) {
-            obj.setLoot(gp.eGenerator.getObject(lootName));
+            objectEntity.setLoot(generator.getObject(lootName));
           }
 
-          obj.setOpened(ds.getMapObjectOpened()[mapNum][i]);
+          objectEntity.setOpened(ds.getMapObjectOpened()[mapNum][i]);
 
           // Caso precise restaurar o sprite "aberto":
           // Requer que Entity tenha getImage2() e setDown1(BufferedImage).
-          if (obj.isOpened()) {
-            obj.applyOpenedAppearance();
+          if (objectEntity.isOpened()) {
+            objectEntity.applyOpenedAppearance();
           }
         }
       }
@@ -193,15 +209,17 @@ public class SaveLoad {
   }
 
   private void applyEquipment(DataStorage ds) {
+    var player = gp.getPlayer();
+
     int weaponSlot = ds.getCurrentWeaponSlot();
     int shieldSlot = ds.getCurrentShieldSlot();
 
-    var inv = gp.player.getInventory();
+    var inv = player.getInventory();
     if (weaponSlot >= 0 && weaponSlot < inv.size()) {
-      gp.player.setCurrentWeapon(inv.get(weaponSlot));
+      player.setCurrentWeapon(inv.get(weaponSlot));
     }
     if (shieldSlot >= 0 && shieldSlot < inv.size()) {
-      gp.player.setCurrentShield(inv.get(shieldSlot));
+      player.setCurrentShield(inv.get(shieldSlot));
     }
   }
 }

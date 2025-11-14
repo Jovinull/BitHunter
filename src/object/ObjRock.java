@@ -6,14 +6,15 @@ import entity.Entity;
 import entity.Projectile;
 import main.GamePanel;
 
-public class OBJ_Rock extends Projectile {
+public class ObjRock extends Projectile {
 
-  public static final String objName = "Pedra";
+  public static final String OBJ_NAME = "Pedra";
+  private static final String ROCK_SPRITE_PATH = "/projectile/rock_down_1";
 
-  public OBJ_Rock(GamePanel gp) {
+  public ObjRock(GamePanel gp) {
     super(gp);
 
-    setName(objName);
+    setName(OBJ_NAME);
     setSpeed(8);
     setMaxLife(80);
     setLife(getMaxLife());
@@ -26,14 +27,14 @@ public class OBJ_Rock extends Projectile {
 
   private void loadSprites() {
     // As sprites da pedra usam a mesma imagem para todas as direções
-    up1 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
-    up2 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
-    down1 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
-    down2 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
-    left1 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
-    left2 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
-    right1 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
-    right2 = setup("/projectile/rock_down_1", gp.tileSize, gp.tileSize);
+    up1 = setup(ROCK_SPRITE_PATH, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    up2 = setup(ROCK_SPRITE_PATH, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    down1 = setup(ROCK_SPRITE_PATH, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    down2 = setup(ROCK_SPRITE_PATH, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    left1 = setup(ROCK_SPRITE_PATH, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    left2 = setup(ROCK_SPRITE_PATH, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    right1 = setup(ROCK_SPRITE_PATH, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    right2 = setup(ROCK_SPRITE_PATH, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
   }
 
   @Override

@@ -5,20 +5,20 @@ import java.awt.Color;
 import entity.Entity;
 import main.GamePanel;
 
-public class IT_DryTree extends InteractiveTile {
+public class ItDryTree extends InteractiveTile {
 
-  public IT_DryTree(GamePanel gp, int col, int row) {
+  public ItDryTree(GamePanel gp, int col, int row) {
     super(gp, col, row);
 
     // Posiciona via setters (sem acessar worldX/worldY diretamente)
-    setWorldX(gp.tileSize * col);
-    setWorldY(gp.tileSize * row);
+    setWorldX(GamePanel.TILE_SIZE * col);
+    setWorldY(GamePanel.TILE_SIZE * row);
 
     // Sprite
-    down1 = setup("/tiles_interactive/drytree", gp.tileSize, gp.tileSize);
+    down1 = setup("/tiles_interactive/drytree", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
     // Comportamento
-    destructible = true;
+    setDestructible(true);
     setMaxLife(3);
     setLife(3);
   }
@@ -37,9 +37,9 @@ public class IT_DryTree extends InteractiveTile {
 
   @Override
   public InteractiveTile getDestroyedForm() {
-    int col = getWorldX() / gp.tileSize;
-    int row = getWorldY() / gp.tileSize;
-    return new IT_Trunk(gp, col, row);
+    int col = getWorldX() / GamePanel.TILE_SIZE;
+    int row = getWorldY() / GamePanel.TILE_SIZE;
+    return new ItTrunk(gp, col, row);
   }
 
   // Aparência das partículas ao ser atingido

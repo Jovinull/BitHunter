@@ -5,19 +5,19 @@ import java.awt.Rectangle;
 import entity.Entity;
 import main.GamePanel;
 
-public class OBJ_Chest extends Entity {
+public class ObjChest extends Entity {
 
-  public static final String objName = "Baú";
+  public static final String OBJ_NAME = "Baú";
 
-  public OBJ_Chest(GamePanel gp) {
+  public ObjChest(GamePanel gp) {
     super(gp);
 
     setType(TYPE_OBSTACLE);
-    setName(objName);
+    setName(OBJ_NAME);
 
     // sprites (protegidos em Entity)
-    image = setup("/objects/chest", gp.tileSize, gp.tileSize);
-    image2 = setup("/objects/chest_opened", gp.tileSize, gp.tileSize);
+    image = setup("/objects/chest", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    image2 = setup("/objects/chest_opened", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     down1 = image;
 
     setCollision(true);
@@ -54,7 +54,9 @@ public class OBJ_Chest extends Entity {
     if (!isOpened()) {
       gp.playSE(3);
 
-      if (!gp.player.canObtainItem(getLoot())) {
+      var player = gp.getPlayer();
+
+      if (!player.canObtainItem(getLoot())) {
         startDialogue(this, 0);
       } else {
         startDialogue(this, 1);
