@@ -31,7 +31,7 @@ public class MonSkeletonLord extends Entity {
     setKnockBackPower(5);
     setSleep(true);
 
-    int size = gp.tileSize * 5;
+    int size = GamePanel.TILE_SIZE * 5;
 
     // Área sólida
     getSolidArea().x = 48;
@@ -59,23 +59,23 @@ public class MonSkeletonLord extends Entity {
     int i = 5;
 
     if (!isInRage()) {
-      up1 = setup("/monster/skeletonlord_up_1", gp.tileSize * i, gp.tileSize * i);
-      up2 = setup("/monster/skeletonlord_up_2", gp.tileSize * i, gp.tileSize * i);
-      down1 = setup("/monster/skeletonlord_down_1", gp.tileSize * i, gp.tileSize * i);
-      down2 = setup("/monster/skeletonlord_down_2", gp.tileSize * i, gp.tileSize * i);
-      left1 = setup("/monster/skeletonlord_left_1", gp.tileSize * i, gp.tileSize * i);
-      left2 = setup("/monster/skeletonlord_left_2", gp.tileSize * i, gp.tileSize * i);
-      right1 = setup("/monster/skeletonlord_right_1", gp.tileSize * i, gp.tileSize * i);
-      right2 = setup("/monster/skeletonlord_right_2", gp.tileSize * i, gp.tileSize * i);
+      up1 = setup("/monster/skeletonlord_up_1", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i);
+      up2 = setup("/monster/skeletonlord_up_2", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i);
+      down1 = setup("/monster/skeletonlord_down_1", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i);
+      down2 = setup("/monster/skeletonlord_down_2", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i);
+      left1 = setup("/monster/skeletonlord_left_1", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i);
+      left2 = setup("/monster/skeletonlord_left_2", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i);
+      right1 = setup("/monster/skeletonlord_right_1", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i);
+      right2 = setup("/monster/skeletonlord_right_2", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i);
     } else {
-      up1 = setup("/monster/skeletonlord_phase2_up_1", gp.tileSize * i, gp.tileSize * i);
-      up2 = setup("/monster/skeletonlord_phase2_up_2", gp.tileSize * i, gp.tileSize * i);
-      down1 = setup("/monster/skeletonlord_phase2_down_1", gp.tileSize * i, gp.tileSize * i);
-      down2 = setup("/monster/skeletonlord_phase2_down_2", gp.tileSize * i, gp.tileSize * i);
-      left1 = setup("/monster/skeletonlord_phase2_left_1", gp.tileSize * i, gp.tileSize * i);
-      left2 = setup("/monster/skeletonlord_phase2_left_2", gp.tileSize * i, gp.tileSize * i);
-      right1 = setup("/monster/skeletonlord_phase2_right_1", gp.tileSize * i, gp.tileSize * i);
-      right2 = setup("/monster/skeletonlord_phase2_right_2", gp.tileSize * i, gp.tileSize * i);
+      up1 = setup("/monster/skeletonlord_phase2_up_1", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i);
+      up2 = setup("/monster/skeletonlord_phase2_up_2", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i);
+      down1 = setup("/monster/skeletonlord_phase2_down_1", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i);
+      down2 = setup("/monster/skeletonlord_phase2_down_2", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i);
+      left1 = setup("/monster/skeletonlord_phase2_left_1", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i);
+      left2 = setup("/monster/skeletonlord_phase2_left_2", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i);
+      right1 = setup("/monster/skeletonlord_phase2_right_1", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i);
+      right2 = setup("/monster/skeletonlord_phase2_right_2", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i);
     }
   }
 
@@ -83,23 +83,33 @@ public class MonSkeletonLord extends Entity {
     int i = 5;
 
     if (!isInRage()) {
-      attackUp1 = setup("/monster/skeletonlord_attack_up_1", gp.tileSize * i, gp.tileSize * i * 2);
-      attackUp2 = setup("/monster/skeletonlord_attack_up_2", gp.tileSize * i, gp.tileSize * i * 2);
-      attackDown1 = setup("/monster/skeletonlord_attack_down_1", gp.tileSize * i, gp.tileSize * i * 2);
-      attackDown2 = setup("/monster/skeletonlord_attack_down_2", gp.tileSize * i, gp.tileSize * i * 2);
-      attackLeft1 = setup("/monster/skeletonlord_attack_left_1", gp.tileSize * i * 2, gp.tileSize * i);
-      attackLeft2 = setup("/monster/skeletonlord_attack_left_2", gp.tileSize * i * 2, gp.tileSize * i);
-      attackRight1 = setup("/monster/skeletonlord_attack_right_1", gp.tileSize * i * 2, gp.tileSize * i);
-      attackRight2 = setup("/monster/skeletonlord_attack_right_2", gp.tileSize * i * 2, gp.tileSize * i);
+      attackUp1 = setup("/monster/skeletonlord_attack_up_1", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i * 2);
+      attackUp2 = setup("/monster/skeletonlord_attack_up_2", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i * 2);
+      attackDown1 = setup("/monster/skeletonlord_attack_down_1", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i * 2);
+      attackDown2 = setup("/monster/skeletonlord_attack_down_2", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i * 2);
+      attackLeft1 = setup("/monster/skeletonlord_attack_left_1", GamePanel.TILE_SIZE * i * 2, GamePanel.TILE_SIZE * i);
+      attackLeft2 = setup("/monster/skeletonlord_attack_left_2", GamePanel.TILE_SIZE * i * 2, GamePanel.TILE_SIZE * i);
+      attackRight1 = setup("/monster/skeletonlord_attack_right_1", GamePanel.TILE_SIZE * i * 2,
+          GamePanel.TILE_SIZE * i);
+      attackRight2 = setup("/monster/skeletonlord_attack_right_2", GamePanel.TILE_SIZE * i * 2,
+          GamePanel.TILE_SIZE * i);
     } else {
-      attackUp1 = setup("/monster/skeletonlord_phase2_attack_up_1", gp.tileSize * i, gp.tileSize * i * 2);
-      attackUp2 = setup("/monster/skeletonlord_phase2_attack_up_2", gp.tileSize * i, gp.tileSize * i * 2);
-      attackDown1 = setup("/monster/skeletonlord_phase2_attack_down_1", gp.tileSize * i, gp.tileSize * i * 2);
-      attackDown2 = setup("/monster/skeletonlord_phase2_attack_down_2", gp.tileSize * i, gp.tileSize * i * 2);
-      attackLeft1 = setup("/monster/skeletonlord_phase2_attack_left_1", gp.tileSize * i * 2, gp.tileSize * i);
-      attackLeft2 = setup("/monster/skeletonlord_phase2_attack_left_2", gp.tileSize * i * 2, gp.tileSize * i);
-      attackRight1 = setup("/monster/skeletonlord_phase2_attack_right_1", gp.tileSize * i * 2, gp.tileSize * i);
-      attackRight2 = setup("/monster/skeletonlord_phase2_attack_right_2", gp.tileSize * i * 2, gp.tileSize * i);
+      attackUp1 = setup("/monster/skeletonlord_phase2_attack_up_1", GamePanel.TILE_SIZE * i,
+          GamePanel.TILE_SIZE * i * 2);
+      attackUp2 = setup("/monster/skeletonlord_phase2_attack_up_2", GamePanel.TILE_SIZE * i,
+          GamePanel.TILE_SIZE * i * 2);
+      attackDown1 = setup("/monster/skeletonlord_phase2_attack_down_1", GamePanel.TILE_SIZE * i,
+          GamePanel.TILE_SIZE * i * 2);
+      attackDown2 = setup("/monster/skeletonlord_phase2_attack_down_2", GamePanel.TILE_SIZE * i,
+          GamePanel.TILE_SIZE * i * 2);
+      attackLeft1 = setup("/monster/skeletonlord_phase2_attack_left_1", GamePanel.TILE_SIZE * i * 2,
+          GamePanel.TILE_SIZE * i);
+      attackLeft2 = setup("/monster/skeletonlord_phase2_attack_left_2", GamePanel.TILE_SIZE * i * 2,
+          GamePanel.TILE_SIZE * i);
+      attackRight1 = setup("/monster/skeletonlord_phase2_attack_right_1", GamePanel.TILE_SIZE * i * 2,
+          GamePanel.TILE_SIZE * i);
+      attackRight2 = setup("/monster/skeletonlord_phase2_attack_right_2", GamePanel.TILE_SIZE * i * 2,
+          GamePanel.TILE_SIZE * i);
     }
   }
 
@@ -111,6 +121,7 @@ public class MonSkeletonLord extends Entity {
 
   @Override
   public void setAction() {
+    var player = gp.getPlayer();
 
     // Entra em fúria quando a vida cai abaixo de 50%
     if (!isInRage() && getLife() < getMaxLife() / 2) {
@@ -122,14 +133,14 @@ public class MonSkeletonLord extends Entity {
       setAttack(getAttack() * 2);
     }
 
-    if (getTileDistance(gp.player) < 10) {
+    if (getTileDistance(player) < 10) {
       moveTowardPlayer(60);
     } else {
       getRandomDirection(120);
     }
 
     if (!isAttacking()) {
-      checkAttackOrNot(60, gp.tileSize * 7, gp.tileSize * 5);
+      checkAttackOrNot(60, GamePanel.TILE_SIZE * 7, GamePanel.TILE_SIZE * 5);
     }
   }
 
@@ -140,18 +151,19 @@ public class MonSkeletonLord extends Entity {
 
   @Override
   public void checkDrop() {
-    gp.bossBattleOn = false;
+    gp.setBossBattleOn(false);
     Progress.setSkeletonLordDefeated(true);
 
     gp.stopMusic();
     gp.playMusic(19);
 
     // Remove portas de ferro do mapa atual
-    for (int i = 0; i < gp.obj[gp.currentMap].length; i++) {
-      if (gp.obj[gp.currentMap][i] != null
-          && ObjDoorIron.OBJ_NAME.equals(gp.obj[gp.currentMap][i].getName())) {
+    Entity[] objects = gp.getObj()[gp.getCurrentMap()];
+    for (int i = 0; i < objects.length; i++) {
+      Entity obj = objects[i];
+      if (obj != null && ObjDoorIron.OBJ_NAME.equals(obj.getName())) {
         gp.playSE(21);
-        gp.obj[gp.currentMap][i] = null;
+        objects[i] = null;
       }
     }
 

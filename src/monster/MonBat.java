@@ -42,14 +42,14 @@ public class MonBat extends Entity {
   /** Carrega sprites do morcego (padrão antigo: manter nome getImage()). */
   @Override // (S1161)
   public void getImage() {
-    up1 = setup(BAT_DOWN_1, gp.tileSize, gp.tileSize);
-    up2 = setup(BAT_DOWN_2, gp.tileSize, gp.tileSize);
-    down1 = setup(BAT_DOWN_1, gp.tileSize, gp.tileSize);
-    down2 = setup(BAT_DOWN_2, gp.tileSize, gp.tileSize);
-    left1 = setup(BAT_DOWN_1, gp.tileSize, gp.tileSize);
-    left2 = setup(BAT_DOWN_2, gp.tileSize, gp.tileSize);
-    right1 = setup(BAT_DOWN_1, gp.tileSize, gp.tileSize);
-    right2 = setup(BAT_DOWN_2, gp.tileSize, gp.tileSize);
+    up1 = setup(BAT_DOWN_1, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    up2 = setup(BAT_DOWN_2, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    down1 = setup(BAT_DOWN_1, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    down2 = setup(BAT_DOWN_2, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    left1 = setup(BAT_DOWN_1, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    left2 = setup(BAT_DOWN_2, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    right1 = setup(BAT_DOWN_1, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    right2 = setup(BAT_DOWN_2, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
   }
 
   @Override

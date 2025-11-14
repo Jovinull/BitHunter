@@ -45,39 +45,41 @@ public class MonOrc extends Entity {
 
   @Override
   public void getImage() {
-    up1 = setup("/monster/orc_up_1", gp.tileSize, gp.tileSize);
-    up2 = setup("/monster/orc_up_2", gp.tileSize, gp.tileSize);
-    down1 = setup("/monster/orc_down_1", gp.tileSize, gp.tileSize);
-    down2 = setup("/monster/orc_down_2", gp.tileSize, gp.tileSize);
-    left1 = setup("/monster/orc_left_1", gp.tileSize, gp.tileSize);
-    left2 = setup("/monster/orc_left_2", gp.tileSize, gp.tileSize);
-    right1 = setup("/monster/orc_right_1", gp.tileSize, gp.tileSize);
-    right2 = setup("/monster/orc_right_2", gp.tileSize, gp.tileSize);
+    up1 = setup("/monster/orc_up_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    up2 = setup("/monster/orc_up_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    down1 = setup("/monster/orc_down_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    down2 = setup("/monster/orc_down_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    left1 = setup("/monster/orc_left_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    left2 = setup("/monster/orc_left_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    right1 = setup("/monster/orc_right_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    right2 = setup("/monster/orc_right_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
   }
 
   public void getAttackImage() {
-    attackUp1 = setup("/monster/orc_attack_up_1", gp.tileSize, gp.tileSize * 2);
-    attackUp2 = setup("/monster/orc_attack_up_2", gp.tileSize, gp.tileSize * 2);
-    attackDown1 = setup("/monster/orc_attack_down_1", gp.tileSize, gp.tileSize * 2);
-    attackDown2 = setup("/monster/orc_attack_down_2", gp.tileSize, gp.tileSize * 2);
-    attackLeft1 = setup("/monster/orc_attack_left_1", gp.tileSize * 2, gp.tileSize);
-    attackLeft2 = setup("/monster/orc_attack_left_2", gp.tileSize * 2, gp.tileSize);
-    attackRight1 = setup("/monster/orc_attack_right_1", gp.tileSize * 2, gp.tileSize);
-    attackRight2 = setup("/monster/orc_attack_right_2", gp.tileSize * 2, gp.tileSize);
+    attackUp1 = setup("/monster/orc_attack_up_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+    attackUp2 = setup("/monster/orc_attack_up_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+    attackDown1 = setup("/monster/orc_attack_down_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+    attackDown2 = setup("/monster/orc_attack_down_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+    attackLeft1 = setup("/monster/orc_attack_left_1", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
+    attackLeft2 = setup("/monster/orc_attack_left_2", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
+    attackRight1 = setup("/monster/orc_attack_right_1", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
+    attackRight2 = setup("/monster/orc_attack_right_2", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
   }
 
   @Override
   public void setAction() {
+    var player = gp.getPlayer();
+
     if (isOnPath()) {
-      checkStopChasingOrNot(gp.player, 15, 100);
-      searchPath(getGoalCol(gp.player), getGoalRow(gp.player));
+      checkStopChasingOrNot(player, 15, 100);
+      searchPath(getGoalCol(player), getGoalRow(player));
     } else {
-      checkStartChasingOrNot(gp.player, 5, 100);
+      checkStartChasingOrNot(player, 5, 100);
       getRandomDirection(120);
     }
 
     if (!isAttacking()) {
-      checkAttackOrNot(30, gp.tileSize * 4, gp.tileSize);
+      checkAttackOrNot(30, GamePanel.TILE_SIZE * 4, GamePanel.TILE_SIZE);
     }
   }
 

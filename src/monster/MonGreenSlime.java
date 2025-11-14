@@ -43,26 +43,26 @@ public class MonGreenSlime extends Entity {
   @Override
   public void getImage() {
     // Sprites em todas as direções (slime usa os mesmos frames do "down")
-    up1 = setup(SLIME_DOWN_1, gp.tileSize, gp.tileSize);
-    up2 = setup(SLIME_DOWN_2, gp.tileSize, gp.tileSize);
-    down1 = setup(SLIME_DOWN_1, gp.tileSize, gp.tileSize);
-    down2 = setup(SLIME_DOWN_2, gp.tileSize, gp.tileSize);
-    left1 = setup(SLIME_DOWN_1, gp.tileSize, gp.tileSize);
-    left2 = setup(SLIME_DOWN_2, gp.tileSize, gp.tileSize);
-    right1 = setup(SLIME_DOWN_1, gp.tileSize, gp.tileSize);
-    right2 = setup(SLIME_DOWN_2, gp.tileSize, gp.tileSize);
+    up1 = setup(SLIME_DOWN_1, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    up2 = setup(SLIME_DOWN_2, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    down1 = setup(SLIME_DOWN_1, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    down2 = setup(SLIME_DOWN_2, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    left1 = setup(SLIME_DOWN_1, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    left2 = setup(SLIME_DOWN_2, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    right1 = setup(SLIME_DOWN_1, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    right2 = setup(SLIME_DOWN_2, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
   }
 
   @Override
   public void setAction() {
+    var player = gp.getPlayer();
 
     if (isOnPath()) {
-      checkStopChasingOrNot(gp.player, 15, 100);
-      searchPath(getGoalCol(gp.player), getGoalRow(gp.player));
+      checkStopChasingOrNot(player, 15, 100);
+      searchPath(getGoalCol(player), getGoalRow(player));
       checkShootOrNot(200, 30);
-
     } else {
-      checkStartChasingOrNot(gp.player, 5, 100);
+      checkStartChasingOrNot(player, 5, 100);
       getRandomDirection(120);
     }
   }
@@ -70,7 +70,6 @@ public class MonGreenSlime extends Entity {
   @Override
   public void damageReaction() {
     setActionLockCounter(0); // Reseta o contador de ações
-    // (S125) remover código comentado
     setOnPath(true);
   }
 
