@@ -10,10 +10,10 @@ public class EventHandler {
   Entity eventMaster;
 
   int previousEventX;
-  int previousEventY; // S1659: declarar em linha separada
+  int previousEventY; // mantido em linha separada (S1659)
   boolean canTouchEvent = true;
   int tempMap;
-  int tempCol; // S1659: declarar em linhas separadas
+  int tempCol; // mantido em linha separada (S1659)
   int tempRow;
 
   public EventHandler(GamePanel gp) {
@@ -21,12 +21,17 @@ public class EventHandler {
 
     eventMaster = new Entity(gp);
 
-    eventRect = new EventRect[gp.maxMap][gp.maxWorldCol][gp.maxWorldRow];
+    int maxMap = GamePanel.MAX_MAP;
+    int maxCol = gp.getMaxWorldCol();
+    int maxRow = gp.getMaxWorldRow();
+
+    eventRect = new EventRect[maxMap][maxCol][maxRow];
 
     int map = 0;
     int col = 0;
     int row = 0;
-    while (map < gp.maxMap && col < gp.maxWorldCol && row < gp.maxWorldRow) {
+
+    while (map < maxMap && col < maxCol && row < maxRow) {
       eventRect[map][col][row] = new EventRect();
       eventRect[map][col][row].x = 23;
       eventRect[map][col][row].y = 23;
@@ -36,10 +41,10 @@ public class EventHandler {
       eventRect[map][col][row].eventRectDefaultY = eventRect[map][col][row].y;
 
       col++;
-      if (col == gp.maxWorldCol) {
+      if (col == maxCol) {
         col = 0;
         row++;
-        if (row == gp.maxWorldRow) {
+        if (row == maxRow) {
           row = 0;
           map++;
         }
@@ -59,42 +64,47 @@ public class EventHandler {
   public boolean hit(int map, int col, int row, String reqDirection) {
     boolean hit = false;
 
-    if (map == gp.currentMap) {
-      var playerArea = gp.player.getSolidArea();
-      int playerDefaultX = gp.player.getSolidAreaDefaultX();
-      int playerDefaultY = gp.player.getSolidAreaDefaultY();
+    int currentMap = gp.getCurrentMap();
 
-      playerArea.x = gp.player.getWorldX() + playerArea.x;
-      playerArea.y = gp.player.getWorldY() + playerArea.y;
+    if (map == currentMap) {
+      var player = gp.getPlayer();
+      var playerArea = player.getSolidArea();
+      int playerDefaultX = player.getSolidAreaDefaultX();
+      int playerDefaultY = player.getSolidAreaDefaultY();
 
-      eventRect[map][col][row].x = col * gp.tileSize + eventRect[map][col][row].x;
-      eventRect[map][col][row].y = row * gp.tileSize + eventRect[map][col][row].y;
+      playerArea.x = player.getWorldX() + playerArea.x;
+      playerArea.y = player.getWorldY() + playerArea.y;
 
-      String playerDir = gp.player.getDirection();
+      EventRect rect = eventRect[map][col][row];
+      rect.x = col * GamePanel.TILE_SIZE + rect.x;
+      rect.y = row * GamePanel.TILE_SIZE + rect.y;
 
-      // S1066: mesclar o if interno com o if adjacente
-      if (playerArea.intersects(eventRect[map][col][row])
-          && !eventRect[map][col][row].eventDone
+      String playerDir = player.getDirection();
+
+      if (playerArea.intersects(rect)
+          && !rect.eventDone
           && (playerDir.equals(reqDirection) || "any".equals(reqDirection))) {
         hit = true;
-        previousEventX = gp.player.getWorldX();
-        previousEventY = gp.player.getWorldY();
+        previousEventX = player.getWorldX();
+        previousEventY = player.getWorldY();
       }
 
       playerArea.x = playerDefaultX;
       playerArea.y = playerDefaultY;
-      eventRect[map][col][row].x = eventRect[map][col][row].eventRectDefaultX;
-      eventRect[map][col][row].y = eventRect[map][col][row].eventRectDefaultY;
+      rect.x = rect.eventRectDefaultX;
+      rect.y = rect.eventRectDefaultY;
     }
 
     return hit;
   }
 
   public void checkEvent() {
-    int xDistance = Math.abs(gp.player.getWorldX() - previousEventX);
-    int yDistance = Math.abs(gp.player.getWorldY() - previousEventY);
+    var player = gp.getPlayer();
+
+    int xDistance = Math.abs(player.getWorldX() - previousEventX);
+    int yDistance = Math.abs(player.getWorldY() - previousEventY);
     int distance = Math.max(xDistance, yDistance);
-    if (distance > gp.tileSize) {
+    if (distance > GamePanel.TILE_SIZE) {
       canTouchEvent = true;
     }
 
@@ -102,50 +112,57 @@ public class EventHandler {
       return;
     }
 
+    // dano no buraco
     if (hit(0, 27, 16, Entity.DIR_RIGHT)) {
-      damagePit(gp.dialogueState);
+      damagePit(GamePanel.DIALOGUE_STATE);
       return;
     }
+    // fonte de cura
     if (hit(0, 23, 12, Entity.DIR_UP)) {
-      healingPool(gp.dialogueState);
+      healingPool(GamePanel.DIALOGUE_STATE);
       return;
     }
+    // casa
     if (hit(0, 10, 39, "any")) {
-      teleport(1, 12, 13, gp.indoor);
+      teleport(1, 12, 13, GamePanel.INDOOR);
       return;
     }
     if (hit(1, 12, 13, "any")) {
-      teleport(0, 10, 39, gp.outside);
+      teleport(0, 10, 39, GamePanel.OUTSIDE);
       return;
     }
+    // falar com NPC
     if (hit(1, 12, 9, Entity.DIR_UP)) {
-      speak(gp.npc[1][0]);
+      speak(gp.getNpc()[1][0]);
       return;
     }
+    // dungeon 1
     if (hit(0, 12, 9, "any")) {
-      teleport(2, 9, 41, gp.dungeon);
+      teleport(2, 9, 41, GamePanel.DUNGEON);
       return;
     }
     if (hit(2, 9, 41, "any")) {
-      teleport(0, 12, 9, gp.outside);
+      teleport(0, 12, 9, GamePanel.OUTSIDE);
       return;
     }
+    // dungeon 2 / boss room
     if (hit(2, 8, 7, "any")) {
-      teleport(3, 26, 41, gp.dungeon);
+      teleport(3, 26, 41, GamePanel.DUNGEON);
       return;
     }
     if (hit(3, 26, 41, "any")) {
-      teleport(2, 8, 7, gp.dungeon);
+      teleport(2, 8, 7, GamePanel.DUNGEON);
       return;
     }
+    // trigger do Skeleton Lord
     if (hit(3, 25, 27, "any")) {
       skeletonLord();
     }
   }
 
   public void teleport(int map, int col, int row, int area) {
-    gp.gameState = gp.transitionState;
-    gp.nextArea = area;
+    gp.setGameState(GamePanel.TRANSITION_STATE);
+    gp.setNextArea(area);
     tempMap = map;
     tempCol = col;
     tempRow = row;
@@ -154,47 +171,56 @@ public class EventHandler {
   }
 
   public void damagePit(int gameState) {
-    gp.gameState = gameState;
+    gp.setGameState(gameState);
     gp.playSE(6);
     eventMaster.startDialogue(eventMaster, 0);
-    gp.player.setLife(gp.player.getLife() - 1);
+
+    var player = gp.getPlayer();
+    player.setLife(player.getLife() - 1);
+
     canTouchEvent = false;
   }
 
   public void healingPool(int gameState) {
-    if (gp.keyH.isEnterPressed()) {
-      gp.keyH.setEnterPressed(false);
+    var keyH = gp.getKeyH();
+    var player = gp.getPlayer();
 
-      gp.gameState = gameState;
-      gp.player.setAttackCanceled(true);
+    if (keyH.isEnterPressed()) {
+      keyH.setEnterPressed(false);
+
+      gp.setGameState(gameState);
+      player.setAttackCanceled(true);
 
       gp.playSE(2);
 
       eventMaster.startDialogue(eventMaster, 1);
 
-      gp.player.setLife(gp.player.getMaxLife());
-      gp.player.setMana(gp.player.getMaxMana());
+      player.setLife(player.getMaxLife());
+      player.setMana(player.getMaxMana());
 
       canTouchEvent = false;
 
-      gp.aSetter.setMonster();
+      gp.getaSetter().setMonster();
 
       gp.saveLoad.save();
     }
   }
 
   public void speak(Entity entity) {
-    if (gp.keyH.isEnterPressed()) {
-      gp.gameState = gp.dialogueState;
-      gp.player.setAttackCanceled(true);
+    var keyH = gp.getKeyH();
+    var player = gp.getPlayer();
+
+    if (keyH.isEnterPressed()) {
+      gp.setGameState(GamePanel.DIALOGUE_STATE);
+      player.setAttackCanceled(true);
       entity.speak();
     }
   }
 
   public void skeletonLord() {
-    if (!gp.bossBattleOn && !Progress.isSkeletonLordDefeated()) {
-      gp.gameState = gp.cutsceneState;
-      gp.csManager.startSkeletonLordScene();
+    if (!gp.isBossBattleOn() && !Progress.isSkeletonLordDefeated()) {
+      gp.setGameState(GamePanel.CUTSCENE_STATE);
+      gp.getCsManager().startSkeletonLordScene();
     }
   }
 }
