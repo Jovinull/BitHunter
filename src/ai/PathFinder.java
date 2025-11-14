@@ -15,7 +15,7 @@ public class PathFinder {
   private Node[][] node;
 
   private final List<Node> openList = new ArrayList<>();
-  public final List<Node> pathList = new ArrayList<>();
+  private final List<Node> pathList = new ArrayList<>();
 
   private Node startNode;
   private Node goalNode;
@@ -30,21 +30,28 @@ public class PathFinder {
   }
 
   public void instantiateNodes() {
-    node = new Node[gp.maxWorldCol][gp.maxWorldRow];
+    int maxCol = gp.getMaxWorldCol();
+    int maxRow = gp.getMaxWorldRow();
 
-    for (int col = 0; col < gp.maxWorldCol; col++) {
-      for (int row = 0; row < gp.maxWorldRow; row++) {
+    node = new Node[maxCol][maxRow];
+
+    for (int col = 0; col < maxCol; col++) {
+      for (int row = 0; row < maxRow; row++) {
         node[col][row] = new Node(col, row);
       }
     }
   }
 
   public void resetNodes() {
-    for (int col = 0; col < gp.maxWorldCol; col++) {
-      for (int row = 0; row < gp.maxWorldRow; row++) {
-        node[col][row].setOpen(false);
-        node[col][row].setChecked(false);
-        node[col][row].setSolid(false);
+    int maxCol = gp.getMaxWorldCol();
+    int maxRow = gp.getMaxWorldRow();
+
+    for (int col = 0; col < maxCol; col++) {
+      for (int row = 0; row < maxRow; row++) {
+        Node current = node[col][row];
+        current.setOpen(false);
+        current.setChecked(false);
+        current.setSolid(false);
       }
     }
 
@@ -62,14 +69,17 @@ public class PathFinder {
     goalNode = node[goalCol][goalRow];
     openList.add(currentNode);
 
-    final int[][][] map = gp.tileM.getMapTileNum();
-    final Tile[] tiles = gp.tileM.getTiles();
+    final int[][][] map = gp.getTileM().getMapTileNum();
+    final Tile[] tiles = gp.getTileM().getTiles();
 
     // Pré-computa as posições sólidas vindas de iTiles (reduz loops e complexidade)
     final boolean[][] iTileMask = buildInteractiveSolidMask();
 
-    for (int col = 0; col < gp.maxWorldCol; col++) {
-      for (int row = 0; row < gp.maxWorldRow; row++) {
+    int maxCol = gp.getMaxWorldCol();
+    int maxRow = gp.getMaxWorldRow();
+
+    for (int col = 0; col < maxCol; col++) {
+      for (int row = 0; row < maxRow; row++) {
 
         if (isSolidCell(col, row, map, tiles, iTileMask)) {
           node[col][row].setSolid(true);
@@ -81,10 +91,16 @@ public class PathFinder {
   }
 
   private boolean[][] buildInteractiveSolidMask() {
-    boolean[][] mask = new boolean[gp.maxWorldCol][gp.maxWorldRow];
+    int maxCol = gp.getMaxWorldCol();
+    int maxRow = gp.getMaxWorldRow();
 
-    InteractiveTile[] layer = (gp.iTile != null && gp.iTile[gp.currentMap] != null)
-        ? gp.iTile[gp.currentMap]
+    boolean[][] mask = new boolean[maxCol][maxRow];
+
+    InteractiveTile[][] interactiveTiles = gp.getiTile();
+    int currentMapIndex = gp.getCurrentMap();
+
+    InteractiveTile[] layer = (interactiveTiles != null && interactiveTiles[currentMapIndex] != null)
+        ? interactiveTiles[currentMapIndex]
         : null;
 
     if (layer == null) {
@@ -95,9 +111,9 @@ public class PathFinder {
       if (it == null || !it.isDestructible()) {
         continue;
       }
-      int itCol = it.getWorldX() / gp.tileSize;
-      int itRow = it.getWorldY() / gp.tileSize;
-      if (itCol >= 0 && itRow >= 0 && itCol < gp.maxWorldCol && itRow < gp.maxWorldRow) {
+      int itCol = it.getWorldX() / GamePanel.TILE_SIZE;
+      int itRow = it.getWorldY() / GamePanel.TILE_SIZE;
+      if (itCol >= 0 && itRow >= 0 && itCol < maxCol && itRow < maxRow) {
         mask[itCol][itRow] = true;
       }
     }
@@ -106,7 +122,8 @@ public class PathFinder {
   }
 
   private boolean isSolidCell(int col, int row, int[][][] map, Tile[] tiles, boolean[][] iTileMask) {
-    int id = map[gp.currentMap][col][row];
+    int currentMapIndex = gp.getCurrentMap();
+    int id = map[currentMapIndex][col][row];
     boolean solidFromTile = id >= 0 && id < tiles.length && tiles[id] != null && tiles[id].isCollision();
     boolean solidFromInteractive = iTileMask[col][row];
     return solidFromTile || solidFromInteractive;
@@ -149,16 +166,19 @@ public class PathFinder {
   // ---- helpers ----
 
   private void expandNeighbors(int col, int row) {
+    int maxRow = gp.getMaxWorldRow();
+    int maxCol = gp.getMaxWorldCol();
+
     if (row > 0) {
       openNode(node[col][row - 1]); // up
     }
     if (col > 0) {
       openNode(node[col - 1][row]); // left
     }
-    if (row + 1 < gp.maxWorldRow) {
+    if (row + 1 < maxRow) {
       openNode(node[col][row + 1]); // down
     }
-    if (col + 1 < gp.maxWorldCol) {
+    if (col + 1 < maxCol) {
       openNode(node[col + 1][row]); // right
     }
   }
@@ -195,5 +215,9 @@ public class PathFinder {
       pathList.add(0, cur);
       cur = cur.getParent();
     }
+  }
+
+  public List<Node> getPathList() {
+    return pathList;
   }
 }
