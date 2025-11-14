@@ -13,7 +13,6 @@ public class KeyHandler implements KeyListener {
   private final GamePanel gp;
 
   // Flags de input contínuo (consumidas no update do jogo)
-  // Encapsuladas conforme Sonar (S1104)
   private boolean upPressed;
   private boolean downPressed;
   private boolean leftPressed;
@@ -22,7 +21,7 @@ public class KeyHandler implements KeyListener {
   private boolean shotKeyPressed;
   private boolean spacePressed;
 
-  // DEBUG/God mode encapsulados (S1104)
+  // DEBUG/God mode encapsulados
   private boolean showDebugText = false;
   private boolean godModeOn = false;
 
@@ -50,36 +49,37 @@ public class KeyHandler implements KeyListener {
   @Override
   public void keyPressed(KeyEvent e) {
     final int key = e.getKeyCode();
+    final int state = gp.getGameState();
 
-    if (gp.gameState == gp.titleState) {
+    if (state == GamePanel.TITLE_STATE) {
       titleState(key);
       return;
     }
-    if (gp.gameState == gp.playState) {
+    if (state == GamePanel.PLAY_STATE) {
       playState(key);
       return;
     }
-    if (gp.gameState == gp.pauseState) {
+    if (state == GamePanel.PAUSE_STATE) {
       pauseState(key);
       return;
     }
-    if (gp.gameState == gp.dialogueState || gp.gameState == gp.cutsceneState) {
+    if (state == GamePanel.DIALOGUE_STATE || state == GamePanel.CUTSCENE_STATE) {
       dialogueState(key);
       return;
     }
-    if (gp.gameState == gp.characterState) {
+    if (state == GamePanel.CHARACTER_STATE) {
       characterState(key);
     }
-    if (gp.gameState == gp.optionsState) {
+    if (state == GamePanel.OPTIONS_STATE) {
       optionsState(key);
     }
-    if (gp.gameState == gp.gameOverState) {
+    if (state == GamePanel.GAME_OVER_STATE) {
       gameOverState(key);
     }
-    if (gp.gameState == gp.tradeState) {
+    if (state == GamePanel.TRADE_STATE) {
       tradeState(key);
     }
-    if (gp.gameState == gp.mapState) {
+    if (state == GamePanel.MAP_STATE) {
       mapState(key);
     }
   }
@@ -89,7 +89,7 @@ public class KeyHandler implements KeyListener {
    * titleScreenState 0 = menu principal; 1 = seleção de classe/personagem.
    */
   public void titleState(int code) {
-    switch (gp.ui.getTitleScreenState()) {
+    switch (gp.getGameUi().getTitleScreenState()) {
       case 0 -> handleTitleMainMenu(code);
       case 1 -> handleTitleClassSelect(code);
       default -> {
@@ -110,14 +110,14 @@ public class KeyHandler implements KeyListener {
   }
 
   private void handleTitleMainEnter() {
-    switch (gp.ui.getCommandNum()) {
+    switch (gp.getGameUi().getCommandNum()) {
       case 0 -> { // Novo jogo -> vai para seleção de classe
-        gp.ui.setTitleScreenState(1);
-        gp.ui.setCommandNum(0);
+        gp.getGameUi().setTitleScreenState(1);
+        gp.getGameUi().setCommandNum(0);
       }
       case 1 -> { // Carregar jogo
         gp.saveLoad.load();
-        gp.gameState = gp.playState;
+        gp.setGameState(GamePanel.PLAY_STATE);
         gp.playMusic(0);
       }
       case 2 -> System.exit(0); // Sair
@@ -132,17 +132,17 @@ public class KeyHandler implements KeyListener {
       case KeyEvent.VK_W -> navigateUp(MENU_CLASS_MAX_INDEX);
       case KeyEvent.VK_S -> navigateDown(MENU_CLASS_MAX_INDEX);
       case KeyEvent.VK_ENTER -> {
-        if (gp.ui.getCommandNum() == 3) { // Voltar
-          gp.ui.setTitleScreenState(0);
-          gp.ui.setCommandNum(0);
+        if (gp.getGameUi().getCommandNum() == 3) { // Voltar
+          gp.getGameUi().setTitleScreenState(0);
+          gp.getGameUi().setCommandNum(0);
         } else {
-          gp.gameState = gp.playState;
+          gp.setGameState(GamePanel.PLAY_STATE);
           gp.playMusic(0);
         }
       }
       case KeyEvent.VK_ESCAPE -> {
-        gp.ui.setTitleScreenState(0);
-        gp.ui.setCommandNum(0);
+        gp.getGameUi().setTitleScreenState(0);
+        gp.getGameUi().setCommandNum(0);
       }
       default -> {
         // noop
@@ -162,15 +162,15 @@ public class KeyHandler implements KeyListener {
       case KeyEvent.VK_D -> rightPressed = true;
 
       // Pausa / Status / Ações
-      case KeyEvent.VK_P -> gp.gameState = gp.pauseState;
-      case KeyEvent.VK_C -> gp.gameState = gp.characterState;
+      case KeyEvent.VK_P -> gp.setGameState(GamePanel.PAUSE_STATE);
+      case KeyEvent.VK_C -> gp.setGameState(GamePanel.CHARACTER_STATE);
       case KeyEvent.VK_ENTER -> enterPressed = true;
       case KeyEvent.VK_F -> shotKeyPressed = true;
       case KeyEvent.VK_SPACE -> spacePressed = true;
 
       // Opções / Mapas
-      case KeyEvent.VK_ESCAPE -> gp.gameState = gp.optionsState;
-      case KeyEvent.VK_M -> gp.gameState = gp.mapState;
+      case KeyEvent.VK_ESCAPE -> gp.setGameState(GamePanel.OPTIONS_STATE);
+      case KeyEvent.VK_M -> gp.setGameState(GamePanel.MAP_STATE);
       case KeyEvent.VK_X -> gp.map.setMiniMapOn(!gp.map.isMiniMapOn());
 
       // Dev shortcuts
@@ -186,13 +186,13 @@ public class KeyHandler implements KeyListener {
 
   private void toggleDebug() {
     showDebugText = !showDebugText;
-    gp.tileM.setDrawPath(showDebugText);
+    gp.getTileM().setDrawPath(showDebugText);
   }
 
   private void reloadCurrentMap() {
-    switch (gp.currentMap) {
-      case 0 -> gp.tileM.loadMap("/maps/world01.txt", 0);
-      case 1 -> gp.tileM.loadMap("/maps/interior01.txt", 1);
+    switch (gp.getCurrentMap()) {
+      case 0 -> gp.getTileM().loadMap("/maps/world01.txt", 0);
+      case 1 -> gp.getTileM().loadMap("/maps/interior01.txt", 1);
       default -> {
         // noop
       }
@@ -204,7 +204,7 @@ public class KeyHandler implements KeyListener {
    */
   public void pauseState(int key) {
     if (key == KeyEvent.VK_P) {
-      gp.gameState = gp.playState;
+      gp.setGameState(GamePanel.PLAY_STATE);
     }
   }
 
@@ -222,21 +222,20 @@ public class KeyHandler implements KeyListener {
    */
   public void characterState(int code) {
     if (code == KeyEvent.VK_C) {
-      gp.gameState = gp.playState;
+      gp.setGameState(GamePanel.PLAY_STATE);
     } else if (code == KeyEvent.VK_ENTER) {
-      gp.player.selectItem();
+      gp.getPlayer().selectItem();
     }
     // Navegação do inventário com W/A/S/D
     playerInventory(code);
   }
 
   /**
-   * Estado: Opções. Reduzido com helpers e flatten das condicionais (S3776 +
-   * S1066).
+   * Estado: Opções.
    */
   public void optionsState(int code) {
     if (code == KeyEvent.VK_ESCAPE) {
-      gp.gameState = gp.playState;
+      gp.setGameState(GamePanel.PLAY_STATE);
       return;
     }
     if (code == KeyEvent.VK_ENTER) {
@@ -258,7 +257,7 @@ public class KeyHandler implements KeyListener {
   }
 
   private int getOptionsMaxCommandNum() {
-    return switch (gp.ui.subState) {
+    return switch (gp.getGameUi().subState) {
       case 0 -> 5;
       case 3 -> 1;
       default -> 0;
@@ -266,7 +265,7 @@ public class KeyHandler implements KeyListener {
   }
 
   private void moveCommandNum(int delta, int max) {
-    int commandNum = gp.ui.getCommandNum();
+    int commandNum = gp.getGameUi().getCommandNum();
     commandNum += delta;
     if (commandNum < 0) {
       commandNum = max;
@@ -274,15 +273,16 @@ public class KeyHandler implements KeyListener {
     if (commandNum > max) {
       commandNum = 0;
     }
-    gp.ui.setCommandNum(commandNum);
+    gp.getGameUi().setCommandNum(commandNum);
     gp.playSE(9);
   }
 
   private void adjustVolume(int direction) {
-    if (gp.ui.subState != 0)
+    if (gp.getGameUi().subState != 0) {
       return;
+    }
 
-    switch (gp.ui.getCommandNum()) {
+    switch (gp.getGameUi().getCommandNum()) {
       case 1 -> { // música
         final int next = gp.music.volumeScale + direction;
         if (next >= 0 && next <= 5) {
@@ -309,44 +309,44 @@ public class KeyHandler implements KeyListener {
    */
   public void gameOverState(int code) {
     if (code == KeyEvent.VK_W) {
-      int commandNum = gp.ui.getCommandNum();
+      int commandNum = gp.getGameUi().getCommandNum();
       commandNum--;
       if (commandNum < 0) {
         commandNum = 1;
       }
-      gp.ui.setCommandNum(commandNum);
+      gp.getGameUi().setCommandNum(commandNum);
       gp.playSE(9);
     }
 
     if (code == KeyEvent.VK_S) {
-      int commandNum = gp.ui.getCommandNum();
+      int commandNum = gp.getGameUi().getCommandNum();
       commandNum++;
       if (commandNum > 1) {
         commandNum = 0;
       }
-      gp.ui.setCommandNum(commandNum);
+      gp.getGameUi().setCommandNum(commandNum);
       gp.playSE(9);
     }
 
     if (code == KeyEvent.VK_ENTER) {
-      int commandNum = gp.ui.getCommandNum();
+      int commandNum = gp.getGameUi().getCommandNum();
       if (commandNum == 0) {
-        gp.gameState = gp.playState;
+        gp.setGameState(GamePanel.PLAY_STATE);
         gp.resetGame(false);
         gp.playMusic(0);
       } else if (commandNum == 1) {
         gp.stopMusic();
         gp.resetGame(true);
-        gp.ui.setTitleScreenState(0);
-        gp.ui.setCommandNum(0);
-        gp.ui.subState = 0;
-        gp.gameState = gp.titleState;
+        gp.getGameUi().setTitleScreenState(0);
+        gp.getGameUi().setCommandNum(0);
+        gp.getGameUi().subState = 0;
+        gp.setGameState(GamePanel.TITLE_STATE);
       }
     }
   }
 
   /**
-   * Estado: Comércio (trade). Reduzido com dispatch por subState (S3776).
+   * Estado: Comércio (trade).
    */
   public void tradeState(int code) {
     if (code == KeyEvent.VK_ENTER) {
@@ -354,17 +354,19 @@ public class KeyHandler implements KeyListener {
       return;
     }
 
-    switch (gp.ui.subState) {
+    switch (gp.getGameUi().subState) {
       case 0 -> handleTradeMenuNavigation(code);
       case 1 -> {
         npcInventory(code);
-        if (code == KeyEvent.VK_ESCAPE)
-          gp.ui.subState = 0;
+        if (code == KeyEvent.VK_ESCAPE) {
+          gp.getGameUi().subState = 0;
+        }
       }
       case 2 -> {
         playerInventory(code);
-        if (code == KeyEvent.VK_ESCAPE)
-          gp.ui.subState = 0;
+        if (code == KeyEvent.VK_ESCAPE) {
+          gp.getGameUi().subState = 0;
+        }
       }
       default -> {
         // noop
@@ -375,21 +377,21 @@ public class KeyHandler implements KeyListener {
   private void handleTradeMenuNavigation(int code) {
     switch (code) {
       case KeyEvent.VK_W -> {
-        int commandNum = gp.ui.getCommandNum();
+        int commandNum = gp.getGameUi().getCommandNum();
         commandNum--;
         if (commandNum < 0) {
           commandNum = 2;
         }
-        gp.ui.setCommandNum(commandNum);
+        gp.getGameUi().setCommandNum(commandNum);
         gp.playSE(9);
       }
       case KeyEvent.VK_S -> {
-        int commandNum = gp.ui.getCommandNum();
+        int commandNum = gp.getGameUi().getCommandNum();
         commandNum++;
         if (commandNum > 2) {
           commandNum = 0;
         }
-        gp.ui.setCommandNum(commandNum);
+        gp.getGameUi().setCommandNum(commandNum);
         gp.playSE(9);
       }
       default -> {
@@ -400,44 +402,44 @@ public class KeyHandler implements KeyListener {
 
   public void mapState(int code) {
     if (code == KeyEvent.VK_M) {
-      gp.gameState = gp.playState;
+      gp.setGameState(GamePanel.PLAY_STATE);
     }
   }
 
   public void playerInventory(int code) {
-    int row = gp.ui.getPlayerSlotRow();
-    int col = gp.ui.getPlayerSlotCol();
+    int row = gp.getGameUi().getPlayerSlotRow();
+    int col = gp.getGameUi().getPlayerSlotCol();
 
     if (code == KeyEvent.VK_W && row != 0) {
-      gp.ui.setPlayerSlotRow(row - 1);
+      gp.getGameUi().setPlayerSlotRow(row - 1);
       gp.playSE(9);
     } else if (code == KeyEvent.VK_A && col != 0) {
-      gp.ui.setPlayerSlotCol(col - 1);
+      gp.getGameUi().setPlayerSlotCol(col - 1);
       gp.playSE(9);
     } else if (code == KeyEvent.VK_S && row != SLOT_ROW_MAX) {
-      gp.ui.setPlayerSlotRow(row + 1);
+      gp.getGameUi().setPlayerSlotRow(row + 1);
       gp.playSE(9);
     } else if (code == KeyEvent.VK_D && col != SLOT_COL_MAX) {
-      gp.ui.setPlayerSlotCol(col + 1);
+      gp.getGameUi().setPlayerSlotCol(col + 1);
       gp.playSE(9);
     }
   }
 
   public void npcInventory(int code) {
-    int row = gp.ui.getNpcSlotRow();
-    int col = gp.ui.getNpcSlotCol();
+    int row = gp.getGameUi().getNpcSlotRow();
+    int col = gp.getGameUi().getNpcSlotCol();
 
     if (code == KeyEvent.VK_W && row != 0) {
-      gp.ui.setNpcSlotRow(row - 1);
+      gp.getGameUi().setNpcSlotRow(row - 1);
       gp.playSE(9);
     } else if (code == KeyEvent.VK_A && col != 0) {
-      gp.ui.setNpcSlotCol(col - 1);
+      gp.getGameUi().setNpcSlotCol(col - 1);
       gp.playSE(9);
     } else if (code == KeyEvent.VK_S && row != SLOT_ROW_MAX) {
-      gp.ui.setNpcSlotRow(row + 1);
+      gp.getGameUi().setNpcSlotRow(row + 1);
       gp.playSE(9);
     } else if (code == KeyEvent.VK_D && col != SLOT_COL_MAX) {
-      gp.ui.setNpcSlotCol(col + 1);
+      gp.getGameUi().setNpcSlotCol(col + 1);
       gp.playSE(9);
     }
   }
@@ -467,26 +469,26 @@ public class KeyHandler implements KeyListener {
 
   /** Move seleção para cima no menu com wrap-around. */
   private void navigateUp(int maxIndex) {
-    int commandNum = gp.ui.getCommandNum();
+    int commandNum = gp.getGameUi().getCommandNum();
     commandNum--;
     if (commandNum < 0) {
       commandNum = maxIndex;
     }
-    gp.ui.setCommandNum(commandNum);
+    gp.getGameUi().setCommandNum(commandNum);
   }
 
   /** Move seleção para baixo no menu com wrap-around. */
   private void navigateDown(int maxIndex) {
-    int commandNum = gp.ui.getCommandNum();
+    int commandNum = gp.getGameUi().getCommandNum();
     commandNum++;
     if (commandNum > maxIndex) {
       commandNum = 0;
     }
-    gp.ui.setCommandNum(commandNum);
+    gp.getGameUi().setCommandNum(commandNum);
   }
 
   // -----------------------
-  // Accessors (S1104)
+  // Accessors
   // -----------------------
   public boolean isUpPressed() {
     return upPressed;
