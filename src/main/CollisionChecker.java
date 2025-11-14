@@ -24,11 +24,13 @@ public class CollisionChecker {
     int entityTopWorldY = entity.getWorldY() + sa.y;
     int entityBottomWorldY = entity.getWorldY() + sa.y + sa.height;
 
+    int tileSize = GamePanel.TILE_SIZE;
+
     // Conversão dessas coordenadas para colunas e linhas da matriz de tiles
-    int entityLeftCol = entityLeftWorldX / gp.tileSize;
-    int entityRightCol = entityRightWorldX / gp.tileSize;
-    int entityTopRow = entityTopWorldY / gp.tileSize;
-    int entityBottomRow = entityBottomWorldY / gp.tileSize;
+    int entityLeftCol = entityLeftWorldX / tileSize;
+    int entityRightCol = entityRightWorldX / tileSize;
+    int entityTopRow = entityTopWorldY / tileSize;
+    int entityBottomRow = entityBottomWorldY / tileSize;
 
     int tileNum1;
     int tileNum2;
@@ -37,43 +39,46 @@ public class CollisionChecker {
     String direction = entity.isKnockBack() ? entity.getKnockBackDirection() : entity.getDirection();
     int speed = entity.getSpeed();
 
-    // Atalhos para os getters do TileManager
-    int[][][] map = gp.tileM.getMapTileNum();
+    // Atalhos para o TileManager
+    var tileManager = gp.getTileM();
+    int[][][] map = tileManager.getMapTileNum();
+    var tiles = tileManager.getTiles();
+    int currentMapIndex = gp.getCurrentMap();
 
     // Verifica colisão com base na direção do movimento
     switch (direction) {
       case Entity.DIR_UP:
-        entityTopRow = (entityTopWorldY - speed) / gp.tileSize;
-        tileNum1 = map[gp.currentMap][entityLeftCol][entityTopRow];
-        tileNum2 = map[gp.currentMap][entityRightCol][entityTopRow];
-        if (gp.tileM.getTiles()[tileNum1].isCollision() || gp.tileM.getTiles()[tileNum2].isCollision()) {
+        entityTopRow = (entityTopWorldY - speed) / tileSize;
+        tileNum1 = map[currentMapIndex][entityLeftCol][entityTopRow];
+        tileNum2 = map[currentMapIndex][entityRightCol][entityTopRow];
+        if (tiles[tileNum1].isCollision() || tiles[tileNum2].isCollision()) {
           entity.setCollisionOn(true);
         }
         break;
 
       case Entity.DIR_DOWN:
-        entityBottomRow = (entityBottomWorldY + speed) / gp.tileSize;
-        tileNum1 = map[gp.currentMap][entityLeftCol][entityBottomRow];
-        tileNum2 = map[gp.currentMap][entityRightCol][entityBottomRow];
-        if (gp.tileM.getTiles()[tileNum1].isCollision() || gp.tileM.getTiles()[tileNum2].isCollision()) {
+        entityBottomRow = (entityBottomWorldY + speed) / tileSize;
+        tileNum1 = map[currentMapIndex][entityLeftCol][entityBottomRow];
+        tileNum2 = map[currentMapIndex][entityRightCol][entityBottomRow];
+        if (tiles[tileNum1].isCollision() || tiles[tileNum2].isCollision()) {
           entity.setCollisionOn(true);
         }
         break;
 
       case Entity.DIR_LEFT:
-        entityLeftCol = (entityLeftWorldX - speed) / gp.tileSize;
-        tileNum1 = map[gp.currentMap][entityLeftCol][entityTopRow];
-        tileNum2 = map[gp.currentMap][entityLeftCol][entityBottomRow];
-        if (gp.tileM.getTiles()[tileNum1].isCollision() || gp.tileM.getTiles()[tileNum2].isCollision()) {
+        entityLeftCol = (entityLeftWorldX - speed) / tileSize;
+        tileNum1 = map[currentMapIndex][entityLeftCol][entityTopRow];
+        tileNum2 = map[currentMapIndex][entityLeftCol][entityBottomRow];
+        if (tiles[tileNum1].isCollision() || tiles[tileNum2].isCollision()) {
           entity.setCollisionOn(true);
         }
         break;
 
       case Entity.DIR_RIGHT:
-        entityRightCol = (entityRightWorldX + speed) / gp.tileSize;
-        tileNum1 = map[gp.currentMap][entityRightCol][entityTopRow];
-        tileNum2 = map[gp.currentMap][entityRightCol][entityBottomRow];
-        if (gp.tileM.getTiles()[tileNum1].isCollision() || gp.tileM.getTiles()[tileNum2].isCollision()) {
+        entityRightCol = (entityRightWorldX + speed) / tileSize;
+        tileNum1 = map[currentMapIndex][entityRightCol][entityTopRow];
+        tileNum2 = map[currentMapIndex][entityRightCol][entityBottomRow];
+        if (tiles[tileNum1].isCollision() || tiles[tileNum2].isCollision()) {
           entity.setCollisionOn(true);
         }
         break;
@@ -89,12 +94,16 @@ public class CollisionChecker {
 
     String direction = entity.isKnockBack() ? entity.getKnockBackDirection() : entity.getDirection();
     int speed = entity.getSpeed();
-    int len = gp.obj[gp.currentMap].length;
+
+    var objects = gp.getObj();
+    int currentMapIndex = gp.getCurrentMap();
+    int len = objects[currentMapIndex].length;
 
     for (int i = 0; i < len; i++) {
-      Entity obj = gp.obj[gp.currentMap][i];
-      if (obj == null)
+      Entity obj = objects[currentMapIndex][i];
+      if (obj == null) {
         continue;
+      }
 
       // Rects temporários em coords do mundo (não muta as solidArea reais)
       Rectangle eRect = toWorldRect(entity);
@@ -138,12 +147,14 @@ public class CollisionChecker {
 
     String direction = entity.isKnockBack() ? entity.getKnockBackDirection() : entity.getDirection();
     int speed = entity.getSpeed();
-    int len = target[gp.currentMap].length;
+    int currentMapIndex = gp.getCurrentMap();
+    int len = target[currentMapIndex].length;
 
     for (int i = 0; i < len; i++) {
-      Entity other = target[gp.currentMap][i];
-      if (other == null)
+      Entity other = target[currentMapIndex][i];
+      if (other == null) {
         continue;
+      }
 
       Rectangle eRect = toWorldRect(entity);
       Rectangle oRect = toWorldRect(other);
@@ -179,8 +190,10 @@ public class CollisionChecker {
 
     boolean contactPlayer = false;
 
+    var player = gp.getPlayer();
+
     Rectangle eRect = toWorldRect(entity);
-    Rectangle pRect = toWorldRect(gp.player);
+    Rectangle pRect = toWorldRect(player);
 
     String direction = entity.isKnockBack() ? entity.getKnockBackDirection() : entity.getDirection();
     int speed = entity.getSpeed();
@@ -212,7 +225,7 @@ public class CollisionChecker {
 
   // ----- Helpers -----
 
-  private Rectangle toWorldRect(Entity e) {
+  private static Rectangle toWorldRect(Entity e) {
     Rectangle sa = e.getSolidArea();
     return new Rectangle(e.getWorldX() + sa.x, e.getWorldY() + sa.y, sa.width, sa.height);
   }
