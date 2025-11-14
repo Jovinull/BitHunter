@@ -529,7 +529,8 @@ public class UI {
 
       if (entity.getInventory().get(i) == entity.getCurrentWeapon() ||
           entity.getInventory().get(i) == entity.getCurrentShield() ||
-          entity.getInventory().get(i) == entity.getCurrentLight()) {
+          entity.getInventory().get(i) == entity.getCurrentLight() ||
+          entity.getInventory().get(i) == entity.getCurrentBoots()) {
         g2.setColor(COL_ACCENT);
         g2.fillRoundRect(slotX, slotY, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE, 8, 8);
       }
@@ -1028,7 +1029,8 @@ public class UI {
       if (gp.getKeyH().isEnterPressed()) {
 
         if (player.getInventory().get(itemIndex) == player.getCurrentWeapon()
-            || player.getInventory().get(itemIndex) == player.getCurrentShield()) {
+            || player.getInventory().get(itemIndex) == player.getCurrentShield()
+            || player.getInventory().get(itemIndex) == player.getCurrentBoots()) {
 
           commandNum = 0;
           subState = 0;
@@ -1220,8 +1222,10 @@ public class UI {
     g2.drawString("Moedas", textX, textY);
     textY += lineHeight + 8;
     g2.drawString("Arma", textX, textY);
-    textY += lineHeight + 12;
+    textY += lineHeight + 16;
     g2.drawString("Escudo", textX, textY);
+    textY += lineHeight + 24;
+    g2.drawString("Botas", textX, textY);
 
     // Valores
     int tailX = (frameX + frameWidth) - 30;
@@ -1276,6 +1280,10 @@ public class UI {
     textY += GamePanel.TILE_SIZE;
     if (player.getCurrentShield() != null) {
       g2.drawImage(player.getCurrentShield().getDown1(), tailX - GamePanel.TILE_SIZE, textY - 24, null);
+    }
+    textY += GamePanel.TILE_SIZE;
+    if (player.getCurrentBoots() != null) {
+      g2.drawImage(player.getCurrentBoots().getDown1(), tailX - GamePanel.TILE_SIZE, textY - 24, null);
     }
   }
 
