@@ -58,27 +58,31 @@ public class CutsceneManager {
   }
 
   private void phase0Setup() {
-    gp.bossBattleOn = true;
+    gp.setBossBattleOn(true);
     placeIronDoor();
     spawnPlayerDummy();
-    gp.player.setDrawing(false);
+    gp.getPlayer().setDrawing(false);
     scenePhase++;
   }
 
   private void phase1MovePlayerUp() {
-    gp.player.setWorldY(gp.player.getWorldY() - 2);
-    if (gp.player.getWorldY() < gp.tileSize * 16) {
+    var player = gp.getPlayer();
+    player.setWorldY(player.getWorldY() - 2);
+    if (player.getWorldY() < GamePanel.TILE_SIZE * 16) {
       scenePhase++;
     }
   }
 
   private void phase2WakeBossAndOpenDialogue() {
+    var monsters = gp.getMonster();
+    int currentMap = gp.getCurrentMap();
+
     // Procurar o boss
-    for (int i = 0; i < gp.monster[gp.currentMap].length; i++) {
-      if (gp.monster[gp.currentMap][i] != null
-          && MonSkeletonLord.MON_NAME.equals(gp.monster[gp.currentMap][i].getName())) {
-        gp.monster[gp.currentMap][i].setSleep(false);
-        gp.ui.setNpc(gp.monster[gp.currentMap][i]);
+    for (int i = 0; i < monsters[currentMap].length; i++) {
+      var monster = monsters[currentMap][i];
+      if (monster != null && MonSkeletonLord.MON_NAME.equals(monster.getName())) {
+        monster.setSleep(false);
+        gp.getGameUi().setNpc(monster);
         scenePhase++;
         break;
       }
@@ -87,17 +91,17 @@ public class CutsceneManager {
 
   private void phase3ShowBossDialogue() {
     // O boss fala
-    gp.ui.drawDialogueScreen();
+    gp.getGameUi().drawDialogueScreen();
   }
 
   private void phase4RestorePlayerAndReset() {
     restorePlayerFromDummy();
-    gp.player.setDrawing(true);
+    gp.getPlayer().setDrawing(true);
 
     // Reset
     sceneNum = NA;
     scenePhase = 0;
-    gp.gameState = gp.playState;
+    gp.setGameState(GamePanel.PLAY_STATE);
 
     // Trocar música
     gp.stopMusic();
@@ -105,13 +109,16 @@ public class CutsceneManager {
   }
 
   private void placeIronDoor() {
+    var objects = gp.getObj();
+    int currentMap = gp.getCurrentMap();
+
     // Fechar a porta de ferro
-    for (int i = 0; i < gp.obj[gp.currentMap].length; i++) {
-      if (gp.obj[gp.currentMap][i] == null) {
-        gp.obj[gp.currentMap][i] = new ObjDoorIron(gp);
-        gp.obj[gp.currentMap][i].setWorldX(gp.tileSize * 25);
-        gp.obj[gp.currentMap][i].setWorldY(gp.tileSize * 28);
-        gp.obj[gp.currentMap][i].setTemp(true);
+    for (int i = 0; i < objects[currentMap].length; i++) {
+      if (objects[currentMap][i] == null) {
+        objects[currentMap][i] = new ObjDoorIron(gp);
+        objects[currentMap][i].setWorldX(GamePanel.TILE_SIZE * 25);
+        objects[currentMap][i].setWorldY(GamePanel.TILE_SIZE * 28);
+        objects[currentMap][i].setTemp(true);
         gp.playSE(21);
         break;
       }
@@ -119,27 +126,36 @@ public class CutsceneManager {
   }
 
   private void spawnPlayerDummy() {
+    var npcs = gp.getNpc();
+    int currentMap = gp.getCurrentMap();
+    var player = gp.getPlayer();
+
     // Slot vago para o dummy
-    for (int i = 0; i < gp.npc[gp.currentMap].length; i++) {
-      if (gp.npc[gp.currentMap][i] == null) {
-        gp.npc[gp.currentMap][i] = new PlayerDummy(gp);
-        gp.npc[gp.currentMap][i].setWorldX(gp.player.getWorldX());
-        gp.npc[gp.currentMap][i].setWorldY(gp.player.getWorldY());
-        gp.npc[gp.currentMap][i].setDirection(gp.player.getDirection());
+    for (int i = 0; i < npcs[currentMap].length; i++) {
+      if (npcs[currentMap][i] == null) {
+        npcs[currentMap][i] = new PlayerDummy(gp);
+        npcs[currentMap][i].setWorldX(player.getWorldX());
+        npcs[currentMap][i].setWorldY(player.getWorldY());
+        npcs[currentMap][i].setDirection(player.getDirection());
         break;
       }
     }
   }
 
   private void restorePlayerFromDummy() {
+    var npcs = gp.getNpc();
+    int currentMap = gp.getCurrentMap();
+    var player = gp.getPlayer();
+
     // Procurar o dummy
-    for (int i = 0; i < gp.npc[gp.currentMap].length; i++) {
-      if (gp.npc[gp.currentMap][i] != null && PlayerDummy.NPC_NAME.equals(gp.npc[gp.currentMap][i].getName())) {
+    for (int i = 0; i < npcs[currentMap].length; i++) {
+      if (npcs[currentMap][i] != null &&
+          PlayerDummy.NPC_NAME.equals(npcs[currentMap][i].getName())) {
         // Restaurar posição do player
-        gp.player.setWorldX(gp.npc[gp.currentMap][i].getWorldX());
-        gp.player.setWorldY(gp.npc[gp.currentMap][i].getWorldY());
+        player.setWorldX(npcs[currentMap][i].getWorldX());
+        player.setWorldY(npcs[currentMap][i].getWorldY());
         // Remover o dummy
-        gp.npc[gp.currentMap][i] = null;
+        npcs[currentMap][i] = null;
         break;
       }
     }
