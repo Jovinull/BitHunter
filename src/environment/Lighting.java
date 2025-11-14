@@ -29,14 +29,20 @@ public class Lighting {
   }
 
   public void setLightSource() {
-    darknessFilter = new BufferedImage(gp.screenWidth, gp.screenHeight, BufferedImage.TYPE_INT_ARGB);
+    darknessFilter = new BufferedImage(
+        GamePanel.SCREEN_WIDTH,
+        GamePanel.SCREEN_HEIGHT,
+        BufferedImage.TYPE_INT_ARGB);
+
     Graphics2D g2 = (Graphics2D) darknessFilter.getGraphics();
 
-    if (gp.player.getCurrentLight() == null) {
+    var player = gp.getPlayer();
+
+    if (player.getCurrentLight() == null) {
       g2.setColor(new Color(0, 0, 0.1f, 0.97f));
     } else {
-      int centerX = gp.player.screenX + (gp.tileSize) / 2;
-      int centerY = gp.player.screenY + (gp.tileSize) / 2;
+      int centerX = player.screenX + (GamePanel.TILE_SIZE) / 2;
+      int centerY = player.screenY + (GamePanel.TILE_SIZE) / 2;
 
       Color[] color = new Color[12];
       float[] fraction = new float[12];
@@ -67,12 +73,12 @@ public class Lighting {
       fraction[10] = 0.95f;
       fraction[11] = 1f;
 
-      int radius = gp.player.getCurrentLight().getLightRadius();
+      int radius = player.getCurrentLight().getLightRadius();
       RadialGradientPaint gPaint = new RadialGradientPaint(centerX, centerY, radius, fraction, color);
       g2.setPaint(gPaint);
     }
 
-    g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+    g2.fillRect(0, 0, GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT);
     g2.dispose();
   }
 
@@ -83,10 +89,12 @@ public class Lighting {
   }
 
   public void update() {
+    var player = gp.getPlayer();
+
     // Atualiza quando a iluminação do player muda (usar accessors)
-    if (gp.player.isLightUpdated()) {
+    if (player.isLightUpdated()) {
       setLightSource();
-      gp.player.setLightUpdated(false);
+      player.setLightUpdated(false);
     }
 
     switch (dayPhase) {
@@ -123,18 +131,21 @@ public class Lighting {
   }
 
   public void draw(Graphics2D g2) {
-    if (gp.currentArea == gp.outside) {
+    int currentArea = gp.getCurrentArea();
+
+    if (currentArea == GamePanel.OUTSIDE) {
       g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, filterAlpha));
     }
 
-    if (gp.currentArea == gp.outside || gp.currentArea == gp.dungeon) {
+    if (currentArea == GamePanel.OUTSIDE || currentArea == GamePanel.DUNGEON) {
       g2.drawImage(darknessFilter, 0, 0, null);
     }
 
     g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 
     // DEBUG
-    if (gp.keyH != null && gp.keyH.isShowDebugText()) {
+    var keyH = gp.getKeyH();
+    if (keyH != null && keyH.isShowDebugText()) {
       String situation;
       switch (dayPhase) {
         case DAY -> situation = "Day";
@@ -154,10 +165,12 @@ public class Lighting {
   }
 
   public void setFilterAlpha(float alpha) {
-    if (alpha < 0f)
+    if (alpha < 0f) {
       alpha = 0f;
-    if (alpha > 1f)
+    }
+    if (alpha > 1f) {
       alpha = 1f;
+    }
     this.filterAlpha = alpha;
   }
 
