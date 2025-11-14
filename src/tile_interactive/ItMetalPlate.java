@@ -12,14 +12,14 @@ public class ItMetalPlate extends InteractiveTile {
     super(gp, col, row);
 
     // Posição via setters
-    setWorldX(gp.tileSize * col);
-    setWorldY(gp.tileSize * row);
+    setWorldX(GamePanel.TILE_SIZE * col);
+    setWorldY(GamePanel.TILE_SIZE * row);
 
     // Nome via setter
     setName(IT_NAME);
 
     // Sprite
-    down1 = setup("/tiles_interactive/metalplate", gp.tileSize, gp.tileSize);
+    down1 = setup("/tiles_interactive/metalplate", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
     // Área sólida zerada usando getters/setters
     Rectangle sa = getSolidArea();

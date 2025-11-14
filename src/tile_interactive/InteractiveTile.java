@@ -12,8 +12,9 @@ public abstract class InteractiveTile extends Entity {
   protected InteractiveTile(GamePanel gp, int col, int row) {
     super(gp);
     // posiciona o tile no mundo com base no grid
-    setWorldX(col * gp.tileSize);
-    setWorldY(row * gp.tileSize);
+    int tileSize = GamePanel.TILE_SIZE;
+    setWorldX(col * tileSize);
+    setWorldY(row * tileSize);
   }
 
   public abstract boolean isCorrectItem(Entity entity);
@@ -48,8 +49,9 @@ public abstract class InteractiveTile extends Entity {
 
   @Override
   public void draw(Graphics2D g2) {
-    if (!inCamera())
+    if (!inCamera()) {
       return;
+    }
 
     int screenX = getScreenX();
     int screenY = getScreenY();

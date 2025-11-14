@@ -10,11 +10,11 @@ public class ItTrunk extends InteractiveTile {
     super(gp, col, row);
 
     // Posição via setters
-    setWorldX(gp.tileSize * col);
-    setWorldY(gp.tileSize * row);
+    setWorldX(GamePanel.TILE_SIZE * col);
+    setWorldY(GamePanel.TILE_SIZE * row);
 
     // Sprite
-    down1 = setup("/tiles_interactive/trunk", gp.tileSize, gp.tileSize);
+    down1 = setup("/tiles_interactive/trunk", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
     Rectangle sa = getSolidArea();
     sa.x = 0;

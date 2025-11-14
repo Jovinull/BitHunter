@@ -15,7 +15,7 @@ public class ItDestructibleWall extends InteractiveTile {
     super(gp, col, row);
 
     // Sprite do bloco
-    down1 = setup("/tiles_interactive/destructiblewall", gp.tileSize, gp.tileSize);
+    down1 = setup("/tiles_interactive/destructiblewall", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
     // Comportamento de "quebrável" + vida
     setDestructible(true);

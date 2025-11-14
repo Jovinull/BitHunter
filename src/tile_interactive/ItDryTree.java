@@ -11,11 +11,11 @@ public class ItDryTree extends InteractiveTile {
     super(gp, col, row);
 
     // Posiciona via setters (sem acessar worldX/worldY diretamente)
-    setWorldX(gp.tileSize * col);
-    setWorldY(gp.tileSize * row);
+    setWorldX(GamePanel.TILE_SIZE * col);
+    setWorldY(GamePanel.TILE_SIZE * row);
 
     // Sprite
-    down1 = setup("/tiles_interactive/drytree", gp.tileSize, gp.tileSize);
+    down1 = setup("/tiles_interactive/drytree", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
     // Comportamento
     setDestructible(true);
@@ -37,8 +37,8 @@ public class ItDryTree extends InteractiveTile {
 
   @Override
   public InteractiveTile getDestroyedForm() {
-    int col = getWorldX() / gp.tileSize;
-    int row = getWorldY() / gp.tileSize;
+    int col = getWorldX() / GamePanel.TILE_SIZE;
+    int row = getWorldY() / GamePanel.TILE_SIZE;
     return new ItTrunk(gp, col, row);
   }
 
