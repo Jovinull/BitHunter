@@ -16,8 +16,9 @@ public class ObjBoots extends Entity {
     down1 = setup("/objects/boots", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
     setSpeedValue(2);
+    setDefenseValue(2);
 
     setDescription("[" + getName() + "]\nBotas leves que \naumentam a velocidade \nem +2.");
-    setPrice(20);
+    setPrice(720);
   }
 }

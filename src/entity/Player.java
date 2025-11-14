@@ -123,7 +123,12 @@ public class Player extends Entity {
       bonus += getCurrentBoots().getSpeedValue();
     }
 
-    setSpeed(getDefaultSpeed() + bonus);
+    int finalSpeed = getDefaultSpeed() + bonus;
+    if (finalSpeed < 1) {
+      finalSpeed = 1;
+    }
+
+    setSpeed(finalSpeed);
   }
 
   @Override
@@ -143,6 +148,11 @@ public class Player extends Entity {
   @Override
   public int getDefense() {
     int value = getDexterity() * getCurrentShield().getDefenseValue();
+
+    if (getCurrentBoots() != null) {
+      value += getCurrentBoots().getDefenseValue();
+    }
+
     setDefense(value);
     return value;
   }
