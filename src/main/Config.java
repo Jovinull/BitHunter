@@ -5,25 +5,27 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Config {
 
-  GamePanel gp;
+  private static final Logger LOGGER = Logger.getLogger(Config.class.getName());
+  private static final String CONFIG_FILE_NAME = "config.txt";
+  private static final String VALUE_ON = "On";
+  private static final String VALUE_OFF = "Off";
+
+  private final GamePanel gp;
 
   public Config(GamePanel gp) {
     this.gp = gp;
   }
 
   public void saveConfig() {
-    try (BufferedWriter bw = new BufferedWriter(new FileWriter("config.txt"))) {
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter(CONFIG_FILE_NAME))) {
 
       // Full screen
-      if (gp.fullScreenOn) {
-        bw.write("On");
-      } else {
-        bw.write("Off");
-      }
-
+      bw.write(gp.isFullScreenOn() ? VALUE_ON : VALUE_OFF);
       bw.newLine();
 
       // Music volume
@@ -34,22 +36,21 @@ public class Config {
       bw.write(String.valueOf(gp.se.volumeScale));
       bw.newLine();
 
-    } catch (IOException e) {
-      e.printStackTrace();
+    } catch (IOException ex) {
+      LOGGER.log(Level.SEVERE, "Falha ao salvar configurações em " + CONFIG_FILE_NAME, ex);
     }
   }
 
   public void loadConfig() {
-    try (BufferedReader br = new BufferedReader(new FileReader("config.txt"))) {
+    try (BufferedReader br = new BufferedReader(new FileReader(CONFIG_FILE_NAME))) {
 
       String s = br.readLine();
 
       // Full screen
-      if (s.equals("On")) {
-        gp.fullScreenOn = true;
-      }
-      if (s.equals("Off")) {
-        gp.fullScreenOn = false;
+      if (VALUE_ON.equals(s)) {
+        gp.setFullScreenOn(true);
+      } else if (VALUE_OFF.equals(s)) {
+        gp.setFullScreenOn(false);
       }
 
       // Music volume
@@ -60,8 +61,8 @@ public class Config {
       s = br.readLine();
       gp.se.volumeScale = Integer.parseInt(s);
 
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (IOException | NumberFormatException ex) {
+      LOGGER.log(Level.SEVERE, "Falha ao carregar configurações de " + CONFIG_FILE_NAME, ex);
     }
   }
 }
