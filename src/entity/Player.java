@@ -70,7 +70,11 @@ public class Player extends Entity {
     setCurrentWeapon(new ObjSwordNormal(gp));
     setCurrentShield(new ObjShieldWood(gp));
     setCurrentLight(null);
+    setCurrentBoots(null);
     setProjectile(new ObjFireball(gp));
+    setCurrentHelmet(null);
+    setCurrentChest(null);
+    setCurrentLegs(null);
 
     setAttack(getAttack());
     setDefense(getDefense());
@@ -147,10 +151,28 @@ public class Player extends Entity {
 
   @Override
   public int getDefense() {
-    int value = getDexterity() * getCurrentShield().getDefenseValue();
+    int value = 0;
 
+    // defesa base vinda do escudo (mantém a lógica antiga)
+    if (getCurrentShield() != null) {
+      value = getDexterity() * getCurrentShield().getDefenseValue();
+    } else {
+      // fallback mínimo se estiver sem escudo
+      value = getDexterity();
+    }
+
+    // bônus das demais peças de armadura
     if (getCurrentBoots() != null) {
       value += getCurrentBoots().getDefenseValue();
+    }
+    if (getCurrentHelmet() != null) {
+      value += getCurrentHelmet().getDefenseValue();
+    }
+    if (getCurrentChest() != null) {
+      value += getCurrentChest().getDefenseValue();
+    }
+    if (getCurrentLegs() != null) {
+      value += getCurrentLegs().getDefenseValue();
     }
 
     setDefense(value);
@@ -650,10 +672,24 @@ public class Player extends Entity {
       case TYPE_BOOTS -> {
         setCurrentBoots(selectedItem);
         recalculateSpeedFromEquipment();
+        setDefense(getDefense()); // boots podem dar defesa também
+      }
+      case TYPE_HELMET -> {
+        setCurrentHelmet(selectedItem);
+        setDefense(getDefense());
+      }
+      case TYPE_CHEST -> {
+        setCurrentChest(selectedItem);
+        setDefense(getDefense());
+      }
+      case TYPE_LEGS -> {
+        setCurrentLegs(selectedItem);
+        setDefense(getDefense());
       }
       case TYPE_CONSUMABLE -> handleConsumableSelection(selectedItem, itemIndex);
       default -> {
-        /* no-op: tipo de item não suportado */ }
+        /* tipo de item não suportado, ignora */
+      }
     }
   }
 

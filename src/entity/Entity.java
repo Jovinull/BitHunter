@@ -42,6 +42,9 @@ public class Entity {
   public static final int TYPE_LIGHT = 9;
   public static final int TYPE_PICKAXE = 10;
   public static final int TYPE_BOOTS = 11;
+  public static final int TYPE_HELMET = 12;
+  public static final int TYPE_CHEST = 13;
+  public static final int TYPE_LEGS = 14;
 
   public static final int MAX_INVENTORY_SIZE = 20;
 
@@ -155,6 +158,9 @@ public class Entity {
   private Entity currentShield;
   private Entity currentLight;
   private Entity currentBoots;
+  private Entity currentHelmet;
+  private Entity currentChest;
+  private Entity currentLegs;
 
   private Projectile projectile;
   private boolean boss;
@@ -1638,5 +1644,29 @@ public class Entity {
 
   public void setType(int type) {
     this.type = type;
+  }
+
+  public Entity getCurrentHelmet() {
+    return currentHelmet;
+  }
+
+  public void setCurrentHelmet(Entity currentHelmet) {
+    this.currentHelmet = currentHelmet;
+  }
+
+  public Entity getCurrentChest() {
+    return currentChest;
+  }
+
+  public void setCurrentChest(Entity currentChest) {
+    this.currentChest = currentChest;
+  }
+
+  public Entity getCurrentLegs() {
+    return currentLegs;
+  }
+
+  public void setCurrentLegs(Entity currentLegs) {
+    this.currentLegs = currentLegs;
   }
 }
