@@ -19,6 +19,6 @@ public class ObjBoots extends Entity {
     setDefenseValue(2);
 
     setDescription("[" + getName() + "]\nBotas leves que \naumentam a velocidade \nem +2.");
-    setPrice(20);
+    setPrice(720);
   }
 }

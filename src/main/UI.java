@@ -619,11 +619,24 @@ public class UI {
       int textX = dFrameX + 20;
       int textY = dFrameY + GamePanel.TILE_SIZE;
       g2.setColor(COL_TEXT);
-      // descrição menor e mais compacta
-      g2.setFont(g2.getFont().deriveFont(20F));
 
-      for (String line : entity.getInventory().get(itemIndex).getDescription().split("\n")) {
-        g2.drawString(line, textX, textY);
+      Font baseFont = maruMonica != null ? maruMonica : g2.getFont();
+      Font titleFont = baseFont.deriveFont(Font.BOLD, 20F);
+      Font descFont = baseFont.deriveFont(Font.PLAIN, 20F);
+
+      String[] lines = entity.getInventory().get(itemIndex).getDescription().split("\n");
+
+      // primeira linha (ex: [Espada Comum]) em negrito
+      if (lines.length > 0) {
+        g2.setFont(titleFont);
+        g2.drawString(lines[0], textX, textY);
+        textY += 24;
+      }
+
+      // demais linhas em normal
+      g2.setFont(descFont);
+      for (int i = 1; i < lines.length; i++) {
+        g2.drawString(lines[i], textX, textY);
         textY += 22;
       }
     }
@@ -1225,8 +1238,9 @@ public class UI {
     int textX = frameX + padding;
     int textY = frameY + padding;
 
-    // ===== TÍTULO ===== (mais espaço abaixo)
-    drawTextShadow("Status do Personagem", textX, textY, COL_TEXT, Color.black, 2);
+    // ===== TÍTULO =====
+    int titleOffsetY = 8;
+    drawTextShadow("Status do Personagem", textX, textY + titleOffsetY, COL_TEXT, Color.black, 2);
     textY += 44;
 
     // ===== BLOCO SUPERIOR: PORTRAIT + HP/MP =====
@@ -1279,6 +1293,16 @@ public class UI {
         player.getMaxMana(),
         "Mana");
 
+    infoY += 30;
+    drawStatBar(
+        infoX,
+        infoY,
+        barWidth,
+        barHeight,
+        player.getExp(),
+        player.getNextLevelExp(),
+        "XP");
+
     // ===== BLOCO INFERIOR ESQUERDA: ATRIBUTOS =====
     int statsBlockX = frameX + padding;
     int statsBlockY = portraitY + portraitSize + 40;
@@ -1291,8 +1315,6 @@ public class UI {
         "Destreza",
         "Ataque",
         "Defesa",
-        "EXP",
-        "Próx. Nível",
         "Moedas"
     };
 
@@ -1301,8 +1323,6 @@ public class UI {
         String.valueOf(player.getDexterity()),
         String.valueOf(player.getAttack()),
         String.valueOf(player.getDefense()),
-        String.valueOf(player.getExp()),
-        String.valueOf(player.getNextLevelExp()),
         String.valueOf(player.getCoin())
     };
 
@@ -1324,7 +1344,7 @@ public class UI {
     int equipAreaWidth = equipAreaRight - equipAreaX;
 
     g2.setFont(g2.getFont().deriveFont(Font.BOLD, 22F));
-    int equipTitleY = portraitY + portraitSize + 32; // alinhado com os atributos
+    int equipTitleY = portraitY + portraitSize + 32;
     if (equipTitleY > statsBlockY - 8) {
       equipTitleY = statsBlockY - 8;
     }
@@ -1333,11 +1353,11 @@ public class UI {
     int cols = 3;
     int rows = 2;
 
-    int slotSize = GamePanel.TILE_SIZE; // menor pra caber dentro da moldura
-    int hGap = Math.max(8, (equipAreaWidth - cols * slotSize) / (cols - 1));
-    int vGap = 24;
+    int slotSize = GamePanel.TILE_SIZE;
+    int hGap = Math.max(12, (equipAreaWidth - cols * slotSize) / (cols - 1));
+    int vGap = 32;
 
-    int gridStartY = equipTitleY + 18;
+    int gridStartY = equipTitleY + 28;
 
     // Ordem visual no grid (3 colunas x 2 linhas):
     // [ Capacete | Peitoral | Calça ]
