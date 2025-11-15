@@ -65,7 +65,6 @@ public class UI {
   private static final Color COL_ACCENT = new Color(0xE0, 0xB5, 0x66);
 
   private static final int MENU_LINE = 48;
-  private static final String LABEL_BACK = "Voltar";
 
   public UI(GamePanel gp) {
     this.gp = gp;
@@ -301,7 +300,9 @@ public class UI {
 
           g2.setFont(g2.getFont().deriveFont(Font.BOLD, 24f));
           g2.setColor(Color.white);
-          g2.drawString(monster.getName(), x + 4, y - 10);
+
+          String bossName = monster.getDisplayName();
+          g2.drawString(bossName, x + 4, y - 10);
         }
       }
     }
@@ -690,7 +691,7 @@ public class UI {
       case 1 -> optionsFullScreenNotification(frameX, frameY);
       case 2 -> optionsControl(frameX, frameY);
       case 3 -> optionsEndGameConfirmation(frameX, frameY);
-      case 4 -> optionsLanguage(frameX, frameY); // <<< NOVO SUBMENU DE IDIOMA
+      case 4 -> optionsLanguage(frameX, frameY);
       default -> {
         /* no-op */ }
     }
@@ -871,32 +872,6 @@ public class UI {
         keyH.setEnterPressed(false);
       }
     }
-  }
-
-  private void cycleLanguage() {
-    LanguageManager languageManager = gp.getLanguageManager();
-    java.util.List<LanguageManager.LanguageOption> langs = languageManager.getAvailableLanguages();
-
-    if (langs == null || langs.isEmpty()) {
-      return;
-    }
-
-    String currentCode = languageManager.getCurrentLanguageCode();
-    int index = 0;
-
-    for (int i = 0; i < langs.size(); i++) {
-      if (langs.get(i).code().equals(currentCode)) {
-        index = i;
-        break;
-      }
-    }
-
-    int nextIndex = (index + 1) % langs.size();
-    String nextCode = langs.get(nextIndex).code();
-
-    languageManager.setCurrentLanguage(nextCode);
-    gp.config.saveConfig();
-    gp.playSE(9);
   }
 
   public void optionsFullScreenNotification(int frameX, int frameY) {

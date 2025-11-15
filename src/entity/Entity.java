@@ -521,7 +521,6 @@ public class Entity {
   public String getDisplayName() {
     LanguageManager lm = gp != null ? gp.getLanguageManager() : null;
 
-    // Se não tiver translationKey definida, tenta usar o internalId
     String baseKey = null;
     if (translationKey != null && !translationKey.isEmpty()) {
       baseKey = translationKey;
@@ -530,10 +529,9 @@ public class Entity {
     }
 
     if (lm != null && baseKey != null) {
-      return lm.text(baseKey + ".displayName");
+      return lm.text(baseKey + ".name");
     }
 
-    // Fallback: nome "cru" (pode ser OBJ_ID ou nome antigo)
     return name != null ? name : "";
   }
 
