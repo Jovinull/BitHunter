@@ -164,91 +164,78 @@ public class UI {
     }
   }
 
-  // --- HUD: Vida & Mana ---
+  // --- HUD: Vida & Mana (barras) ---
   public void drawPlayerLife() {
-    final int iconSize = 32;
-    final int colsPerRow = 8;
-
-    int startX = GamePanel.TILE_SIZE / 2;
-    int startY = GamePanel.TILE_SIZE / 2;
-
-    int x = startX;
-    int y = startY;
-    int i = 0;
-
-    int manaStartX = (GamePanel.TILE_SIZE / 2) - 5;
-    int manaStartY;
-
     var player = gp.getPlayer();
 
-    // --- MAX LIFE (corações vazios) ---
-    int maxHearts = player.getMaxLife() / 2;
-    while (i < maxHearts) {
-      g2.drawImage(heartBlank, x, y, iconSize, iconSize, null);
-      i++;
-      x += iconSize;
+    int barWidth = GamePanel.TILE_SIZE * 3;
+    int barHeight = 18;
 
-      if (i % colsPerRow == 0) {
-        x = startX;
-        y += iconSize;
-      }
+    int x = GamePanel.TILE_SIZE;
+    int y = GamePanel.TILE_SIZE / 2;
+
+    // Vida - barra vermelha
+    HudBarLayout lifeLayout = new HudBarLayout(x, y, barWidth, barHeight);
+    drawHudBar(
+        lifeLayout,
+        player.getLife(),
+        player.getMaxLife(),
+        "Vida",
+        new Color(210, 70, 70));
+
+    // Mana - barra azul, logo abaixo
+    y += barHeight + 8;
+    HudBarLayout manaLayout = new HudBarLayout(x, y, barWidth, barHeight);
+    drawHudBar(
+        manaLayout,
+        player.getMana(),
+        player.getMaxMana(),
+        "Mana",
+        new Color(70, 120, 220));
+  }
+
+  private record HudBarLayout(int x, int y, int width, int height) {
+  }
+
+  private void drawHudBar(
+      HudBarLayout layout,
+      int current,
+      int max,
+      String label,
+      Color fillColor) {
+
+    int x = layout.x();
+    int y = layout.y();
+    int width = layout.width();
+    int height = layout.height();
+
+    // fundo da barra
+    g2.setColor(new Color(0, 0, 0, 180));
+    g2.fillRoundRect(x - 2, y - 2, width + 4, height + 4, 8, 8);
+
+    // borda
+    g2.setColor(COL_PANEL_BORDER);
+    g2.drawRoundRect(x - 2, y - 2, width + 4, height + 4, 8, 8);
+
+    // valor atual
+    if (max > 0 && current > 0) {
+      int clamped = Math.min(current, max);
+      int filledWidth = (int) (width * (clamped / (double) max));
+      g2.setColor(fillColor);
+      g2.fillRoundRect(x, y, filledWidth, height, 8, 8);
     }
 
-    // Base da mana logo abaixo dos corações
-    manaStartY = y + iconSize;
+    // texto: "Vida 12/12", "Mana 4/4"
+    String text = label + " " + current + "/" + max;
+    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 14F));
 
-    // --- VIDA ATUAL ---
-    x = startX;
-    y = startY;
+    int textX = x + 6;
+    int textY = y + height - 3;
 
-    int fullHearts = player.getLife() / 2;
-    int halfHeart = player.getLife() % 2;
-
-    for (int idx = 0; idx < fullHearts; idx++) {
-      g2.drawImage(heartFull, x, y, iconSize, iconSize, null);
-      x += iconSize;
-      if ((idx + 1) % colsPerRow == 0) {
-        x = startX;
-        y += iconSize;
-      }
-    }
-
-    if (halfHeart == 1) {
-      g2.drawImage(heartHalf, x, y, iconSize, iconSize, null);
-    }
-
-    // --- MANA (vazio) ---
-    int crystalStep = iconSize + 3;
-    x = manaStartX;
-    y = manaStartY;
-    i = 0;
-
-    while (i < player.getMaxMana()) {
-      g2.drawImage(crystalBlank, x, y, iconSize, iconSize, null);
-      i++;
-      x += crystalStep;
-
-      if (i % colsPerRow == 0) {
-        x = manaStartX;
-        y += iconSize;
-      }
-    }
-
-    // --- MANA ATUAL ---
-    x = manaStartX;
-    y = manaStartY;
-    i = 0;
-
-    while (i < player.getMana()) {
-      g2.drawImage(crystalFull, x, y, iconSize, iconSize, null);
-      i++;
-      x += crystalStep;
-
-      if (i % colsPerRow == 0) {
-        x = manaStartX;
-        y += iconSize;
-      }
-    }
+    g2.setColor(Color.black);
+    g2.drawString(text, textX + 1, textY + 1);
+    g2.setColor(COL_TEXT);
+    g2.drawString(text, textX, textY);
   }
 
   public void drawMonsterLife() {
@@ -509,8 +496,15 @@ public class UI {
 
     drawSubWindow(frameX, frameY, frameWidth, frameHeight);
 
+    // Título interno (fonte ligeiramente menor)
+    String title = (entity == gp.getPlayer()) ? "Mochila" : "Inventário";
+    int titleY = frameY + 32;
+
+    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 22F));
+    drawTextShadow(title, frameX + 20, titleY, COL_TEXT, Color.black, 2);
+
     final int slotXstart = frameX + 20;
-    final int slotYstart = frameY + 20;
+    final int slotYstart = titleY + 16;
     int slotSize = GamePanel.TILE_SIZE + 3;
 
     drawInventoryItems(entity, slotXstart, slotYstart, slotSize);
@@ -526,29 +520,29 @@ public class UI {
     int slotY = slotYstart;
 
     for (int i = 0; i < entity.getInventory().size(); i++) {
+      Entity item = entity.getInventory().get(i);
 
-      if (entity.getInventory().get(i) == entity.getCurrentWeapon() ||
-          entity.getInventory().get(i) == entity.getCurrentShield() ||
-          entity.getInventory().get(i) == entity.getCurrentLight() ||
-          entity.getInventory().get(i) == entity.getCurrentBoots()) {
+      if (item != null && isEquippedItem(entity, item)) {
         g2.setColor(COL_ACCENT);
         g2.fillRoundRect(slotX, slotY, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE, 8, 8);
       }
 
-      g2.drawImage(entity.getInventory().get(i).getDown1(), slotX, slotY, null);
+      if (item != null && item.getDown1() != null) {
+        g2.drawImage(item.getDown1(), slotX, slotY, null);
+      }
 
       // DISPLAY AMOUNT
-      if (entity == gp.getPlayer() && entity.getInventory().get(i).getAmount() > 1) {
+      if (item != null && entity == gp.getPlayer() && item.getAmount() > 1) {
         g2.setFont(g2.getFont().deriveFont(32f));
-        String s = String.valueOf(entity.getInventory().get(i).getAmount());
+        String s = String.valueOf(item.getAmount());
         int amountX = getXforAlignToRightText(s, slotX + 44);
         int amountY = slotY + GamePanel.TILE_SIZE;
 
-        // SHADOW
+        // sombra
         g2.setColor(new Color(60, 60, 60));
         g2.drawString(s, amountX, amountY);
 
-        // NUMBER
+        // número
         g2.setColor(Color.white);
         g2.drawString(s, amountX - 3, amountY - 3);
       }
@@ -560,6 +554,20 @@ public class UI {
         slotY += GamePanel.TILE_SIZE;
       }
     }
+  }
+
+  private boolean isEquippedItem(Entity entity, Entity item) {
+    if (item == null) {
+      return false;
+    }
+
+    return item == entity.getCurrentWeapon()
+        || item == entity.getCurrentShield()
+        || item == entity.getCurrentLight()
+        || item == entity.getCurrentBoots()
+        || item == entity.getCurrentHelmet()
+        || item == entity.getCurrentChest()
+        || item == entity.getCurrentLegs();
   }
 
   private void drawInventoryCursor(
@@ -600,11 +608,25 @@ public class UI {
       int textX = dFrameX + 20;
       int textY = dFrameY + GamePanel.TILE_SIZE;
       g2.setColor(COL_TEXT);
-      g2.setFont(g2.getFont().deriveFont(28F));
 
-      for (String line : entity.getInventory().get(itemIndex).getDescription().split("\n")) {
-        g2.drawString(line, textX, textY);
-        textY += 28;
+      Font baseFont = maruMonica != null ? maruMonica : g2.getFont();
+      Font titleFont = baseFont.deriveFont(Font.BOLD, 20F);
+      Font descFont = baseFont.deriveFont(Font.PLAIN, 20F);
+
+      String[] lines = entity.getInventory().get(itemIndex).getDescription().split("\n");
+
+      // primeira linha (ex: [Espada Comum]) em negrito
+      if (lines.length > 0) {
+        g2.setFont(titleFont);
+        g2.drawString(lines[0], textX, textY);
+        textY += 24;
+      }
+
+      // demais linhas em normal
+      g2.setFont(descFont);
+      for (int i = 1; i < lines.length; i++) {
+        g2.drawString(lines[i], textX, textY);
+        textY += 22;
       }
     }
   }
@@ -1030,7 +1052,10 @@ public class UI {
 
         if (player.getInventory().get(itemIndex) == player.getCurrentWeapon()
             || player.getInventory().get(itemIndex) == player.getCurrentShield()
-            || player.getInventory().get(itemIndex) == player.getCurrentBoots()) {
+            || player.getInventory().get(itemIndex) == player.getCurrentBoots()
+            || player.getInventory().get(itemIndex) == player.getCurrentHelmet()
+            || player.getInventory().get(itemIndex) == player.getCurrentChest()
+            || player.getInventory().get(itemIndex) == player.getCurrentLegs()) {
 
           commandNum = 0;
           subState = 0;
@@ -1189,102 +1214,255 @@ public class UI {
   public void drawCharacterScreen() {
     final int frameX = GamePanel.TILE_SIZE * 2;
     final int frameY = GamePanel.TILE_SIZE;
-    final int frameWidth = GamePanel.TILE_SIZE * 5;
+    final int frameWidth = GamePanel.TILE_SIZE * 9; // um pouco mais largo
     final int frameHeight = GamePanel.TILE_SIZE * 10;
     drawSubWindow(frameX, frameY, frameWidth, frameHeight);
 
-    g2.setColor(COL_TEXT);
-    g2.setFont(g2.getFont().deriveFont(32F));
-
-    int textX = frameX + 20;
-    int textY = frameY + GamePanel.TILE_SIZE;
-    final int lineHeight = 30;
-
-    // Labels
-    g2.drawString("Nível", textX, textY);
-    textY += lineHeight;
-    g2.drawString("Vida", textX, textY);
-    textY += lineHeight;
-    g2.drawString("Mana", textX, textY);
-    textY += lineHeight;
-    g2.drawString("Força", textX, textY);
-    textY += lineHeight;
-    g2.drawString("Destreza", textX, textY);
-    textY += lineHeight;
-    g2.drawString("Ataque", textX, textY);
-    textY += lineHeight;
-    g2.drawString("Defesa", textX, textY);
-    textY += lineHeight;
-    g2.drawString("EXP", textX, textY);
-    textY += lineHeight;
-    g2.drawString("Próximo Nível", textX, textY);
-    textY += lineHeight;
-    g2.drawString("Moedas", textX, textY);
-    textY += lineHeight + 8;
-    g2.drawString("Arma", textX, textY);
-    textY += lineHeight + 16;
-    g2.drawString("Escudo", textX, textY);
-    textY += lineHeight + 24;
-    g2.drawString("Botas", textX, textY);
-
-    // Valores
-    int tailX = (frameX + frameWidth) - 30;
-    textY = frameY + GamePanel.TILE_SIZE;
-
     var player = gp.getPlayer();
-    String value;
 
-    value = String.valueOf(player.getLevel());
-    g2.drawString(value, getXforAlignToRightText(value, tailX), textY);
-    textY += lineHeight;
+    g2.setColor(COL_TEXT);
+    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 30F));
 
-    value = player.getLife() + "/" + player.getMaxLife();
-    g2.drawString(value, getXforAlignToRightText(value, tailX), textY);
-    textY += lineHeight;
+    final int padding = 24;
+    int textX = frameX + padding;
+    int textY = frameY + padding;
 
-    value = player.getMana() + "/" + player.getMaxMana();
-    g2.drawString(value, getXforAlignToRightText(value, tailX), textY);
-    textY += lineHeight;
+    // ===== TÍTULO =====
+    int titleOffsetY = 8;
+    drawTextShadow("Status do Personagem", textX, textY + titleOffsetY, COL_TEXT, Color.black, 2);
+    textY += 44;
 
-    value = String.valueOf(player.getStrength());
-    g2.drawString(value, getXforAlignToRightText(value, tailX), textY);
-    textY += lineHeight;
+    // ===== BLOCO SUPERIOR: PORTRAIT + HP/MP =====
+    int portraitSize = GamePanel.TILE_SIZE * 3;
+    int portraitX = textX;
+    int portraitY = textY;
 
-    value = String.valueOf(player.getDexterity());
-    g2.drawString(value, getXforAlignToRightText(value, tailX), textY);
-    textY += lineHeight;
+    // Fundo do portrait
+    g2.setColor(new Color(10, 10, 15, 190));
+    g2.fillRoundRect(portraitX, portraitY, portraitSize, portraitSize, 12, 12);
 
-    value = String.valueOf(player.getAttack());
-    g2.drawString(value, getXforAlignToRightText(value, tailX), textY);
-    textY += lineHeight;
+    // Sprite do player
+    g2.drawImage(
+        player.getDown1(),
+        portraitX + portraitSize / 2 - GamePanel.TILE_SIZE,
+        portraitY + portraitSize / 2 - GamePanel.TILE_SIZE,
+        GamePanel.TILE_SIZE * 2,
+        GamePanel.TILE_SIZE * 2,
+        null);
 
-    value = String.valueOf(player.getDefense());
-    g2.drawString(value, getXforAlignToRightText(value, tailX), textY);
-    textY += lineHeight;
+    // Infos rápidas ao lado
+    int infoX = portraitX + portraitSize + 24;
+    int infoY = portraitY + 8;
 
-    value = String.valueOf(player.getExp());
-    g2.drawString(value, getXforAlignToRightText(value, tailX), textY);
-    textY += lineHeight;
+    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 22F));
+    String nivelLabel = "Nível " + player.getLevel();
+    drawTextShadow(nivelLabel, infoX, infoY, COL_TEXT, Color.black, 2);
+    infoY += 30;
 
-    value = String.valueOf(player.getNextLevelExp());
-    g2.drawString(value, getXforAlignToRightText(value, tailX), textY);
-    textY += lineHeight;
+    // Barras HP / MP
+    int barWidth = GamePanel.TILE_SIZE * 4;
+    int barHeight = 16;
 
-    value = String.valueOf(player.getCoin());
-    g2.drawString(value, getXforAlignToRightText(value, tailX), textY);
-    textY += lineHeight;
+    drawStatBar(
+        infoX,
+        infoY,
+        barWidth,
+        barHeight,
+        player.getLife(),
+        player.getMaxLife(),
+        "Vida");
+    infoY += 30;
 
-    if (player.getCurrentWeapon() != null) {
-      g2.drawImage(player.getCurrentWeapon().getDown1(), tailX - GamePanel.TILE_SIZE, textY - 24, null);
+    drawStatBar(
+        infoX,
+        infoY,
+        barWidth,
+        barHeight,
+        player.getMana(),
+        player.getMaxMana(),
+        "Mana");
+
+    infoY += 30;
+    drawStatBar(
+        infoX,
+        infoY,
+        barWidth,
+        barHeight,
+        player.getExp(),
+        player.getNextLevelExp(),
+        "XP");
+
+    // ===== BLOCO INFERIOR ESQUERDA: ATRIBUTOS =====
+    int statsBlockX = frameX + padding;
+    int statsBlockY = portraitY + portraitSize + 40;
+
+    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20F));
+    int lineHeight = 24;
+
+    String[] labels = {
+        "Força",
+        "Destreza",
+        "Ataque",
+        "Defesa",
+        "Moedas"
+    };
+
+    String[] values = {
+        String.valueOf(player.getStrength()),
+        String.valueOf(player.getDexterity()),
+        String.valueOf(player.getAttack()),
+        String.valueOf(player.getDefense()),
+        String.valueOf(player.getCoin())
+    };
+
+    int tailX = frameX + frameWidth / 2 - 30;
+
+    for (int i = 0; i < labels.length; i++) {
+      g2.setColor(COL_TEXT_DIM);
+      g2.drawString(labels[i], statsBlockX, statsBlockY);
+      g2.setColor(COL_TEXT);
+      String value = values[i];
+      g2.drawString(value, getXforAlignToRightText(value, tailX), statsBlockY);
+      statsBlockY += lineHeight;
     }
-    textY += GamePanel.TILE_SIZE;
-    if (player.getCurrentShield() != null) {
-      g2.drawImage(player.getCurrentShield().getDown1(), tailX - GamePanel.TILE_SIZE, textY - 24, null);
+
+    // ===== BLOCO DIREITA: GRID DE EQUIPAMENTOS 3x2 =====
+    int equipAreaPadding = 16;
+    int equipAreaX = frameX + frameWidth / 2 + equipAreaPadding;
+    int equipAreaRight = frameX + frameWidth - equipAreaPadding;
+    int equipAreaWidth = equipAreaRight - equipAreaX;
+
+    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 22F));
+    int equipTitleY = portraitY + portraitSize + 32;
+    if (equipTitleY > statsBlockY - 8) {
+      equipTitleY = statsBlockY - 8;
     }
-    textY += GamePanel.TILE_SIZE;
-    if (player.getCurrentBoots() != null) {
-      g2.drawImage(player.getCurrentBoots().getDown1(), tailX - GamePanel.TILE_SIZE, textY - 24, null);
+    drawTextShadow("Equipamentos", equipAreaX, equipTitleY, COL_TEXT, Color.black, 2);
+
+    int cols = 3;
+    int rows = 2;
+
+    int slotSize = GamePanel.TILE_SIZE;
+    int hGap = Math.max(12, (equipAreaWidth - cols * slotSize) / (cols - 1));
+    int vGap = 32;
+
+    int gridStartY = equipTitleY + 28;
+
+    // Ordem visual no grid (3 colunas x 2 linhas):
+    // [ Capacete | Peitoral | Calça ]
+    // [ Botas | Arma | Escudo ]
+    String[] equipLabels = {
+        "Capacete",
+        "Peitoral",
+        "Calça",
+        "Botas",
+        "Arma",
+        "Escudo"
+    };
+
+    Entity[] equipItems = {
+        player.getCurrentHelmet(),
+        player.getCurrentChest(),
+        player.getCurrentLegs(),
+        player.getCurrentBoots(),
+        player.getCurrentWeapon(),
+        player.getCurrentShield()
+    };
+
+    EquipmentGridLayout equipLayout = new EquipmentGridLayout(
+        equipAreaX,
+        gridStartY,
+        slotSize,
+        cols,
+        rows,
+        hGap,
+        vGap);
+    drawEquipmentGrid(equipLayout, equipLabels, equipItems);
+  }
+
+  // Auxiliar para evitar muitos parâmetros em drawEquipmentGrid
+  private record EquipmentGridLayout(
+      int startX,
+      int startY,
+      int slotSize,
+      int cols,
+      int rows,
+      int hGap,
+      int vGap) {
+  }
+
+  private void drawEquipmentGrid(
+      EquipmentGridLayout layout,
+      String[] labels,
+      Entity[] items) {
+
+    int index = 0;
+
+    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 16F));
+
+    for (int row = 0; row < layout.rows(); row++) {
+      for (int col = 0; col < layout.cols(); col++) {
+        if (index >= labels.length || index >= items.length) {
+          return;
+        }
+
+        int slotX = layout.startX() + col * (layout.slotSize() + layout.hGap());
+        int slotY = layout.startY() + row * (layout.slotSize() + layout.vGap());
+
+        // Label acima do slot
+        g2.setColor(COL_TEXT_DIM);
+        g2.drawString(labels[index], slotX, slotY - 6);
+
+        // Caixa do slot
+        int boxY = slotY;
+        g2.setColor(COL_PANEL_BORDER);
+        g2.drawRoundRect(slotX, boxY, layout.slotSize(), layout.slotSize(), 10, 10);
+        g2.setColor(new Color(20, 24, 32, 220));
+        g2.fillRoundRect(
+            slotX + 1,
+            boxY + 1,
+            layout.slotSize() - 2,
+            layout.slotSize() - 2,
+            10,
+            10);
+
+        // Ícone do equipamento
+        Entity item = items[index];
+        if (item != null && item.getDown1() != null) {
+          int iconMargin = 4;
+          int iconSize = layout.slotSize() - iconMargin * 2;
+          int iconX = slotX + iconMargin;
+          int iconY = boxY + iconMargin;
+          g2.drawImage(item.getDown1(), iconX, iconY, iconSize, iconSize, null);
+        }
+
+        index++;
+      }
     }
+  }
+
+  private void drawStatBar(int x, int y, int width, int height, int current, int max, String label) {
+    // Fundo
+    g2.setColor(COL_PANEL_BORDER);
+    g2.fillRoundRect(x, y, width, height, 8, 8);
+
+    // Valor atual
+    if (max > 0 && current > 0) {
+      int filledWidth = (int) (width * (Math.min(current, max) / (double) max));
+      g2.setColor(COL_ACCENT);
+      g2.fillRoundRect(x, y, filledWidth, height, 8, 8);
+    }
+
+    // Label e texto (ex: "Vida 30/50")
+    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 18F));
+    String text = label + " " + current + "/" + max;
+    int textX = x + 8;
+    int textY = y + height - 4;
+
+    g2.setColor(Color.black);
+    g2.drawString(text, textX + 1, textY + 1);
+    g2.setColor(COL_TEXT);
+    g2.drawString(text, textX, textY);
   }
 
   public int getXforAlignToRightText(String text, int tailX) {
