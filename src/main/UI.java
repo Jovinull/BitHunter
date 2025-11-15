@@ -174,7 +174,7 @@ public class UI {
     var player = gp.getPlayer();
 
     int barWidth = GamePanel.TILE_SIZE * 3;
-    int barHeight = 20;
+    int barHeight = 24;
 
     int x = GamePanel.TILE_SIZE;
     int y = GamePanel.TILE_SIZE / 2;
@@ -218,9 +218,12 @@ public class UI {
     g2.setColor(new Color(0, 0, 0, 180));
     g2.fillRoundRect(x - 2, y - 2, width + 4, height + 4, 8, 8);
 
-    // borda
+    // borda (um pouco mais forte)
+    var oldStroke = g2.getStroke();
+    g2.setStroke(new BasicStroke(2f));
     g2.setColor(COL_PANEL_BORDER);
     g2.drawRoundRect(x - 2, y - 2, width + 4, height + 4, 8, 8);
+    g2.setStroke(oldStroke);
 
     // valor atual
     if (max > 0 && current > 0) {
@@ -232,11 +235,18 @@ public class UI {
 
     // texto: "Vida 12/12", "Mana 4/4"
     String text = label + " " + current + "/" + max;
-    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 14F));
 
-    int textX = x + 6;
-    int textY = y + height - 3;
+    // Usa explicitamente a MaruMonica (se existir) e aumenta o tamanho
+    Font baseFont = maruMonica != null ? maruMonica : g2.getFont();
+    Font hudFont = baseFont.deriveFont(Font.BOLD, 18F); // antes 14F
+    g2.setFont(hudFont);
 
+    // Centraliza verticalmente usando FontMetrics
+    java.awt.FontMetrics fm = g2.getFontMetrics();
+    int textX = x + 8;
+    int textY = y + (height - fm.getHeight()) / 2 + fm.getAscent();
+
+    // sombra + texto
     g2.setColor(Color.black);
     g2.drawString(text, textX + 1, textY + 1);
     g2.setColor(COL_TEXT);
