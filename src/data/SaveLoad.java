@@ -79,25 +79,6 @@ public class SaveLoad {
     player.recalculateSpeedFromEquipment();
   }
 
-  /**
-   * Resolve qual identificador usar para salvar a entidade.
-   * Preferência:
-   * 1) internalId (OBJ_ID, ex: "item.axe")
-   * 2) name (para compatibilidade com coisas antigas)
-   */
-  private String resolveEntityId(Entity entity) {
-    if (entity == null) {
-      return null;
-    }
-
-    String id = entity.getInternalId();
-    if (id != null && !id.isEmpty()) {
-      return id;
-    }
-
-    return entity.getInternalId();
-  }
-
   /* ----- Copy to storage (SAVE) ----- */
 
   private void copyPlayerStatsToStorage(DataStorage ds) {
@@ -119,8 +100,7 @@ public class SaveLoad {
     var inv = player.getInventory();
     for (int i = 0; i < inv.size(); i++) {
       Entity item = inv.get(i);
-      String id = resolveEntityId(item);
-      ds.getItemNames().add(id);
+      ds.getItemNames().add(item.getInternalId());
       ds.getItemAmounts().add(item.getAmount());
     }
   }
@@ -149,15 +129,13 @@ public class SaveLoad {
         if (objectEntity == null) {
           ds.getMapObjectNames()[mapNum][i] = "NA";
         } else {
-          // Salva sempre o identificador (internalId/OBJ_ID)
-          ds.getMapObjectNames()[mapNum][i] = resolveEntityId(objectEntity);
+          ds.getMapObjectNames()[mapNum][i] = objectEntity.getInternalId();
           ds.getMapObjectWorldX()[mapNum][i] = objectEntity.getWorldX();
           ds.getMapObjectWorldY()[mapNum][i] = objectEntity.getWorldY();
 
           if (objectEntity.getLoot() != null) {
-            ds.getMapObjectLootNames()[mapNum][i] = resolveEntityId(objectEntity.getLoot());
+            ds.getMapObjectLootNames()[mapNum][i] = objectEntity.getLoot().getInternalId();
           }
-
           ds.getMapObjectOpened()[mapNum][i] = objectEntity.isOpened();
         }
       }
@@ -188,16 +166,9 @@ public class SaveLoad {
     var generator = gp.geteGenerator();
 
     for (int i = 0; i < ds.getItemNames().size(); i++) {
-      String id = ds.getItemNames().get(i); // agora esperamos um OBJ_ID
+      String itemName = ds.getItemNames().get(i);
       int amount = ds.getItemAmounts().get(i);
-
-      Entity item = generator.getObject(id);
-      if (item == null) {
-        // Pode acontecer em caso de id desconhecido (ex: item removido em update)
-        LOG.warning(() -> "Unknown item id in save: " + id);
-        continue;
-      }
-
+      Entity item = generator.getObject(itemName);
       item.setAmount(amount);
       inv.add(item);
     }
@@ -212,39 +183,28 @@ public class SaveLoad {
     for (int mapNum = 0; mapNum < maps; mapNum++) {
       int slots = objects[mapNum].length;
       for (int i = 0; i < slots; i++) {
-        String id = ds.getMapObjectNames()[mapNum][i];
-
-        if ("NA".equals(id)) {
+        String name = ds.getMapObjectNames()[mapNum][i];
+        if ("NA".equals(name)) {
           objects[mapNum][i] = null;
-          continue;
-        }
+        } else {
+          Entity objectEntity = generator.getObject(name);
+          objects[mapNum][i] = objectEntity;
 
-        Entity objectEntity = generator.getObject(id);
-        if (objectEntity == null) {
-          LOG.warning(() -> "Unknown map object id in save: " + id);
-          objects[mapNum][i] = null;
-          continue;
-        }
+          objectEntity.setWorldX(ds.getMapObjectWorldX()[mapNum][i]);
+          objectEntity.setWorldY(ds.getMapObjectWorldY()[mapNum][i]);
 
-        objects[mapNum][i] = objectEntity;
-
-        objectEntity.setWorldX(ds.getMapObjectWorldX()[mapNum][i]);
-        objectEntity.setWorldY(ds.getMapObjectWorldY()[mapNum][i]);
-
-        String lootId = ds.getMapObjectLootNames()[mapNum][i];
-        if (lootId != null) {
-          Entity loot = generator.getObject(lootId);
-          if (loot == null) {
-            LOG.warning(() -> "Unknown loot id in save: " + lootId);
-          } else {
-            objectEntity.setLoot(loot);
+          String lootName = ds.getMapObjectLootNames()[mapNum][i];
+          if (lootName != null) {
+            objectEntity.setLoot(generator.getObject(lootName));
           }
-        }
 
-        objectEntity.setOpened(ds.getMapObjectOpened()[mapNum][i]);
+          objectEntity.setOpened(ds.getMapObjectOpened()[mapNum][i]);
 
-        if (objectEntity.isOpened()) {
-          objectEntity.applyOpenedAppearance();
+          // Caso precise restaurar o sprite "aberto":
+          // Requer que Entity tenha getImage2() e setDown1(BufferedImage).
+          if (objectEntity.isOpened()) {
+            objectEntity.applyOpenedAppearance();
+          }
         }
       }
     }
