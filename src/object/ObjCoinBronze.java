@@ -14,6 +14,11 @@ public class ObjCoinBronze extends Entity {
     setName(OBJ_NAME);
     setValue(1);
     down1 = setup("/objects/coin_bronze", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+
+    // descrição com i18n
+    String displayName = t("item.coin.bronze.displayName");
+    String description = "[" + displayName + "]\n" + t("item.coin.bronze.desc");
+    setDescription(description);
   }
 
   @Override
@@ -23,8 +28,14 @@ public class ObjCoinBronze extends Entity {
     var ui = gp.getGameUi();
     var player = gp.getPlayer();
 
-    ui.addMessage("Moedas +" + getValue());
+    String msg = String.format(t("item.coin.bronze.pickup"), getValue());
+    ui.addMessage(msg);
+
     player.setCoin(player.getCoin() + getValue());
     return true;
+  }
+
+  private String t(String key) {
+    return gp.getLanguageManager().text(key);
   }
 }

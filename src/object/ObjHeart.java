@@ -18,6 +18,11 @@ public class ObjHeart extends Entity {
     image = setup("/objects/heart_full", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     image2 = setup("/objects/heart_half", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     image3 = setup("/objects/heart_blank", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+
+    // descrição com i18n
+    String displayName = t("item.heart.displayName");
+    String description = "[" + displayName + "]\n" + String.format(t("item.heart.desc"), getValue());
+    setDescription(description);
   }
 
   @Override
@@ -27,8 +32,14 @@ public class ObjHeart extends Entity {
     var ui = gp.getGameUi();
     var player = gp.getPlayer();
 
-    ui.addMessage("Vida +" + getValue());
+    String msg = String.format(t("item.heart.pickup"), getValue());
+    ui.addMessage(msg);
+
     player.setLife(player.getLife() + getValue());
     return true;
+  }
+
+  private String t(String key) {
+    return gp.getLanguageManager().text(key);
   }
 }

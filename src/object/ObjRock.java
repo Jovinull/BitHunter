@@ -22,6 +22,10 @@ public class ObjRock extends Projectile {
     setUseCost(1);
     setAlive(false);
 
+    String displayName = t("item.rock.displayName");
+    String description = "[" + displayName + "]\n" + t("item.rock.desc");
+    setDescription(description);
+
     loadSprites();
   }
 
@@ -65,5 +69,9 @@ public class ObjRock extends Projectile {
   @Override
   public int getParticleMaxLife() {
     return 20;
+  }
+
+  private String t(String key) {
+    return gp.getLanguageManager().text(key);
   }
 }

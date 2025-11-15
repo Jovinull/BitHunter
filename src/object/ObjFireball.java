@@ -22,6 +22,11 @@ public class ObjFireball extends Projectile {
     setUseCost(1);
     setAlive(false);
 
+    // descrição com i18n
+    String displayName = t("item.fireball.displayName");
+    String description = "[" + displayName + "]\n" + t("item.fireball.desc");
+    setDescription(description);
+
     loadSprites();
   }
 
@@ -64,5 +69,9 @@ public class ObjFireball extends Projectile {
   @Override
   public int getParticleMaxLife() {
     return 20;
+  }
+
+  private String t(String key) {
+    return gp.getLanguageManager().text(key);
   }
 }

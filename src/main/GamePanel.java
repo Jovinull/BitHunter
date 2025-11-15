@@ -66,9 +66,9 @@ public class GamePanel extends JPanel implements Runnable {
   transient Sound se = new Sound(); // Gerencia os efeitos sonoros do jogo
   private transient CollisionChecker cChecker = new CollisionChecker(this); // Verifica colisões
   private transient AssetSetter aSetter = new AssetSetter(this); // Configura os objetos do jogo
+  private transient LanguageManager languageManager = new LanguageManager(); // i18n
   private transient UI gameUi = new UI(this); // Interface do usuário (HUD, mensagens, etc.)
   private transient EventHandler eHandler = new EventHandler(this);
-  private transient LanguageManager languageManager = new LanguageManager(); // i18n
   transient Config config = new Config(this);
   private transient PathFinder pFinder = new PathFinder(this);
   transient EnvironmentManager eManager = new EnvironmentManager(this);

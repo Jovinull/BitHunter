@@ -16,7 +16,15 @@ public class ObjShieldBlue extends Entity {
     down1 = setup("/objects/shield_blue", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
     setDefenseValue(2);
-    setDescription("[" + getName() + "]\nUm escudo azul reluzente.");
+
+    String displayName = t("item.shieldBlue.displayName");
+    String description = "[" + displayName + "]\n" + t("item.shieldBlue.desc");
+    setDescription(description);
+
     setPrice(250);
+  }
+
+  private String t(String key) {
+    return gp.getLanguageManager().text(key);
   }
 }

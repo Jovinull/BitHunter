@@ -17,6 +17,10 @@ public class ObjManaCrystal extends Entity {
     down1 = setup("/objects/manacrystal_full", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     image = setup("/objects/manacrystal_full", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     image2 = setup("/objects/manacrystal_blank", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+
+    String displayName = t("item.manaCrystal.displayName");
+    String description = "[" + displayName + "]\n" + String.format(t("item.manaCrystal.desc"), getValue());
+    setDescription(description);
   }
 
   @Override
@@ -26,8 +30,14 @@ public class ObjManaCrystal extends Entity {
     var ui = gp.getGameUi();
     var player = gp.getPlayer();
 
-    ui.addMessage("Mana +" + getValue());
+    String msg = String.format(t("item.manaCrystal.pickup"), getValue());
+    ui.addMessage(msg);
+
     player.setMana(player.getMana() + getValue());
     return true;
+  }
+
+  private String t(String key) {
+    return gp.getLanguageManager().text(key);
   }
 }

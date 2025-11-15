@@ -31,11 +31,15 @@ public class ObjDoor extends Entity {
 
   public void setDialogue() {
     String[][] d = getDialogues();
-    d[0][0] = "Uma porta trancada. Você precisa de uma \nchave para abri-la.";
+    d[0][0] = t("item.door.dialog.locked");
   }
 
   @Override
   public void interact() {
     startDialogue(this, 0);
+  }
+
+  private String t(String key) {
+    return gp.getLanguageManager().text(key);
   }
 }

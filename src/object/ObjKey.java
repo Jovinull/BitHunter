@@ -13,7 +13,11 @@ public class ObjKey extends Entity {
     setType(TYPE_CONSUMABLE);
     setName(OBJ_NAME);
     down1 = setup("/objects/key", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
-    setDescription("[" + getName() + "]\nAbre portas trancadas.");
+
+    String displayName = t("item.key.displayName");
+    String description = "[" + displayName + "]\n" + t("item.key.desc");
+    setDescription(description);
+
     setPrice(100);
     setStackable(true);
 
@@ -22,8 +26,8 @@ public class ObjKey extends Entity {
 
   public void setDialogue() {
     String[][] d = getDialogues();
-    d[0][0] = "Você usa o " + getName() + " e abre a porta";
-    d[1][0] = "O que você está fazendo?";
+    d[0][0] = String.format(t("item.key.dialog.use"), getName());
+    d[1][0] = t("item.key.dialog.nothing");
   }
 
   @Override
@@ -43,5 +47,9 @@ public class ObjKey extends Entity {
 
     startDialogue(this, 1);
     return false;
+  }
+
+  private String t(String key) {
+    return gp.getLanguageManager().text(key);
   }
 }

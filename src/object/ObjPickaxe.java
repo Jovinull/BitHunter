@@ -19,11 +19,18 @@ public class ObjPickaxe extends Entity {
     getAttackArea().width = 30;
     getAttackArea().height = 30;
 
-    setDescription("[Picareta]\nVocê vai adorar cavar \ncom isso!.");
+    String displayName = t("item.pickaxe.displayName");
+    String description = "[" + displayName + "]\n" + t("item.pickaxe.desc");
+    setDescription(description);
+
     setPrice(75);
     setKnockBackPower(10);
 
     setMotion1Duration(10);
     setMotion2Duration(20);
+  }
+
+  private String t(String key) {
+    return gp.getLanguageManager().text(key);
   }
 }

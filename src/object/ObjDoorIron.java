@@ -31,11 +31,15 @@ public class ObjDoorIron extends Entity {
 
   public void setDialogue() {
     String[][] d = getDialogues();
-    d[0][0] = "Isso não vai se mexer.";
+    d[0][0] = t("item.doorIron.dialog.immovable");
   }
 
   @Override
   public void interact() {
     startDialogue(this, 0);
+  }
+
+  private String t(String key) {
+    return gp.getLanguageManager().text(key);
   }
 }

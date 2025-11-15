@@ -19,11 +19,18 @@ public class ObjSwordNormal extends Entity {
     getAttackArea().width = 36;
     getAttackArea().height = 36;
 
-    setDescription("[" + getName() + "]\nUma espada antiga.");
+    String displayName = t("item.swordNormal.displayName");
+    String description = "[" + displayName + "]\n" + t("item.swordNormal.desc");
+    setDescription(description);
+
     setPrice(20);
     setKnockBackPower(2);
 
     setMotion1Duration(5);
     setMotion2Duration(25);
+  }
+
+  private String t(String key) {
+    return gp.getLanguageManager().text(key);
   }
 }

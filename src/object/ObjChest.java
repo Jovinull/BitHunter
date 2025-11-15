@@ -42,11 +42,15 @@ public class ObjChest extends Entity {
     String lootName = (getLoot() != null) ? getLoot().getName() : "???";
     String[][] d = getDialogues();
 
-    d[0][0] = "Você abre o baú e encontra um " + lootName + "!" +
-        "\n...Mas você não pode carregar mais nada!";
-    d[1][0] = "Você abre o baú e encontra um " + lootName + "!" +
-        "\nVocê obteve " + lootName + "!";
-    d[2][0] = "Está vazio.";
+    d[0][0] = String.format(t("item.chest.dialog.fullInventory.line1"), lootName)
+        + "\n"
+        + t("item.chest.dialog.fullInventory.line2");
+
+    d[1][0] = String.format(t("item.chest.dialog.obtained.line1"), lootName)
+        + "\n"
+        + String.format(t("item.chest.dialog.obtained.line2"), lootName);
+
+    d[2][0] = t("item.chest.dialog.empty");
   }
 
   @Override
@@ -67,5 +71,9 @@ public class ObjChest extends Entity {
     } else {
       startDialogue(this, 2);
     }
+  }
+
+  private String t(String key) {
+    return gp.getLanguageManager().text(key);
   }
 }

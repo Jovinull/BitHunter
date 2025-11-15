@@ -23,11 +23,19 @@ public class ObjAxe extends Entity {
     ar.width = 30;
     ar.height = 30;
 
-    setDescription("[" + getName() + "]\nUm pouco enferrujado, \nmas ainda corta algumas \nárvores.");
+    // descrição com i18n
+    String displayName = t("item.axe.displayName");
+    String description = "[" + displayName + "]\n" + t("item.axe.desc");
+    setDescription(description);
+
     setPrice(75);
     setKnockBackPower(10);
 
     setMotion1Duration(20);
     setMotion2Duration(40);
+  }
+
+  private String t(String key) {
+    return gp.getLanguageManager().text(key);
   }
 }

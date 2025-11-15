@@ -13,8 +13,16 @@ public class ObjLantern extends Entity {
     setType(TYPE_LIGHT);
     setName(OBJ_NAME);
     down1 = setup("/objects/lantern", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
-    setDescription("[" + getName() + "]\nIlumina seus arredores.");
+
+    String displayName = t("item.lantern.displayName");
+    String description = "[" + displayName + "]\n" + t("item.lantern.desc");
+    setDescription(description);
+
     setPrice(200);
     setLightRadius(250);
+  }
+
+  private String t(String key) {
+    return gp.getLanguageManager().text(key);
   }
 }

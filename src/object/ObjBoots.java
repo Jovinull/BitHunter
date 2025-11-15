@@ -18,7 +18,15 @@ public class ObjBoots extends Entity {
     setSpeedValue(2);
     setDefenseValue(2);
 
-    setDescription("[" + getName() + "]\nBotas leves que \naumentam a velocidade \nem +2.");
+    // descrição com i18n
+    String displayName = t("item.boots.displayName");
+    String description = "[" + displayName + "]\n" + t("item.boots.desc");
+    setDescription(description);
+
     setPrice(720);
+  }
+
+  private String t(String key) {
+    return gp.getLanguageManager().text(key);
   }
 }

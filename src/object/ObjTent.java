@@ -15,7 +15,10 @@ public class ObjTent extends Entity {
 
     down1 = setup("/objects/tent", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
-    setDescription("[" + getName() + "]\nVocê pode dormir até \na manhã seguinte.");
+    String displayName = t("item.tent.displayName");
+    String description = "[" + displayName + "]\n" + t("item.tent.desc");
+    setDescription(description);
+
     setPrice(300);
     setStackable(true);
   }
@@ -32,5 +35,9 @@ public class ObjTent extends Entity {
     // mantém o comportamento existente
     player.getSleepingImage(down1);
     return true;
+  }
+
+  private String t(String key) {
+    return gp.getLanguageManager().text(key);
   }
 }

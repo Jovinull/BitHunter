@@ -15,7 +15,11 @@ public class ObjPotionRed extends Entity {
     setValue(5);
 
     down1 = setup("/objects/potion_red", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
-    setDescription("[" + getName() + "]\nRestaura sua vida em " + getValue() + ".");
+
+    String displayName = t("item.potionRed.displayName");
+    String description = "[" + displayName + "]\n" + String.format(t("item.potionRed.desc"), getValue());
+    setDescription(description);
+
     setPrice(25);
     setStackable(true);
 
@@ -24,7 +28,8 @@ public class ObjPotionRed extends Entity {
 
   public void setDialogue() {
     String[][] d = getDialogues();
-    d[0][0] = "Você bebe a " + getName() + "!\nSua vida foi restaurada em " + getValue() + ".";
+    String displayName = t("item.potionRed.displayName");
+    d[0][0] = String.format(t("item.potionRed.dialog.use"), displayName, getValue());
   }
 
   @Override
@@ -32,5 +37,9 @@ public class ObjPotionRed extends Entity {
     startDialogue(this, 0);
     gp.playSE(2);
     return true;
+  }
+
+  private String t(String key) {
+    return gp.getLanguageManager().text(key);
   }
 }
