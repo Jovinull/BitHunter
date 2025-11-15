@@ -150,7 +150,7 @@ public class CutsceneManager {
     // Procurar o dummy
     for (int i = 0; i < npcs[currentMap].length; i++) {
       if (npcs[currentMap][i] != null &&
-          PlayerDummy.NPC_NAME.equals(npcs[currentMap][i].getInternalId())) {
+          PlayerDummy.NPC_ID.equals(npcs[currentMap][i].getInternalId())) {
         // Restaurar posição do player
         player.setWorldX(npcs[currentMap][i].getWorldX());
         player.setWorldY(npcs[currentMap][i].getWorldY());

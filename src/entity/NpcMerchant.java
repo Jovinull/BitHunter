@@ -14,11 +14,16 @@ import object.ObjSwordNormal;
 
 public class NpcMerchant extends Entity {
 
+  public static final String NPC_ID = "npc.merchant";
+
   private static final String SPRITE_DOWN_1 = "/npc/merchant/merchant_down_1";
   private static final String SPRITE_DOWN_2 = "/npc/merchant/merchant_down_2";
 
   public NpcMerchant(GamePanel gp) {
     super(gp);
+
+    setInternalId(NPC_ID);
+    setTranslationKey(NPC_ID);
 
     setDirection(DIR_DOWN);
     setSpeed(1);

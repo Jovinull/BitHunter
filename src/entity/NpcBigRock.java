@@ -11,8 +11,8 @@ import tile_interactive.ItMetalPlate;
 
 public class NpcBigRock extends Entity {
 
-  // Nome público e estável do NPC (usado para comparação)
-  public static final String NPC_NAME = "Pedra Grande";
+  // Identificador interno estável do NPC (usado para lógica)
+  public static final String NPC_ID = "npc.bigRock";
 
   // Evita duplicação do literal do caminho
   private static final String SPRITE_PATH = "/npc/bigrock";
@@ -25,7 +25,10 @@ public class NpcBigRock extends Entity {
   public NpcBigRock(GamePanel gp) {
     super(gp);
 
-    setName(NPC_NAME);
+    // Novo padrão: tudo baseado em internalId/translationKey
+    setInternalId(NPC_ID);
+    setTranslationKey(NPC_ID);
+
     setDirection(DIR_DOWN);
     setSpeed(4);
 
@@ -154,7 +157,7 @@ public class NpcBigRock extends Entity {
     Entity[] npcs = allNpcs[currentMapIndex];
 
     for (Entity e : npcs) {
-      if (e != null && NPC_NAME.equals(e.getInternalId())) {
+      if (e != null && NPC_ID.equals(e.getInternalId())) {
         rocks.add(e);
       }
     }

@@ -4,11 +4,12 @@ import main.GamePanel;
 
 public class PlayerDummy extends Entity {
 
-  public static final String NPC_NAME = "Dummy";
+  public static final String NPC_ID = "npc.dummy";
 
   public PlayerDummy(GamePanel gp) {
     super(gp);
-    setName(NPC_NAME);
+    setInternalId(NPC_ID);
+    setTranslationKey(NPC_ID);
     getImage();
   }
 

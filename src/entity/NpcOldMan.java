@@ -6,6 +6,8 @@ import main.GamePanel;
 
 public class NpcOldMan extends Entity {
 
+  public static final String NPC_ID = "npc.oldMan";
+
   // Objetivo do pathfinder
   private static final int GOAL_COL = 23;
   private static final int GOAL_ROW = 13;
@@ -27,6 +29,9 @@ public class NpcOldMan extends Entity {
 
   public NpcOldMan(GamePanel gp) {
     super(gp);
+
+    setInternalId(NPC_ID);
+    setTranslationKey(NPC_ID);
 
     setDirection(DIR_DOWN);
     setSpeed(1);
