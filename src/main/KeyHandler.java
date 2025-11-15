@@ -268,7 +268,7 @@ public class KeyHandler implements KeyListener {
    */
   private int getOptionsMaxCommandNum() {
     return switch (gp.getGameUi().subState) {
-      case 0 -> 6;
+      case 0 -> 5;
       case 1, 2 -> 0;
       case 3 -> 1;
       case 4 -> gp.getLanguageManager().getAvailableLanguages().size();
