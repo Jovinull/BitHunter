@@ -8,16 +8,21 @@ import main.GamePanel;
 public class ObjDoor extends Entity {
 
   public static final String OBJ_ID = "item.door";
-  public static final String OBJ_NAME = "Porta";
+  public static final String OBJ_NAME = "Porta"; // opcional, só se você ainda usar em algum lugar legado
 
   public ObjDoor(GamePanel gp) {
     super(gp);
 
     setType(TYPE_OBSTACLE);
+
+    // Identidade e i18n
     setInternalId(OBJ_ID);
     setTranslationKey(OBJ_ID);
-    setName(OBJ_NAME);
 
+    // Nome interno: usa o OBJ_ID para ficar consistente com o sistema novo
+    setName(OBJ_ID);
+
+    // Sprite e colisão
     down1 = setup("/objects/door", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     setCollision(true);
 
@@ -32,7 +37,7 @@ public class ObjDoor extends Entity {
     setDialogue();
   }
 
-  public void setDialogue() {
+  private void setDialogue() {
     String[][] d = getDialogues();
     d[0][0] = t("item.door.dialog.locked");
   }
