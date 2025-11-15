@@ -80,7 +80,7 @@ public class CutsceneManager {
     // Procurar o boss
     for (int i = 0; i < monsters[currentMap].length; i++) {
       var monster = monsters[currentMap][i];
-      if (monster != null && MonSkeletonLord.MON_NAME.equals(monster.getName())) {
+      if (monster != null && MonSkeletonLord.MON_NAME.equals(monster.getInternalId())) {
         monster.setSleep(false);
         gp.getGameUi().setNpc(monster);
         scenePhase++;
@@ -150,7 +150,7 @@ public class CutsceneManager {
     // Procurar o dummy
     for (int i = 0; i < npcs[currentMap].length; i++) {
       if (npcs[currentMap][i] != null &&
-          PlayerDummy.NPC_NAME.equals(npcs[currentMap][i].getName())) {
+          PlayerDummy.NPC_NAME.equals(npcs[currentMap][i].getInternalId())) {
         // Restaurar posição do player
         player.setWorldX(npcs[currentMap][i].getWorldX());
         player.setWorldY(npcs[currentMap][i].getWorldY());

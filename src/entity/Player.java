@@ -494,7 +494,7 @@ public class Player extends Entity {
       String text;
       if (canObtainItem(obj)) {
         gp.playSE(1);
-        text = "Você obteve " + obj.getName() + "!";
+        text = "Você obteve " + obj.getInternalId() + "!";
       } else {
         text = "Você não pode carregar mais nada!";
       }
@@ -573,7 +573,7 @@ public class Player extends Entity {
 
       if (mon.getLife() <= 0) {
         mon.setDying(true);
-        gp.getGameUi().addMessage("Matou o " + mon.getName() + "!");
+        gp.getGameUi().addMessage("Matou o " + mon.getInternalId() + "!");
         gp.getGameUi().addMessage("Exp + " + mon.getExp());
         setExp(getExp() + mon.getExp());
         checkLevelUp();
@@ -708,7 +708,7 @@ public class Player extends Entity {
   public int searchItemInInventory(String itemName) {
     var inv = getInventory();
     for (int i = 0; i < inv.size(); i++) {
-      if (inv.get(i).getName().equals(itemName)) {
+      if (inv.get(i).getInternalId().equals(itemName)) {
         return i;
       }
     }
@@ -717,11 +717,11 @@ public class Player extends Entity {
 
   public boolean canObtainItem(Entity item) {
     boolean canObtain = false;
-    Entity newItem = gp.geteGenerator().getObject(item.getName());
+    Entity newItem = gp.geteGenerator().getObject(item.getInternalId());
     var inv = getInventory();
 
     if (newItem.isStackable()) {
-      int index = searchItemInInventory(newItem.getName());
+      int index = searchItemInInventory(newItem.getInternalId());
       if (index != 999) {
         inv.get(index).setAmount(inv.get(index).getAmount() + 1);
         canObtain = true;

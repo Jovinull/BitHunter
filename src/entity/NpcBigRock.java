@@ -139,7 +139,7 @@ public class NpcBigRock extends Entity {
     InteractiveTile[] tiles = allTiles[currentMapIndex];
 
     for (InteractiveTile tile : tiles) {
-      if (tile != null && ItMetalPlate.IT_NAME.equals(tile.getName())) {
+      if (tile != null && ItMetalPlate.IT_NAME.equals(tile.getInternalId())) {
         plates.add(tile);
       }
     }
@@ -154,7 +154,7 @@ public class NpcBigRock extends Entity {
     Entity[] npcs = allNpcs[currentMapIndex];
 
     for (Entity e : npcs) {
-      if (e != null && NPC_NAME.equals(e.getName())) {
+      if (e != null && NPC_NAME.equals(e.getInternalId())) {
         rocks.add(e);
       }
     }
@@ -200,7 +200,7 @@ public class NpcBigRock extends Entity {
 
     for (int i = 0; i < objects.length; i++) {
       Entity obj = objects[i];
-      if (obj != null && ObjDoorIron.OBJ_ID.equals(obj.getName())) {
+      if (obj != null && ObjDoorIron.OBJ_ID.equals(obj.getInternalId())) {
         objects[i] = null;
         opened = true;
       }

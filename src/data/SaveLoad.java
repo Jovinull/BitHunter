@@ -95,7 +95,7 @@ public class SaveLoad {
       return id;
     }
 
-    return entity.getName();
+    return entity.getInternalId();
   }
 
   /* ----- Copy to storage (SAVE) ----- */

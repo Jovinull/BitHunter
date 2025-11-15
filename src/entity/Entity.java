@@ -1096,8 +1096,8 @@ public class Entity {
 
       // 2) Fallback de compatibilidade: se não tiver internalId, tenta por name
       if ((candidateId == null || candidateId.isEmpty())
-          && t.getName() != null
-          && t.getName().equals(targetInternalId)) {
+          && t.getInternalId() != null
+          && t.getInternalId().equals(targetInternalId)) {
         return i;
       }
     }
