@@ -256,10 +256,22 @@ public class KeyHandler implements KeyListener {
     }
   }
 
+  /**
+   * Retorna o índice máximo de comando permitido na tela de opções, de acordo
+   * com o subState atual da UI.
+   *
+   * subState 0 -> menu principal de opções (0..6)
+   * subState 1 -> aviso de tela cheia (apenas "Voltar", índice 0)
+   * subState 2 -> tela de controles (apenas "Voltar", índice 0)
+   * subState 3 -> confirmação de encerrar jogo ("Sim"/"Não", índices 0..1)
+   * subState 4 -> seleção de idioma (0..N idiomas, + "Voltar" em N)
+   */
   private int getOptionsMaxCommandNum() {
     return switch (gp.getGameUi().subState) {
-      case 0 -> 5;
+      case 0 -> 6;
+      case 1, 2 -> 0;
       case 3 -> 1;
+      case 4 -> gp.getLanguageManager().getAvailableLanguages().size();
       default -> 0;
     };
   }

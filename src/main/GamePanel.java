@@ -68,6 +68,7 @@ public class GamePanel extends JPanel implements Runnable {
   private transient AssetSetter aSetter = new AssetSetter(this); // Configura os objetos do jogo
   private transient UI gameUi = new UI(this); // Interface do usuário (HUD, mensagens, etc.)
   private transient EventHandler eHandler = new EventHandler(this);
+  private transient LanguageManager languageManager = new LanguageManager(); // i18n
   transient Config config = new Config(this);
   private transient PathFinder pFinder = new PathFinder(this);
   transient EnvironmentManager eManager = new EnvironmentManager(this);
@@ -129,6 +130,9 @@ public class GamePanel extends JPanel implements Runnable {
     aSetter.setMonster();
     aSetter.setInteractiveTile();
     eManager.setup();
+
+    // Carrega configurações persistidas (volume, fullscreen, idioma)
+    config.loadConfig();
 
     gameState = TITLE_STATE;
     currentArea = OUTSIDE;
@@ -612,5 +616,9 @@ public class GamePanel extends JPanel implements Runnable {
 
   public void setNextArea(int nextArea) {
     this.nextArea = nextArea;
+  }
+
+  public LanguageManager getLanguageManager() {
+    return languageManager;
   }
 }
