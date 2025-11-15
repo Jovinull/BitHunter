@@ -15,7 +15,6 @@ public class ObjAxe extends Entity {
     setType(TYPE_AXE);
     setInternalId(OBJ_ID);
     setTranslationKey(OBJ_ID);
-    setName(OBJ_ID);
 
     // sprite
     down1 = setup("/objects/axe", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);

@@ -13,7 +13,6 @@ public class ObjPickaxe extends Entity {
     setType(TYPE_PICKAXE);
     setInternalId(OBJ_ID);
     setTranslationKey(OBJ_ID);
-    setName(OBJ_ID);
 
     down1 = setup("/objects/pickaxe", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 

@@ -13,7 +13,6 @@ public class ObjLantern extends Entity {
     setType(TYPE_LIGHT);
     setInternalId(OBJ_ID);
     setTranslationKey(OBJ_ID);
-    setName(OBJ_ID);
 
     down1 = setup("/objects/lantern", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 

@@ -15,7 +15,6 @@ public class ObjFireball extends Projectile {
 
     setInternalId(OBJ_ID);
     setTranslationKey(OBJ_ID);
-    setName(OBJ_ID);
 
     setSpeed(5);
     setMaxLife(80);

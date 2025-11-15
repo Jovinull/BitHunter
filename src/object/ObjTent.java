@@ -13,7 +13,6 @@ public class ObjTent extends Entity {
     setType(TYPE_CONSUMABLE);
     setInternalId(OBJ_ID);
     setTranslationKey(OBJ_ID);
-    setName(OBJ_ID);
 
     down1 = setup("/objects/tent", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 

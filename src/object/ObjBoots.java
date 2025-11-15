@@ -13,7 +13,6 @@ public class ObjBoots extends Entity {
     setType(TYPE_BOOTS);
     setInternalId(OBJ_ID);
     setTranslationKey(OBJ_ID);
-    setName(OBJ_ID);
 
     down1 = setup("/objects/boots", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 

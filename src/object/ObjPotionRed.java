@@ -13,7 +13,6 @@ public class ObjPotionRed extends Entity {
     setType(TYPE_CONSUMABLE);
     setInternalId(OBJ_ID);
     setTranslationKey(OBJ_ID);
-    setName(OBJ_ID);
     setValue(5);
 
     down1 = setup("/objects/potion_red", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);

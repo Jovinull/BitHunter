@@ -13,7 +13,6 @@ public class ObjSwordNormal extends Entity {
     setType(TYPE_SWORD);
     setInternalId(OBJ_ID);
     setTranslationKey(OBJ_ID);
-    setName(OBJ_ID);
 
     down1 = setup("/objects/sword_normal", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 

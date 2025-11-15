@@ -18,9 +18,6 @@ public class ObjDoorIron extends Entity {
     setInternalId(OBJ_ID);
     setTranslationKey(OBJ_ID);
 
-    // Nome interno seguindo o padrão novo
-    setName(OBJ_ID);
-
     // Sprite e colisão
     down1 = setup("/objects/door_iron", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     setCollision(true);

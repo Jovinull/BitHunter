@@ -13,7 +13,6 @@ public class ObjShieldBlue extends Entity {
     setType(TYPE_SHIELD);
     setInternalId(OBJ_ID);
     setTranslationKey(OBJ_ID);
-    setName(OBJ_ID);
 
     down1 = setup("/objects/shield_blue", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 

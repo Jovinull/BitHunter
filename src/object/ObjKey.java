@@ -13,7 +13,6 @@ public class ObjKey extends Entity {
     setType(TYPE_CONSUMABLE);
     setInternalId(OBJ_ID);
     setTranslationKey(OBJ_ID);
-    setName(OBJ_ID);
 
     down1 = setup("/objects/key", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 

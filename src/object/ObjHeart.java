@@ -13,7 +13,6 @@ public class ObjHeart extends Entity {
     setType(TYPE_PICKUP_ONLY);
     setInternalId(OBJ_ID);
     setTranslationKey(OBJ_ID);
-    setName(OBJ_ID);
     setValue(2);
 
     down1 = setup("/objects/heart_full", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);

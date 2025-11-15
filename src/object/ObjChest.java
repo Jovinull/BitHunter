@@ -15,7 +15,6 @@ public class ObjChest extends Entity {
     setType(TYPE_OBSTACLE);
     setInternalId(OBJ_ID);
     setTranslationKey(OBJ_ID);
-    setName(OBJ_ID);
 
     // sprites
     image = setup("/objects/chest", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);

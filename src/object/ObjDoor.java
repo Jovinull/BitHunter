@@ -18,9 +18,6 @@ public class ObjDoor extends Entity {
     setInternalId(OBJ_ID);
     setTranslationKey(OBJ_ID);
 
-    // Nome interno: usa o OBJ_ID para ficar consistente com o sistema novo
-    setName(OBJ_ID);
-
     // Sprite e colisão
     down1 = setup("/objects/door", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     setCollision(true);

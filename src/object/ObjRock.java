@@ -16,7 +16,6 @@ public class ObjRock extends Projectile {
 
     setInternalId(OBJ_ID);
     setTranslationKey(OBJ_ID);
-    setName(OBJ_ID);
 
     setSpeed(8);
     setMaxLife(80);

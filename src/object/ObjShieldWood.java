@@ -13,7 +13,6 @@ public class ObjShieldWood extends Entity {
     setType(TYPE_SHIELD);
     setInternalId(OBJ_ID);
     setTranslationKey(OBJ_ID);
-    setName(OBJ_ID);
 
     down1 = setup("/objects/shield_wood", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 

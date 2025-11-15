@@ -13,7 +13,6 @@ public class ObjCoinBronze extends Entity {
     setType(TYPE_PICKUP_ONLY);
     setInternalId(OBJ_ID);
     setTranslationKey(OBJ_ID);
-    setName(OBJ_ID);
 
     setValue(1);
     down1 = setup("/objects/coin_bronze", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
