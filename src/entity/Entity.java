@@ -520,10 +520,21 @@ public class Entity {
    */
   public String getDisplayName() {
     LanguageManager lm = gp != null ? gp.getLanguageManager() : null;
-    if (lm != null && translationKey != null && !translationKey.isEmpty()) {
-      return lm.text(translationKey + ".name");
+
+    // Se não tiver translationKey definida, tenta usar o internalId
+    String baseKey = null;
+    if (translationKey != null && !translationKey.isEmpty()) {
+      baseKey = translationKey;
+    } else if (internalId != null && !internalId.isEmpty()) {
+      baseKey = internalId;
     }
-    return getName();
+
+    if (lm != null && baseKey != null) {
+      return lm.text(baseKey + ".displayName");
+    }
+
+    // Fallback: nome "cru" (pode ser OBJ_ID ou nome antigo)
+    return name != null ? name : "";
   }
 
   /**
@@ -532,11 +543,20 @@ public class Entity {
    */
   public String getDisplayDescription() {
     LanguageManager lm = gp != null ? gp.getLanguageManager() : null;
-    if (lm != null && translationKey != null && !translationKey.isEmpty()) {
-      return lm.text(translationKey + ".desc");
+
+    String baseKey = null;
+    if (translationKey != null && !translationKey.isEmpty()) {
+      baseKey = translationKey;
+    } else if (internalId != null && !internalId.isEmpty()) {
+      baseKey = internalId;
     }
-    String desc = getDescription();
-    return desc != null ? desc : "";
+
+    if (lm != null && baseKey != null) {
+      return lm.text(baseKey + ".desc");
+    }
+
+    // Fallback: usa a descrição que eventualmente foi preenchida manualmente
+    return description != null ? description : "";
   }
 
   /**
