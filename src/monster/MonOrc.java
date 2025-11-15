@@ -10,12 +10,16 @@ import object.ObjManaCrystal;
 
 public class MonOrc extends Entity {
 
+  public static final String MON_ID = "monster.orc";
+
   public MonOrc(GamePanel gp) {
     super(gp);
 
     // Atributos base
     setType(TYPE_MONSTER);
-    setName("Orc");
+    setInternalId(MON_ID);
+    setTranslationKey(MON_ID);
+
     setDefaultSpeed(1);
     setSpeed(getDefaultSpeed());
     setMaxLife(12);
@@ -91,7 +95,6 @@ public class MonOrc extends Entity {
 
   @Override
   public void checkDrop() {
-    // (S2119) Reusar Random -> ThreadLocalRandom
     int i = ThreadLocalRandom.current().nextInt(1, 101);
 
     if (i < 50) {

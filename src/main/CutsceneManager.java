@@ -80,7 +80,7 @@ public class CutsceneManager {
     // Procurar o boss
     for (int i = 0; i < monsters[currentMap].length; i++) {
       var monster = monsters[currentMap][i];
-      if (monster != null && MonSkeletonLord.MON_NAME.equals(monster.getInternalId())) {
+      if (monster != null && MonSkeletonLord.MON_ID.equals(monster.getInternalId())) {
         monster.setSleep(false);
         gp.getGameUi().setNpc(monster);
         scenePhase++;

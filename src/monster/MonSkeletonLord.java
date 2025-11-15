@@ -12,7 +12,7 @@ import object.ObjManaCrystal;
 
 public class MonSkeletonLord extends Entity {
 
-  public static final String MON_NAME = "Lorde Esqueleto";
+  public static final String MON_ID = "monster.skeletonLord";
 
   public MonSkeletonLord(GamePanel gp) {
     super(gp);
@@ -20,7 +20,9 @@ public class MonSkeletonLord extends Entity {
     // Atributos-base
     setType(TYPE_MONSTER);
     setBoss(true);
-    setName(MON_NAME);
+    setInternalId(MON_ID);
+    setTranslationKey(MON_ID);
+
     setDefaultSpeed(1);
     setSpeed(getDefaultSpeed());
     setMaxLife(50);
@@ -85,10 +87,14 @@ public class MonSkeletonLord extends Entity {
     if (!isInRage()) {
       attackUp1 = setup("/monster/skeletonlord_attack_up_1", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i * 2);
       attackUp2 = setup("/monster/skeletonlord_attack_up_2", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i * 2);
-      attackDown1 = setup("/monster/skeletonlord_attack_down_1", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i * 2);
-      attackDown2 = setup("/monster/skeletonlord_attack_down_2", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i * 2);
-      attackLeft1 = setup("/monster/skeletonlord_attack_left_1", GamePanel.TILE_SIZE * i * 2, GamePanel.TILE_SIZE * i);
-      attackLeft2 = setup("/monster/skeletonlord_attack_left_2", GamePanel.TILE_SIZE * i * 2, GamePanel.TILE_SIZE * i);
+      attackDown1 = setup("/monster/skeletonlord_attack_down_1", GamePanel.TILE_SIZE * i,
+          GamePanel.TILE_SIZE * i * 2);
+      attackDown2 = setup("/monster/skeletonlord_attack_down_2", GamePanel.TILE_SIZE * i,
+          GamePanel.TILE_SIZE * i * 2);
+      attackLeft1 = setup("/monster/skeletonlord_attack_left_1", GamePanel.TILE_SIZE * i * 2,
+          GamePanel.TILE_SIZE * i);
+      attackLeft2 = setup("/monster/skeletonlord_attack_left_2", GamePanel.TILE_SIZE * i * 2,
+          GamePanel.TILE_SIZE * i);
       attackRight1 = setup("/monster/skeletonlord_attack_right_1", GamePanel.TILE_SIZE * i * 2,
           GamePanel.TILE_SIZE * i);
       attackRight2 = setup("/monster/skeletonlord_attack_right_2", GamePanel.TILE_SIZE * i * 2,
@@ -167,7 +173,6 @@ public class MonSkeletonLord extends Entity {
       }
     }
 
-    // (S2119) Reusar Random -> ThreadLocalRandom
     int roll = ThreadLocalRandom.current().nextInt(1, 101);
 
     if (roll < 50) {

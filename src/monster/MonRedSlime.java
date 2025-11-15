@@ -11,7 +11,8 @@ import object.ObjRock;
 
 public class MonRedSlime extends Entity {
 
-  // Evita duplicação de literais (S1192)
+  public static final String MON_ID = "monster.redSlime";
+
   private static final String SLIME_DOWN_1 = "/monster/redslime_down_1";
   private static final String SLIME_DOWN_2 = "/monster/redslime_down_2";
 
@@ -20,7 +21,9 @@ public class MonRedSlime extends Entity {
 
     // Atributos base
     setType(TYPE_MONSTER);
-    setName("Slime Vermelho");
+    setInternalId(MON_ID);
+    setTranslationKey(MON_ID);
+
     setDefaultSpeed(2);
     setSpeed(getDefaultSpeed());
     setMaxLife(8);
