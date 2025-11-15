@@ -16,6 +16,7 @@ import javax.imageio.ImageIO;
 
 import main.GamePanel;
 import main.UtilityTool;
+import main.LanguageManager;
 
 public class Entity {
 
@@ -52,7 +53,7 @@ public class Entity {
 
   protected final GamePanel gp;
 
-  // Sprites de movimento (visíveis para subclasses, não públicos)
+  // Sprites de movimento
   protected BufferedImage up1;
   protected BufferedImage up2;
   protected BufferedImage down1;
@@ -90,7 +91,7 @@ public class Entity {
 
   private boolean collision = false;
 
-  // Diálogos (expostos via getter para UI/consumo externo)
+  // Diálogos
   private final String[][] dialogues = new String[20][20];
 
   private Entity attacker;
@@ -178,6 +179,10 @@ public class Entity {
   private boolean stackable = false;
   private int amount = 1;
   private int lightRadius;
+
+  // NOVOS CAMPOS PARA IDENTIFICAÇÃO / I18N
+  private String internalId; // id estável: ex: "item.axe"
+  private String translationKey; // chave base para i18n: ex: "item.axe"
 
   private int type; // usar TYPE_*
 
@@ -290,29 +295,24 @@ public class Entity {
     this.loot = loot;
   }
 
-  /** hook: sobrescreva em subclasses para definir ações por frame */
   public void setAction() {
     // no-op
   }
 
-  /** hook: atualização direcional direta; padrão apenas ajusta a direção atual */
   public void move(String direction) {
     if (direction != null) {
       this.direction = direction;
     }
   }
 
-  /** hook: reação de dano em subclasses (knockback custom etc.) */
   public void damageReaction() {
     // no-op
   }
 
-  /** hook: diálogo em NPCs/Jogador */
   public void speak() {
     // no-op
   }
 
-  /** hook: interação genérica (abrir baú, alavanca, etc.) */
   public void interact() {
     // no-op
   }
@@ -343,23 +343,11 @@ public class Entity {
     dialogueSet = setNum;
   }
 
-  /**
-   * hook: uso/aplicação de item/entidade sobre outra entidade.
-   *
-   * @param entity
-   *          alvo do uso (não pode ser null)
-   * @return true se houve uso bem-sucedido
-   * @throws NullPointerException
-   *           se entity for null
-   * @throws UnsupportedOperationException
-   *           se esta entidade não for usável
-   */
   public boolean use(Entity entity) {
     Objects.requireNonNull(entity, "entity");
     throw new UnsupportedOperationException(getClass().getSimpleName() + " não é usável.");
   }
 
-  /** hook: lógica de drop em morte/abertura */
   public void checkDrop() {
     // no-op
   }
@@ -524,6 +512,42 @@ public class Entity {
     if (shotAvailableCounter < 30) {
       shotAvailableCounter++;
     }
+  }
+
+  /**
+   * Nome para exibição, já traduzido.
+   * Por padrão usa translationKey + ".name".
+   */
+  public String getDisplayName() {
+    LanguageManager lm = gp != null ? gp.getLanguageManager() : null;
+    if (lm != null && translationKey != null && !translationKey.isEmpty()) {
+      return lm.text(translationKey + ".name");
+    }
+    return getName();
+  }
+
+  /**
+   * Descrição para exibição, já traduzida.
+   * Por padrão usa translationKey + ".desc".
+   */
+  public String getDisplayDescription() {
+    LanguageManager lm = gp != null ? gp.getLanguageManager() : null;
+    if (lm != null && translationKey != null && !translationKey.isEmpty()) {
+      return lm.text(translationKey + ".desc");
+    }
+    String desc = getDescription();
+    return desc != null ? desc : "";
+  }
+
+  /**
+   * Helper básico de tradução para subclasses de Entity.
+   */
+  protected String t(String key) {
+    LanguageManager lm = gp != null ? gp.getLanguageManager() : null;
+    if (lm == null) {
+      return key;
+    }
+    return lm.text(key);
   }
 
   private void handleOffBalance() {
@@ -768,8 +792,6 @@ public class Entity {
         worldY - tileSize < player.getWorldY() + player.screenY);
   }
 
-  // -------- DRAW --------
-
   public void draw(Graphics2D g2) {
     if (!inCamera()) {
       return;
@@ -849,10 +871,9 @@ public class Entity {
   }
 
   public void dyingAnimation(Graphics2D g2) {
-    // Pisca a cada 5 frames; após 8 fases, marca como morto.
     dyingCounter++;
-    int phase = dyingCounter / 5; // 0..?
-    boolean visible = (phase % 2) == 1; // alterna visibilidade
+    int phase = dyingCounter / 5;
+    boolean visible = (phase % 2) == 1;
 
     changeAlpha(g2, visible ? 1f : 0f);
 
@@ -879,7 +900,7 @@ public class Entity {
   }
 
   // =========================
-  // PATHFINDING (refatorado)
+  // PATHFINDING
   // =========================
   public void searchPath(int goalCol, int goalRow) {
     int startCol = getCol();
@@ -899,7 +920,6 @@ public class Entity {
       return;
     }
 
-    // Primeiro passo do caminho
     int nextCol = path.get(0).getCol();
     int nextRow = path.get(0).getRow();
 
@@ -914,7 +934,6 @@ public class Entity {
     boolean alignedVertical = isAlignedVertical(enLeftX, enRightX, nextX);
     boolean alignedHorizontal = isAlignedHorizontal(enTopY, enBottomY, nextY);
 
-    // Movimentos retos
     if (alignedVertical && moveVerticallyToward(enTopY, nextY)) {
       checkGoalReached(goalCol, goalRow, nextCol, nextRow);
       return;
@@ -924,7 +943,6 @@ public class Entity {
       return;
     }
 
-    // Movimento diagonal com fallback
     moveDiagonallyTowards(nextX, nextY, enLeftX, enRightX, enTopY, enBottomY);
 
     checkGoalReached(goalCol, goalRow, nextCol, nextRow);
@@ -1047,7 +1065,7 @@ public class Entity {
   }
 
   // =========================
-  // Getters/Setters essenciais
+  // Getters/Setters
   // =========================
 
   public Rectangle getSolidArea() {
@@ -1510,16 +1528,16 @@ public class Entity {
     return currentShield;
   }
 
+  public void setCurrentShield(Entity currentShield) {
+    this.currentShield = currentShield;
+  }
+
   public Entity getCurrentBoots() {
     return currentBoots;
   }
 
   public void setCurrentBoots(Entity currentBoots) {
     this.currentBoots = currentBoots;
-  }
-
-  public void setCurrentShield(Entity currentShield) {
-    this.currentShield = currentShield;
   }
 
   public Entity getCurrentLight() {
@@ -1566,20 +1584,20 @@ public class Entity {
     this.attackValue = attackValue;
   }
 
-  public int getSpeedValue() {
-    return speedValue;
-  }
-
-  public void setSpeedValue(int speedValue) {
-    this.speedValue = speedValue;
-  }
-
   public int getDefenseValue() {
     return defenseValue;
   }
 
   public void setDefenseValue(int defenseValue) {
     this.defenseValue = defenseValue;
+  }
+
+  public int getSpeedValue() {
+    return speedValue;
+  }
+
+  public void setSpeedValue(int speedValue) {
+    this.speedValue = speedValue;
   }
 
   public String getDescription() {
@@ -1668,5 +1686,21 @@ public class Entity {
 
   public void setCurrentLegs(Entity currentLegs) {
     this.currentLegs = currentLegs;
+  }
+
+  public String getInternalId() {
+    return internalId;
+  }
+
+  public void setInternalId(String internalId) {
+    this.internalId = internalId;
+  }
+
+  public String getTranslationKey() {
+    return translationKey;
+  }
+
+  public void setTranslationKey(String translationKey) {
+    this.translationKey = translationKey;
   }
 }

@@ -620,6 +620,12 @@ public class UI {
 
     int itemIndex = getItemIndexOnSlot(slotCol, slotRow);
     if (itemIndex < entity.getInventory().size()) {
+
+      Entity item = entity.getInventory().get(itemIndex);
+      if (item == null) {
+        return;
+      }
+
       drawSubWindow(dFrameX, dFrameY, dFrameWidth, dFrameHeight);
 
       int textX = dFrameX + 20;
@@ -630,20 +636,22 @@ public class UI {
       Font titleFont = baseFont.deriveFont(Font.BOLD, 20F);
       Font descFont = baseFont.deriveFont(Font.PLAIN, 20F);
 
-      String[] lines = entity.getInventory().get(itemIndex).getDescription().split("\n");
+      // --- Nome traduzido ---
+      String displayName = item.getDisplayName(); // usa i18n
+      g2.setFont(titleFont);
+      g2.drawString("[" + displayName + "]", textX, textY);
+      textY += 24;
 
-      // primeira linha (ex: [Espada Comum]) em negrito
-      if (lines.length > 0) {
-        g2.setFont(titleFont);
-        g2.drawString(lines[0], textX, textY);
-        textY += 24;
-      }
-
-      // demais linhas em normal
+      // --- Descrição traduzida ---
+      String desc = item.getDisplayDescription(); // usa i18n
       g2.setFont(descFont);
-      for (int i = 1; i < lines.length; i++) {
-        g2.drawString(lines[i], textX, textY);
-        textY += 22;
+
+      if (desc != null && !desc.isEmpty()) {
+        String[] lines = desc.split("\n");
+        for (String line : lines) {
+          g2.drawString(line, textX, textY);
+          textY += 22;
+        }
       }
     }
   }
