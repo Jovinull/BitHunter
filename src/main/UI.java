@@ -164,91 +164,77 @@ public class UI {
     }
   }
 
-  // --- HUD: Vida & Mana ---
+  // --- HUD: Vida & Mana (barras) ---
   public void drawPlayerLife() {
-    final int iconSize = 32;
-    final int colsPerRow = 8;
-
-    int startX = GamePanel.TILE_SIZE / 2;
-    int startY = GamePanel.TILE_SIZE / 2;
-
-    int x = startX;
-    int y = startY;
-    int i = 0;
-
-    int manaStartX = (GamePanel.TILE_SIZE / 2) - 5;
-    int manaStartY;
-
     var player = gp.getPlayer();
 
-    // --- MAX LIFE (corações vazios) ---
-    int maxHearts = player.getMaxLife() / 2;
-    while (i < maxHearts) {
-      g2.drawImage(heartBlank, x, y, iconSize, iconSize, null);
-      i++;
-      x += iconSize;
+    int barWidth = GamePanel.TILE_SIZE * 3;
+    int barHeight = 18;
 
-      if (i % colsPerRow == 0) {
-        x = startX;
-        y += iconSize;
-      }
+    int x = GamePanel.TILE_SIZE;
+    int y = GamePanel.TILE_SIZE / 2;
+
+    // Vida - barra vermelha
+    drawHudBar(
+        x,
+        y,
+        barWidth,
+        barHeight,
+        player.getLife(),
+        player.getMaxLife(),
+        "Vida",
+        new Color(210, 70, 70));
+
+    // Mana - barra azul, logo abaixo
+    y += barHeight + 8;
+    drawHudBar(
+        x,
+        y,
+        barWidth,
+        barHeight,
+        player.getMana(),
+        player.getMaxMana(),
+        "Mana",
+        new Color(70, 120, 220));
+  }
+
+  private void drawHudBar(
+      int x,
+      int y,
+      int width,
+      int height,
+      int current,
+      int max,
+      String label,
+      Color fillColor) {
+
+    // fundo da barra
+    g2.setColor(new Color(0, 0, 0, 180));
+    g2.fillRoundRect(x - 2, y - 2, width + 4, height + 4, 8, 8);
+
+    // borda
+    g2.setColor(COL_PANEL_BORDER);
+    g2.drawRoundRect(x - 2, y - 2, width + 4, height + 4, 8, 8);
+
+    // valor atual
+    if (max > 0 && current > 0) {
+      int clamped = Math.min(current, max);
+      int filledWidth = (int) (width * (clamped / (double) max));
+      g2.setColor(fillColor);
+      g2.fillRoundRect(x, y, filledWidth, height, 8, 8);
     }
 
-    // Base da mana logo abaixo dos corações
-    manaStartY = y + iconSize;
+    // texto: "Vida 12/12", "Mana 4/4"
+    String text = label + " " + current + "/" + max;
+    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 14F));
 
-    // --- VIDA ATUAL ---
-    x = startX;
-    y = startY;
+    int textX = x + 6;
+    int textY = y + height - 3;
 
-    int fullHearts = player.getLife() / 2;
-    int halfHeart = player.getLife() % 2;
-
-    for (int idx = 0; idx < fullHearts; idx++) {
-      g2.drawImage(heartFull, x, y, iconSize, iconSize, null);
-      x += iconSize;
-      if ((idx + 1) % colsPerRow == 0) {
-        x = startX;
-        y += iconSize;
-      }
-    }
-
-    if (halfHeart == 1) {
-      g2.drawImage(heartHalf, x, y, iconSize, iconSize, null);
-    }
-
-    // --- MANA (vazio) ---
-    int crystalStep = iconSize + 3;
-    x = manaStartX;
-    y = manaStartY;
-    i = 0;
-
-    while (i < player.getMaxMana()) {
-      g2.drawImage(crystalBlank, x, y, iconSize, iconSize, null);
-      i++;
-      x += crystalStep;
-
-      if (i % colsPerRow == 0) {
-        x = manaStartX;
-        y += iconSize;
-      }
-    }
-
-    // --- MANA ATUAL ---
-    x = manaStartX;
-    y = manaStartY;
-    i = 0;
-
-    while (i < player.getMana()) {
-      g2.drawImage(crystalFull, x, y, iconSize, iconSize, null);
-      i++;
-      x += crystalStep;
-
-      if (i % colsPerRow == 0) {
-        x = manaStartX;
-        y += iconSize;
-      }
-    }
+    g2.setColor(Color.black);
+    g2.drawString(text, textX + 1, textY + 1);
+    g2.setColor(COL_TEXT);
+    g2.drawString(text, textX, textY);
   }
 
   public void drawMonsterLife() {
