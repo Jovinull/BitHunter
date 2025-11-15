@@ -1025,7 +1025,11 @@ public class Entity {
     }
   }
 
-  public int getDetected(Entity user, Entity[][] target, String targetName) {
+  public int getDetected(Entity user, Entity[][] target, String targetInternalId) {
+    if (targetInternalId == null || targetInternalId.isEmpty()) {
+      return 999;
+    }
+
     int nextWorldX = user.getLeftX();
     int nextWorldY = user.getTopY();
 
@@ -1057,10 +1061,29 @@ public class Entity {
 
     for (int i = 0; i < mapTargets.length; i++) {
       Entity t = mapTargets[i];
-      if (t != null && t.getCol() == col && t.getRow() == row && targetName.equals(t.getName())) {
+      if (t == null) {
+        continue;
+      }
+
+      // primeiro garante que está no tile certo
+      if (t.getCol() != col || t.getRow() != row) {
+        continue;
+      }
+
+      // 1) Novo padrão: compara por internalId
+      String candidateId = t.getInternalId();
+      if (candidateId != null && candidateId.equals(targetInternalId)) {
+        return i;
+      }
+
+      // 2) Fallback de compatibilidade: se não tiver internalId, tenta por name
+      if ((candidateId == null || candidateId.isEmpty())
+          && t.getName() != null
+          && t.getName().equals(targetInternalId)) {
         return i;
       }
     }
+
     return 999;
   }
 

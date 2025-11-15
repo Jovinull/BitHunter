@@ -5,20 +5,18 @@ import main.GamePanel;
 
 public class ObjCoinBronze extends Entity {
 
-  public static final String OBJ_NAME = "Moeda de Bronze";
+  public static final String OBJ_ID = "item.coin.bronze";
 
   public ObjCoinBronze(GamePanel gp) {
     super(gp);
 
     setType(TYPE_PICKUP_ONLY);
-    setName(OBJ_NAME);
+    setInternalId(OBJ_ID);
+    setTranslationKey(OBJ_ID);
+    setName(OBJ_ID);
+
     setValue(1);
     down1 = setup("/objects/coin_bronze", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
-
-    // descrição com i18n
-    String displayName = t("item.coin.bronze.displayName");
-    String description = "[" + displayName + "]\n" + t("item.coin.bronze.desc");
-    setDescription(description);
   }
 
   @Override
@@ -35,7 +33,4 @@ public class ObjCoinBronze extends Entity {
     return true;
   }
 
-  private String t(String key) {
-    return gp.getLanguageManager().text(key);
-  }
 }

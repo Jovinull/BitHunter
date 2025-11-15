@@ -5,28 +5,20 @@ import main.GamePanel;
 
 public class ObjBoots extends Entity {
 
-  public static final String OBJ_NAME = "Botas";
+  public static final String OBJ_ID = "item.boots";
 
   public ObjBoots(GamePanel gp) {
     super(gp);
 
     setType(TYPE_BOOTS);
-    setName(OBJ_NAME);
+    setInternalId(OBJ_ID);
+    setTranslationKey(OBJ_ID);
+    setName(OBJ_ID);
 
     down1 = setup("/objects/boots", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
     setSpeedValue(2);
     setDefenseValue(2);
-
-    // descrição com i18n
-    String displayName = t("item.boots.displayName");
-    String description = "[" + displayName + "]\n" + t("item.boots.desc");
-    setDescription(description);
-
     setPrice(720);
-  }
-
-  private String t(String key) {
-    return gp.getLanguageManager().text(key);
   }
 }

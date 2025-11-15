@@ -5,22 +5,20 @@ import main.GamePanel;
 
 public class ObjManaCrystal extends Entity {
 
-  public static final String OBJ_NAME = "Cristal de Mana";
+  public static final String OBJ_ID = "item.manaCrystal";
 
   public ObjManaCrystal(GamePanel gp) {
     super(gp);
 
     setType(TYPE_PICKUP_ONLY);
-    setName(OBJ_NAME);
+    setInternalId(OBJ_ID);
+    setTranslationKey(OBJ_ID);
+    setName(OBJ_ID);
     setValue(1);
 
     down1 = setup("/objects/manacrystal_full", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     image = setup("/objects/manacrystal_full", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     image2 = setup("/objects/manacrystal_blank", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
-
-    String displayName = t("item.manaCrystal.displayName");
-    String description = "[" + displayName + "]\n" + String.format(t("item.manaCrystal.desc"), getValue());
-    setDescription(description);
   }
 
   @Override
@@ -37,7 +35,19 @@ public class ObjManaCrystal extends Entity {
     return true;
   }
 
-  private String t(String key) {
-    return gp.getLanguageManager().text(key);
+  @Override
+  public String getDisplayDescription() {
+    String key = getTranslationKey();
+    if (key == null || key.isEmpty()) {
+      return super.getDisplayDescription();
+    }
+
+    String pattern = t(key + ".desc");
+    try {
+      return String.format(pattern, getValue());
+    } catch (IllegalArgumentException ex) {
+      // fallback caso a string não tenha %d
+      return pattern;
+    }
   }
 }

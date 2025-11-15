@@ -8,12 +8,15 @@ import main.GamePanel;
 
 public class ObjFireball extends Projectile {
 
-  public static final String OBJ_NAME = "Bola de Fogo";
+  public static final String OBJ_ID = "item.fireball";
 
   public ObjFireball(GamePanel gp) {
     super(gp);
 
-    setName(OBJ_NAME);
+    setInternalId(OBJ_ID);
+    setTranslationKey(OBJ_ID);
+    setName(OBJ_ID);
+
     setSpeed(5);
     setMaxLife(80);
     setLife(getMaxLife());
@@ -21,11 +24,6 @@ public class ObjFireball extends Projectile {
     setKnockBackPower(5);
     setUseCost(1);
     setAlive(false);
-
-    // descrição com i18n
-    String displayName = t("item.fireball.displayName");
-    String description = "[" + displayName + "]\n" + t("item.fireball.desc");
-    setDescription(description);
 
     loadSprites();
   }
@@ -69,9 +67,5 @@ public class ObjFireball extends Projectile {
   @Override
   public int getParticleMaxLife() {
     return 20;
-  }
-
-  private String t(String key) {
-    return gp.getLanguageManager().text(key);
   }
 }

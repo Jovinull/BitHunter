@@ -5,20 +5,18 @@ import main.GamePanel;
 
 public class ObjPotionRed extends Entity {
 
-  public static final String OBJ_NAME = "Poção Vermelha";
+  public static final String OBJ_ID = "item.potionRed";
 
   public ObjPotionRed(GamePanel gp) {
     super(gp);
 
     setType(TYPE_CONSUMABLE);
-    setName(OBJ_NAME);
+    setInternalId(OBJ_ID);
+    setTranslationKey(OBJ_ID);
+    setName(OBJ_ID);
     setValue(5);
 
     down1 = setup("/objects/potion_red", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
-
-    String displayName = t("item.potionRed.displayName");
-    String description = "[" + displayName + "]\n" + String.format(t("item.potionRed.desc"), getValue());
-    setDescription(description);
 
     setPrice(25);
     setStackable(true);
@@ -28,7 +26,7 @@ public class ObjPotionRed extends Entity {
 
   public void setDialogue() {
     String[][] d = getDialogues();
-    String displayName = t("item.potionRed.displayName");
+    String displayName = getDisplayName();
     d[0][0] = String.format(t("item.potionRed.dialog.use"), displayName, getValue());
   }
 
@@ -39,7 +37,18 @@ public class ObjPotionRed extends Entity {
     return true;
   }
 
-  private String t(String key) {
-    return gp.getLanguageManager().text(key);
+  @Override
+  public String getDisplayDescription() {
+    String key = getTranslationKey();
+    if (key == null || key.isEmpty()) {
+      return super.getDisplayDescription();
+    }
+
+    String pattern = t(key + ".desc");
+    try {
+      return String.format(pattern, getValue());
+    } catch (IllegalArgumentException ex) {
+      return pattern;
+    }
   }
 }

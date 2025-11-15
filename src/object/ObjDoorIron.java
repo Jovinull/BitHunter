@@ -7,12 +7,15 @@ import main.GamePanel;
 
 public class ObjDoorIron extends Entity {
 
+  public static final String OBJ_ID = "item.doorIron";
   public static final String OBJ_NAME = "Porta de Ferro";
 
   public ObjDoorIron(GamePanel gp) {
     super(gp);
 
     setType(TYPE_OBSTACLE);
+    setInternalId(OBJ_ID);
+    setTranslationKey(OBJ_ID);
     setName(OBJ_NAME);
 
     down1 = setup("/objects/door_iron", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
@@ -37,9 +40,5 @@ public class ObjDoorIron extends Entity {
   @Override
   public void interact() {
     startDialogue(this, 0);
-  }
-
-  private String t(String key) {
-    return gp.getLanguageManager().text(key);
   }
 }
