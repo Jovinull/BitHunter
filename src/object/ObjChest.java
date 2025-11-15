@@ -42,14 +42,17 @@ public class ObjChest extends Entity {
     String lootName = (getLoot() != null) ? getLoot().getDisplayName() : "???";
     String[][] d = getDialogues();
 
+    // Inventário cheio
     d[0][0] = String.format(t("item.chest.dialog.fullInventory.line1"), lootName)
         + "\n"
         + t("item.chest.dialog.fullInventory.line2");
 
+    // Item obtido
     d[1][0] = String.format(t("item.chest.dialog.obtained.line1"), lootName)
         + "\n"
         + String.format(t("item.chest.dialog.obtained.line2"), lootName);
 
+    // Baú vazio
     d[2][0] = t("item.chest.dialog.empty");
   }
 

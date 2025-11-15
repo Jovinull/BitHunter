@@ -120,9 +120,8 @@ public class MonSkeletonLord extends Entity {
   }
 
   public void setDialogue() {
-    getDialogues()[0][0] = "Ninguém vai tocar no meu tesouro!";
-    getDialogues()[0][1] = "Você vai morrer aqui, insignificante!";
-    getDialogues()[0][2] = "BEM-VINDO AO SEU FIM!";
+    String baseKey = getTranslationKey() + ".dialog.intro";
+    fillDialogueSet(0, baseKey, 3);
   }
 
   @Override

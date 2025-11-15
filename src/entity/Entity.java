@@ -568,6 +568,16 @@ public class Entity {
     return lm.text(key);
   }
 
+  protected void fillDialogueSet(int setIndex, String baseKey, int totalLines) {
+    if (baseKey == null || baseKey.isBlank()) {
+      return;
+    }
+
+    for (int i = 0; i < totalLines; i++) {
+      dialogues[setIndex][i] = t(baseKey + ".line" + (i + 1));
+    }
+  }
+
   private void handleOffBalance() {
     if (offBalance && ++offBalanceCounter > 60) {
       offBalance = false;

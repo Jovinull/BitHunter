@@ -61,9 +61,8 @@ public class NpcBigRock extends Entity {
   }
 
   public void setDialogue() {
-    String[][] d = getDialogues();
-    d[0][0] = "Isso é uma pedra gigante.";
-    d[0][1] = "Acho que sou capaz de empurrar isso...";
+    String baseKey = getTranslationKey() + ".dialog.0";
+    fillDialogueSet(0, baseKey, 2);
   }
 
   @Override

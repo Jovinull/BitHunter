@@ -55,10 +55,15 @@ public class EventHandler {
   }
 
   public void setDialogue() {
+    var lm = gp.getLanguageManager();
     String[][] d = eventMaster.getDialogues();
-    d[0][0] = "Você caiu em um buraco!!";
-    d[1][0] = "Você bebe a água.\nSua vida e mana foi restaurada.\n(O progresso foi salvo)";
-    d[1][1] = "Caramba, essa água é boa demais.";
+
+    // Buraco (dano)
+    d[0][0] = lm.text("event.pit.dialog.0.line1");
+
+    // Fonte de cura
+    d[1][0] = lm.text("event.healingPool.dialog.1.line1");
+    d[1][1] = lm.text("event.healingPool.dialog.1.line2");
   }
 
   public boolean hit(int map, int col, int row, String reqDirection) {

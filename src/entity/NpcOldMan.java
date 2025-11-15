@@ -66,17 +66,16 @@ public class NpcOldMan extends Entity {
   }
 
   public void setDialogue() {
-    String[][] d = getDialogues();
-    d[0][0] = "Olá, rapaz.";
-    d[0][1] = "Então você veio até esta ilha em busca do \ntesouro?";
-    d[0][2] = "Eu costumava ser um grande mago, mas agora... \nestou um pouco velho para aventuras.";
-    d[0][3] = "Bem, boa sorte para você!";
+    String base = getTranslationKey() + ".dialog.";
 
-    d[1][0] = "Se você ficar cansado, descanse na água.";
-    d[1][1] = "Porém, os monstros reaparecem quando você descansa.\nNão sei por quê, mas é assim que funciona.";
-    d[1][2] = "De qualquer forma, não se esforce demais.";
+    // Conjunto 0: 4 linhas
+    fillDialogueSet(0, base + "0", 4);
 
-    d[2][0] = "Eu me pergunto como abrir aquela porta...";
+    // Conjunto 1: 3 linhas
+    fillDialogueSet(1, base + "1", 3);
+
+    // Conjunto 2: 1 linha
+    fillDialogueSet(2, base + "2", 1);
   }
 
   private boolean atGoal() {
