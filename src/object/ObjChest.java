@@ -65,7 +65,7 @@ public class ObjChest extends Entity {
         startDialogue(this, 0);
       } else {
         startDialogue(this, 1);
-        down1 = image2;
+        applyOpenedAppearance();
         setOpened(true);
       }
     } else {

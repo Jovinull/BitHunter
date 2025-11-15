@@ -161,7 +161,7 @@ public class MonSkeletonLord extends Entity {
     Entity[] objects = gp.getObj()[gp.getCurrentMap()];
     for (int i = 0; i < objects.length; i++) {
       Entity obj = objects[i];
-      if (obj != null && ObjDoorIron.OBJ_NAME.equals(obj.getName())) {
+      if (obj != null && ObjDoorIron.OBJ_ID.equals(obj.getName())) {
         gp.playSE(21);
         objects[i] = null;
       }

@@ -22,73 +22,114 @@ import object.ObjTent;
 
 public class EntityGenerator {
 
-  GamePanel gp;
+  private final GamePanel gp;
 
   public EntityGenerator(GamePanel gp) {
     this.gp = gp;
   }
 
-  public Entity getObject(String itemName) {
+  public Entity getObject(String idOrName) {
+
+    if (idOrName == null || idOrName.isEmpty()) {
+      return null;
+    }
 
     Entity obj = null;
 
-    switch (itemName) {
-      case ObjAxe.OBJ_NAME:
+    switch (idOrName) {
+
+      // Machado
+      case ObjAxe.OBJ_ID:
         obj = new ObjAxe(gp);
         break;
-      case ObjBoots.OBJ_NAME:
+
+      // Botas
+      case ObjBoots.OBJ_ID:
         obj = new ObjBoots(gp);
         break;
-      case ObjChest.OBJ_NAME:
+
+      // Baú
+      case ObjChest.OBJ_ID:
         obj = new ObjChest(gp);
         break;
-      case ObjCoinBronze.OBJ_NAME:
+
+      // Moeda de bronze
+      case ObjCoinBronze.OBJ_ID:
         obj = new ObjCoinBronze(gp);
         break;
-      case ObjDoorIron.OBJ_NAME:
+
+      // Porta de ferro
+      case ObjDoorIron.OBJ_ID:
         obj = new ObjDoorIron(gp);
         break;
-      case ObjDoor.OBJ_NAME:
+
+      // Porta comum
+      case ObjDoor.OBJ_ID:
         obj = new ObjDoor(gp);
         break;
-      case ObjFireball.OBJ_NAME:
+
+      // Bola de fogo
+      case ObjFireball.OBJ_ID:
         obj = new ObjFireball(gp);
         break;
-      case ObjHeart.OBJ_NAME:
+
+      // Coração
+      case ObjHeart.OBJ_ID:
         obj = new ObjHeart(gp);
         break;
-      case ObjKey.OBJ_NAME:
+
+      // Chave
+      case ObjKey.OBJ_ID:
         obj = new ObjKey(gp);
         break;
-      case ObjLantern.OBJ_NAME:
+
+      // Lanterna
+      case ObjLantern.OBJ_ID:
         obj = new ObjLantern(gp);
         break;
-      case ObjManaCrystal.OBJ_NAME:
+
+      // Cristal de Mana
+      case ObjManaCrystal.OBJ_ID:
         obj = new ObjManaCrystal(gp);
         break;
-      case ObjPickaxe.OBJ_NAME:
+
+      // Picareta
+      case ObjPickaxe.OBJ_ID:
         obj = new ObjPickaxe(gp);
         break;
-      case ObjPotionRed.OBJ_NAME:
+
+      // Poção Vermelha
+      case ObjPotionRed.OBJ_ID:
         obj = new ObjPotionRed(gp);
         break;
-      case ObjRock.OBJ_NAME:
+
+      // Pedra
+      case ObjRock.OBJ_ID:
         obj = new ObjRock(gp);
         break;
-      case ObjShieldBlue.OBJ_NAME:
+
+      // Escudo Azul
+      case ObjShieldBlue.OBJ_ID:
         obj = new ObjShieldBlue(gp);
         break;
-      case ObjShieldWood.OBJ_NAME:
+
+      // Escudo de Madeira
+      case ObjShieldWood.OBJ_ID:
         obj = new ObjShieldWood(gp);
         break;
-      case ObjSwordNormal.OBJ_NAME:
+
+      // Espada Comum
+      case ObjSwordNormal.OBJ_ID:
         obj = new ObjSwordNormal(gp);
         break;
-      case ObjTent.OBJ_NAME:
+
+      // Tenda
+      case ObjTent.OBJ_ID:
         obj = new ObjTent(gp);
         break;
+
       default:
-        // itemName desconhecido; obj permanece null
+        // id desconhecido; obj permanece null
         break;
     }
 

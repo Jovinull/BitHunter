@@ -8,7 +8,6 @@ import main.GamePanel;
 public class ObjDoor extends Entity {
 
   public static final String OBJ_ID = "item.door";
-  public static final String OBJ_NAME = "Porta"; // opcional, só se você ainda usar em algum lugar legado
 
   public ObjDoor(GamePanel gp) {
     super(gp);

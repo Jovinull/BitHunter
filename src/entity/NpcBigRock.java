@@ -200,7 +200,7 @@ public class NpcBigRock extends Entity {
 
     for (int i = 0; i < objects.length; i++) {
       Entity obj = objects[i];
-      if (obj != null && ObjDoorIron.OBJ_NAME.equals(obj.getName())) {
+      if (obj != null && ObjDoorIron.OBJ_ID.equals(obj.getName())) {
         objects[i] = null;
         opened = true;
       }
