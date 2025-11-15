@@ -175,11 +175,9 @@ public class UI {
     int y = GamePanel.TILE_SIZE / 2;
 
     // Vida - barra vermelha
+    HudBarLayout lifeLayout = new HudBarLayout(x, y, barWidth, barHeight);
     drawHudBar(
-        x,
-        y,
-        barWidth,
-        barHeight,
+        lifeLayout,
         player.getLife(),
         player.getMaxLife(),
         "Vida",
@@ -187,26 +185,29 @@ public class UI {
 
     // Mana - barra azul, logo abaixo
     y += barHeight + 8;
+    HudBarLayout manaLayout = new HudBarLayout(x, y, barWidth, barHeight);
     drawHudBar(
-        x,
-        y,
-        barWidth,
-        barHeight,
+        manaLayout,
         player.getMana(),
         player.getMaxMana(),
         "Mana",
         new Color(70, 120, 220));
   }
 
+  private record HudBarLayout(int x, int y, int width, int height) {
+  }
+
   private void drawHudBar(
-      int x,
-      int y,
-      int width,
-      int height,
+      HudBarLayout layout,
       int current,
       int max,
       String label,
       Color fillColor) {
+
+    int x = layout.x();
+    int y = layout.y();
+    int width = layout.width();
+    int height = layout.height();
 
     // fundo da barra
     g2.setColor(new Color(0, 0, 0, 180));
@@ -521,15 +522,17 @@ public class UI {
     for (int i = 0; i < entity.getInventory().size(); i++) {
       Entity item = entity.getInventory().get(i);
 
-      if (isEquippedItem(entity, item)) {
+      if (item != null && isEquippedItem(entity, item)) {
         g2.setColor(COL_ACCENT);
         g2.fillRoundRect(slotX, slotY, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE, 8, 8);
       }
 
-      g2.drawImage(item.getDown1(), slotX, slotY, null);
+      if (item != null && item.getDown1() != null) {
+        g2.drawImage(item.getDown1(), slotX, slotY, null);
+      }
 
       // DISPLAY AMOUNT
-      if (entity == gp.getPlayer() && item.getAmount() > 1) {
+      if (item != null && entity == gp.getPlayer() && item.getAmount() > 1) {
         g2.setFont(g2.getFont().deriveFont(32f));
         String s = String.valueOf(item.getAmount());
         int amountX = getXforAlignToRightText(s, slotX + 44);
@@ -1366,26 +1369,30 @@ public class UI {
         player.getCurrentShield()
     };
 
-    drawEquipmentGrid(
+    EquipmentGridLayout equipLayout = new EquipmentGridLayout(
         equipAreaX,
         gridStartY,
         slotSize,
         cols,
         rows,
         hGap,
-        vGap,
-        equipLabels,
-        equipItems);
+        vGap);
+    drawEquipmentGrid(equipLayout, equipLabels, equipItems);
   }
 
-  private void drawEquipmentGrid(
+  // Auxiliar para evitar muitos parâmetros em drawEquipmentGrid
+  private record EquipmentGridLayout(
       int startX,
       int startY,
       int slotSize,
       int cols,
       int rows,
       int hGap,
-      int vGap,
+      int vGap) {
+  }
+
+  private void drawEquipmentGrid(
+      EquipmentGridLayout layout,
       String[] labels,
       Entity[] items) {
 
@@ -1393,14 +1400,14 @@ public class UI {
 
     g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 16F));
 
-    for (int row = 0; row < rows; row++) {
-      for (int col = 0; col < cols; col++) {
+    for (int row = 0; row < layout.rows(); row++) {
+      for (int col = 0; col < layout.cols(); col++) {
         if (index >= labels.length || index >= items.length) {
           return;
         }
 
-        int slotX = startX + col * (slotSize + hGap);
-        int slotY = startY + row * (slotSize + vGap);
+        int slotX = layout.startX() + col * (layout.slotSize() + layout.hGap());
+        int slotY = layout.startY() + row * (layout.slotSize() + layout.vGap());
 
         // Label acima do slot
         g2.setColor(COL_TEXT_DIM);
@@ -1409,15 +1416,21 @@ public class UI {
         // Caixa do slot
         int boxY = slotY;
         g2.setColor(COL_PANEL_BORDER);
-        g2.drawRoundRect(slotX, boxY, slotSize, slotSize, 10, 10);
+        g2.drawRoundRect(slotX, boxY, layout.slotSize(), layout.slotSize(), 10, 10);
         g2.setColor(new Color(20, 24, 32, 220));
-        g2.fillRoundRect(slotX + 1, boxY + 1, slotSize - 2, slotSize - 2, 10, 10);
+        g2.fillRoundRect(
+            slotX + 1,
+            boxY + 1,
+            layout.slotSize() - 2,
+            layout.slotSize() - 2,
+            10,
+            10);
 
         // Ícone do equipamento
         Entity item = items[index];
         if (item != null && item.getDown1() != null) {
           int iconMargin = 4;
-          int iconSize = slotSize - iconMargin * 2;
+          int iconSize = layout.slotSize() - iconMargin * 2;
           int iconX = slotX + iconMargin;
           int iconY = boxY + iconMargin;
           g2.drawImage(item.getDown1(), iconX, iconY, iconSize, iconSize, null);
