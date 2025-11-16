@@ -40,6 +40,12 @@ public class LanguageManager {
   /**
    * Idiomas disponíveis no jogo.
    * Aqui você controla quais aparecem no menu.
+   *
+   * LINGUAGENS REMOVIDAS
+   * list.add(new LanguageOption("zh_CN", "简体中文"));
+   * list.add(new LanguageOption("ja_JP", "日本語"));
+   * list.add(new LanguageOption("ko_KR", "한국어"));
+   * OBS: Essas foram removidas por falta de suporte das fontes.
    */
   public List<LanguageOption> getAvailableLanguages() {
     List<LanguageOption> list = new ArrayList<>();
@@ -50,9 +56,6 @@ public class LanguageManager {
     list.add(new LanguageOption("it_IT", "Italiano"));
     list.add(new LanguageOption("de_DE", "Deutsch"));
     list.add(new LanguageOption("ru_RU", "Русский"));
-    list.add(new LanguageOption("zh_CN", "简体中文"));
-    list.add(new LanguageOption("ja_JP", "日本語"));
-    list.add(new LanguageOption("ko_KR", "한국어"));
     return list;
   }
 
