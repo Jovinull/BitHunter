@@ -169,7 +169,10 @@ public class KeyHandler implements KeyListener {
       case KeyEvent.VK_SPACE -> spacePressed = true;
 
       // Opções / Mapas
-      case KeyEvent.VK_ESCAPE -> gp.setGameState(GamePanel.OPTIONS_STATE);
+      case KeyEvent.VK_ESCAPE -> {
+        gp.getGameUi().resetOptionsMenu();
+        gp.setGameState(GamePanel.OPTIONS_STATE);
+      }
       case KeyEvent.VK_M -> gp.setGameState(GamePanel.MAP_STATE);
       case KeyEvent.VK_X -> gp.map.setMiniMapOn(!gp.map.isMiniMapOn());
 

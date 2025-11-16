@@ -1571,6 +1571,11 @@ public class UI {
     return tailX - length;
   }
 
+  public void resetOptionsMenu() {
+    subState = 0;
+    commandNum = 0;
+  }
+
   // --- Getters específicos ---
   public Font getMaruMonica() {
     return maruMonica;
