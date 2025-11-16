@@ -5,13 +5,14 @@ import main.GamePanel;
 
 public class ObjManaCrystal extends Entity {
 
-  public static final String OBJ_NAME = "Cristal de Mana";
+  public static final String OBJ_ID = "item.manaCrystal";
 
   public ObjManaCrystal(GamePanel gp) {
     super(gp);
 
     setType(TYPE_PICKUP_ONLY);
-    setName(OBJ_NAME);
+    setInternalId(OBJ_ID);
+    setTranslationKey(OBJ_ID);
     setValue(1);
 
     down1 = setup("/objects/manacrystal_full", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
@@ -26,8 +27,25 @@ public class ObjManaCrystal extends Entity {
     var ui = gp.getGameUi();
     var player = gp.getPlayer();
 
-    ui.addMessage("Mana +" + getValue());
+    String msg = String.format(t("item.manaCrystal.pickup"), getValue());
+    ui.addMessage(msg);
+
     player.setMana(player.getMana() + getValue());
     return true;
+  }
+
+  @Override
+  public String getDisplayDescription() {
+    String key = getTranslationKey();
+    if (key == null || key.isEmpty()) {
+      return super.getDisplayDescription();
+    }
+
+    String pattern = t(key + ".desc");
+    try {
+      return String.format(pattern, getValue());
+    } catch (IllegalArgumentException _) {
+      return pattern;
+    }
   }
 }

@@ -7,14 +7,18 @@ import main.GamePanel;
 
 public class ObjDoorIron extends Entity {
 
-  public static final String OBJ_NAME = "Porta de Ferro";
+  public static final String OBJ_ID = "item.doorIron";
 
   public ObjDoorIron(GamePanel gp) {
     super(gp);
 
     setType(TYPE_OBSTACLE);
-    setName(OBJ_NAME);
 
+    // Identidade e i18n
+    setInternalId(OBJ_ID);
+    setTranslationKey(OBJ_ID);
+
+    // Sprite e colisão
     down1 = setup("/objects/door_iron", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     setCollision(true);
 
@@ -29,9 +33,9 @@ public class ObjDoorIron extends Entity {
     setDialogue();
   }
 
-  public void setDialogue() {
+  private void setDialogue() {
     String[][] d = getDialogues();
-    d[0][0] = "Isso não vai se mexer.";
+    d[0][0] = t("item.doorIron.dialog.immovable");
   }
 
   @Override

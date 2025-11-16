@@ -36,6 +36,10 @@ public class Config {
       bw.write(String.valueOf(gp.se.volumeScale));
       bw.newLine();
 
+      // Language code (ex: pt_BR, en_US)
+      bw.write(gp.getLanguageManager().getCurrentLanguageCode());
+      bw.newLine();
+
     } catch (IOException ex) {
       LOGGER.log(Level.SEVERE, "Falha ao salvar configurações em " + CONFIG_FILE_NAME, ex);
     }
@@ -61,8 +65,16 @@ public class Config {
       s = br.readLine();
       gp.se.volumeScale = Integer.parseInt(s);
 
+      // Language (linha opcional para configs antigos)
+      s = br.readLine();
+      if (s != null && !s.isBlank()) {
+        gp.getLanguageManager().setCurrentLanguage(s.trim());
+      }
+
     } catch (IOException | NumberFormatException ex) {
       LOGGER.log(Level.SEVERE, "Falha ao carregar configurações de " + CONFIG_FILE_NAME, ex);
+      // Em caso de erro, garante pelo menos o idioma padrão
+      gp.getLanguageManager().setCurrentLanguage(LanguageManager.DEFAULT_LANGUAGE);
     }
   }
 }

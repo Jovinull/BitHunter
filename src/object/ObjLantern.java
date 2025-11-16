@@ -5,15 +5,17 @@ import main.GamePanel;
 
 public class ObjLantern extends Entity {
 
-  public static final String OBJ_NAME = "Lanterna";
+  public static final String OBJ_ID = "item.lantern";
 
   public ObjLantern(GamePanel gp) {
     super(gp);
 
     setType(TYPE_LIGHT);
-    setName(OBJ_NAME);
+    setInternalId(OBJ_ID);
+    setTranslationKey(OBJ_ID);
+
     down1 = setup("/objects/lantern", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
-    setDescription("[" + getName() + "]\nIlumina seus arredores.");
+
     setPrice(200);
     setLightRadius(250);
   }

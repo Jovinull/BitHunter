@@ -6,14 +6,14 @@ import main.GamePanel;
 
 public class ItTrunk extends InteractiveTile {
 
+  public static final String TILE_ID = "tile.trunk";
+
   public ItTrunk(GamePanel gp, int col, int row) {
     super(gp, col, row);
 
-    // Posição via setters
-    setWorldX(GamePanel.TILE_SIZE * col);
-    setWorldY(GamePanel.TILE_SIZE * row);
+    setInternalId(TILE_ID);
+    setTranslationKey(TILE_ID);
 
-    // Sprite
     down1 = setup("/tiles_interactive/trunk", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
     Rectangle sa = getSolidArea();
@@ -22,7 +22,6 @@ public class ItTrunk extends InteractiveTile {
     sa.width = 0;
     sa.height = 0;
 
-    // Defaults da área sólida
     setSolidAreaDefaultX(sa.x);
     setSolidAreaDefaultY(sa.y);
   }

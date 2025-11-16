@@ -8,9 +8,9 @@ import java.awt.image.BufferedImage;
  */
 public class Tile {
 
-  // Ainda públicos para compatibilidade com código legado
-  public BufferedImage image;
-  public boolean collision = false;
+  // Campos agora encapsulados (Sonar S1104)
+  private BufferedImage image;
+  private boolean collision = false;
 
   // --- Getters/Setters preferenciais ---
 

@@ -5,15 +5,17 @@ import main.GamePanel;
 
 public class ObjKey extends Entity {
 
-  public static final String OBJ_NAME = "Chave";
+  public static final String OBJ_ID = "item.key";
 
   public ObjKey(GamePanel gp) {
     super(gp);
 
     setType(TYPE_CONSUMABLE);
-    setName(OBJ_NAME);
+    setInternalId(OBJ_ID);
+    setTranslationKey(OBJ_ID);
+
     down1 = setup("/objects/key", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
-    setDescription("[" + getName() + "]\nAbre portas trancadas.");
+
     setPrice(100);
     setStackable(true);
 
@@ -22,8 +24,10 @@ public class ObjKey extends Entity {
 
   public void setDialogue() {
     String[][] d = getDialogues();
-    d[0][0] = "Você usa o " + getName() + " e abre a porta";
-    d[1][0] = "O que você está fazendo?";
+    String displayName = getDisplayName();
+
+    d[0][0] = String.format(t("item.key.dialog.use"), displayName);
+    d[1][0] = t("item.key.dialog.nothing");
   }
 
   @Override
@@ -31,8 +35,8 @@ public class ObjKey extends Entity {
     Entity[][] objects = gp.getObj();
     int currentMapIndex = gp.getCurrentMap();
 
-    // procura por uma porta à frente do usuário
-    int objIndex = getDetected(entity, objects, ObjDoor.OBJ_NAME);
+    // Agora usando OBJ_ID da porta (e getDetected por internalId)
+    int objIndex = getDetected(entity, objects, ObjDoor.OBJ_ID);
 
     if (objIndex != 999) {
       startDialogue(this, 0);
@@ -44,4 +48,5 @@ public class ObjKey extends Entity {
     startDialogue(this, 1);
     return false;
   }
+
 }

@@ -7,13 +7,14 @@ import main.GamePanel;
 
 public class ObjAxe extends Entity {
 
-  public static final String OBJ_NAME = "Machado de Lenhador";
+  public static final String OBJ_ID = "item.axe";
 
   public ObjAxe(GamePanel gp) {
     super(gp);
 
     setType(TYPE_AXE);
-    setName(OBJ_NAME);
+    setInternalId(OBJ_ID);
+    setTranslationKey(OBJ_ID);
 
     // sprite
     down1 = setup("/objects/axe", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
@@ -23,7 +24,6 @@ public class ObjAxe extends Entity {
     ar.width = 30;
     ar.height = 30;
 
-    setDescription("[" + getName() + "]\nUm pouco enferrujado, \nmas ainda corta algumas \nárvores.");
     setPrice(75);
     setKnockBackPower(10);
 

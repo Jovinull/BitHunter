@@ -49,7 +49,7 @@ public class UI {
   private int playerSlotRow = 0;
   private int npcSlotCol = 0;
   private int npcSlotRow = 0;
-  int subState = 0;
+  private int subState = 0;
   int counter = 0;
   private Entity npc;
   int charIndex = 0;
@@ -65,7 +65,11 @@ public class UI {
   private static final Color COL_ACCENT = new Color(0xE0, 0xB5, 0x66);
 
   private static final int MENU_LINE = 48;
-  private static final String LABEL_BACK = "Voltar";
+  private static final int MAX_VISIBLE_LANG_OPTIONS = 5;
+  private int languageScrollOffset = 0;
+
+  private static final String KEY_COMMON_BACK = "ui.common.back";
+  private static final String KEY_TRADE_HINT_BACK = "ui.trade.hintBack";
 
   public UI(GamePanel gp) {
     this.gp = gp;
@@ -98,6 +102,11 @@ public class UI {
 
     Entity bronzeCoin = new ObjCoinBronze(gp);
     coin = bronzeCoin.getDown1();
+  }
+
+  // ---- Helper de tradução ----
+  private String t(String key) {
+    return gp.getLanguageManager().text(key);
   }
 
   // --- Mensagens temporárias ---
@@ -169,7 +178,7 @@ public class UI {
     var player = gp.getPlayer();
 
     int barWidth = GamePanel.TILE_SIZE * 3;
-    int barHeight = 18;
+    int barHeight = 24;
 
     int x = GamePanel.TILE_SIZE;
     int y = GamePanel.TILE_SIZE / 2;
@@ -180,7 +189,7 @@ public class UI {
         lifeLayout,
         player.getLife(),
         player.getMaxLife(),
-        "Vida",
+        t("ui.stats.hp"),
         new Color(210, 70, 70));
 
     // Mana - barra azul, logo abaixo
@@ -190,7 +199,7 @@ public class UI {
         manaLayout,
         player.getMana(),
         player.getMaxMana(),
-        "Mana",
+        t("ui.stats.mp"),
         new Color(70, 120, 220));
   }
 
@@ -213,9 +222,12 @@ public class UI {
     g2.setColor(new Color(0, 0, 0, 180));
     g2.fillRoundRect(x - 2, y - 2, width + 4, height + 4, 8, 8);
 
-    // borda
+    // borda (um pouco mais forte)
+    var oldStroke = g2.getStroke();
+    g2.setStroke(new BasicStroke(2f));
     g2.setColor(COL_PANEL_BORDER);
     g2.drawRoundRect(x - 2, y - 2, width + 4, height + 4, 8, 8);
+    g2.setStroke(oldStroke);
 
     // valor atual
     if (max > 0 && current > 0) {
@@ -227,11 +239,18 @@ public class UI {
 
     // texto: "Vida 12/12", "Mana 4/4"
     String text = label + " " + current + "/" + max;
-    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 14F));
 
-    int textX = x + 6;
-    int textY = y + height - 3;
+    // Usa explicitamente a MaruMonica (se existir) e aumenta o tamanho
+    Font baseFont = maruMonica != null ? maruMonica : g2.getFont();
+    Font hudFont = baseFont.deriveFont(Font.BOLD, 18F); // antes 14F
+    g2.setFont(hudFont);
 
+    // Centraliza verticalmente usando FontMetrics
+    java.awt.FontMetrics fm = g2.getFontMetrics();
+    int textX = x + 8;
+    int textY = y + (height - fm.getHeight()) / 2 + fm.getAscent();
+
+    // sombra + texto
     g2.setColor(Color.black);
     g2.drawString(text, textX + 1, textY + 1);
     g2.setColor(COL_TEXT);
@@ -286,7 +305,9 @@ public class UI {
 
           g2.setFont(g2.getFont().deriveFont(Font.BOLD, 24f));
           g2.setColor(Color.white);
-          g2.drawString(monster.getName(), x + 4, y - 10);
+
+          String bossName = monster.getDisplayName();
+          g2.drawString(bossName, x + 4, y - 10);
         }
       }
     }
@@ -334,7 +355,7 @@ public class UI {
       if (purisaB != null) {
         g2.setFont(purisaB.deriveFont(Font.BOLD, 112F));
       }
-      drawTextShadowCentered("Bit Hunter", GamePanel.TILE_SIZE * 3, COL_TEXT, Color.black, 3);
+      drawTextShadowCentered(t("ui.title.gameName"), GamePanel.TILE_SIZE * 3, COL_TEXT, Color.black, 3);
 
       int xImg = GamePanel.SCREEN_WIDTH / 2 - (GamePanel.TILE_SIZE * 2) / 2;
       int yImg = GamePanel.TILE_SIZE * 3 + GamePanel.TILE_SIZE * 2;
@@ -350,16 +371,16 @@ public class UI {
         g2.setFont(purisaB.deriveFont(Font.BOLD, 48F));
       }
       int yMenuStart = yImg + (int) (GamePanel.TILE_SIZE * 3.2);
-      drawMenuItem("NOVO JOGO", yMenuStart, commandNum == 0);
-      drawMenuItem("CARREGAR JOGO", yMenuStart + MENU_LINE, commandNum == 1);
-      drawMenuItem("SAIR", yMenuStart + MENU_LINE * 2, commandNum == 2);
+      drawMenuItem(t("ui.title.newGame"), yMenuStart, commandNum == 0);
+      drawMenuItem(t("ui.title.loadGame"), yMenuStart + MENU_LINE, commandNum == 1);
+      drawMenuItem(t("ui.title.exit"), yMenuStart + MENU_LINE * 2, commandNum == 2);
 
       // Dica
       useCrispPixelText(g2);
       if (maruMonica != null) {
         g2.setFont(maruMonica.deriveFont(Font.PLAIN, 16F));
       }
-      String hint = "W/S ou ↑/↓ navegar • ENTER confirma";
+      String hint = t("ui.title.hintNavigation");
       drawTextShadowCentered(
           hint,
           GamePanel.SCREEN_HEIGHT - GamePanel.TILE_SIZE,
@@ -375,11 +396,11 @@ public class UI {
       }
       drawSubWindowCenter(GamePanel.TILE_SIZE * 10, GamePanel.TILE_SIZE * 8);
       int cy = GamePanel.SCREEN_HEIGHT / 2 - GamePanel.TILE_SIZE;
-      drawTextShadowCentered("Selecione sua classe", cy - MENU_LINE, COL_TEXT, Color.black, 2);
-      drawMenuItem("Guerreiro", cy, commandNum == 0);
-      drawMenuItem("Ladrão", cy + MENU_LINE, commandNum == 1);
-      drawMenuItem("Feiticeiro", cy + MENU_LINE * 2, commandNum == 2);
-      drawMenuItem(LABEL_BACK, cy + MENU_LINE * 4, commandNum == 3);
+      drawTextShadowCentered(t("ui.title.classSelection"), cy - MENU_LINE, COL_TEXT, Color.black, 2);
+      drawMenuItem(t("ui.title.class.warrior"), cy, commandNum == 0);
+      drawMenuItem(t("ui.title.class.thief"), cy + MENU_LINE, commandNum == 1);
+      drawMenuItem(t("ui.title.class.wizard"), cy + MENU_LINE * 2, commandNum == 2);
+      drawMenuItem(t(KEY_COMMON_BACK), cy + MENU_LINE * 4, commandNum == 3);
     }
   }
 
@@ -394,7 +415,7 @@ public class UI {
     if (purisaB != null) {
       g2.setFont(purisaB.deriveFont(Font.PLAIN, 80F));
     }
-    String text = "PAUSADO";
+    String text = t("ui.pause.title");
     drawTextShadowCentered(text, y + (int) (h * 0.62), COL_TEXT, Color.black, 3);
   }
 
@@ -497,7 +518,9 @@ public class UI {
     drawSubWindow(frameX, frameY, frameWidth, frameHeight);
 
     // Título interno (fonte ligeiramente menor)
-    String title = (entity == gp.getPlayer()) ? "Mochila" : "Inventário";
+    String title = (entity == gp.getPlayer())
+        ? t("ui.inventory.playerTitle")
+        : t("ui.inventory.npcTitle");
     int titleY = frameY + 32;
 
     g2.setFont(g2.getFont().deriveFont(Font.BOLD, 22F));
@@ -603,6 +626,12 @@ public class UI {
 
     int itemIndex = getItemIndexOnSlot(slotCol, slotRow);
     if (itemIndex < entity.getInventory().size()) {
+
+      Entity item = entity.getInventory().get(itemIndex);
+      if (item == null) {
+        return;
+      }
+
       drawSubWindow(dFrameX, dFrameY, dFrameWidth, dFrameHeight);
 
       int textX = dFrameX + 20;
@@ -613,20 +642,22 @@ public class UI {
       Font titleFont = baseFont.deriveFont(Font.BOLD, 20F);
       Font descFont = baseFont.deriveFont(Font.PLAIN, 20F);
 
-      String[] lines = entity.getInventory().get(itemIndex).getDescription().split("\n");
+      // --- Nome traduzido ---
+      String displayName = item.getDisplayName(); // usa i18n
+      g2.setFont(titleFont);
+      g2.drawString("[" + displayName + "]", textX, textY);
+      textY += 24;
 
-      // primeira linha (ex: [Espada Comum]) em negrito
-      if (lines.length > 0) {
-        g2.setFont(titleFont);
-        g2.drawString(lines[0], textX, textY);
-        textY += 24;
-      }
-
-      // demais linhas em normal
+      // --- Descrição traduzida ---
+      String desc = item.getDisplayDescription(); // usa i18n
       g2.setFont(descFont);
-      for (int i = 1; i < lines.length; i++) {
-        g2.drawString(lines[i], textX, textY);
-        textY += 22;
+
+      if (desc != null && !desc.isEmpty()) {
+        String[] lines = desc.split("\n");
+        for (String line : lines) {
+          g2.drawString(line, textX, textY);
+          textY += 22;
+        }
       }
     }
   }
@@ -639,14 +670,14 @@ public class UI {
     if (purisaB != null) {
       g2.setFont(purisaB.deriveFont(Font.BOLD, 96f));
     }
-    String text = "GAME OVER";
+    String text = t("ui.gameover.title");
     drawTextShadowCentered(text, GamePanel.TILE_SIZE * 4, COL_TEXT, Color.black, 4);
 
     g2.setFont(g2.getFont().deriveFont(44f));
     int y = GamePanel.TILE_SIZE * 8;
 
-    drawMenuItem("Reviver", y, commandNum == 0);
-    drawMenuItem("Sair", y + MENU_LINE, commandNum == 1);
+    drawMenuItem(t("ui.gameover.retry"), y, commandNum == 0);
+    drawMenuItem(t("ui.gameover.exit"), y + MENU_LINE, commandNum == 1);
   }
 
   // --- Opções ---
@@ -660,11 +691,12 @@ public class UI {
     int frameHeight = GamePanel.TILE_SIZE * 10;
     drawSubWindow(frameX, frameY, frameWidth, frameHeight);
 
-    switch (subState) {
+    switch (getSubState()) {
       case 0 -> optionsTop(frameX, frameY);
       case 1 -> optionsFullScreenNotification(frameX, frameY);
       case 2 -> optionsControl(frameX, frameY);
       case 3 -> optionsEndGameConfirmation(frameX, frameY);
+      case 4 -> optionsLanguage(frameX, frameY);
       default -> {
         /* no-op */ }
     }
@@ -676,7 +708,7 @@ public class UI {
     int textX;
     int textY;
 
-    String text = "Opções";
+    String text = t("ui.options.title");
     textX = getXforCenteredText(text);
     textY = frameY + GamePanel.TILE_SIZE;
     drawTextShadow(text, textX, textY, COL_TEXT, Color.black, 2);
@@ -687,61 +719,69 @@ public class UI {
     textX = frameX + GamePanel.TILE_SIZE;
     textY = frameY + GamePanel.TILE_SIZE * 2;
     g2.setColor(COL_TEXT);
-    g2.drawString("Tela cheia", textX, textY);
+    g2.drawString(t("ui.options.fullscreen"), textX, textY);
     if (commandNum == 0) {
       g2.drawString(">", textX - 25, textY);
       if (keyH.isEnterPressed()) {
         gp.setFullScreenOn(!gp.isFullScreenOn());
-        subState = 1;
+        setSubState(1);
       }
     }
 
     // MÚSICA
     textY += GamePanel.TILE_SIZE;
-    g2.drawString("Música", textX, textY);
+    g2.drawString(t("ui.options.music"), textX, textY);
     if (commandNum == 1) {
       g2.drawString(">", textX - 25, textY);
     }
 
     // EFEITOS SONOROS
     textY += GamePanel.TILE_SIZE;
-    g2.drawString("Efeitos", textX, textY);
+    g2.drawString(t("ui.options.effects"), textX, textY);
     if (commandNum == 2) {
       g2.drawString(">", textX - 25, textY);
     }
 
     // CONTROLES
     textY += GamePanel.TILE_SIZE;
-    g2.drawString("Controles", textX, textY);
+    g2.drawString(t("ui.options.controls"), textX, textY);
     if (commandNum == 3) {
       g2.drawString(">", textX - 25, textY);
       if (keyH.isEnterPressed()) {
-        subState = 2;
+        setSubState(2);
         commandNum = 0;
+      }
+    }
+
+    // IDIOMA -> abre submenu dedicado
+    textY += GamePanel.TILE_SIZE;
+    String currentLangName = gp.getLanguageManager().getCurrentLanguageDisplayName();
+    String languageLine = t("ui.options.language") + ": " + currentLangName;
+    g2.drawString(languageLine, textX, textY);
+    if (commandNum == 4) {
+      g2.drawString(">", textX - 25, textY);
+      if (keyH.isEnterPressed()) {
+        setSubState(4);
+        commandNum = 0;
+        languageScrollOffset = 0;
       }
     }
 
     // ENCERRAR JOGO
     textY += GamePanel.TILE_SIZE;
-    g2.drawString("Encerrar jogo", textX, textY);
-    if (commandNum == 4) {
+    g2.drawString(t("ui.options.endGame"), textX, textY);
+    if (commandNum == 5) {
       g2.drawString(">", textX - 25, textY);
       if (keyH.isEnterPressed()) {
-        subState = 3;
+        setSubState(3);
         commandNum = 0;
       }
     }
 
-    // VOLTAR
-    textY += GamePanel.TILE_SIZE * 3;
-    g2.drawString(LABEL_BACK, textX, textY);
-    if (commandNum == 5) {
-      g2.drawString(">", textX - 25, textY);
-      if (keyH.isEnterPressed()) {
-        gp.setGameState(GamePanel.PLAY_STATE);
-        commandNum = 0;
-      }
-    }
+    // Dica de voltar (ESC)
+    textY += GamePanel.TILE_SIZE * 2;
+    g2.setColor(COL_TEXT_DIM);
+    g2.drawString(t(KEY_TRADE_HINT_BACK), textX, textY);
 
     // CHECKBOX TELA CHEIA
     textX = frameX + (int) (GamePanel.TILE_SIZE * 4.5);
@@ -773,11 +813,148 @@ public class UI {
     gp.config.saveConfig();
   }
 
+  /**
+   * Submenu dedicado de seleção de idioma.
+   * Lista os idiomas retornados por LanguageManager.getAvailableLanguages()
+   * e adiciona, ao final, uma opção "Voltar".
+   *
+   * Navegação:
+   * - W/S: já é tratada no KeyHandler (optionsState + getOptionsMaxCommandNum)
+   * - ENTER:
+   * - se commandNum < langs.size(): troca o idioma
+   * - se commandNum == langs.size(): volta para subState 0 (Opções)
+   */
+  public void optionsLanguage(int frameX, int frameY) {
+    LanguageManager langManager = gp.getLanguageManager();
+    java.util.List<LanguageManager.LanguageOption> langs = langManager.getAvailableLanguages();
+
+    int textX = frameX + GamePanel.TILE_SIZE;
+    int textY = drawLanguageHeader(frameX, frameY, langManager);
+
+    updateLanguageScrollState(langs.size());
+
+    KeyHandler keyH = gp.getKeyH();
+    textY = drawLanguageOptionsList(langs, textX, textY, keyH, langManager);
+
+    drawScrollIndicators(frameX, frameY, textY, langs.size());
+    drawBackOption(textX, textY, keyH, langs.size());
+  }
+
+  private int drawLanguageHeader(int frameX, int frameY, LanguageManager langManager) {
+    String title = t("ui.options.languageTitle");
+    int titleX = getXforCenteredText(title);
+    int titleY = frameY + GamePanel.TILE_SIZE;
+    drawTextShadow(title, titleX, titleY, COL_TEXT, Color.black, 2);
+
+    int textX = frameX + GamePanel.TILE_SIZE;
+    int currentLabelY = titleY + GamePanel.TILE_SIZE * 2;
+    String currentLabel = t("ui.options.languageCurrent") + ": " + langManager.getCurrentLanguageDisplayName();
+
+    g2.setColor(COL_TEXT_DIM);
+    g2.drawString(currentLabel, textX, currentLabelY);
+
+    // Próxima linha para começar a listar idiomas
+    return currentLabelY + GamePanel.TILE_SIZE;
+  }
+
+  private void updateLanguageScrollState(int totalLanguages) {
+    int lastIndex = totalLanguages; // último índice é o "Voltar"
+
+    if (commandNum < 0) {
+      commandNum = 0;
+    } else if (commandNum > lastIndex) {
+      commandNum = lastIndex;
+    }
+
+    int visibleCount = Math.min(MAX_VISIBLE_LANG_OPTIONS, totalLanguages);
+    int maxOffset = Math.max(0, totalLanguages - visibleCount);
+
+    // Mantém o cursor visível na janela
+    if (commandNum < totalLanguages) {
+      if (commandNum < languageScrollOffset) {
+        languageScrollOffset = commandNum;
+      } else if (commandNum > languageScrollOffset + visibleCount - 1) {
+        languageScrollOffset = commandNum - visibleCount + 1;
+      }
+    }
+
+    if (languageScrollOffset < 0) {
+      languageScrollOffset = 0;
+    } else if (languageScrollOffset > maxOffset) {
+      languageScrollOffset = maxOffset;
+    }
+  }
+
+  private int drawLanguageOptionsList(
+      java.util.List<LanguageManager.LanguageOption> langs,
+      int textX,
+      int textY,
+      KeyHandler keyH,
+      LanguageManager langManager) {
+
+    g2.setColor(COL_TEXT);
+
+    int totalLanguages = langs.size();
+    int visibleCount = Math.min(MAX_VISIBLE_LANG_OPTIONS, totalLanguages);
+    int start = languageScrollOffset;
+    int end = Math.min(languageScrollOffset + visibleCount, totalLanguages);
+
+    for (int i = start; i < end; i++) {
+      LanguageManager.LanguageOption opt = langs.get(i);
+      String name = opt.displayName();
+
+      g2.drawString(name, textX, textY);
+      if (commandNum == i) {
+        g2.drawString(">", textX - 25, textY);
+        if (keyH.isEnterPressed()) {
+          // Troca idioma
+          langManager.setCurrentLanguage(opt.code());
+          gp.config.saveConfig();
+          gp.playSE(9);
+        }
+      }
+      textY += GamePanel.TILE_SIZE;
+    }
+
+    return textY;
+  }
+
+  private void drawScrollIndicators(int frameX, int frameY, int textY, int totalLanguages) {
+    int visibleCount = Math.min(MAX_VISIBLE_LANG_OPTIONS, totalLanguages);
+    int maxOffset = Math.max(0, totalLanguages - visibleCount);
+    int arrowX = frameX + GamePanel.TILE_SIZE * 7;
+
+    if (languageScrollOffset > 0) {
+      g2.setColor(COL_TEXT_DIM);
+      g2.drawString("↑", arrowX, frameY + GamePanel.TILE_SIZE * 4);
+    }
+    if (languageScrollOffset < maxOffset) {
+      g2.setColor(COL_TEXT_DIM);
+      g2.drawString("↓", arrowX, textY - GamePanel.TILE_SIZE / 2);
+    }
+    g2.setColor(COL_TEXT);
+  }
+
+  private void drawBackOption(int textX, int textY, KeyHandler keyH, int totalLanguages) {
+    int backIndex = totalLanguages;
+    String backLabel = t(KEY_COMMON_BACK);
+
+    g2.drawString(backLabel, textX, textY);
+    if (commandNum == backIndex) {
+      g2.drawString(">", textX - 25, textY);
+      if (keyH.isEnterPressed()) {
+        setSubState(0); // volta para opções principais
+        commandNum = 4; // reposiciona o cursor em "Idioma"
+        keyH.setEnterPressed(false);
+      }
+    }
+  }
+
   public void optionsFullScreenNotification(int frameX, int frameY) {
     int textX = frameX + GamePanel.TILE_SIZE;
     int textY = frameY + GamePanel.TILE_SIZE * 3;
 
-    currentDialogue = "A alteração terá efeito\napós reiniciar o jogo.";
+    currentDialogue = t("ui.options.fullscreenNotice");
 
     g2.setColor(COL_TEXT);
     for (String line : currentDialogue.split("\n")) {
@@ -786,11 +963,11 @@ public class UI {
     }
 
     textY = frameY + GamePanel.TILE_SIZE * 9;
-    g2.drawString(LABEL_BACK, textX, textY);
+    g2.drawString(t(KEY_COMMON_BACK), textX, textY);
     if (commandNum == 0) {
       g2.drawString(">", textX - 25, textY);
       if (gp.getKeyH().isEnterPressed()) {
-        subState = 0;
+        setSubState(0);
       }
     }
   }
@@ -799,7 +976,7 @@ public class UI {
     int textX;
     int textY;
 
-    String text = "Controles";
+    String text = t("ui.controls.title");
     textX = getXforCenteredText(text);
     textY = frameY + GamePanel.TILE_SIZE;
     drawTextShadow(text, textX, textY, COL_TEXT, Color.black, 2);
@@ -807,17 +984,17 @@ public class UI {
     textX = frameX + GamePanel.TILE_SIZE;
     textY += GamePanel.TILE_SIZE;
     g2.setColor(COL_TEXT);
-    g2.drawString("Mover", textX, textY);
+    g2.drawString(t("ui.controls.move"), textX, textY);
     textY += GamePanel.TILE_SIZE;
-    g2.drawString("Confirmar/Atacar", textX, textY);
+    g2.drawString(t("ui.controls.confirmAttack"), textX, textY);
     textY += GamePanel.TILE_SIZE;
-    g2.drawString("Atirar/Conjurar", textX, textY);
+    g2.drawString(t("ui.controls.shootCast"), textX, textY);
     textY += GamePanel.TILE_SIZE;
-    g2.drawString("Tela do Personagem", textX, textY);
+    g2.drawString(t("ui.controls.characterScreen"), textX, textY);
     textY += GamePanel.TILE_SIZE;
-    g2.drawString("Pausar", textX, textY);
+    g2.drawString(t("ui.controls.pause"), textX, textY);
     textY += GamePanel.TILE_SIZE;
-    g2.drawString("Opções", textX, textY);
+    g2.drawString(t("ui.controls.options"), textX, textY);
 
     textX = frameX + GamePanel.TILE_SIZE * 6;
     textY = frameY + GamePanel.TILE_SIZE * 2;
@@ -836,11 +1013,11 @@ public class UI {
     // Voltar
     textX = frameX + GamePanel.TILE_SIZE;
     textY = frameY + GamePanel.TILE_SIZE * 9;
-    g2.drawString(LABEL_BACK, textX, textY);
+    g2.drawString(t(KEY_COMMON_BACK), textX, textY);
     if (commandNum == 0) {
       g2.drawString(">", textX - 25, textY);
       if (gp.getKeyH().isEnterPressed()) {
-        subState = 0;
+        setSubState(0);
         commandNum = 3;
       }
     }
@@ -850,7 +1027,7 @@ public class UI {
     int textX = frameX + GamePanel.TILE_SIZE;
     int textY = frameY + GamePanel.TILE_SIZE * 3;
 
-    currentDialogue = "Sair do jogo e\nvoltar à tela de título?";
+    currentDialogue = t("ui.endGame.confirmation");
 
     g2.setColor(COL_TEXT);
     for (String line : currentDialogue.split("\n")) {
@@ -859,7 +1036,7 @@ public class UI {
     }
 
     // SIM
-    String text = "Sim";
+    String text = t("ui.common.yes");
     textX = getXforCenteredText(text);
     textY += GamePanel.TILE_SIZE * 2;
     g2.drawString(text, textX, textY);
@@ -867,7 +1044,7 @@ public class UI {
     if (commandNum == 0) {
       g2.drawString(">", textX - 25, textY);
       if (keyH.isEnterPressed()) {
-        subState = 0;
+        setSubState(0);
         commandNum = 0;
         titleScreenState = 0;
         gp.stopMusic();
@@ -878,14 +1055,14 @@ public class UI {
     }
 
     // NÃO
-    text = "Não";
+    text = t("ui.common.no");
     textX = getXforCenteredText(text);
     textY += GamePanel.TILE_SIZE;
     g2.drawString(text, textX, textY);
     if (commandNum == 1) {
       g2.drawString(">", textX - 25, textY);
       if (keyH.isEnterPressed()) {
-        subState = 0;
+        setSubState(0);
         commandNum = 4;
         keyH.setEnterPressed(false);
       }
@@ -893,7 +1070,7 @@ public class UI {
   }
 
   public void drawTradeScreen() {
-    switch (subState) {
+    switch (getSubState()) {
       case 0 -> tradeSelect();
       case 1 -> tradeBuy();
       case 2 -> tradeSell();
@@ -920,25 +1097,25 @@ public class UI {
 
     var keyH = gp.getKeyH();
 
-    g2.drawString("Comprar", x, y);
+    g2.drawString(t("ui.trade.buy"), x, y);
     if (commandNum == 0) {
       g2.drawString(">", x - 24, y);
       if (keyH.isEnterPressed()) {
-        subState = 1;
+        setSubState(1);
       }
     }
     y += GamePanel.TILE_SIZE;
 
-    g2.drawString("Vender", x, y);
+    g2.drawString(t("ui.trade.sell"), x, y);
     if (commandNum == 1) {
       g2.drawString(">", x - 24, y);
       if (keyH.isEnterPressed()) {
-        subState = 2;
+        setSubState(2);
       }
     }
     y += GamePanel.TILE_SIZE;
 
-    g2.drawString("Sair", x, y);
+    g2.drawString(t("ui.trade.leave"), x, y);
     if (commandNum == 2) {
       g2.drawString(">", x - 24, y);
       if (keyH.isEnterPressed()) {
@@ -963,7 +1140,7 @@ public class UI {
     int width = GamePanel.TILE_SIZE * 6;
     int height = GamePanel.TILE_SIZE * 2;
     drawSubWindow(x, y, width, height);
-    g2.drawString("[ESC] Voltar", x + 24, y + 60);
+    g2.drawString(t(KEY_TRADE_HINT_BACK), x + 24, y + 60);
 
     // JANELA DE MOEDAS DO JOGADOR
     x = GamePanel.TILE_SIZE * 12;
@@ -971,7 +1148,7 @@ public class UI {
     width = GamePanel.TILE_SIZE * 6;
     height = GamePanel.TILE_SIZE * 2;
     drawSubWindow(x, y, width, height);
-    g2.drawString("Suas moedas: " + player.getCoin(), x + 24, y + 60);
+    g2.drawString(t("ui.trade.yourCoins") + " " + player.getCoin(), x + 24, y + 60);
 
     // JANELA DE PREÇO
     int itemIndex = getItemIndexOnSlot(npcSlotCol, npcSlotRow);
@@ -991,13 +1168,13 @@ public class UI {
       // COMPRAR UM ITEM
       if (gp.getKeyH().isEnterPressed()) {
         if (price > player.getCoin()) {
-          subState = 0;
+          setSubState(0);
           npc.startDialogue(npc, 2);
         } else {
           if (player.canObtainItem(npc.getInventory().get(itemIndex))) {
             player.setCoin(player.getCoin() - price);
           } else {
-            subState = 0;
+            setSubState(0);
             npc.startDialogue(npc, 3);
           }
         }
@@ -1022,7 +1199,7 @@ public class UI {
     width = GamePanel.TILE_SIZE * 6;
     height = GamePanel.TILE_SIZE * 2;
     drawSubWindow(x, y, width, height);
-    g2.drawString("[ESC] Voltar", x + 24, y + 60);
+    g2.drawString(t(KEY_TRADE_HINT_BACK), x + 24, y + 60);
 
     // JANELA DE MOEDAS DO JOGADOR
     x = GamePanel.TILE_SIZE * 12;
@@ -1030,7 +1207,7 @@ public class UI {
     width = GamePanel.TILE_SIZE * 6;
     height = GamePanel.TILE_SIZE * 2;
     drawSubWindow(x, y, width, height);
-    g2.drawString("Suas moedas: " + player.getCoin(), x + 24, y + 60);
+    g2.drawString(t("ui.trade.yourCoins") + " " + player.getCoin(), x + 24, y + 60);
 
     // JANELA DE PREÇO
     int itemIndex = getItemIndexOnSlot(playerSlotCol, playerSlotRow);
@@ -1058,7 +1235,7 @@ public class UI {
             || player.getInventory().get(itemIndex) == player.getCurrentLegs()) {
 
           commandNum = 0;
-          subState = 0;
+          setSubState(0);
           npc.startDialogue(npc, 4);
         } else {
           if (player.getInventory().get(itemIndex).getAmount() > 1) {
@@ -1229,7 +1406,7 @@ public class UI {
 
     // ===== TÍTULO =====
     int titleOffsetY = 8;
-    drawTextShadow("Status do Personagem", textX, textY + titleOffsetY, COL_TEXT, Color.black, 2);
+    drawTextShadow(t("ui.character.title"), textX, textY + titleOffsetY, COL_TEXT, Color.black, 2);
     textY += 44;
 
     // ===== BLOCO SUPERIOR: PORTRAIT + HP/MP =====
@@ -1255,11 +1432,11 @@ public class UI {
     int infoY = portraitY + 8;
 
     g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 22F));
-    String nivelLabel = "Nível " + player.getLevel();
+    String nivelLabel = t("ui.character.levelPrefix") + " " + player.getLevel();
     drawTextShadow(nivelLabel, infoX, infoY, COL_TEXT, Color.black, 2);
     infoY += 30;
 
-    // Barras HP / MP
+    // Barras HP / MP / XP
     int barWidth = GamePanel.TILE_SIZE * 4;
     int barHeight = 16;
 
@@ -1270,7 +1447,7 @@ public class UI {
         barHeight,
         player.getLife(),
         player.getMaxLife(),
-        "Vida");
+        t("ui.stats.hp"));
     infoY += 30;
 
     drawStatBar(
@@ -1280,7 +1457,7 @@ public class UI {
         barHeight,
         player.getMana(),
         player.getMaxMana(),
-        "Mana");
+        t("ui.stats.mp"));
 
     infoY += 30;
     drawStatBar(
@@ -1290,7 +1467,7 @@ public class UI {
         barHeight,
         player.getExp(),
         player.getNextLevelExp(),
-        "XP");
+        t("ui.stats.exp"));
 
     // ===== BLOCO INFERIOR ESQUERDA: ATRIBUTOS =====
     int statsBlockX = frameX + padding;
@@ -1300,11 +1477,11 @@ public class UI {
     int lineHeight = 24;
 
     String[] labels = {
-        "Força",
-        "Destreza",
-        "Ataque",
-        "Defesa",
-        "Moedas"
+        t("ui.character.stat.strength"),
+        t("ui.character.stat.dexterity"),
+        t("ui.character.stat.attack"),
+        t("ui.character.stat.defense"),
+        t("ui.character.stat.coins")
     };
 
     String[] values = {
@@ -1337,7 +1514,7 @@ public class UI {
     if (equipTitleY > statsBlockY - 8) {
       equipTitleY = statsBlockY - 8;
     }
-    drawTextShadow("Equipamentos", equipAreaX, equipTitleY, COL_TEXT, Color.black, 2);
+    drawTextShadow(t("ui.character.equipmentsTitle"), equipAreaX, equipTitleY, COL_TEXT, Color.black, 2);
 
     int cols = 3;
     int rows = 2;
@@ -1352,12 +1529,12 @@ public class UI {
     // [ Capacete | Peitoral | Calça ]
     // [ Botas | Arma | Escudo ]
     String[] equipLabels = {
-        "Capacete",
-        "Peitoral",
-        "Calça",
-        "Botas",
-        "Arma",
-        "Escudo"
+        t("ui.character.equipment.helmet"),
+        t("ui.character.equipment.chest"),
+        t("ui.character.equipment.legs"),
+        t("ui.character.equipment.boots"),
+        t("ui.character.equipment.weapon"),
+        t("ui.character.equipment.shield")
     };
 
     Entity[] equipItems = {
@@ -1470,6 +1647,11 @@ public class UI {
     return tailX - length;
   }
 
+  public void resetOptionsMenu() {
+    setSubState(0);
+    commandNum = 0;
+  }
+
   // --- Getters específicos ---
   public Font getMaruMonica() {
     return maruMonica;
@@ -1545,5 +1727,13 @@ public class UI {
 
   public void setNpc(Entity npc) {
     this.npc = npc;
+  }
+
+  public int getSubState() {
+    return subState;
+  }
+
+  public void setSubState(int subState) {
+    this.subState = subState;
   }
 }

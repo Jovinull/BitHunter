@@ -1,8 +1,8 @@
-# Game Design Document — **BitHUnter**
+# Game Design Document — **BitHunter**
 
 ## Sumário
 
-- [Game Design Document — **BitHUnter**](#game-design-document--bithunter)
+- [Game Design Document — **BitHunter**](#game-design-document--bithunter)
   - [Sumário](#sumário)
   - [Visão Geral](#visão-geral)
     - [Introdução](#introdução)
@@ -46,7 +46,13 @@
   - [Conteúdo Futuro / Backlog](#conteúdo-futuro--backlog)
   - [Referências](#referências)
     - [Notas rápidas de implementação (pragmáticas)](#notas-rápidas-de-implementação-pragmáticas)
-  - [Notas de Bugs/Implementações](#notas-de-bugsimplementações)
+  - [Sistema de Identificadores (`internalId`) e Localização de Texto (`translationKey`)](#sistema-de-identificadores-internalid-e-localização-de-texto-translationkey)
+    - [Objetivo](#objetivo)
+    - [`internalId` — Identificador técnico estável](#internalid--identificador-técnico-estável)
+    - [`translationKey` — Ponte para os textos traduzidos](#translationkey--ponte-para-os-textos-traduzidos)
+    - [Por que `translationKey` é “opcional” agora, mas útil a longo prazo?](#por-que-translationkey-é-opcional-agora-mas-útil-a-longo-prazo)
+    - [Contextos diferentes para o mesmo item (várias descrições)](#contextos-diferentes-para-o-mesmo-item-várias-descrições)
+    - [Relação entre `internalId` e `translationKey` no BitHUnter](#relação-entre-internalid-e-translationkey-no-bithunter)
 
 ---
 
@@ -56,7 +62,7 @@ Segue a revisão — mantendo suas ideias, corrigindo ortografia e deixando mais
 
 ### Introdução
 
-**BitHUnter** é um RPG 2D top-down de ação e exploração. O jogador é lançado em um mundo desconhecido, sem uma narrativa prévia ou uma história linear que se desenvolva ao longo do jogo. O foco é uma **aventura praticamente infinita**, em que o jogador pode **explorar e reexplorar** ambientes (no estilo **Tibia**).
+**BitHunter** é um RPG 2D top-down de ação e exploração. O jogador é lançado em um mundo desconhecido, sem uma narrativa prévia ou uma história linear que se desenvolva ao longo do jogo. O foco é uma **aventura praticamente infinita**, em que o jogador pode **explorar e reexplorar** ambientes (no estilo **Tibia**).
 No longo prazo, haverá **dungeons infinitas** nas quais o jogador desce e avança continuamente, com **aumento progressivo de dificuldade** e **recompensas melhores** (inspiradas na **Torre de DanMachi** e na **Mina de Caverna** de *Stardew Valley*).
 Também está nos planos um **modo multijogador colaborativo** e mecânicas de **end-game**, como **refinamento e nivelamento de equipamentos**, **roda de habilidades** (como em **Tibia**) e um sistema de **ascensão**, no qual o personagem é resetado em troca de **bônus permanentes**.
 
@@ -71,7 +77,7 @@ Também está nos planos um **modo multijogador colaborativo** e mecânicas de *
 
 ### Pitch do Jogo
 
-**BitHUnter** é um RPG 2D top-down de ação e exploração focado em progressão consistente e rejogabilidade. Em um mundo sem narrativa linear, o jogador avança por áreas interconectadas e **dungeons de profundidade infinita**, onde a dificuldade cresce de forma previsível e as recompensas acompanham o risco. O ciclo central é direto: **explorar → enfrentar inimigos → obter recursos → evoluir o personagem e o equipamento**.
+**BitHunter** é um RPG 2D top-down de ação e exploração focado em progressão consistente e rejogabilidade. Em um mundo sem narrativa linear, o jogador avança por áreas interconectadas e **dungeons de profundidade infinita**, onde a dificuldade cresce de forma previsível e as recompensas acompanham o risco. O ciclo central é direto: **explorar → enfrentar inimigos → obter recursos → evoluir o personagem e o equipamento**.
 
 O projeto prioriza **clareza mecânica**, **leitura visual limpa** e **desempenho estável**, com sistemas de progressão de longo prazo (refino e nivelamento de equipamentos, árvore/roda de habilidades e **ascensão** com bônus permanentes). A visão inclui **modo cooperativo** para coordenação de rotas e papéis, mantendo o foco em decisões táticas e domínio do mapa.
 
@@ -460,3 +466,200 @@ Aqui vai a seção reescrita com base direta no que o seu código já implementa
 * **Elementos**: atributo `element` em arma/projétil/monstro; tabela simples de multiplicadores.
 * **Parry/Block**: tecla de defesa ativando **i-frames curtos** e “stagger” se perfect-timing.
 * **Boss fights**: use `transitionState` para setup de arena + música; fases controladas por limiares de HP.
+
+## Sistema de Identificadores (`internalId`) e Localização de Texto (`translationKey`)
+
+### Objetivo
+
+O jogo usa dois conceitos diferentes para identificar e exibir o conteúdo das entidades (itens, NPCs, objetos de cenário, etc.):
+
+* **`internalId`** → identificação **técnica**, usada pela engine.
+* **`translationKey`** → identificação **textual**, usada pelo sistema de tradução (i18n).
+
+Separar essas duas responsabilidades evita acoplamento entre **lógica de jogo** e **texto apresentado ao jogador**, facilita evolução futura e abre espaço para descrições/contextos diferentes de um mesmo item.
+
+---
+
+### `internalId` — Identificador técnico estável
+
+`internalId` é o “CPF técnico” da entidade. É um valor **não traduzido** e **não exibido diretamente ao jogador**, pensado para:
+
+* **Save/Load**
+
+  * O `SaveLoad` armazena apenas `internalId` no `DataStorage` (inventário, objetos no mapa, loot, etc.).
+  * Ao carregar, o jogo chama algo como `generator.getObject(internalId)` para recriar a entidade correta.
+
+* **Lógica de jogo**
+
+  * Comparações de tipo:
+
+    * Ex.: verificar se um objeto é uma porta de ferro ou uma placa metálica.
+  * Eventos e regras específicas:
+
+    * Ex.: “se for `item.pickaxe`, permite quebrar certos blocos”.
+
+* **Consistência e estabilidade**
+
+  * **Não deve mudar** entre versões, ou saves antigos quebram.
+  * Formato típico:
+
+    * `item.axe`
+    * `item.coin.bronze`
+    * `npc.oldMan`
+    * `tile.metalPlate`
+    * `object.doorIron`
+
+> Em resumo: `internalId` é **fixo** e pensado para a **engine**. O jogador nunca deveria ver esse valor na tela.
+
+---
+
+### `translationKey` — Ponte para os textos traduzidos
+
+`translationKey` é a chave usada para buscar textos nos arquivos de idioma (por exemplo, os `.properties` que você está montando).
+
+A função dele é servir de **ponte entre a entidade e as strings traduzidas**:
+
+* A entidade guarda **apenas a base**, por exemplo:
+
+  * `item.axe`
+  * `item.coin.bronze`
+  * `npc.oldMan`
+
+* A UI monta as chaves completas:
+
+  * Nome do item:
+
+    * `item.axe.name`
+  * Descrição padrão:
+
+    * `item.axe.desc`
+  * Mensagem de pickup:
+
+    * `item.coin.bronze.pickup`
+  * Diálogo:
+
+    * `npc.oldMan.dialog.0.line1`, etc.
+
+Isso permite:
+
+* Centralizar todos os textos em arquivos de idioma.
+* Trocar/ajustar textos sem tocar nas classes Java.
+* Suportar facilmente múltiplos idiomas.
+
+> Hoje, normalmente você faz algo como:
+>
+> ```java
+> setInternalId(OBJ_ID);      // ex.: "item.axe"
+> setTranslationKey(OBJ_ID);  // mesma base
+> ```
+>
+> Ou seja: o valor é o mesmo, mas o **uso** é diferente.
+
+---
+
+### Por que `translationKey` é “opcional” agora, mas útil a longo prazo?
+
+Tecnicamente, o jogo poderia funcionar só com `internalId` e strings hardcoded nas classes.
+Por isso eu comentei que `translationKey` é **“opcional” para o funcionamento**, mas **muito útil para a arquitetura**.
+
+A longo prazo, manter `translationKey` separado traz vantagens claras:
+
+1. **Refatorar textos sem mexer em lógica / saves**
+
+   * Você pode reorganizar os arquivos de idioma, renomear chaves, ajustar textos, etc.
+   * O `internalId` continua igual, então **nada quebra na parte de save/load**.
+
+2. **Ter várias entidades diferentes compartilhando o mesmo texto**
+
+   * Ex.: dois itens diferentes (`item.sword.iron`, `item.sword.rusty`) podem apontar para a mesma mensagem de tutorial ou dica.
+
+3. **Flexibilidade para mudanças futuras**
+
+   * Se um dia você precisar alterar um padrão de `internalId` (por ex. versão 2 de um item, outro balanceamento, etc.), ainda pode manter o `translationKey` antigo para não perder as traduções — ou o contrário.
+
+4. **Ferramentas externas e pipelines de tradução**
+
+   * Fica mais fácil jogar esses `.properties` em ferramentas de tradução e ter um fluxo à parte da programação.
+
+Resumindo: **não é estritamente necessário para o jogo rodar**, mas **prepara o projeto para crescer sem virar um caos de texto hardcoded**.
+
+---
+
+### Contextos diferentes para o mesmo item (várias descrições)
+
+Separar `internalId` de `translationKey` também facilita ter **textos diferentes para o mesmo item**, dependendo do contexto. Alguns exemplos práticos:
+
+* **Descrição padrão (inventário)**
+
+  * `item.axe.desc`
+  * Ex.: “Um pouco enferrujado, mas ainda corta algumas árvores.”
+
+* **Descrição em loja (foco em valor/custo)**
+
+  * `item.axe.desc.shop`
+  * Ex.: “Um machado simples, ideal para quem está começando. Corta árvores básicas.”
+
+* **Descrição expandida quando equipado**
+
+  * `item.axe.desc.equipped`
+  * Ex.: “Equipado: concede +X de ataque e permite cortar árvores específicas.”
+
+* **Mensagem de pickup**
+
+  * `item.axe.pickup`
+  * Ex.: “Você obteve o Machado de Lenhador!”
+
+No código, a entidade só precisa guardar **uma base**:
+
+```java
+setInternalId("item.axe");
+setTranslationKey("item.axe");
+```
+
+E a UI decide **qual contexto** usar:
+
+```java
+// Inventário
+String name = t(entity.getTranslationKey() + ".name");
+String desc = t(entity.getTranslationKey() + ".desc");
+
+// Loja
+String shopDesc = t(entity.getTranslationKey() + ".desc.shop");
+
+// Mensagem de pickup
+String pickupMsg = t(entity.getTranslationKey() + ".pickup");
+```
+
+Isso abre espaço para:
+
+* Descrições mais curtas ou técnicas em certos lugares (HUD).
+* Textos mais “flavor” em diálogos, inventário ou lojas.
+* Mesmo item, **múltiplas “vozes”** dependendo da situação, sem duplicar lógica.
+
+---
+
+### Relação entre `internalId` e `translationKey` no BitHUnter
+
+Na implementação atual do BitHUnter:
+
+* O **`internalId`**:
+
+  * É usado em **Save/Load**, geração de entidades e comparações de lógica.
+  * **Não muda** entre sessões e versões (idealmente).
+
+* O **`translationKey`**:
+
+  * É geralmente igual ao `internalId` (por conveniência).
+  * É usado pela UI/sistema de i18n para montar chaves do tipo `.name`, `.desc`, `.pickup`, `.dialog.*`.
+
+Hoje, manter os dois com o mesmo valor é **simples e suficiente**.
+Mas o fato de já estarem **conceitualmente separados** garante que, no futuro, você possa:
+
+* Mudar a estrutura de textos sem tocar no sistema de save.
+* Adicionar contextos extras de descrição por tela/situação.
+* Evoluir o sistema de tradução de forma independente da lógica de gameplay.
+
+Em outras palavras:
+
+> **`internalId` garante a identidade técnica da entidade.
+> `translationKey` garante que o texto mostrado possa evoluir à vontade, sem amarrar a narrativa/interface à estrutura interna do código.**

@@ -11,8 +11,8 @@ import tile_interactive.ItMetalPlate;
 
 public class NpcBigRock extends Entity {
 
-  // Nome público e estável do NPC (usado para comparação)
-  public static final String NPC_NAME = "Pedra Grande";
+  // Identificador interno estável do NPC (usado para lógica)
+  public static final String NPC_ID = "npc.bigRock";
 
   // Evita duplicação do literal do caminho
   private static final String SPRITE_PATH = "/npc/bigrock";
@@ -25,7 +25,10 @@ public class NpcBigRock extends Entity {
   public NpcBigRock(GamePanel gp) {
     super(gp);
 
-    setName(NPC_NAME);
+    // Novo padrão: tudo baseado em internalId/translationKey
+    setInternalId(NPC_ID);
+    setTranslationKey(NPC_ID);
+
     setDirection(DIR_DOWN);
     setSpeed(4);
 
@@ -58,9 +61,8 @@ public class NpcBigRock extends Entity {
   }
 
   public void setDialogue() {
-    String[][] d = getDialogues();
-    d[0][0] = "Isso é uma pedra gigante.";
-    d[0][1] = "Acho que sou capaz de empurrar isso...";
+    String baseKey = getTranslationKey() + ".dialog.0";
+    fillDialogueSet(0, baseKey, 2);
   }
 
   @Override
@@ -139,7 +141,7 @@ public class NpcBigRock extends Entity {
     InteractiveTile[] tiles = allTiles[currentMapIndex];
 
     for (InteractiveTile tile : tiles) {
-      if (tile != null && ItMetalPlate.IT_NAME.equals(tile.getName())) {
+      if (tile != null && ItMetalPlate.TILE_ID.equals(tile.getInternalId())) {
         plates.add(tile);
       }
     }
@@ -154,7 +156,7 @@ public class NpcBigRock extends Entity {
     Entity[] npcs = allNpcs[currentMapIndex];
 
     for (Entity e : npcs) {
-      if (e != null && NPC_NAME.equals(e.getName())) {
+      if (e != null && NPC_ID.equals(e.getInternalId())) {
         rocks.add(e);
       }
     }
@@ -200,7 +202,7 @@ public class NpcBigRock extends Entity {
 
     for (int i = 0; i < objects.length; i++) {
       Entity obj = objects[i];
-      if (obj != null && ObjDoorIron.OBJ_NAME.equals(obj.getName())) {
+      if (obj != null && ObjDoorIron.OBJ_ID.equals(obj.getInternalId())) {
         objects[i] = null;
         opened = true;
       }

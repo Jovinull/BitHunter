@@ -5,13 +5,14 @@ import main.GamePanel;
 
 public class ObjHeart extends Entity {
 
-  public static final String OBJ_NAME = "Coração";
+  public static final String OBJ_ID = "item.heart";
 
   public ObjHeart(GamePanel gp) {
     super(gp);
 
     setType(TYPE_PICKUP_ONLY);
-    setName(OBJ_NAME);
+    setInternalId(OBJ_ID);
+    setTranslationKey(OBJ_ID);
     setValue(2);
 
     down1 = setup("/objects/heart_full", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
@@ -27,8 +28,25 @@ public class ObjHeart extends Entity {
     var ui = gp.getGameUi();
     var player = gp.getPlayer();
 
-    ui.addMessage("Vida +" + getValue());
+    String msg = String.format(t("item.heart.pickup"), getValue());
+    ui.addMessage(msg);
+
     player.setLife(player.getLife() + getValue());
     return true;
+  }
+
+  @Override
+  public String getDisplayDescription() {
+    String key = getTranslationKey();
+    if (key == null || key.isEmpty()) {
+      return super.getDisplayDescription();
+    }
+
+    String pattern = t(key + ".desc");
+    try {
+      return String.format(pattern, getValue());
+    } catch (IllegalArgumentException _) {
+      return pattern;
+    }
   }
 }

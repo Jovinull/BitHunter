@@ -8,12 +8,14 @@ import main.GamePanel;
 
 public class ObjFireball extends Projectile {
 
-  public static final String OBJ_NAME = "Bola de Fogo";
+  public static final String OBJ_ID = "item.fireball";
 
   public ObjFireball(GamePanel gp) {
     super(gp);
 
-    setName(OBJ_NAME);
+    setInternalId(OBJ_ID);
+    setTranslationKey(OBJ_ID);
+
     setSpeed(5);
     setMaxLife(80);
     setLife(getMaxLife());

@@ -14,11 +14,16 @@ import object.ObjSwordNormal;
 
 public class NpcMerchant extends Entity {
 
+  public static final String NPC_ID = "npc.merchant";
+
   private static final String SPRITE_DOWN_1 = "/npc/merchant/merchant_down_1";
   private static final String SPRITE_DOWN_2 = "/npc/merchant/merchant_down_2";
 
   public NpcMerchant(GamePanel gp) {
     super(gp);
+
+    setInternalId(NPC_ID);
+    setTranslationKey(NPC_ID);
 
     setDirection(DIR_DOWN);
     setSpeed(1);
@@ -52,12 +57,14 @@ public class NpcMerchant extends Entity {
   }
 
   public void setDialogue() {
+    String base = getTranslationKey() + ".dialog.";
     String[][] d = getDialogues();
-    d[0][0] = "Hehe, então me encontrou.\nTenho mercadorias de primeira.\nQuer fazer negócio?";
-    d[1][0] = "Volte sempre, hehe!";
-    d[2][0] = "Você precisa de mais moedas para comprar isso!";
-    d[3][0] = "Você não pode carregar mais itens!";
-    d[4][0] = "Você não pode vender um item equipado!";
+
+    d[0][0] = t(base + "welcome");
+    d[1][0] = t(base + "goodbye");
+    d[2][0] = t(base + "notEnoughCoins");
+    d[3][0] = t(base + "inventoryFull");
+    d[4][0] = t(base + "cannotSellEquipped");
   }
 
   public void setItems() {

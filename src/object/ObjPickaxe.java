@@ -5,13 +5,14 @@ import main.GamePanel;
 
 public class ObjPickaxe extends Entity {
 
-  public static final String OBJ_NAME = "Picareta";
+  public static final String OBJ_ID = "item.pickaxe";
 
   public ObjPickaxe(GamePanel gp) {
     super(gp);
 
     setType(TYPE_PICKAXE);
-    setName(OBJ_NAME);
+    setInternalId(OBJ_ID);
+    setTranslationKey(OBJ_ID);
 
     down1 = setup("/objects/pickaxe", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
@@ -19,7 +20,6 @@ public class ObjPickaxe extends Entity {
     getAttackArea().width = 30;
     getAttackArea().height = 30;
 
-    setDescription("[Picareta]\nVocê vai adorar cavar \ncom isso!.");
     setPrice(75);
     setKnockBackPower(10);
 

@@ -95,8 +95,7 @@ public class Player extends Entity {
 
   public void setDialogue() {
     String[][] d = getDialogues();
-    d[0][0] = "Você subiu de level!\n" + "Seu level agora é " + getLevel() + "!\n"
-        + "Vida máxima aumentada!\n" + "Força e Destreza aumentadas!";
+    d[0][0] = String.format(t("player.levelUp.dialog.0.line1"), getLevel());
   }
 
   public void restoreStatus() {
@@ -494,9 +493,10 @@ public class Player extends Entity {
       String text;
       if (canObtainItem(obj)) {
         gp.playSE(1);
-        text = "Você obteve " + obj.getName() + "!";
+        String itemName = obj.getDisplayName(); // já vem traduzido
+        text = String.format(t("player.message.itemObtained"), itemName);
       } else {
-        text = "Você não pode carregar mais nada!";
+        text = t("player.message.cannotCarryMore");
       }
       gp.getGameUi().addMessage(text);
       objects[currentMapIndex][i] = null;
@@ -566,15 +566,25 @@ public class Player extends Entity {
       }
 
       mon.setLife(mon.getLife() - damage);
-      gp.getGameUi().addMessage(damage + " de dano!");
+
+      // Mensagem de dano
+      String damageMsg = String.format(t("player.message.damageDealt"), damage);
+      gp.getGameUi().addMessage(damageMsg);
 
       mon.setInvincible(true);
       mon.damageReaction();
 
       if (mon.getLife() <= 0) {
         mon.setDying(true);
-        gp.getGameUi().addMessage("Matou o " + mon.getName() + "!");
-        gp.getGameUi().addMessage("Exp + " + mon.getExp());
+
+        String monsterName = mon.getDisplayName();
+
+        String killMsg = String.format(t("player.message.monsterKilled"), monsterName);
+        gp.getGameUi().addMessage(killMsg);
+
+        String expMsg = String.format(t("player.message.expGained"), mon.getExp());
+        gp.getGameUi().addMessage(expMsg);
+
         setExp(getExp() + mon.getExp());
         checkLevelUp();
       }
@@ -708,7 +718,7 @@ public class Player extends Entity {
   public int searchItemInInventory(String itemName) {
     var inv = getInventory();
     for (int i = 0; i < inv.size(); i++) {
-      if (inv.get(i).getName().equals(itemName)) {
+      if (inv.get(i).getInternalId().equals(itemName)) {
         return i;
       }
     }
@@ -717,11 +727,11 @@ public class Player extends Entity {
 
   public boolean canObtainItem(Entity item) {
     boolean canObtain = false;
-    Entity newItem = gp.geteGenerator().getObject(item.getName());
+    Entity newItem = gp.geteGenerator().getObject(item.getInternalId());
     var inv = getInventory();
 
     if (newItem.isStackable()) {
-      int index = searchItemInInventory(newItem.getName());
+      int index = searchItemInInventory(newItem.getInternalId());
       if (index != 999) {
         inv.get(index).setAmount(inv.get(index).getAmount() + 1);
         canObtain = true;

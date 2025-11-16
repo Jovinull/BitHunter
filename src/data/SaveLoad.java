@@ -100,7 +100,7 @@ public class SaveLoad {
     var inv = player.getInventory();
     for (int i = 0; i < inv.size(); i++) {
       Entity item = inv.get(i);
-      ds.getItemNames().add(item.getName());
+      ds.getItemNames().add(item.getInternalId());
       ds.getItemAmounts().add(item.getAmount());
     }
   }
@@ -129,12 +129,12 @@ public class SaveLoad {
         if (objectEntity == null) {
           ds.getMapObjectNames()[mapNum][i] = "NA";
         } else {
-          ds.getMapObjectNames()[mapNum][i] = objectEntity.getName();
+          ds.getMapObjectNames()[mapNum][i] = objectEntity.getInternalId();
           ds.getMapObjectWorldX()[mapNum][i] = objectEntity.getWorldX();
           ds.getMapObjectWorldY()[mapNum][i] = objectEntity.getWorldY();
 
           if (objectEntity.getLoot() != null) {
-            ds.getMapObjectLootNames()[mapNum][i] = objectEntity.getLoot().getName();
+            ds.getMapObjectLootNames()[mapNum][i] = objectEntity.getLoot().getInternalId();
           }
           ds.getMapObjectOpened()[mapNum][i] = objectEntity.isOpened();
         }

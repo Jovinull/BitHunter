@@ -7,22 +7,22 @@ import main.GamePanel;
 
 public class ObjChest extends Entity {
 
-  public static final String OBJ_NAME = "Baú";
+  public static final String OBJ_ID = "item.chest";
 
   public ObjChest(GamePanel gp) {
     super(gp);
 
     setType(TYPE_OBSTACLE);
-    setName(OBJ_NAME);
+    setInternalId(OBJ_ID);
+    setTranslationKey(OBJ_ID);
 
-    // sprites (protegidos em Entity)
+    // sprites
     image = setup("/objects/chest", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     image2 = setup("/objects/chest_opened", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     down1 = image;
 
     setCollision(true);
 
-    // solidArea via getter + defaults via setters
     Rectangle sa = getSolidArea();
     sa.x = 4;
     sa.y = 16;
@@ -39,14 +39,21 @@ public class ObjChest extends Entity {
   }
 
   public void setDialogue() {
-    String lootName = (getLoot() != null) ? getLoot().getName() : "???";
+    String lootName = (getLoot() != null) ? getLoot().getDisplayName() : "???";
     String[][] d = getDialogues();
 
-    d[0][0] = "Você abre o baú e encontra um " + lootName + "!" +
-        "\n...Mas você não pode carregar mais nada!";
-    d[1][0] = "Você abre o baú e encontra um " + lootName + "!" +
-        "\nVocê obteve " + lootName + "!";
-    d[2][0] = "Está vazio.";
+    // Inventário cheio
+    d[0][0] = String.format(t("item.chest.dialog.fullInventory.line1"), lootName)
+        + "\n"
+        + t("item.chest.dialog.fullInventory.line2");
+
+    // Item obtido
+    d[1][0] = String.format(t("item.chest.dialog.obtained.line1"), lootName)
+        + "\n"
+        + String.format(t("item.chest.dialog.obtained.line2"), lootName);
+
+    // Baú vazio
+    d[2][0] = t("item.chest.dialog.empty");
   }
 
   @Override
@@ -60,8 +67,7 @@ public class ObjChest extends Entity {
         startDialogue(this, 0);
       } else {
         startDialogue(this, 1);
-        // aplica aparência aberta
-        down1 = image2; // campos protegidos em Entity
+        applyOpenedAppearance();
         setOpened(true);
       }
     } else {

@@ -5,18 +5,18 @@ import main.GamePanel;
 
 public class ObjShieldWood extends Entity {
 
-  public static final String OBJ_NAME = "Escudo de Madeira";
+  public static final String OBJ_ID = "item.shieldWood";
 
   public ObjShieldWood(GamePanel gp) {
     super(gp);
 
     setType(TYPE_SHIELD);
-    setName(OBJ_NAME);
+    setInternalId(OBJ_ID);
+    setTranslationKey(OBJ_ID);
 
     down1 = setup("/objects/shield_wood", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
     setDefenseValue(1);
-    setDescription("[" + getName() + "]\nUm escudo simples de \nmadeira.");
     setPrice(35);
   }
 }

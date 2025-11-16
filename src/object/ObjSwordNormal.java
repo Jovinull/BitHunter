@@ -5,13 +5,14 @@ import main.GamePanel;
 
 public class ObjSwordNormal extends Entity {
 
-  public static final String OBJ_NAME = "Espada Comum";
+  public static final String OBJ_ID = "item.swordNormal";
 
   public ObjSwordNormal(GamePanel gp) {
     super(gp);
 
     setType(TYPE_SWORD);
-    setName(OBJ_NAME);
+    setInternalId(OBJ_ID);
+    setTranslationKey(OBJ_ID);
 
     down1 = setup("/objects/sword_normal", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
@@ -19,7 +20,6 @@ public class ObjSwordNormal extends Entity {
     getAttackArea().width = 36;
     getAttackArea().height = 36;
 
-    setDescription("[" + getName() + "]\nUma espada antiga.");
     setPrice(20);
     setKnockBackPower(2);
 

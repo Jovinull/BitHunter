@@ -10,7 +10,8 @@ import object.ObjManaCrystal;
 
 public class MonBat extends Entity {
 
-  // Evita duplicação de literais (S1192)
+  public static final String MON_ID = "monster.bat";
+
   private static final String BAT_DOWN_1 = "/monster/bat_down_1";
   private static final String BAT_DOWN_2 = "/monster/bat_down_2";
 
@@ -18,7 +19,9 @@ public class MonBat extends Entity {
     super(gp);
 
     setType(TYPE_MONSTER);
-    setName("Morcego");
+    setInternalId(MON_ID);
+    setTranslationKey(MON_ID);
+
     setDefaultSpeed(4);
     setSpeed(getDefaultSpeed());
     setMaxLife(7);

@@ -8,13 +8,15 @@ import main.GamePanel;
 
 public class ObjRock extends Projectile {
 
-  public static final String OBJ_NAME = "Pedra";
+  public static final String OBJ_ID = "item.rock";
   private static final String ROCK_SPRITE_PATH = "/projectile/rock_down_1";
 
   public ObjRock(GamePanel gp) {
     super(gp);
 
-    setName(OBJ_NAME);
+    setInternalId(OBJ_ID);
+    setTranslationKey(OBJ_ID);
+
     setSpeed(8);
     setMaxLife(80);
     setLife(getMaxLife());
@@ -26,7 +28,7 @@ public class ObjRock extends Projectile {
   }
 
   private void loadSprites() {
-    // As sprites da pedra usam a mesma imagem para todas as direções
+    // mesma sprite para todas as direções
     up1 = setup(ROCK_SPRITE_PATH, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     up2 = setup(ROCK_SPRITE_PATH, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     down1 = setup(ROCK_SPRITE_PATH, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);

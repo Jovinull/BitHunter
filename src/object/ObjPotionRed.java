@@ -5,17 +5,18 @@ import main.GamePanel;
 
 public class ObjPotionRed extends Entity {
 
-  public static final String OBJ_NAME = "Poção Vermelha";
+  public static final String OBJ_ID = "item.potionRed";
 
   public ObjPotionRed(GamePanel gp) {
     super(gp);
 
     setType(TYPE_CONSUMABLE);
-    setName(OBJ_NAME);
+    setInternalId(OBJ_ID);
+    setTranslationKey(OBJ_ID);
     setValue(5);
 
     down1 = setup("/objects/potion_red", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
-    setDescription("[" + getName() + "]\nRestaura sua vida em " + getValue() + ".");
+
     setPrice(25);
     setStackable(true);
 
@@ -24,7 +25,8 @@ public class ObjPotionRed extends Entity {
 
   public void setDialogue() {
     String[][] d = getDialogues();
-    d[0][0] = "Você bebe a " + getName() + "!\nSua vida foi restaurada em " + getValue() + ".";
+    String displayName = getDisplayName();
+    d[0][0] = String.format(t("item.potionRed.dialog.use"), displayName, getValue());
   }
 
   @Override
@@ -32,5 +34,20 @@ public class ObjPotionRed extends Entity {
     startDialogue(this, 0);
     gp.playSE(2);
     return true;
+  }
+
+  @Override
+  public String getDisplayDescription() {
+    String key = getTranslationKey();
+    if (key == null || key.isEmpty()) {
+      return super.getDisplayDescription();
+    }
+
+    String pattern = t(key + ".desc");
+    try {
+      return String.format(pattern, getValue());
+    } catch (IllegalArgumentException _) {
+      return pattern;
+    }
   }
 }
