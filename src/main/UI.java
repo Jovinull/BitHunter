@@ -49,7 +49,7 @@ public class UI {
   private int playerSlotRow = 0;
   private int npcSlotCol = 0;
   private int npcSlotRow = 0;
-  int subState = 0;
+  private int subState = 0;
   int counter = 0;
   private Entity npc;
   int charIndex = 0;
@@ -1697,5 +1697,13 @@ public class UI {
 
   public void setNpc(Entity npc) {
     this.npc = npc;
+  }
+
+  public int getSubState() {
+    return subState;
+  }
+
+  public void setSubState(int subState) {
+    this.subState = subState;
   }
 }

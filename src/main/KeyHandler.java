@@ -246,6 +246,13 @@ public class KeyHandler implements KeyListener {
       return;
     }
 
+    // Navegação ESPECIAL para o submenu de idiomas (subState 4)
+    if (gp.getGameUi().getSubState() == 4
+        && (code == KeyEvent.VK_W || code == KeyEvent.VK_S)) {
+      handleLanguageMenuNavigation(code);
+      return;
+    }
+
     final int maxCommandNum = getOptionsMaxCommandNum();
 
     switch (code) {
@@ -260,17 +267,71 @@ public class KeyHandler implements KeyListener {
   }
 
   /**
+   * Navegação específica do submenu de idiomas:
+   *
+   * - índices 0..(totalLanguages-1): idiomas
+   * - índice totalLanguages: "Voltar"
+   *
+   * Regras:
+   * - W em 0 -> último idioma (totalLanguages-1)
+   * - W em "Voltar" -> último idioma
+   * - W no meio -> idioma anterior normal
+   *
+   * - S no meio -> próximo idioma
+   * - S no último idioma -> "Voltar"
+   * - S em "Voltar" -> primeiro idioma (0)
+   */
+  private void handleLanguageMenuNavigation(int code) {
+    var ui = gp.getGameUi();
+    var langManager = gp.getLanguageManager();
+
+    int totalLanguages = langManager.getAvailableLanguages().size();
+    int backIndex = totalLanguages;
+    int commandNum = ui.getCommandNum();
+
+    switch (code) {
+      case KeyEvent.VK_W -> {
+        if (commandNum == 0 || commandNum == backIndex) {
+          // Da primeira opção ou de "Voltar" -> último idioma
+          commandNum = totalLanguages - 1;
+        } else {
+          // Dentro da lista de idiomas
+          commandNum--;
+        }
+      }
+      case KeyEvent.VK_S -> {
+        if (commandNum < totalLanguages - 1) {
+          // Idioma intermediário -> próximo idioma
+          commandNum++;
+        } else if (commandNum == totalLanguages - 1) {
+          // Último idioma -> "Voltar"
+          commandNum = backIndex;
+        } else {
+          // Estava em "Voltar" -> volta para o primeiro idioma
+          commandNum = 0;
+        }
+      }
+      default -> {
+        return; // não trata outras teclas aqui
+      }
+    }
+
+    ui.setCommandNum(commandNum);
+    gp.playSE(9);
+  }
+
+  /**
    * Retorna o índice máximo de comando permitido na tela de opções, de acordo
    * com o subState atual da UI.
    *
-   * subState 0 -> menu principal de opções (0..6)
+   * subState 0 -> menu principal de opções (0..5)
    * subState 1 -> aviso de tela cheia (apenas "Voltar", índice 0)
    * subState 2 -> tela de controles (apenas "Voltar", índice 0)
    * subState 3 -> confirmação de encerrar jogo ("Sim"/"Não", índices 0..1)
    * subState 4 -> seleção de idioma (0..N idiomas, + "Voltar" em N)
    */
   private int getOptionsMaxCommandNum() {
-    return switch (gp.getGameUi().subState) {
+    return switch (gp.getGameUi().getSubState()) {
       case 0 -> 5;
       case 1, 2 -> 0;
       case 3 -> 1;
@@ -293,7 +354,7 @@ public class KeyHandler implements KeyListener {
   }
 
   private void adjustVolume(int direction) {
-    if (gp.getGameUi().subState != 0) {
+    if (gp.getGameUi().getSubState() != 0) {
       return;
     }
 
@@ -354,7 +415,7 @@ public class KeyHandler implements KeyListener {
         gp.resetGame(true);
         gp.getGameUi().setTitleScreenState(0);
         gp.getGameUi().setCommandNum(0);
-        gp.getGameUi().subState = 0;
+        gp.getGameUi().setSubState(0);
         gp.setGameState(GamePanel.TITLE_STATE);
       }
     }
@@ -369,18 +430,18 @@ public class KeyHandler implements KeyListener {
       return;
     }
 
-    switch (gp.getGameUi().subState) {
+    switch (gp.getGameUi().getSubState()) {
       case 0 -> handleTradeMenuNavigation(code);
       case 1 -> {
         npcInventory(code);
         if (code == KeyEvent.VK_ESCAPE) {
-          gp.getGameUi().subState = 0;
+          gp.getGameUi().setSubState(0);
         }
       }
       case 2 -> {
         playerInventory(code);
         if (code == KeyEvent.VK_ESCAPE) {
-          gp.getGameUi().subState = 0;
+          gp.getGameUi().setSubState(0);
         }
       }
       default -> {
