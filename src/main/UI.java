@@ -688,7 +688,7 @@ public class UI {
     int frameHeight = GamePanel.TILE_SIZE * 10;
     drawSubWindow(frameX, frameY, frameWidth, frameHeight);
 
-    switch (subState) {
+    switch (getSubState()) {
       case 0 -> optionsTop(frameX, frameY);
       case 1 -> optionsFullScreenNotification(frameX, frameY);
       case 2 -> optionsControl(frameX, frameY);
@@ -721,7 +721,7 @@ public class UI {
       g2.drawString(">", textX - 25, textY);
       if (keyH.isEnterPressed()) {
         gp.setFullScreenOn(!gp.isFullScreenOn());
-        subState = 1;
+        setSubState(1);
       }
     }
 
@@ -745,7 +745,7 @@ public class UI {
     if (commandNum == 3) {
       g2.drawString(">", textX - 25, textY);
       if (keyH.isEnterPressed()) {
-        subState = 2;
+        setSubState(2);
         commandNum = 0;
       }
     }
@@ -758,7 +758,7 @@ public class UI {
     if (commandNum == 4) {
       g2.drawString(">", textX - 25, textY);
       if (keyH.isEnterPressed()) {
-        subState = 4;
+        setSubState(4);
         commandNum = 0;
         languageScrollOffset = 0;
       }
@@ -770,7 +770,7 @@ public class UI {
     if (commandNum == 5) {
       g2.drawString(">", textX - 25, textY);
       if (keyH.isEnterPressed()) {
-        subState = 3;
+        setSubState(3);
         commandNum = 0;
       }
     }
@@ -913,7 +913,7 @@ public class UI {
     if (commandNum == backIndex) {
       g2.drawString(">", textX - 25, textY);
       if (keyH.isEnterPressed()) {
-        subState = 0; // volta para opções principais
+        setSubState(0); // volta para opções principais
         commandNum = 4; // reposiciona o cursor em "Idioma"
         keyH.setEnterPressed(false);
       }
@@ -937,7 +937,7 @@ public class UI {
     if (commandNum == 0) {
       g2.drawString(">", textX - 25, textY);
       if (gp.getKeyH().isEnterPressed()) {
-        subState = 0;
+        setSubState(0);
       }
     }
   }
@@ -987,7 +987,7 @@ public class UI {
     if (commandNum == 0) {
       g2.drawString(">", textX - 25, textY);
       if (gp.getKeyH().isEnterPressed()) {
-        subState = 0;
+        setSubState(0);
         commandNum = 3;
       }
     }
@@ -1014,7 +1014,7 @@ public class UI {
     if (commandNum == 0) {
       g2.drawString(">", textX - 25, textY);
       if (keyH.isEnterPressed()) {
-        subState = 0;
+        setSubState(0);
         commandNum = 0;
         titleScreenState = 0;
         gp.stopMusic();
@@ -1032,7 +1032,7 @@ public class UI {
     if (commandNum == 1) {
       g2.drawString(">", textX - 25, textY);
       if (keyH.isEnterPressed()) {
-        subState = 0;
+        setSubState(0);
         commandNum = 4;
         keyH.setEnterPressed(false);
       }
@@ -1040,7 +1040,7 @@ public class UI {
   }
 
   public void drawTradeScreen() {
-    switch (subState) {
+    switch (getSubState()) {
       case 0 -> tradeSelect();
       case 1 -> tradeBuy();
       case 2 -> tradeSell();
@@ -1071,7 +1071,7 @@ public class UI {
     if (commandNum == 0) {
       g2.drawString(">", x - 24, y);
       if (keyH.isEnterPressed()) {
-        subState = 1;
+        setSubState(1);
       }
     }
     y += GamePanel.TILE_SIZE;
@@ -1080,7 +1080,7 @@ public class UI {
     if (commandNum == 1) {
       g2.drawString(">", x - 24, y);
       if (keyH.isEnterPressed()) {
-        subState = 2;
+        setSubState(2);
       }
     }
     y += GamePanel.TILE_SIZE;
@@ -1138,13 +1138,13 @@ public class UI {
       // COMPRAR UM ITEM
       if (gp.getKeyH().isEnterPressed()) {
         if (price > player.getCoin()) {
-          subState = 0;
+          setSubState(0);
           npc.startDialogue(npc, 2);
         } else {
           if (player.canObtainItem(npc.getInventory().get(itemIndex))) {
             player.setCoin(player.getCoin() - price);
           } else {
-            subState = 0;
+            setSubState(0);
             npc.startDialogue(npc, 3);
           }
         }
@@ -1205,7 +1205,7 @@ public class UI {
             || player.getInventory().get(itemIndex) == player.getCurrentLegs()) {
 
           commandNum = 0;
-          subState = 0;
+          setSubState(0);
           npc.startDialogue(npc, 4);
         } else {
           if (player.getInventory().get(itemIndex).getAmount() > 1) {
@@ -1618,7 +1618,7 @@ public class UI {
   }
 
   public void resetOptionsMenu() {
-    subState = 0;
+    setSubState(0);
     commandNum = 0;
   }
 
