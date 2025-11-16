@@ -45,8 +45,7 @@ public class ObjHeart extends Entity {
     String pattern = t(key + ".desc");
     try {
       return String.format(pattern, getValue());
-    } catch (IllegalArgumentException ex) {
-      // se a string no lang estiver sem %d, evita crash e mostra o padrão cru
+    } catch (IllegalArgumentException _) {
       return pattern;
     }
   }

@@ -44,8 +44,7 @@ public class ObjManaCrystal extends Entity {
     String pattern = t(key + ".desc");
     try {
       return String.format(pattern, getValue());
-    } catch (IllegalArgumentException ex) {
-      // fallback caso a string não tenha %d
+    } catch (IllegalArgumentException _) {
       return pattern;
     }
   }

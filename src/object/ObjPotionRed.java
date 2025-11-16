@@ -46,7 +46,7 @@ public class ObjPotionRed extends Entity {
     String pattern = t(key + ".desc");
     try {
       return String.format(pattern, getValue());
-    } catch (IllegalArgumentException ex) {
+    } catch (IllegalArgumentException _) {
       return pattern;
     }
   }
