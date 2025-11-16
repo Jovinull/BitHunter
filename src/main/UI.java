@@ -822,39 +822,51 @@ public class UI {
    * - se commandNum == langs.size(): volta para subState 0 (Opções)
    */
   public void optionsLanguage(int frameX, int frameY) {
-    var langManager = gp.getLanguageManager();
+    LanguageManager langManager = gp.getLanguageManager();
     java.util.List<LanguageManager.LanguageOption> langs = langManager.getAvailableLanguages();
 
-    int textX;
-    int textY;
+    int textX = frameX + GamePanel.TILE_SIZE;
+    int textY = drawLanguageHeader(frameX, frameY, langManager);
 
-    // Título
+    updateLanguageScrollState(langs.size());
+
+    KeyHandler keyH = gp.getKeyH();
+    textY = drawLanguageOptionsList(langs, textX, textY, keyH, langManager);
+
+    drawScrollIndicators(frameX, frameY, textY, langs.size());
+    drawBackOption(textX, textY, keyH, langs.size());
+  }
+
+  private int drawLanguageHeader(int frameX, int frameY, LanguageManager langManager) {
     String title = t("ui.options.languageTitle");
-    textX = getXforCenteredText(title);
-    textY = frameY + GamePanel.TILE_SIZE;
-    drawTextShadow(title, textX, textY, COL_TEXT, Color.black, 2);
+    int titleX = getXforCenteredText(title);
+    int titleY = frameY + GamePanel.TILE_SIZE;
+    drawTextShadow(title, titleX, titleY, COL_TEXT, Color.black, 2);
 
-    // Idioma atual
-    textX = frameX + GamePanel.TILE_SIZE;
-    textY += GamePanel.TILE_SIZE * 2;
+    int textX = frameX + GamePanel.TILE_SIZE;
+    int currentLabelY = titleY + GamePanel.TILE_SIZE * 2;
     String currentLabel = t("ui.options.languageCurrent") + ": " + langManager.getCurrentLanguageDisplayName();
-    g2.setColor(COL_TEXT_DIM);
-    g2.drawString(currentLabel, textX, textY);
 
-    // ----- Cálculo do scroll -----
-    int totalLanguages = langs.size();
+    g2.setColor(COL_TEXT_DIM);
+    g2.drawString(currentLabel, textX, currentLabelY);
+
+    // Próxima linha para começar a listar idiomas
+    return currentLabelY + GamePanel.TILE_SIZE;
+  }
+
+  private void updateLanguageScrollState(int totalLanguages) {
     int lastIndex = totalLanguages; // último índice é o "Voltar"
+
     if (commandNum < 0) {
       commandNum = 0;
-    }
-    if (commandNum > lastIndex) {
+    } else if (commandNum > lastIndex) {
       commandNum = lastIndex;
     }
 
     int visibleCount = Math.min(MAX_VISIBLE_LANG_OPTIONS, totalLanguages);
     int maxOffset = Math.max(0, totalLanguages - visibleCount);
 
-    // Se estamos em um idioma, ajusta offset para manter o cursor visível
+    // Mantém o cursor visível na janela
     if (commandNum < totalLanguages) {
       if (commandNum < languageScrollOffset) {
         languageScrollOffset = commandNum;
@@ -868,13 +880,19 @@ public class UI {
     } else if (languageScrollOffset > maxOffset) {
       languageScrollOffset = maxOffset;
     }
+  }
 
-    // ----- Lista de idiomas (com scroll) -----
-    textY += GamePanel.TILE_SIZE;
+  private int drawLanguageOptionsList(
+      java.util.List<LanguageManager.LanguageOption> langs,
+      int textX,
+      int textY,
+      KeyHandler keyH,
+      LanguageManager langManager) {
+
     g2.setColor(COL_TEXT);
 
-    var keyH = gp.getKeyH();
-
+    int totalLanguages = langs.size();
+    int visibleCount = Math.min(MAX_VISIBLE_LANG_OPTIONS, totalLanguages);
     int start = languageScrollOffset;
     int end = Math.min(languageScrollOffset + visibleCount, totalLanguages);
 
@@ -895,8 +913,14 @@ public class UI {
       textY += GamePanel.TILE_SIZE;
     }
 
-    // Indicadores de scroll (↑ / ↓)
+    return textY;
+  }
+
+  private void drawScrollIndicators(int frameX, int frameY, int textY, int totalLanguages) {
+    int visibleCount = Math.min(MAX_VISIBLE_LANG_OPTIONS, totalLanguages);
+    int maxOffset = Math.max(0, totalLanguages - visibleCount);
     int arrowX = frameX + GamePanel.TILE_SIZE * 7;
+
     if (languageScrollOffset > 0) {
       g2.setColor(COL_TEXT_DIM);
       g2.drawString("↑", arrowX, frameY + GamePanel.TILE_SIZE * 4);
@@ -906,10 +930,13 @@ public class UI {
       g2.drawString("↓", arrowX, textY - GamePanel.TILE_SIZE / 2);
     }
     g2.setColor(COL_TEXT);
+  }
 
-    // ----- Opção "Voltar" (índice totalLanguages) -----
+  private void drawBackOption(int textX, int textY, KeyHandler keyH, int totalLanguages) {
     int backIndex = totalLanguages;
-    g2.drawString(t("ui.common.back"), textX, textY);
+    String backLabel = t("ui.common.back");
+
+    g2.drawString(backLabel, textX, textY);
     if (commandNum == backIndex) {
       g2.drawString(">", textX - 25, textY);
       if (keyH.isEnterPressed()) {
