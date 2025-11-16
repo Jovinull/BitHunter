@@ -65,6 +65,8 @@ public class UI {
   private static final Color COL_ACCENT = new Color(0xE0, 0xB5, 0x66);
 
   private static final int MENU_LINE = 48;
+  private static final int MAX_VISIBLE_LANG_OPTIONS = 5;
+  private int languageScrollOffset = 0;
 
   public UI(GamePanel gp) {
     this.gp = gp;
@@ -756,8 +758,9 @@ public class UI {
     if (commandNum == 4) {
       g2.drawString(">", textX - 25, textY);
       if (keyH.isEnterPressed()) {
-        subState = 4; // vai para submenu de idiomas
-        commandNum = 0; // começa na primeira opção de idioma
+        subState = 4;
+        commandNum = 0;
+        languageScrollOffset = 0;
       }
     }
 
@@ -838,13 +841,44 @@ public class UI {
     g2.setColor(COL_TEXT_DIM);
     g2.drawString(currentLabel, textX, textY);
 
-    // Lista de idiomas
+    // ----- Cálculo do scroll -----
+    int totalLanguages = langs.size();
+    int lastIndex = totalLanguages; // último índice é o "Voltar"
+    if (commandNum < 0) {
+      commandNum = 0;
+    }
+    if (commandNum > lastIndex) {
+      commandNum = lastIndex;
+    }
+
+    int visibleCount = Math.min(MAX_VISIBLE_LANG_OPTIONS, totalLanguages);
+    int maxOffset = Math.max(0, totalLanguages - visibleCount);
+
+    // Se estamos em um idioma, ajusta offset para manter o cursor visível
+    if (commandNum < totalLanguages) {
+      if (commandNum < languageScrollOffset) {
+        languageScrollOffset = commandNum;
+      } else if (commandNum > languageScrollOffset + visibleCount - 1) {
+        languageScrollOffset = commandNum - visibleCount + 1;
+      }
+    }
+
+    if (languageScrollOffset < 0) {
+      languageScrollOffset = 0;
+    } else if (languageScrollOffset > maxOffset) {
+      languageScrollOffset = maxOffset;
+    }
+
+    // ----- Lista de idiomas (com scroll) -----
     textY += GamePanel.TILE_SIZE;
     g2.setColor(COL_TEXT);
 
     var keyH = gp.getKeyH();
 
-    for (int i = 0; i < langs.size(); i++) {
+    int start = languageScrollOffset;
+    int end = Math.min(languageScrollOffset + visibleCount, totalLanguages);
+
+    for (int i = start; i < end; i++) {
       LanguageManager.LanguageOption opt = langs.get(i);
       String name = opt.displayName();
 
@@ -861,8 +895,20 @@ public class UI {
       textY += GamePanel.TILE_SIZE;
     }
 
-    // Opção "Voltar" (último índice)
-    int backIndex = langs.size();
+    // Indicadores de scroll (↑ / ↓)
+    int arrowX = frameX + GamePanel.TILE_SIZE * 7;
+    if (languageScrollOffset > 0) {
+      g2.setColor(COL_TEXT_DIM);
+      g2.drawString("↑", arrowX, frameY + GamePanel.TILE_SIZE * 4);
+    }
+    if (languageScrollOffset < maxOffset) {
+      g2.setColor(COL_TEXT_DIM);
+      g2.drawString("↓", arrowX, textY - GamePanel.TILE_SIZE / 2);
+    }
+    g2.setColor(COL_TEXT);
+
+    // ----- Opção "Voltar" (índice totalLanguages) -----
+    int backIndex = totalLanguages;
     g2.drawString(t("ui.common.back"), textX, textY);
     if (commandNum == backIndex) {
       g2.drawString(">", textX - 25, textY);
