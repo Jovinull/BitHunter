@@ -45,7 +45,7 @@ public class LanguageManager {
     List<LanguageOption> list = new ArrayList<>();
     list.add(new LanguageOption("pt_BR", "Português (Brasil)"));
     list.add(new LanguageOption("en_US", "English"));
-    // adicionar aqui mais idiomas futuramente
+    list.add(new LanguageOption("es_ES", "Español"));
     return list;
   }
 
