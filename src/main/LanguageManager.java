@@ -50,7 +50,9 @@ public class LanguageManager {
     list.add(new LanguageOption("it_IT", "Italiano"));
     list.add(new LanguageOption("de_DE", "Deutsch"));
     list.add(new LanguageOption("ru_RU", "Русский"));
-    // adicionar aqui mais idiomas futuramente
+    list.add(new LanguageOption("zh_CN", "简体中文"));
+    list.add(new LanguageOption("ja_JP", "日本語"));
+    list.add(new LanguageOption("ko_KR", "한국어"));
     return list;
   }
 
