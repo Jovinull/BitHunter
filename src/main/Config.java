@@ -29,11 +29,11 @@ public class Config {
       bw.newLine();
 
       // Music volume
-      bw.write(String.valueOf(gp.music.volumeScale));
+      bw.write(String.valueOf(gp.music.getVolumeScale()));
       bw.newLine();
 
       // SE volume
-      bw.write(String.valueOf(gp.se.volumeScale));
+      bw.write(String.valueOf(gp.se.getVolumeScale()));
       bw.newLine();
 
       // Language code (ex: pt_BR, en_US)
@@ -59,11 +59,11 @@ public class Config {
 
       // Music volume
       s = br.readLine();
-      gp.music.volumeScale = Integer.parseInt(s);
+      gp.getMusic().setVolumeScale(Integer.parseInt(s));
 
       // SE volume
       s = br.readLine();
-      gp.se.volumeScale = Integer.parseInt(s);
+      gp.getSe().setVolumeScale(Integer.parseInt(s));
 
       // Language (linha opcional para configs antigos)
       s = br.readLine();

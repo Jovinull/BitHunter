@@ -1,12 +1,13 @@
 package environment;
 
 import java.awt.Graphics2D;
+
 import main.GamePanel;
 
 public class EnvironmentManager {
 
   private final GamePanel gp;
-  private Lighting lighting; // S1104: não-público + getter
+  private Lighting lighting;
 
   public EnvironmentManager(GamePanel gp) {
     this.gp = gp;
@@ -28,7 +29,6 @@ public class EnvironmentManager {
     }
   }
 
-  // Acesso controlado, se necessário por outras partes do sistema
   public Lighting getLighting() {
     return lighting;
   }

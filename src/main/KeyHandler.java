@@ -354,23 +354,31 @@ public class KeyHandler implements KeyListener {
   }
 
   private void adjustVolume(int direction) {
+    // só ajusta volume no topo das opções
     if (gp.getGameUi().getSubState() != 0) {
       return;
     }
 
-    switch (gp.getGameUi().getCommandNum()) {
+    int commandNum = gp.getGameUi().getCommandNum();
+
+    switch (commandNum) {
       case 1 -> { // música
-        final int next = gp.music.volumeScale + direction;
+        Sound music = gp.getMusic();
+        int current = music.getVolumeScale();
+        int next = current + direction;
+
         if (next >= 0 && next <= 5) {
-          gp.music.volumeScale = next;
-          gp.music.checkVolume();
+          music.setVolumeScale(next); // checkVolume() é chamado dentro do setter
           gp.playSE(9);
         }
       }
       case 2 -> { // efeitos
-        final int next = gp.se.volumeScale + direction;
+        Sound se = gp.getSe();
+        int current = se.getVolumeScale();
+        int next = current + direction;
+
         if (next >= 0 && next <= 5) {
-          gp.se.volumeScale = next;
+          se.setVolumeScale(next);
           gp.playSE(9);
         }
       }

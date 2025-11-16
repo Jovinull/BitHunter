@@ -5,16 +5,18 @@ import entity.Entity;
 
 public class EventHandler {
 
-  GamePanel gp;
-  EventRect[][][] eventRect;
-  Entity eventMaster;
+  private final GamePanel gp;
+  private final EventRect[][][] eventRect;
+  private final Entity eventMaster;
 
-  int previousEventX;
-  int previousEventY; // mantido em linha separada (S1659)
-  boolean canTouchEvent = true;
-  int tempMap;
-  int tempCol; // mantido em linha separada (S1659)
-  int tempRow;
+  private int previousEventX;
+  private int previousEventY;
+
+  private boolean canTouchEvent = true;
+
+  private int tempMap;
+  private int tempCol;
+  private int tempRow;
 
   public EventHandler(GamePanel gp) {
     this.gp = gp;
@@ -227,5 +229,55 @@ public class EventHandler {
       gp.setGameState(GamePanel.CUTSCENE_STATE);
       gp.getCsManager().startSkeletonLordScene();
     }
+  }
+
+  // ===== Getters/Setters usados pela UI/TransitionUi =====
+
+  public int getPreviousEventX() {
+    return previousEventX;
+  }
+
+  public void setPreviousEventX(int previousEventX) {
+    this.previousEventX = previousEventX;
+  }
+
+  public int getPreviousEventY() {
+    return previousEventY;
+  }
+
+  public void setPreviousEventY(int previousEventY) {
+    this.previousEventY = previousEventY;
+  }
+
+  public boolean isCanTouchEvent() {
+    return canTouchEvent;
+  }
+
+  public void setCanTouchEvent(boolean canTouchEvent) {
+    this.canTouchEvent = canTouchEvent;
+  }
+
+  public int getTempMap() {
+    return tempMap;
+  }
+
+  public void setTempMap(int tempMap) {
+    this.tempMap = tempMap;
+  }
+
+  public int getTempCol() {
+    return tempCol;
+  }
+
+  public void setTempCol(int tempCol) {
+    this.tempCol = tempCol;
+  }
+
+  public int getTempRow() {
+    return tempRow;
+  }
+
+  public void setTempRow(int tempRow) {
+    this.tempRow = tempRow;
   }
 }

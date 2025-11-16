@@ -25,6 +25,7 @@ import environment.EnvironmentManager;
 import tile.Map;
 import tile.TileManager;
 import tile_interactive.InteractiveTile;
+import ui.UI;
 
 // Painel principal do jogo. Responsável por configurar, atualizar e desenhar o jogo.
 // Implementa Runnable para rodar o loop de jogo em uma thread separada.
@@ -620,5 +621,25 @@ public class GamePanel extends JPanel implements Runnable {
 
   public LanguageManager getLanguageManager() {
     return languageManager;
+  }
+
+  public Sound getMusic() {
+    return music;
+  }
+
+  public Sound getSe() {
+    return se;
+  }
+
+  public Config getConfig() {
+    return config;
+  }
+
+  public EnvironmentManager getEnvironmentManager() {
+    return eManager;
+  }
+
+  public SaveLoad getSaveLoad() {
+    return saveLoad;
   }
 }

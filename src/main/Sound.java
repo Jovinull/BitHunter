@@ -10,11 +10,15 @@ import javax.sound.sampled.FloatControl;
 // Classe responsável por tocar efeitos sonoros e músicas do jogo
 public class Sound {
 
-  Clip clip; // Controla o áudio que está sendo reproduzido
-  URL[] soundURL = new URL[30]; // Armazena os caminhos dos arquivos de som
-  FloatControl fc; // Controla o volume do áudio
-  int volumeScale = 3; // Nível de volume (0 a 5)
-  float volume; // Volume calculado com base no volumeScale
+  private Clip clip; // Controla o áudio que está sendo reproduzido
+  private final URL[] soundURL = new URL[30]; // Armazena os caminhos dos arquivos de som
+  private FloatControl fc; // Controla o volume do áudio
+
+  // Nível de volume (0 a 5)
+  private int volumeScale = 3;
+
+  public static final int MIN_VOLUME_SCALE = 0;
+  public static final int MAX_VOLUME_SCALE = 5;
 
   // Construtor: carrega os arquivos de áudio no array
   public Sound() {
@@ -58,43 +62,57 @@ public class Sound {
 
   // Inicia a reprodução do som
   public void play() {
+    if (clip == null) {
+      return;
+    }
+    clip.setFramePosition(0); // garante que começa do início
     clip.start();
   }
 
   // Reproduz o som em loop contínuo
   public void loop() {
+    if (clip == null) {
+      return;
+    }
     clip.loop(Clip.LOOP_CONTINUOUSLY);
   }
 
   // Para a reprodução do som
   public void stop() {
-    clip.stop();
+    if (clip != null && clip.isRunning()) {
+      clip.stop();
+    }
   }
 
   public void checkVolume() {
-    switch (volumeScale) {
-      case 0:
-        volume = -80f; // Silencioso
-        break;
-      case 1:
-        volume = -20f; // Muito baixo
-        break;
-      case 2:
-        volume = -12f; // Baixo
-        break;
-      case 3:
-        volume = -5f; // Médio
-        break;
-      case 4:
-        volume = 1f; // Alto
-        break;
-      case 5:
-        volume = 6f; // Muito alto
-        break;
-      default:
-        volume = -5f; // Valor padrão
-        break;
+    if (fc == null) {
+      return;
     }
-    fc.setValue(volume); // Aplica o volume calculado
+
+    float volumeLocal;
+    switch (volumeScale) {
+      case 0 -> volumeLocal = -80f; // Silencioso
+      case 1 -> volumeLocal = -20f; // Muito baixo
+      case 2 -> volumeLocal = -12f; // Baixo
+      case 3 -> volumeLocal = -5f; // Médio
+      case 4 -> volumeLocal = 1f; // Alto
+      case 5 -> volumeLocal = 6f; // Muito alto
+      default -> volumeLocal = -5f; // Valor padrão
+    }
+    fc.setValue(volumeLocal); // Aplica o volume calculado
+  }
+
+  public int getVolumeScale() {
+    return volumeScale;
+  }
+
+  public void setVolumeScale(int volumeScale) {
+    if (volumeScale < MIN_VOLUME_SCALE) {
+      volumeScale = MIN_VOLUME_SCALE;
+    } else if (volumeScale > MAX_VOLUME_SCALE) {
+      volumeScale = MAX_VOLUME_SCALE;
+    }
+    this.volumeScale = volumeScale;
+    checkVolume();
   }
 }

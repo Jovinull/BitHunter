@@ -1,0 +1,93 @@
+package ui;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+
+import main.GamePanel;
+
+class TitleUi {
+
+  private final UI ui;
+
+  TitleUi(UI ui) {
+    this.ui = ui;
+  }
+
+  void drawTitleScreen() {
+    Graphics2D g2 = ui.g2;
+    var gp = ui.getGamePanel();
+
+    g2.setColor(UI.COL_BG);
+    g2.fillRect(0, 0, GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT);
+
+    int state = ui.getTitleScreenState();
+
+    // Tela principal
+    if (state == 0) {
+      Font purisa = ui.getPurisaB();
+      if (purisa != null) {
+        g2.setFont(purisa.deriveFont(Font.BOLD, 112F));
+      }
+      ui.drawTextShadowCentered(
+          ui.t("ui.title.gameName"),
+          GamePanel.TILE_SIZE * 3,
+          UI.COL_TEXT,
+          Color.black,
+          3);
+
+      int xImg = GamePanel.SCREEN_WIDTH / 2 - (GamePanel.TILE_SIZE * 2) / 2;
+      int yImg = GamePanel.TILE_SIZE * 3 + GamePanel.TILE_SIZE * 2;
+      g2.drawImage(
+          gp.getPlayer().getDown1(),
+          xImg,
+          yImg,
+          GamePanel.TILE_SIZE * 2,
+          GamePanel.TILE_SIZE * 2,
+          null);
+
+      if (purisa != null) {
+        g2.setFont(purisa.deriveFont(Font.BOLD, 48F));
+      }
+      int yMenuStart = yImg + (int) (GamePanel.TILE_SIZE * 3.2);
+      ui.drawMenuItem(ui.t("ui.title.newGame"), yMenuStart, ui.getCommandNum() == 0);
+      ui.drawMenuItem(ui.t("ui.title.loadGame"), yMenuStart + UI.MENU_LINE, ui.getCommandNum() == 1);
+      ui.drawMenuItem(ui.t("ui.title.exit"), yMenuStart + UI.MENU_LINE * 2, ui.getCommandNum() == 2);
+
+      ui.useCrispPixelText(g2);
+      if (ui.getMaruMonica() != null) {
+        g2.setFont(ui.getMaruMonica().deriveFont(Font.PLAIN, 16F));
+      }
+      String hint = ui.t("ui.title.hintNavigation");
+      ui.drawTextShadowCentered(
+          hint,
+          GamePanel.SCREEN_HEIGHT - GamePanel.TILE_SIZE,
+          UI.COL_TEXT_DIM,
+          Color.black,
+          2);
+      return;
+    }
+
+    // Tela de seleção de classe
+    if (state == 1) {
+      Font purisa = ui.getPurisaB();
+      if (purisa != null) {
+        g2.setFont(purisa.deriveFont(Font.BOLD, 36F));
+      }
+      ui.drawSubWindowCenter(GamePanel.TILE_SIZE * 10, GamePanel.TILE_SIZE * 8);
+      int cy = GamePanel.SCREEN_HEIGHT / 2 - GamePanel.TILE_SIZE;
+
+      ui.drawTextShadowCentered(
+          ui.t("ui.title.classSelection"),
+          cy - UI.MENU_LINE,
+          UI.COL_TEXT,
+          Color.black,
+          2);
+
+      ui.drawMenuItem(ui.t("ui.title.class.warrior"), cy, ui.getCommandNum() == 0);
+      ui.drawMenuItem(ui.t("ui.title.class.thief"), cy + UI.MENU_LINE, ui.getCommandNum() == 1);
+      ui.drawMenuItem(ui.t("ui.title.class.wizard"), cy + UI.MENU_LINE * 2, ui.getCommandNum() == 2);
+      ui.drawMenuItem(ui.t(UI.KEY_COMMON_BACK), cy + UI.MENU_LINE * 4, ui.getCommandNum() == 3);
+    }
+  }
+}
