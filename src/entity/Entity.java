@@ -1087,32 +1087,30 @@ public class Entity {
     int currentMapIndex = gp.getCurrentMap();
     Entity[] mapTargets = target[currentMapIndex];
 
+    return findTargetIndex(mapTargets, targetInternalId, col, row);
+  }
+
+  private int findTargetIndex(Entity[] mapTargets, String targetInternalId, int col, int row) {
     for (int i = 0; i < mapTargets.length; i++) {
-      Entity t = mapTargets[i];
-      if (t == null) {
-        continue;
-      }
-
-      // primeiro garante que está no tile certo
-      if (t.getCol() != col || t.getRow() != row) {
-        continue;
-      }
-
-      // 1) Novo padrão: compara por internalId
-      String candidateId = t.getInternalId();
-      if (candidateId != null && candidateId.equals(targetInternalId)) {
-        return i;
-      }
-
-      // 2) Fallback de compatibilidade: se não tiver internalId, tenta por name
-      if ((candidateId == null || candidateId.isEmpty())
-          && t.getInternalId() != null
-          && t.getInternalId().equals(targetInternalId)) {
+      if (isMatchingTarget(mapTargets[i], targetInternalId, col, row)) {
         return i;
       }
     }
-
     return 999;
+  }
+
+  private boolean isMatchingTarget(Entity t, String targetInternalId, int col, int row) {
+    if (t == null) {
+      return false;
+    }
+
+    // Garante que está no tile certo
+    if (t.getCol() != col || t.getRow() != row) {
+      return false;
+    }
+
+    String candidateId = t.getInternalId();
+    return candidateId != null && candidateId.equals(targetInternalId);
   }
 
   // =========================
