@@ -9,12 +9,15 @@ import object.ObjCoinBronze;
 
 public class ItDestructibleWall extends InteractiveTile {
 
+  public static final String TILE_ID = "tile.destructibleWall";
   private static final Random RNG = new Random();
 
   public ItDestructibleWall(GamePanel gp, int col, int row) {
     super(gp, col, row);
 
-    // Sprite do bloco
+    setInternalId(TILE_ID);
+    setTranslationKey(TILE_ID);
+
     down1 = setup("/tiles_interactive/destructiblewall", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
     // Comportamento de "quebrável" + vida
@@ -32,13 +35,11 @@ public class ItDestructibleWall extends InteractiveTile {
 
   @Override
   public void playSE() {
-    // usa gp herdado de Entity
     gp.playSE(20);
   }
 
   @Override
   public InteractiveTile getDestroyedForm() {
-    // Sem forma destruída por padrão; retorne outra InteractiveTile se quiser
     return null;
   }
 
@@ -50,7 +51,7 @@ public class ItDestructibleWall extends InteractiveTile {
 
   @Override
   public int getParticleSize() {
-    return 6; // pixels
+    return 6;
   }
 
   @Override

@@ -7,17 +7,16 @@ import main.GamePanel;
 
 public class ItDryTree extends InteractiveTile {
 
+  public static final String TILE_ID = "tile.dryTree";
+
   public ItDryTree(GamePanel gp, int col, int row) {
     super(gp, col, row);
 
-    // Posiciona via setters (sem acessar worldX/worldY diretamente)
-    setWorldX(GamePanel.TILE_SIZE * col);
-    setWorldY(GamePanel.TILE_SIZE * row);
+    setInternalId(TILE_ID);
+    setTranslationKey(TILE_ID);
 
-    // Sprite
     down1 = setup("/tiles_interactive/drytree", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
-    // Comportamento
     setDestructible(true);
     setMaxLife(3);
     setLife(3);

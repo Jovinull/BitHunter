@@ -141,7 +141,7 @@ public class NpcBigRock extends Entity {
     InteractiveTile[] tiles = allTiles[currentMapIndex];
 
     for (InteractiveTile tile : tiles) {
-      if (tile != null && ItMetalPlate.IT_NAME.equals(tile.getInternalId())) {
+      if (tile != null && ItMetalPlate.TILE_ID.equals(tile.getInternalId())) {
         plates.add(tile);
       }
     }

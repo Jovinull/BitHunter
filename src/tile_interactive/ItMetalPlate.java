@@ -6,29 +6,22 @@ import main.GamePanel;
 
 public class ItMetalPlate extends InteractiveTile {
 
-  public static final String IT_NAME = "Placa de Metal";
+  public static final String TILE_ID = "tile.metalPlate";
 
   public ItMetalPlate(GamePanel gp, int col, int row) {
     super(gp, col, row);
 
-    // Posição via setters
-    setWorldX(GamePanel.TILE_SIZE * col);
-    setWorldY(GamePanel.TILE_SIZE * row);
+    setInternalId(TILE_ID);
+    setTranslationKey(TILE_ID);
 
-    // Nome via setter
-    setName(IT_NAME);
-
-    // Sprite
     down1 = setup("/tiles_interactive/metalplate", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
-    // Área sólida zerada usando getters/setters
     Rectangle sa = getSolidArea();
     sa.x = 0;
     sa.y = 0;
     sa.width = 0;
     sa.height = 0;
 
-    // Defaults da área sólida
     setSolidAreaDefaultX(sa.x);
     setSolidAreaDefaultY(sa.y);
   }
