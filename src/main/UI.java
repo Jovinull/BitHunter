@@ -68,6 +68,9 @@ public class UI {
   private static final int MAX_VISIBLE_LANG_OPTIONS = 5;
   private int languageScrollOffset = 0;
 
+  private static final String KEY_COMMON_BACK = "ui.common.back";
+  private static final String KEY_TRADE_HINT_BACK = "ui.trade.hintBack";
+
   public UI(GamePanel gp) {
     this.gp = gp;
 
@@ -397,7 +400,7 @@ public class UI {
       drawMenuItem(t("ui.title.class.warrior"), cy, commandNum == 0);
       drawMenuItem(t("ui.title.class.thief"), cy + MENU_LINE, commandNum == 1);
       drawMenuItem(t("ui.title.class.wizard"), cy + MENU_LINE * 2, commandNum == 2);
-      drawMenuItem(t("ui.common.back"), cy + MENU_LINE * 4, commandNum == 3);
+      drawMenuItem(t(KEY_COMMON_BACK), cy + MENU_LINE * 4, commandNum == 3);
     }
   }
 
@@ -778,7 +781,7 @@ public class UI {
     // Dica de voltar (ESC)
     textY += GamePanel.TILE_SIZE * 2;
     g2.setColor(COL_TEXT_DIM);
-    g2.drawString(t("ui.trade.hintBack"), textX, textY);
+    g2.drawString(t(KEY_TRADE_HINT_BACK), textX, textY);
 
     // CHECKBOX TELA CHEIA
     textX = frameX + (int) (GamePanel.TILE_SIZE * 4.5);
@@ -934,7 +937,7 @@ public class UI {
 
   private void drawBackOption(int textX, int textY, KeyHandler keyH, int totalLanguages) {
     int backIndex = totalLanguages;
-    String backLabel = t("ui.common.back");
+    String backLabel = t(KEY_COMMON_BACK);
 
     g2.drawString(backLabel, textX, textY);
     if (commandNum == backIndex) {
@@ -960,7 +963,7 @@ public class UI {
     }
 
     textY = frameY + GamePanel.TILE_SIZE * 9;
-    g2.drawString(t("ui.common.back"), textX, textY);
+    g2.drawString(t(KEY_COMMON_BACK), textX, textY);
     if (commandNum == 0) {
       g2.drawString(">", textX - 25, textY);
       if (gp.getKeyH().isEnterPressed()) {
@@ -1010,7 +1013,7 @@ public class UI {
     // Voltar
     textX = frameX + GamePanel.TILE_SIZE;
     textY = frameY + GamePanel.TILE_SIZE * 9;
-    g2.drawString(t("ui.common.back"), textX, textY);
+    g2.drawString(t(KEY_COMMON_BACK), textX, textY);
     if (commandNum == 0) {
       g2.drawString(">", textX - 25, textY);
       if (gp.getKeyH().isEnterPressed()) {
@@ -1137,7 +1140,7 @@ public class UI {
     int width = GamePanel.TILE_SIZE * 6;
     int height = GamePanel.TILE_SIZE * 2;
     drawSubWindow(x, y, width, height);
-    g2.drawString(t("ui.trade.hintBack"), x + 24, y + 60);
+    g2.drawString(t(KEY_TRADE_HINT_BACK), x + 24, y + 60);
 
     // JANELA DE MOEDAS DO JOGADOR
     x = GamePanel.TILE_SIZE * 12;
@@ -1196,7 +1199,7 @@ public class UI {
     width = GamePanel.TILE_SIZE * 6;
     height = GamePanel.TILE_SIZE * 2;
     drawSubWindow(x, y, width, height);
-    g2.drawString(t("ui.trade.hintBack"), x + 24, y + 60);
+    g2.drawString(t(KEY_TRADE_HINT_BACK), x + 24, y + 60);
 
     // JANELA DE MOEDAS DO JOGADOR
     x = GamePanel.TILE_SIZE * 12;
