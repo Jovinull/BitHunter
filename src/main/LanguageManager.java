@@ -47,6 +47,7 @@ public class LanguageManager {
     list.add(new LanguageOption("en_US", "English"));
     list.add(new LanguageOption("es_ES", "Español"));
     list.add(new LanguageOption("fr_FR", "Français"));
+    list.add(new LanguageOption("it_IT", "Italiano"));
     // adicionar aqui mais idiomas futuramente
     return list;
   }
