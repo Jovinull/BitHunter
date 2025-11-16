@@ -49,7 +49,7 @@ public class LanguageManager {
    */
   public List<LanguageOption> getAvailableLanguages() {
     List<LanguageOption> list = new ArrayList<>();
-    list.add(new LanguageOption("pt_BR", "Português (Brasil)"));
+    list.add(new LanguageOption(DEFAULT_LANGUAGE, "Português (Brasil)"));
     list.add(new LanguageOption("en_US", "English"));
     list.add(new LanguageOption("es_ES", "Español"));
     list.add(new LanguageOption("fr_FR", "Français"));
@@ -86,7 +86,10 @@ public class LanguageManager {
     if (loadLanguage(languageCode)) {
       currentLanguageCode = languageCode;
     } else {
-      LOGGER.warning("Falha ao carregar idioma " + languageCode + ", usando idioma padrão.");
+      LOGGER.log(
+          Level.WARNING,
+          "Falha ao carregar idioma {0}, usando idioma padrão.",
+          languageCode);
       loadLanguage(DEFAULT_LANGUAGE);
       currentLanguageCode = DEFAULT_LANGUAGE;
     }
@@ -130,7 +133,10 @@ public class LanguageManager {
 
     try (InputStream in = getClass().getResourceAsStream(resourceName)) {
       if (in == null) {
-        LOGGER.warning("Arquivo de idioma não encontrado: " + resourceName);
+        LOGGER.log(
+            Level.WARNING,
+            "Arquivo de idioma não encontrado: {0}",
+            resourceName);
         return false;
       }
 
@@ -142,7 +148,11 @@ public class LanguageManager {
       languages.put(languageCode, props);
       return true;
     } catch (IOException e) {
-      LOGGER.log(Level.SEVERE, "Erro ao carregar idioma " + languageCode, e);
+      LOGGER.log(
+          Level.SEVERE,
+          "Erro ao carregar idioma {0}",
+          languageCode);
+      LOGGER.log(Level.SEVERE, "Detalhes da exceção", e);
       return false;
     }
   }
