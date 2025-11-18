@@ -58,13 +58,16 @@ public class UI {
   int charIndex = 0;
   String combinedText = "";
 
-  static final Color COL_BG = new Color(0x0F, 0x11, 0x15);
-  static final Color COL_PANEL = new Color(0x1A, 0x1F, 0x29);
-  static final Color COL_PANEL_BORDER = new Color(0x3A, 0x42, 0x54);
-  static final Color COL_TEXT = new Color(0xE6, 0xE9, 0xEF);
-  static final Color COL_TEXT_DIM = new Color(0xB8, 0xC0, 0xCC);
-  static final Color COL_HIGHLIGHT_BG = new Color(0x2A, 0x34, 0x43);
-  static final Color COL_ACCENT = new Color(0xE0, 0xB5, 0x66);
+  static final Color COL_BG = new Color(0x05, 0x07, 0x14); // fundo quase preto azulado
+  static final Color COL_PANEL = new Color(0x10, 0x15, 0x28); // painel um pouco mais claro
+  static final Color COL_PANEL_BORDER = new Color(0x28, 0x36, 0x56); // borda azul-acinzentada
+
+  static final Color COL_TEXT = new Color(0xF4, 0xF5, 0xFB); // quase branco, bem legível
+  static final Color COL_TEXT_DIM = new Color(0xA9, 0xB4, 0xD8); // texto secundário mais frio
+
+  static final Color COL_HIGHLIGHT_BG = new Color(0x1E, 0x2E, 0x4F); // fundo de seleção / hover
+
+  static final Color COL_ACCENT = new Color(0x4F, 0xD1, 0xC5); // turquesa forte, para botões, barras etc.
 
   static final int MENU_LINE = 48;
   static final int MAX_VISIBLE_LANG_OPTIONS = 5;
