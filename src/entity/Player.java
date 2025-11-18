@@ -635,17 +635,21 @@ public class Player extends Entity {
   }
 
   public void checkLevelUp() {
-    if (getExp() >= getNextLevelExp()) {
+    boolean leveledUp = false;
+
+    while (getExp() >= getNextLevelExp()) {
+      leveledUp = true;
+
+      int requiredExp = getNextLevelExp();
+
+      setExp(getExp() - requiredExp);
       setLevel(getLevel() + 1);
 
-      // Progressão de XP: aumenta, mas não dobra sempre
-      int next = getNextLevelExp() + 5 + (getLevel() * 3);
-      setNextLevelExp(next);
+      int nextRequiredExp = requiredExp + 5 + (getLevel() * 3);
+      setNextLevelExp(nextRequiredExp);
 
-      // Vida cresce sempre
       setMaxLife(getMaxLife() + 3);
 
-      // Força cresce quase sempre, destreza cresce um pouco mais devagar
       setStrength(getStrength() + 1);
       if (getLevel() % 2 == 0) {
         setDexterity(getDexterity() + 1);
@@ -654,7 +658,9 @@ public class Player extends Entity {
       setAttack(getAttack());
       setDefense(getDefense());
       setLife(getMaxLife());
+    }
 
+    if (leveledUp) {
       gp.playSE(8);
       gp.setGameState(GamePanel.DIALOGUE_STATE);
 
