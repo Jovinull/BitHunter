@@ -20,10 +20,18 @@ class TradeUi {
       case 0 -> tradeSelect();
       case 1 -> tradeBuy();
       case 2 -> tradeSell();
-      default -> {
-      }
+      default -> handleUnknownSubState();
     }
     ui.getKeyHandler().setEnterPressed(false);
+  }
+
+  /**
+   * Trata estados de subState não mapeados na tela de trade.
+   * Usado como fallback para evitar estados inválidos silenciosos.
+   */
+  private void handleUnknownSubState() {
+    // Fallback seguro: volta para o menu de seleção de trade
+    ui.setSubState(0);
   }
 
   private void tradeSelect() {
@@ -121,13 +129,11 @@ class TradeUi {
         if (price > player.getCoin()) {
           ui.setSubState(0);
           npc.startDialogue(npc, 2);
+        } else if (player.canObtainItem(npc.getInventory().get(itemIndex))) {
+          player.setCoin(player.getCoin() - price);
         } else {
-          if (player.canObtainItem(npc.getInventory().get(itemIndex))) {
-            player.setCoin(player.getCoin() - price);
-          } else {
-            ui.setSubState(0);
-            npc.startDialogue(npc, 3);
-          }
+          ui.setSubState(0);
+          npc.startDialogue(npc, 3);
         }
       }
     }
@@ -140,15 +146,10 @@ class TradeUi {
 
     inventoryUi.drawInventory(player, true);
 
-    int x;
-    int y;
-    int width;
-    int height;
-
-    x = GamePanel.TILE_SIZE * 2;
-    y = GamePanel.TILE_SIZE * 9;
-    width = GamePanel.TILE_SIZE * 6;
-    height = GamePanel.TILE_SIZE * 2;
+    int x = GamePanel.TILE_SIZE * 2;
+    int y = GamePanel.TILE_SIZE * 9;
+    int width = GamePanel.TILE_SIZE * 6;
+    int height = GamePanel.TILE_SIZE * 2;
     ui.drawSubWindow(x, y, width, height);
     g2.drawString(ui.t(UI.KEY_TRADE_HINT_BACK), x + 24, y + 60);
 
@@ -160,44 +161,63 @@ class TradeUi {
     g2.drawString(ui.t("ui.trade.yourCoins") + " " + player.getCoin(), x + 24, y + 60);
 
     int itemIndex = ui.getItemIndexOnSlot(ui.getPlayerSlotCol(), ui.getPlayerSlotRow());
-    if (itemIndex < player.getInventory().size()) {
-      x = (int) (GamePanel.TILE_SIZE * 15.5);
-      y = (int) (GamePanel.TILE_SIZE * 5.5);
-      width = (int) (GamePanel.TILE_SIZE * 2.5);
-      height = GamePanel.TILE_SIZE;
-      ui.drawSubWindow(x, y, width, height);
-      g2.drawImage(ui.getCoinImage(), x + 10, y + 8, 32, 32, null);
-
-      int price = player.getInventory().get(itemIndex).getPrice() / 2;
-      String text = String.valueOf(price);
-      x = ui.getXforAlignToRightText(text, GamePanel.TILE_SIZE * 18 - 20);
-      g2.drawString(text, x, y + 34);
-
-      if (gp.getKeyH().isEnterPressed()) {
-
-        if (player.getInventory().get(itemIndex) == player.getCurrentWeapon()
-            || player.getInventory().get(itemIndex) == player.getCurrentShield()
-            || player.getInventory().get(itemIndex) == player.getCurrentBoots()
-            || player.getInventory().get(itemIndex) == player.getCurrentHelmet()
-            || player.getInventory().get(itemIndex) == player.getCurrentChest()
-            || player.getInventory().get(itemIndex) == player.getCurrentLegs()) {
-
-          ui.commandNum = 0;
-          ui.setSubState(0);
-          Entity npc = ui.getNpc();
-          if (npc != null) {
-            npc.startDialogue(npc, 4);
-          }
-        } else {
-          if (player.getInventory().get(itemIndex).getAmount() > 1) {
-            player.getInventory().get(itemIndex)
-                .setAmount(player.getInventory().get(itemIndex).getAmount() - 1);
-          } else {
-            player.getInventory().remove(itemIndex);
-          }
-          player.setCoin(player.getCoin() + price);
-        }
-      }
+    if (itemIndex >= player.getInventory().size()) {
+      return;
     }
+
+    drawSellPriceWindow(player, itemIndex);
+
+    if (!gp.getKeyH().isEnterPressed()) {
+      return;
+    }
+
+    handleSell(player, itemIndex);
+  }
+
+  private void drawSellPriceWindow(Entity player, int itemIndex) {
+    Graphics2D g2 = ui.g2;
+
+    int x = (int) (GamePanel.TILE_SIZE * 15.5);
+    int y = (int) (GamePanel.TILE_SIZE * 5.5);
+    int width = (int) (GamePanel.TILE_SIZE * 2.5);
+    int height = GamePanel.TILE_SIZE;
+    ui.drawSubWindow(x, y, width, height);
+    g2.drawImage(ui.getCoinImage(), x + 10, y + 8, 32, 32, null);
+
+    int price = player.getInventory().get(itemIndex).getPrice() / 2;
+    String text = String.valueOf(price);
+    int textX = ui.getXforAlignToRightText(text, GamePanel.TILE_SIZE * 18 - 20);
+    g2.drawString(text, textX, y + 34);
+  }
+
+  private void handleSell(Entity player, int itemIndex) {
+    var item = player.getInventory().get(itemIndex);
+    int price = item.getPrice() / 2;
+
+    if (isEquippedItem(player, item)) {
+      ui.commandNum = 0;
+      ui.setSubState(0);
+      Entity npc = ui.getNpc();
+      if (npc != null) {
+        npc.startDialogue(npc, 4);
+      }
+      return;
+    }
+
+    if (item.getAmount() > 1) {
+      item.setAmount(item.getAmount() - 1);
+    } else {
+      player.getInventory().remove(itemIndex);
+    }
+    player.setCoin(player.getCoin() + price);
+  }
+
+  private boolean isEquippedItem(Entity player, Entity item) {
+    return item == player.getCurrentWeapon()
+        || item == player.getCurrentShield()
+        || item == player.getCurrentBoots()
+        || item == player.getCurrentHelmet()
+        || item == player.getCurrentChest()
+        || item == player.getCurrentLegs();
   }
 }
