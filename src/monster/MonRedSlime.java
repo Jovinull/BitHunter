@@ -26,11 +26,11 @@ public class MonRedSlime extends Entity {
 
     setDefaultSpeed(2);
     setSpeed(getDefaultSpeed());
-    setMaxLife(8);
+    setMaxLife(16);
     setLife(getMaxLife());
     setAttack(7);
-    setDefense(1);
-    setExp(5);
+    setDefense(2);
+    setExp(10);
     setProjectile(new ObjRock(gp));
 
     // Colisão

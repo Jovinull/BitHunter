@@ -16,11 +16,11 @@ public class ObjSwordNormal extends Entity {
 
     down1 = setup("/objects/sword_normal", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
-    setAttackValue(1);
+    setAttackValue(2);
     getAttackArea().width = 36;
     getAttackArea().height = 36;
 
-    setPrice(20);
+    setPrice(30);
     setKnockBackPower(2);
 
     setMotion1Duration(5);

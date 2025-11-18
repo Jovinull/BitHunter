@@ -25,11 +25,11 @@ public class MonSkeletonLord extends Entity {
 
     setDefaultSpeed(1);
     setSpeed(getDefaultSpeed());
-    setMaxLife(50);
+    setMaxLife(80);
     setLife(getMaxLife());
     setAttack(10);
-    setDefense(2);
-    setExp(50);
+    setDefense(4);
+    setExp(100);
     setKnockBackPower(5);
     setSleep(true);
 
@@ -135,7 +135,7 @@ public class MonSkeletonLord extends Entity {
       getAttackImage();
       setDefaultSpeed(getDefaultSpeed() + 1);
       setSpeed(getDefaultSpeed());
-      setAttack(getAttack() * 2);
+      setAttack(15);
     }
 
     if (getTileDistance(player) < 10) {

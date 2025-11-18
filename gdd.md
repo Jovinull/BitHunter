@@ -53,6 +53,20 @@
     - [Por que `translationKey` é “opcional” agora, mas útil a longo prazo?](#por-que-translationkey-é-opcional-agora-mas-útil-a-longo-prazo)
     - [Contextos diferentes para o mesmo item (várias descrições)](#contextos-diferentes-para-o-mesmo-item-várias-descrições)
     - [Relação entre `internalId` e `translationKey` no BitHUnter](#relação-entre-internalid-e-translationkey-no-bithunter)
+  - [Player – Progressão de Status](#player--progressão-de-status)
+    - [Tabela de Atributos por Nível (Níveis 1–10)](#tabela-de-atributos-por-nível-níveis-110)
+    - [Fórmulas de Combate (GDD)](#fórmulas-de-combate-gdd)
+  - [Monstros – Status Gerais](#monstros--status-gerais)
+    - [Tabela de Monstros](#tabela-de-monstros)
+    - [Detalhes Adicionais de Boss (Skeleton Lord)](#detalhes-adicionais-de-boss-skeleton-lord)
+  - [Equipamentos Ofensivos (Armas / Ferramentas)](#equipamentos-ofensivos-armas--ferramentas)
+    - [Tabela de Armas](#tabela-de-armas)
+  - [Equipamentos Defensivos](#equipamentos-defensivos)
+    - [Tabela de Escudos e Botas](#tabela-de-escudos-e-botas)
+  - [Magias e Consumíveis](#magias-e-consumíveis)
+    - [Projectile – Fireball](#projectile--fireball)
+    - [Consumível – Poção Vermelha](#consumível--poção-vermelha)
+  - [Resumo Rápido de Balanceamento (para consulta no GDD)](#resumo-rápido-de-balanceamento-para-consulta-no-gdd)
 
 ---
 
@@ -663,3 +677,142 @@ Em outras palavras:
 
 > **`internalId` garante a identidade técnica da entidade.
 > `translationKey` garante que o texto mostrado possa evoluir à vontade, sem amarrar a narrativa/interface à estrutura interna do código.**
+
+Segue tudo organizado em formato de GDD, já com os **valores sugeridos** que comentei.
+
+## Player – Progressão de Status
+
+### Tabela de Atributos por Nível (Níveis 1–10)
+
+> Premissas:
+>
+> * HP inicial: 12, +3 por nível.
+> * MP inicial: 6, **não** aumenta por enquanto.
+> * STR: +1 por nível.
+> * DEX: +1 em níveis pares.
+> * Ataque c/ Espada Normal = `STR * 2`.
+> * Defesa c/ Escudo de Madeira = `DEX * 1`.
+
+| Nível | HP Máx | MP Máx | STR | DEX | Ataque (Espada Normal) | Defesa (Escudo Madeira) | XP total p/ próximo nível |
+| ----- | ------ | ------ | --- | --- | ---------------------- | ----------------------- | ------------------------- |
+| 1     | 12     | 6      | 2   | 1   | 4                      | 1                       | 10                        |
+| 2     | 15     | 6      | 3   | 2   | 6                      | 2                       | 21                        |
+| 3     | 18     | 6      | 4   | 2   | 8                      | 2                       | 35                        |
+| 4     | 21     | 6      | 5   | 3   | 10                     | 3                       | 52                        |
+| 5     | 24     | 6      | 6   | 3   | 12                     | 3                       | 72                        |
+| 6     | 27     | 6      | 7   | 4   | 14                     | 4                       | 95                        |
+| 7     | 30     | 6      | 8   | 4   | 16                     | 4                       | 121                       |
+| 8     | 33     | 6      | 9   | 5   | 18                     | 5                       | 150                       |
+| 9     | 36     | 6      | 10  | 5   | 20                     | 5                       | 182                       |
+| 10    | 39     | 6      | 11  | 6   | 22                     | 6                       | 217                       |
+
+### Fórmulas de Combate (GDD)
+
+| Conceito                   | Fórmula / Regra                                                                                            |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Ataque base do Jogador     | `AttackJogador = STR * weapon.attackValue`                                                                 |
+| Defesa base do Jogador     | `DefenseJogador = DEX * shield.defenseValue + soma(defesaBoots + defesaHelmet + defesaChest + defesaLegs)` |
+| Dano do Jogador no Monstro | `dano = AttackJogador - DefenseMonstro` (se < 0, vira 0)                                                   |
+| Dano do Monstro no Jogador | `dano = AttackMonstro - DefenseJogador` (se < 1, vira 1)                                                   |
+| XP para próximo nível      | Começa em **10** no nível 1. Ao subir de nível: `NextLevelExp = NextLevelExp + 5 + (novoNível * 3)`        |
+
+---
+
+## Monstros – Status Gerais
+
+### Tabela de Monstros
+
+| ID Interno             | Nome (GDD)    | HP Máx | ATK                     | DEF | SPD (default)         | EXP | Observações de Comportamento / Drops                                                                                                                                                                                                           |
+| ---------------------- | ------------- | ------ | ----------------------- | --- | --------------------- | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `monster.greenSlime`   | Green Slime   | 8      | 3                       | 0   | 1                     | 3   | Inimigo básico. Pode perseguir jogador e atirar `ObjRock` em certas condições. Drop: 50% Bronze Coin, 25% Heart, 25% Mana Crystal.                                                                                                             |
+| `monster.bat`          | Bat           | 10     | 4                       | 0   | 4                     | 5   | Rápido, dano moderado. Movimento aleatório perseguindo jogador em área. Drop: 50% Bronze Coin, 25% Heart, 25% Mana Crystal.                                                                                                                    |
+| `monster.redSlime`     | Red Slime     | 16     | 7                       | 2   | 2                     | 10  | Slime de mid game. Persegue e atira `ObjRock` com maior frequência. Drop: 40% Bronze Coin, 30% Heart, 30% Mana Crystal.                                                                                                                        |
+| `monster.orc`          | Orc           | 30     | 9                       | 3   | 1                     | 20  | Inimigo “elite”. Usa área de ataque corpo a corpo (48×48), tem KnockBackPower 5. Drop: 50% Bronze Coin, 25% Heart, 25% Mana Crystal.                                                                                                           |
+| `monster.skeletonLord` | Skeleton Lord | 80     | 10 (fase 1) / 15 (rage) | 4   | 1 (fase 1) / 2 (rage) | 100 | Boss. Inicialmente `sleep = true`. Ao ficar abaixo de 50% HP entra em “rage” (mais ataque e velocidade). Área de ataque 170×170. Drop padrão de moedas/corações/mana + eventos de fim de boss (remover portas de ferro, atualizar `Progress`). |
+
+### Detalhes Adicionais de Boss (Skeleton Lord)
+
+| Atributo          | Valor / Comportamento                                                                |
+| ----------------- | ------------------------------------------------------------------------------------ |
+| `isBoss`          | `true`                                                                               |
+| HP Máx            | 80                                                                                   |
+| ATK Fase 1        | 10                                                                                   |
+| ATK Fase 2 (rage) | 15                                                                                   |
+| DEF               | 4                                                                                    |
+| SPD Fase 1        | 1                                                                                    |
+| SPD Fase 2        | 2 (aumenta em 1 ao entrar em rage)                                                   |
+| KnockBackPower    | 5                                                                                    |
+| AttackArea        | 170×170                                                                              |
+| Motion1Duration   | 25                                                                                   |
+| Motion2Duration   | 50                                                                                   |
+| Trigger de Rage   | Quando `life < maxLife / 2` → liga `inRage`, atualiza sprites e dobra agressividade. |
+
+---
+
+## Equipamentos Ofensivos (Armas / Ferramentas)
+
+### Tabela de Armas
+
+| ID Interno         | Nome (GDD)    | Tipo    | AttackValue | Área de Ataque (LxA) | KnockBack | Motion1 | Motion2 | Preço | Observações                                           |
+| ------------------ | ------------- | ------- | ----------: | -------------------: | --------: | ------: | ------: | ----: | ----------------------------------------------------- |
+| `item.swordNormal` | Espada Normal | Sword   |           2 |                36×36 |         2 |       5 |      25 |    30 | Arma inicial / early game. Ataque rápido e confiável. |
+| `item.axe`         | Machado       | Axe     |           3 |                30×30 |        10 |      25 |      50 |   120 | Dano alto, muito knockback, animação mais lenta.      |
+| `item.pickaxe`     | Picareta      | Pickaxe |           2 |                30×30 |         6 |      15 |      30 |    60 | Ferramenta de mineração, usável como arma mediana.    |
+
+> **Fórmula de dano do jogador com arma:**
+> `AttackJogador = STR * AttackValueDaArma`.
+
+---
+
+## Equipamentos Defensivos
+
+### Tabela de Escudos e Botas
+
+| ID Interno        | Nome (GDD)        | Tipo   | DefenseValue | SpeedValue | Preço | Observações                                                                             |
+| ----------------- | ----------------- | ------ | -----------: | ---------: | ----: | --------------------------------------------------------------------------------------- |
+| `item.shieldWood` | Escudo de Madeira | Shield |            1 |          0 |    40 | Escudo básico do início do jogo.                                                        |
+| `item.shieldBlue` | Escudo Azul       | Shield |            3 |          0 |   300 | Escudo mid game. Grande aumento de defesa (DEF = DEX * 3).                              |
+| `item.boots`      | Botas de Couro    | Boots  |            1 |          1 |   400 | Aumenta velocidade em +1 e fornece +1 de defesa. Item caro, voltado para mid/late game. |
+
+> **Fórmula de defesa considerando escudo e botas:**
+> `DefenseJogador = DEX * shield.defenseValue + boots.defenseValue + armorPiecesDefense`.
+
+---
+
+## Magias e Consumíveis
+
+### Projectile – Fireball
+
+| ID Interno      | Nome (GDD) | Tipo       |  ATK |  SPD | MaxLife (frames) | KnockBack | Custo de MP (`useCost`) | Observações                                                                      |
+| --------------- | ---------- | ---------- | ---: | ---: | ---------------: | --------: | ----------------------: | -------------------------------------------------------------------------------- |
+| `item.fireball` | Fireball   | Projectile |    3 |    5 |               80 |         4 |                       2 | Feitiço de ataque à distância. Consome mana do jogador, gera partículas de fogo. |
+
+### Consumível – Poção Vermelha
+
+| ID Interno       | Nome (GDD)     | Tipo       | Valor (cura) | Stackable | Preço | Observações                                                                                     |
+| ---------------- | -------------- | ---------- | -----------: | --------: | ----: | ----------------------------------------------------------------------------------------------- |
+| `item.potionRed` | Poção Vermelha | Consumable |         5 HP |      true |    25 | Ao usar, toca SE, exibe diálogo e cura 5 pontos de vida (respeitando limite de HP Máx do alvo). |
+
+---
+
+## Resumo Rápido de Balanceamento (para consulta no GDD)
+
+* **Early Game**
+
+  * Player L1 (Espada Normal + Escudo de Madeira):
+
+    * Atk ≈ 4, Def ≈ 1, HP 12.
+  * Green Slime: HP 8, Atk 3 → morre em 2–3 hits; mata o player em ~6 hits.
+  * Bat: HP 10, Atk 4 → morre em 3 hits; mata o player em ~4 hits.
+
+* **Mid Game**
+
+  * Player L3–L5 com equipamentos melhores (Machado, Escudo Azul, Botas):
+
+    * Atk com Machado vai de 8–18, defesa pode chegar perto de 10 com DEX alta.
+  * Red Slime e Orc: mais HP, mais dano, exigem uso de poções e defesa.
+
+* **Boss (Skeleton Lord)**
+
+  * HP 80, DEF 4, duas fases (ATK 10 → 15, SPD 1 → 2).
+  * Complayer por volta do nível 5, luta dura ~10 hits bem encaixados e punidos se tomar combos na fase 2.

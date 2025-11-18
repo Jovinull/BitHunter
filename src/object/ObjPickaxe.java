@@ -20,10 +20,10 @@ public class ObjPickaxe extends Entity {
     getAttackArea().width = 30;
     getAttackArea().height = 30;
 
-    setPrice(75);
+    setPrice(60);
     setKnockBackPower(10);
 
-    setMotion1Duration(10);
-    setMotion2Duration(20);
+    setMotion1Duration(15);
+    setMotion2Duration(30);
   }
 }

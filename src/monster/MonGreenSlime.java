@@ -25,11 +25,11 @@ public class MonGreenSlime extends Entity {
 
     setDefaultSpeed(1);
     setSpeed(getDefaultSpeed());
-    setMaxLife(6);
+    setMaxLife(8);
     setLife(getMaxLife());
-    setAttack(5);
+    setAttack(3);
     setDefense(0);
-    setExp(2);
+    setExp(3);
     setProjectile(new ObjRock(gp));
 
     // solidArea (usar o objeto via getter, Rectangle tem campos públicos)

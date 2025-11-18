@@ -16,8 +16,8 @@ public class ObjBoots extends Entity {
 
     down1 = setup("/objects/boots", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
-    setSpeedValue(2);
-    setDefenseValue(2);
-    setPrice(720);
+    setSpeedValue(1);
+    setDefenseValue(1);
+    setPrice(400);
   }
 }

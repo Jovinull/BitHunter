@@ -56,16 +56,18 @@ public class Player extends Entity {
 
     // PLAYER STATUS
     setLevel(1);
-    setMaxLife(6);
+    setMaxLife(12);
     setLife(getMaxLife());
-    setMaxMana(4);
+    setMaxMana(6);
     setMana(getMaxMana());
     setAmmo(10);
-    setStrength(1);
+
+    setStrength(2);
     setDexterity(1);
+
     setExp(0);
-    setNextLevelExp(5);
-    setCoin(500);
+    setNextLevelExp(10);
+    setCoin(200);
 
     setCurrentWeapon(new ObjSwordNormal(gp));
     setCurrentShield(new ObjShieldWood(gp));
@@ -635,10 +637,20 @@ public class Player extends Entity {
   public void checkLevelUp() {
     if (getExp() >= getNextLevelExp()) {
       setLevel(getLevel() + 1);
-      setNextLevelExp(getNextLevelExp() * 2);
-      setMaxLife(getMaxLife() + 2);
+
+      // Progressão de XP: aumenta, mas não dobra sempre
+      int next = getNextLevelExp() + 5 + (getLevel() * 3);
+      setNextLevelExp(next);
+
+      // Vida cresce sempre
+      setMaxLife(getMaxLife() + 3);
+
+      // Força cresce quase sempre, destreza cresce um pouco mais devagar
       setStrength(getStrength() + 1);
-      setDexterity(getDexterity() + 1);
+      if (getLevel() % 2 == 0) {
+        setDexterity(getDexterity() + 1);
+      }
+
       setAttack(getAttack());
       setDefense(getDefense());
       setLife(getMaxLife());

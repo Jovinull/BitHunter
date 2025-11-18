@@ -20,14 +20,15 @@ public class ObjAxe extends Entity {
     down1 = setup("/objects/axe", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
     // atributos de combate
+    setAttackValue(3);
     Rectangle ar = getAttackArea();
     ar.width = 30;
     ar.height = 30;
 
-    setPrice(75);
+    setPrice(120);
     setKnockBackPower(10);
 
-    setMotion1Duration(20);
-    setMotion2Duration(40);
+    setMotion1Duration(25);
+    setMotion2Duration(50);
   }
 }

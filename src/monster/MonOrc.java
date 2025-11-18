@@ -22,11 +22,11 @@ public class MonOrc extends Entity {
 
     setDefaultSpeed(1);
     setSpeed(getDefaultSpeed());
-    setMaxLife(12);
+    setMaxLife(30);
     setLife(getMaxLife());
-    setAttack(8);
-    setDefense(2);
-    setExp(10);
+    setAttack(9);
+    setDefense(3);
+    setExp(20);
     setKnockBackPower(5);
 
     // Colisão / Ataque

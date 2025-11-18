@@ -17,6 +17,6 @@ public class ObjShieldWood extends Entity {
     down1 = setup("/objects/shield_wood", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
     setDefenseValue(1);
-    setPrice(35);
+    setPrice(40);
   }
 }

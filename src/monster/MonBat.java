@@ -24,11 +24,11 @@ public class MonBat extends Entity {
 
     setDefaultSpeed(4);
     setSpeed(getDefaultSpeed());
-    setMaxLife(7);
+    setMaxLife(10);
     setLife(getMaxLife());
-    setAttack(7);
+    setAttack(4);
     setDefense(0);
-    setExp(7);
+    setExp(5);
 
     // solidArea (usa o objeto exposto por getSolidArea())
     getSolidArea().x = 3;
