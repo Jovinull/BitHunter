@@ -10,6 +10,8 @@ import main.GamePanel;
 
 class InventoryUi {
 
+  private static final int INVENTORY_COLS = 5;
+
   private final UI ui;
 
   InventoryUi(UI ui) {
@@ -30,14 +32,14 @@ class InventoryUi {
       frameX = GamePanel.TILE_SIZE * 12;
       frameY = GamePanel.TILE_SIZE;
       frameWidth = GamePanel.TILE_SIZE * 6;
-      frameHeight = GamePanel.TILE_SIZE * 5;
+      frameHeight = GamePanel.TILE_SIZE * 5 + 20;
       slotCol = ui.getPlayerSlotCol();
       slotRow = ui.getPlayerSlotRow();
     } else {
       frameX = GamePanel.TILE_SIZE * 2;
       frameY = GamePanel.TILE_SIZE;
       frameWidth = GamePanel.TILE_SIZE * 6;
-      frameHeight = GamePanel.TILE_SIZE * 5;
+      frameHeight = GamePanel.TILE_SIZE * 5 + 20;
       slotCol = ui.getNpcSlotCol();
       slotRow = ui.getNpcSlotRow();
     }
@@ -54,17 +56,24 @@ class InventoryUi {
 
     final int slotXstart = frameX + 20;
     final int slotYstart = titleY + 16;
-    int slotSize = GamePanel.TILE_SIZE + 3;
+    final int slotWidth = GamePanel.TILE_SIZE + 3; // horizontal (como já era)
+    final int slotHeight = GamePanel.TILE_SIZE; // vertical (IMPORTANTE p/ cursor)
 
-    drawInventoryItems(entity, slotXstart, slotYstart, slotSize);
+    drawInventoryItems(entity, slotXstart, slotYstart, slotWidth, slotHeight);
 
     if (cursor) {
-      drawInventoryCursor(slotXstart, slotYstart, slotSize, slotCol, slotRow);
+      drawInventoryCursor(slotXstart, slotYstart, slotWidth, slotHeight, slotCol, slotRow);
       drawInventoryDescription(entity, frameX, frameY, frameWidth, frameHeight, slotCol, slotRow);
     }
   }
 
-  private void drawInventoryItems(Entity entity, int slotXstart, int slotYstart, int slotSize) {
+  private void drawInventoryItems(
+      Entity entity,
+      int slotXstart,
+      int slotYstart,
+      int slotWidth,
+      int slotHeight) {
+
     Graphics2D g2 = ui.g2;
     int slotX = slotXstart;
     int slotY = slotYstart;
@@ -81,7 +90,10 @@ class InventoryUi {
         g2.drawImage(item.getDown1(), slotX, slotY, null);
       }
 
-      if (item != null && entity == ui.getGamePanel().getPlayer() && item.getAmount() > 1) {
+      if (item != null
+          && entity == ui.getGamePanel().getPlayer()
+          && item.getAmount() > 1) {
+
         g2.setFont(g2.getFont().deriveFont(32f));
         String s = String.valueOf(item.getAmount());
         int amountX = ui.getXforAlignToRightText(s, slotX + 44);
@@ -93,11 +105,11 @@ class InventoryUi {
         g2.drawString(s, amountX - 3, amountY - 3);
       }
 
-      slotX += slotSize;
+      slotX += slotWidth;
 
-      if (i == 4 || i == 9 || i == 14) {
+      if ((i + 1) % INVENTORY_COLS == 0) {
         slotX = slotXstart;
-        slotY += GamePanel.TILE_SIZE;
+        slotY += slotHeight;
       }
     }
   }
@@ -119,14 +131,15 @@ class InventoryUi {
   private void drawInventoryCursor(
       int slotXstart,
       int slotYstart,
-      int slotSize,
+      int slotWidth,
+      int slotHeight,
       int slotCol,
       int slotRow) {
 
     Graphics2D g2 = ui.g2;
 
-    int cursorX = slotXstart + (slotSize * slotCol);
-    int cursorY = slotYstart + (slotSize * slotRow);
+    int cursorX = slotXstart + (slotWidth * slotCol);
+    int cursorY = slotYstart + (slotHeight * slotRow);
     int cursorWidth = GamePanel.TILE_SIZE;
     int cursorHeight = GamePanel.TILE_SIZE;
 
