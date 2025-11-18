@@ -10,6 +10,8 @@ import main.LanguageManager;
 
 class OptionsUi {
 
+  private static final int CONTROLS_PER_PAGE = 6;
+
   private final UI ui;
 
   OptionsUi(UI ui) {
@@ -90,6 +92,7 @@ class OptionsUi {
       if (keyH.isEnterPressed()) {
         ui.setSubState(2);
         ui.commandNum = 0;
+        ui.setControlsPage(0);
       }
     }
 
@@ -315,49 +318,89 @@ class OptionsUi {
     var g2 = ui.g2;
     var gp = ui.getGamePanel();
 
-    int textX;
-    int textY;
+    // Título
+    int titleY = frameY + GamePanel.TILE_SIZE;
+    String title = ui.t("ui.controls.title");
+    int titleX = ui.getXforCenteredText(title);
+    ui.drawTextShadow(title, titleX, titleY, UI.COL_TEXT, Color.black, 2);
 
-    String text = ui.t("ui.controls.title");
-    textX = ui.getXforCenteredText(text);
-    textY = frameY + GamePanel.TILE_SIZE;
-    ui.drawTextShadow(text, textX, textY, UI.COL_TEXT, Color.black, 2);
+    final String[] labelKeys = {
+        "ui.controls.move",
+        "ui.controls.confirmAttack",
+        "ui.controls.shootCast",
+        "ui.controls.characterScreen",
+        "ui.controls.pause",
+        "ui.controls.options",
+        "ui.controls.minimap",
+        "ui.controls.map"
+    };
 
-    textX = frameX + GamePanel.TILE_SIZE;
-    textY += GamePanel.TILE_SIZE;
+    final String[] keyLabels = {
+        "WASD",
+        "ENTER",
+        "F",
+        "C",
+        "P",
+        "ESC",
+        "X",
+        "M"
+    };
+
+    int totalControls = labelKeys.length;
+    int perPage = CONTROLS_PER_PAGE;
+
+    // Quantidade total de páginas
+    int pageCount = (totalControls + perPage - 1) / perPage;
+    if (pageCount <= 0) {
+      pageCount = 1;
+    }
+    ui.setControlsPageCount(pageCount);
+
+    int currentPage = ui.getControlsPage();
+    if (currentPage < 0) {
+      currentPage = 0;
+    }
+    if (currentPage > pageCount - 1) {
+      currentPage = pageCount - 1;
+    }
+    ui.setControlsPage(currentPage);
+
+    int startIndex = currentPage * perPage;
+    int endIndex = Math.min(startIndex + perPage, totalControls);
+
+    int textX = frameX + GamePanel.TILE_SIZE;
+    int textY = titleY + GamePanel.TILE_SIZE;
     g2.setColor(UI.COL_TEXT);
-    g2.drawString(ui.t("ui.controls.move"), textX, textY);
-    textY += GamePanel.TILE_SIZE;
-    g2.drawString(ui.t("ui.controls.confirmAttack"), textX, textY);
-    textY += GamePanel.TILE_SIZE;
-    g2.drawString(ui.t("ui.controls.shootCast"), textX, textY);
-    textY += GamePanel.TILE_SIZE;
-    g2.drawString(ui.t("ui.controls.characterScreen"), textX, textY);
-    textY += GamePanel.TILE_SIZE;
-    g2.drawString(ui.t("ui.controls.pause"), textX, textY);
-    textY += GamePanel.TILE_SIZE;
-    g2.drawString(ui.t("ui.controls.options"), textX, textY);
 
-    textX = frameX + GamePanel.TILE_SIZE * 6;
-    textY = frameY + GamePanel.TILE_SIZE * 2;
-    g2.drawString("WASD", textX, textY);
-    textY += GamePanel.TILE_SIZE;
-    g2.drawString("ENTER", textX, textY);
-    textY += GamePanel.TILE_SIZE;
-    g2.drawString("F", textX, textY);
-    textY += GamePanel.TILE_SIZE;
-    g2.drawString("C", textX, textY);
-    textY += GamePanel.TILE_SIZE;
-    g2.drawString("P", textX, textY);
-    textY += GamePanel.TILE_SIZE;
-    g2.drawString("ESC", textX, textY);
+    for (int i = startIndex; i < endIndex; i++) {
+      g2.drawString(ui.t(labelKeys[i]), textX, textY);
+      textY += GamePanel.TILE_SIZE;
+    }
+
+    int keysX = frameX + GamePanel.TILE_SIZE * 6;
+    int keysY = titleY + GamePanel.TILE_SIZE;
+
+    for (int i = startIndex; i < endIndex; i++) {
+      g2.drawString(keyLabels[i], keysX, keysY);
+      keysY += GamePanel.TILE_SIZE;
+    }
+
+    if (pageCount > 1) {
+      String pageLabel = (currentPage + 1) + "/" + pageCount;
+      int pageX = frameX + GamePanel.TILE_SIZE * 6;
+      int pageY = frameY + GamePanel.TILE_SIZE * 9;
+      g2.setColor(UI.COL_TEXT_DIM);
+      g2.drawString(pageLabel, pageX, pageY);
+    }
 
     textX = frameX + GamePanel.TILE_SIZE;
     textY = frameY + GamePanel.TILE_SIZE * 9;
+    g2.setColor(UI.COL_TEXT);
     g2.drawString(ui.t(UI.KEY_COMMON_BACK), textX, textY);
     if (ui.commandNum == 0) {
       g2.drawString(">", textX - 25, textY);
       if (gp.getKeyH().isEnterPressed()) {
+        ui.setControlsPage(0);
         ui.setSubState(0);
         ui.commandNum = 3;
       }

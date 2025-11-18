@@ -73,6 +73,10 @@ public class UI {
   static final int MAX_VISIBLE_LANG_OPTIONS = 5;
   int languageScrollOffset = 0;
 
+  // Paginação da tela de controles
+  int controlsPage = 0;
+  int controlsPageCount = 1;
+
   static final String KEY_COMMON_BACK = "ui.common.back";
   static final String KEY_TRADE_HINT_BACK = "ui.trade.hintBack";
 
@@ -322,6 +326,7 @@ public class UI {
   public void resetOptionsMenu() {
     subState = 0;
     commandNum = 0;
+    controlsPage = 0;
   }
 
   // --- Getters/Setters já existentes (mantidos p/ compatibilidade externa) ---
@@ -408,5 +413,23 @@ public class UI {
 
   public void setSubState(int subState) {
     this.subState = subState;
+  }
+
+  // --- Paginação da tela de controles ---
+
+  public int getControlsPage() {
+    return controlsPage;
+  }
+
+  public void setControlsPage(int controlsPage) {
+    this.controlsPage = controlsPage;
+  }
+
+  public int getControlsPageCount() {
+    return controlsPageCount;
+  }
+
+  public void setControlsPageCount(int controlsPageCount) {
+    this.controlsPageCount = controlsPageCount;
   }
 }

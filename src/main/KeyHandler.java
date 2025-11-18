@@ -253,6 +253,14 @@ public class KeyHandler implements KeyListener {
       return;
     }
 
+    // Navegação ESPECIAL para a tela de controles (subState 2): troca de página com
+    // A/D
+    if (gp.getGameUi().getSubState() == 2
+        && (code == KeyEvent.VK_A || code == KeyEvent.VK_D)) {
+      handleControlsPageNavigation(code);
+      return;
+    }
+
     final int maxCommandNum = getOptionsMaxCommandNum();
 
     switch (code) {
@@ -317,6 +325,38 @@ public class KeyHandler implements KeyListener {
     }
 
     ui.setCommandNum(commandNum);
+    gp.playSE(9);
+  }
+
+  /**
+   * Navegação de páginas na tela de controles (subState 2):
+   *
+   * - A -> página anterior
+   * - D -> próxima página
+   * (com wrap-around)
+   */
+  private void handleControlsPageNavigation(int code) {
+    var ui = gp.getGameUi();
+    int pageCount = ui.getControlsPageCount();
+    if (pageCount <= 1) {
+      return;
+    }
+
+    int page = ui.getControlsPage();
+
+    if (code == KeyEvent.VK_A) {
+      page--;
+      if (page < 0) {
+        page = pageCount - 1;
+      }
+    } else if (code == KeyEvent.VK_D) {
+      page++;
+      if (page > pageCount - 1) {
+        page = 0;
+      }
+    }
+
+    ui.setControlsPage(page);
     gp.playSE(9);
   }
 
