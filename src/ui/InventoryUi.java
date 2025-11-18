@@ -56,8 +56,8 @@ class InventoryUi {
 
     final int slotXstart = frameX + 20;
     final int slotYstart = titleY + 16;
-    final int slotWidth = GamePanel.TILE_SIZE + 3; // horizontal (como já era)
-    final int slotHeight = GamePanel.TILE_SIZE; // vertical (IMPORTANTE p/ cursor)
+    final int slotWidth = GamePanel.TILE_SIZE + 3;
+    final int slotHeight = GamePanel.TILE_SIZE;
 
     drawInventoryItems(entity, slotXstart, slotYstart, slotWidth, slotHeight);
 
