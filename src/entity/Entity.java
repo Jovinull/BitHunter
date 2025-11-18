@@ -122,6 +122,7 @@ public class Entity {
   private boolean inRage = false;
   private boolean sleep = false;
   private boolean drawing = true;
+  private boolean attackDamageApplied = false;
 
   // COUNTERS
   private int spriteCounter = 0;
@@ -697,67 +698,95 @@ public class Entity {
   protected void performAttack() {
     spriteCounter++;
 
-    if (spriteCounter <= motion1Duration) {
-      spriteNum = 1;
-    }
+    updateAttackSprite();
 
-    if (spriteCounter > motion1Duration && spriteCounter <= motion2Duration) {
-      spriteNum = 2;
-
-      int currentWorldX = worldX;
-      int currentWorldY = worldY;
-      int solidAreaWidth = solidArea.width;
-      int solidAreaHeight = solidArea.height;
-
-      switch (direction) {
-        case DIR_UP:
-          worldY -= attackArea.height;
-          break;
-        case DIR_DOWN:
-          worldY += attackArea.height;
-          break;
-        case DIR_LEFT:
-          worldX -= attackArea.width;
-          break;
-        case DIR_RIGHT:
-          worldX += attackArea.width;
-          break;
-        default:
-          break;
-      }
-
-      solidArea.width = attackArea.width;
-      solidArea.height = attackArea.height;
-
-      var collisionChecker = gp.getcChecker();
-      var player = gp.getPlayer();
-
-      if (type == TYPE_MONSTER) {
-        if (collisionChecker.checKPlayer(this)) {
-          damagePlayer(attack);
-        }
-      } else {
-        int monsterIndex = collisionChecker.checkEntity(this, gp.getMonster());
-        player.damageMonster(monsterIndex, this, attack, currentWeapon.knockBackPower);
-
-        int iTileIndex = collisionChecker.checkEntity(this, gp.getiTile());
-        player.damageInteractiveTile(iTileIndex);
-
-        int projectileIndex = collisionChecker.checkEntity(this, gp.getProjectile());
-        player.damageProjectile(projectileIndex);
-      }
-
-      worldX = currentWorldX;
-      worldY = currentWorldY;
-      solidArea.width = solidAreaWidth;
-      solidArea.height = solidAreaHeight;
+    if (isInDamageWindow() && !attackDamageApplied) {
+      applyAttackDamage();
     }
 
     if (spriteCounter > motion2Duration) {
-      spriteNum = 1;
-      spriteCounter = 0;
-      attacking = false;
+      endAttack();
     }
+  }
+
+  private void updateAttackSprite() {
+    if (spriteCounter <= motion1Duration) {
+      spriteNum = 1;
+    } else if (spriteCounter <= motion2Duration) {
+      spriteNum = 2;
+    }
+  }
+
+  private boolean isInDamageWindow() {
+    return spriteCounter > motion1Duration && spriteCounter <= motion2Duration;
+  }
+
+  private void applyAttackDamage() {
+    int currentWorldX = worldX;
+    int currentWorldY = worldY;
+    int solidAreaWidth = solidArea.width;
+    int solidAreaHeight = solidArea.height;
+
+    moveAttackHitboxForward();
+
+    solidArea.width = attackArea.width;
+    solidArea.height = attackArea.height;
+
+    applyAttackCollision();
+
+    // restaura posição / hitbox
+    worldX = currentWorldX;
+    worldY = currentWorldY;
+    solidArea.width = solidAreaWidth;
+    solidArea.height = solidAreaHeight;
+
+    attackDamageApplied = true;
+  }
+
+  private void moveAttackHitboxForward() {
+    switch (direction) {
+      case DIR_UP:
+        worldY -= attackArea.height;
+        break;
+      case DIR_DOWN:
+        worldY += attackArea.height;
+        break;
+      case DIR_LEFT:
+        worldX -= attackArea.width;
+        break;
+      case DIR_RIGHT:
+        worldX += attackArea.width;
+        break;
+      default:
+        break;
+    }
+  }
+
+  private void applyAttackCollision() {
+    var collisionChecker = gp.getcChecker();
+    var player = gp.getPlayer();
+
+    if (type == TYPE_MONSTER) {
+      if (collisionChecker.checKPlayer(this)) {
+        damagePlayer(attack);
+      }
+    } else {
+      int monsterIndex = collisionChecker.checkEntity(this, gp.getMonster());
+      player.damageMonster(monsterIndex, this, attack, currentWeapon.knockBackPower);
+
+      int iTileIndex = collisionChecker.checkEntity(this, gp.getiTile());
+      player.damageInteractiveTile(iTileIndex);
+
+      int projectileIndex = collisionChecker.checkEntity(this, gp.getProjectile());
+      player.damageProjectile(projectileIndex);
+    }
+  }
+
+  private void endAttack() {
+    spriteNum = 1;
+    spriteCounter = 0;
+    attacking = false;
+    attackDamageApplied = false;
   }
 
   public void applyOpenedAppearance() {
