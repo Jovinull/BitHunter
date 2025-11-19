@@ -15,7 +15,7 @@ public class ItDryTree extends InteractiveTile {
     setInternalId(TILE_ID);
     setTranslationKey(TILE_ID);
 
-    down1 = setup("/tiles_interactive/drytree", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    down1 = setup("/tiles_interactive/rottentree", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
     setDestructible(true);
     setMaxLife(3);
