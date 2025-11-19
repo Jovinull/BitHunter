@@ -44,6 +44,40 @@ class HudUi {
         new Color(70, 120, 220));
   }
 
+  void drawXpTopBar() {
+    Graphics2D g2 = ui.g2;
+    var gp = ui.getGamePanel();
+    var player = gp.getPlayer();
+
+    int currentExp = player.getExp();
+    int nextLevelExp = player.getNextLevelExp();
+
+    if (nextLevelExp <= 0) {
+      return;
+    }
+
+    double ratio = Math.min(1.0, currentExp / (double) nextLevelExp);
+
+    int x = 0;
+    int y = 0;
+    int width = GamePanel.SCREEN_WIDTH;
+    int height = 6;
+
+    // Fundo da barra
+    g2.setColor(new Color(5, 12, 30, 220));
+    g2.fillRect(x, y, width, height);
+
+    // Preenchimento de XP
+    int filledWidth = (int) (width * ratio);
+    if (filledWidth > 0) {
+      g2.setColor(new Color(70, 140, 255));
+      g2.fillRect(x, y, filledWidth, height);
+    }
+
+    g2.setColor(new Color(0, 0, 0, 160));
+    g2.drawLine(x, y + height, x + width, y + height);
+  }
+
   private record HudBarLayout(int x, int y, int width, int height) {
   }
 

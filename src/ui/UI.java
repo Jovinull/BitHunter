@@ -194,10 +194,12 @@ public class UI {
     }
 
     if (state == GamePanel.PLAY_STATE) {
+      hudUi.drawXpTopBar();
       hudUi.drawPlayerLife();
       hudUi.drawMonsterLife();
       hudUi.drawMessage();
     } else if (state == GamePanel.PAUSE_STATE) {
+      hudUi.drawPlayerLife();
       hudUi.drawPlayerLife();
       pauseUi.drawPauseScreen();
     } else if (state == GamePanel.DIALOGUE_STATE) {
