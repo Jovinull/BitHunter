@@ -63,6 +63,7 @@
     - [Tabela de Armas](#tabela-de-armas)
   - [Equipamentos Defensivos](#equipamentos-defensivos)
     - [Tabela de Escudos e Botas](#tabela-de-escudos-e-botas)
+    - [Sistema de Guarda (Stamina de Escudo)](#sistema-de-guarda-stamina-de-escudo)
   - [Magias e Consumíveis](#magias-e-consumíveis)
     - [Projectile – Fireball](#projectile--fireball)
     - [Consumível – Poção Vermelha](#consumível--poção-vermelha)
@@ -768,14 +769,32 @@ Segue tudo organizado em formato de GDD, já com os **valores sugeridos** que co
 
 ### Tabela de Escudos e Botas
 
-| ID Interno        | Nome (GDD)        | Tipo   | DefenseValue | SpeedValue | Preço | Observações                                                                             |
-| ----------------- | ----------------- | ------ | -----------: | ---------: | ----: | --------------------------------------------------------------------------------------- |
-| `item.shieldWood` | Escudo de Madeira | Shield |            1 |          0 |    40 | Escudo básico do início do jogo.                                                        |
-| `item.shieldBlue` | Escudo Azul       | Shield |            3 |          0 |   300 | Escudo mid game. Grande aumento de defesa (DEF = DEX * 3).                              |
-| `item.boots`      | Botas de Couro    | Boots  |            1 |          1 |   400 | Aumenta velocidade em +1 e fornece +1 de defesa. Item caro, voltado para mid/late game. |
+| ID Interno        | Nome (GDD)        | Tipo   | DefenseValue | GuardStaminaCap | SpeedValue | Preço | Observações                                                                                          |
+| ----------------- | ----------------- | ------ | -----------: | --------------: | ---------: | ----: | ---------------------------------------------------------------------------------------------------- |
+| `item.shieldWood` | Escudo de Madeira | Shield |            1 |              40 |          0 |    40 | Escudo básico do início do jogo. Fornece pouca defesa e pouca stamina de guarda.                    |
+| `item.shieldBlue` | Escudo Azul       | Shield |            3 |              80 |          0 |   300 | Escudo mid game. Grande aumento de defesa (DEF = DEX * 3) e maior reserva de stamina de guarda.     |
+| `item.boots`      | Botas de Couro    | Boots  |            1 |               – |          1 |   400 | Aumenta velocidade em +1 e fornece +1 de defesa. Item caro, voltado para mid/late game.             |
 
 > **Fórmula de defesa considerando escudo e botas:**
 > `DefenseJogador = DEX * shield.defenseValue + boots.defenseValue + armorPiecesDefense`.
+
+---
+
+### Sistema de Guarda (Stamina de Escudo)
+
+- Cada **escudo** possui um atributo de **stamina de guarda máxima** (`GuardStaminaCap`), que define quanto “fôlego de guarda” ele oferece.
+- O **player** possui uma barra de **stamina de guarda atual**, que vai de `0` até `GuardStaminaCap` do escudo equipado.
+- Enquanto o jogador **segura o botão de guarda (Barra de Espaço)**:
+  - A stamina de guarda é **consumida gradualmente ao longo do tempo** (dreno passivo contínuo).
+- Quando o jogador **defende um ataque** com o escudo:
+  - É consumido um **chunk grande de stamina**, baseado no **ataque do monstro** (quanto mais forte o monstro, maior o custo de stamina ao bloquear).
+  - Se a stamina chegar a `0`, o escudo **não consegue mais guardar** até recuperar stamina; o jogador passa a tomar o dano cheio.
+- Se a stamina de guarda está em `0`, o jogador **não pode entrar em pose de guarda** até recuperar um mínimo de stamina.
+
+> **Observação importante (recarga de stamina):**
+> A **stamina de guarda só começa a recarregar depois que o jogador solta a Barra de Espaço por um período de tempo**.
+> Enquanto a tecla de guarda estiver pressionada, **a barra de stamina não regenera**, mesmo que já esteja zerada.
+
 
 ---
 
