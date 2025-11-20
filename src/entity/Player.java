@@ -13,6 +13,8 @@ import object.ObjKey;
 import object.ObjLantern;
 import object.ObjShieldWood;
 import object.ObjSwordNormal;
+import pets.YellowSnail;
+import pets.PetEntity;
 import tile_interactive.InteractiveTile;
 
 public class Player extends Entity {
@@ -26,6 +28,8 @@ public class Player extends Entity {
   private boolean attackCanceled = false;
   private boolean lightUpdated = false;
   private boolean debugCollision = false;
+
+  private PetEntity pet;
 
   private int guardStamina;
   private int maxGuardStamina;
@@ -99,6 +103,7 @@ public class Player extends Entity {
     getGuardImage();
     setItems();
     setDialogue();
+    initDefaultPet();
   }
 
   public void setDefaultPositions() {
@@ -106,6 +111,11 @@ public class Player extends Entity {
     setWorldX(GamePanel.TILE_SIZE * 23);
     setWorldY(GamePanel.TILE_SIZE * 21);
     setDirection(DIR_DOWN);
+
+    if (pet != null) {
+      pet.setWorldX(getWorldX() - GamePanel.TILE_SIZE);
+      pet.setWorldY(getWorldY());
+    }
   }
 
   public void setDialogue() {
@@ -316,6 +326,10 @@ public class Player extends Entity {
     clampVitals();
     handleDeath();
     handleGuardStaminaRegeneration();
+
+    if (pet != null) {
+      pet.update();
+    }
   }
 
   private boolean hasActiveShield() {
@@ -840,6 +854,10 @@ public class Player extends Entity {
     int tempScreenX = screenX;
     int tempScreenY = screenY;
 
+    if (pet != null) {
+      pet.draw(g2);
+    }
+
     // Ajuste de posição para ataques UP/LEFT
     if (isAttacking()) {
       if (DIR_UP.equals(getDirection())) {
@@ -987,6 +1005,16 @@ public class Player extends Entity {
     return hasActiveShield() && getGuardStamina() > 0;
   }
 
+  private void initDefaultPet() {
+    if (pet == null) {
+      pet = new YellowSnail(gp, this);
+    }
+
+    // posiciona perto do jogador (atrás dele)
+    pet.setWorldX(getWorldX() - GamePanel.TILE_SIZE);
+    pet.setWorldY(getWorldY());
+  }
+
   // ===== Accessors =====
   public boolean isAttackCanceled() {
     return attackCanceled;
@@ -1026,5 +1054,9 @@ public class Player extends Entity {
 
   public void setMaxGuardStamina(int maxGuardStamina) {
     this.maxGuardStamina = maxGuardStamina;
+  }
+
+  public PetEntity getPet() {
+    return pet;
   }
 }

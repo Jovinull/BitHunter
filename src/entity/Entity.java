@@ -46,6 +46,7 @@ public class Entity {
   public static final int TYPE_HELMET = 12;
   public static final int TYPE_CHEST = 13;
   public static final int TYPE_LEGS = 14;
+  public static final int TYPE_PET = 15;
 
   public static final int MAX_INVENTORY_SIZE = 20;
 
