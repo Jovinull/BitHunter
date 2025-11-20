@@ -913,9 +913,7 @@ public class Player extends Entity {
     int newMax = getShieldGuardCapacity();
     setMaxGuardStamina(newMax);
 
-    if (refill) {
-      setGuardStamina(newMax);
-    } else if (getGuardStamina() > newMax) {
+    if (refill || getGuardStamina() > newMax) {
       setGuardStamina(newMax);
     }
 
