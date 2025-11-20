@@ -653,8 +653,4 @@ public class KeyHandler implements KeyListener {
   public void setEnterPressed(boolean value) {
     this.enterPressed = value;
   }
-
-  public void setSpacePressed(boolean value) {
-    this.spacePressed = value;
-  }
 }

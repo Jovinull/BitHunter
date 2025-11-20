@@ -27,15 +27,16 @@ public class Player extends Entity {
   private boolean lightUpdated = false;
   private boolean debugCollision = false;
 
-  // --- Guard stamina ---
-  private int guardStamina; // valor atual
-  private int maxGuardStamina; // máximo atual (vem do escudo equipado)
+  private int guardStamina;
+  private int maxGuardStamina;
   private int guardStaminaRecoveryCounter = 0;
+  private int guardReleaseCounter = 0;
 
-  private static final int GUARD_STAMINA_DRAIN_INTERVAL = 4; // a cada 4 frames segurando
-  private static final int GUARD_STAMINA_DRAIN_AMOUNT = 1; // gasta 1
-  private static final int GUARD_STAMINA_RECOVERY_INTERVAL = 6; // a cada 6 frames sem guardar
-  private static final int GUARD_STAMINA_RECOVERY_AMOUNT = 1; // recupera 1
+  private static final int GUARD_STAMINA_DRAIN_INTERVAL = 4;
+  private static final int GUARD_STAMINA_DRAIN_AMOUNT = 1;
+  private static final int GUARD_STAMINA_RECOVERY_INTERVAL = 6;
+  private static final int GUARD_STAMINA_RECOVERY_AMOUNT = 1;
+  private static final int GUARD_STAMINA_RECOVERY_DELAY = 30;
 
   public Player(GamePanel gp, KeyHandler keyH) {
     super(gp);
@@ -932,7 +933,6 @@ public class Player extends Entity {
     if (newValue <= 0) {
       newValue = 0;
       setGuarding(false);
-      keyH.setSpacePressed(false);
     }
     setGuardStamina(newValue);
   }
@@ -942,23 +942,37 @@ public class Player extends Entity {
       return;
     }
 
-    // custo baseado na força do monstro
-    int cost = Math.max(4, monsterAttack); // sempre tira pelo menos 4
+    int cost = Math.max(4, monsterAttack);
     spendGuardStamina(cost);
   }
 
   private void handleGuardStaminaRegeneration() {
     if (getMaxGuardStamina() <= 0) {
       guardStaminaRecoveryCounter = 0;
+      guardReleaseCounter = 0;
+      return;
+    }
+
+    if (getGuardStamina() >= getMaxGuardStamina()) {
+      guardStaminaRecoveryCounter = 0;
+      guardReleaseCounter = 0;
+      return;
+    }
+
+    if (keyH.isSpacePressed()) {
+      guardReleaseCounter = 0;
+      guardStaminaRecoveryCounter = 0;
       return;
     }
 
     if (isGuarding()) {
       guardStaminaRecoveryCounter = 0;
+      guardReleaseCounter = 0;
       return;
     }
 
-    if (getGuardStamina() >= getMaxGuardStamina()) {
+    if (guardReleaseCounter < GUARD_STAMINA_RECOVERY_DELAY) {
+      guardReleaseCounter++;
       guardStaminaRecoveryCounter = 0;
       return;
     }
