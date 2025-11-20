@@ -45,7 +45,7 @@ class HudUi {
         ui.t("ui.stats.mp"),
         new Color(70, 120, 220));
 
-    // GUARD STAMINA (só mostra se tiver escudo/capacidade)
+    // Guard Stamina
     int guardMax = player.getMaxGuardStamina();
     if (guardMax > 0) {
       y += barHeight + 8;
@@ -54,8 +54,8 @@ class HudUi {
           guardLayout,
           player.getGuardStamina(),
           guardMax,
-          ui.t("ui.stats.guard"), // adiciona essa key no teu LanguageManager
-          new Color(120, 200, 120)); // verde/teal de stamina
+          ui.t("ui.stats.guard"),
+          new Color(120, 200, 120));
     }
   }
 
