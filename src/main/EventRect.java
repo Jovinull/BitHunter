@@ -10,13 +10,20 @@ public class EventRect extends Rectangle {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
+    if (this == obj) {
       return true;
-    if (!(obj instanceof EventRect))
+    }
+
+    if (obj == null || getClass() != obj.getClass()) {
       return false;
-    if (!super.equals(obj))
+    }
+
+    if (!super.equals(obj)) {
       return false;
+    }
+
     EventRect other = (EventRect) obj;
+
     return this.eventRectDefaultX == other.eventRectDefaultX
         && this.eventRectDefaultY == other.eventRectDefaultY
         && this.eventDone == other.eventDone;

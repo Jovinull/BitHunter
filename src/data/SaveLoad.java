@@ -29,8 +29,8 @@ public class SaveLoad {
       DataStorage ds = buildDataStorage();
       oos.writeObject(ds);
       LOG.fine(() -> "Game saved: " + file.getAbsolutePath());
-    } catch (IOException e) {
-      LOG.log(Level.SEVERE, "Failed to save game", e);
+    } catch (IOException ex) {
+      LOG.log(Level.SEVERE, "Failed to save game", ex);
     }
   }
 
@@ -42,19 +42,37 @@ public class SaveLoad {
     }
 
     try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-      Object obj = ois.readObject();
-      if (!(obj instanceof DataStorage ds)) {
-        LOG.warning("Invalid save file format (not a DataStorage).");
+      DataStorage ds = readDataStorage(ois);
+      if (ds == null) {
         return;
       }
+
       applyFromDataStorage(ds);
       LOG.fine(() -> "Game loaded: " + file.getAbsolutePath());
-    } catch (IOException | ClassNotFoundException e) {
-      LOG.log(Level.SEVERE, "Failed to load game", e);
+    } catch (IOException | ClassNotFoundException ex) {
+      LOG.log(Level.SEVERE, "Failed to load game", ex);
     }
   }
 
   /* ===== Helpers ===== */
+
+  private DataStorage readDataStorage(ObjectInputStream ois)
+      throws IOException, ClassNotFoundException {
+
+    Object raw = ois.readObject();
+
+    if (raw == null) {
+      LOG.warning("Invalid save file format (not a DataStorage).");
+      return null;
+    }
+
+    try {
+      return (DataStorage) raw;
+    } catch (ClassCastException _) { // variável descartada (unnamed pattern)
+      LOG.warning("Invalid save file format (not a DataStorage).");
+      return null;
+    }
+  }
 
   private DataStorage buildDataStorage() {
     DataStorage ds = new DataStorage();
@@ -200,8 +218,6 @@ public class SaveLoad {
 
           objectEntity.setOpened(ds.getMapObjectOpened()[mapNum][i]);
 
-          // Caso precise restaurar o sprite "aberto":
-          // Requer que Entity tenha getImage2() e setDown1(BufferedImage).
           if (objectEntity.isOpened()) {
             objectEntity.applyOpenedAppearance();
           }
