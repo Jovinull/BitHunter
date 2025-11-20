@@ -27,6 +27,16 @@ public class Player extends Entity {
   private boolean lightUpdated = false;
   private boolean debugCollision = false;
 
+  // --- Guard stamina ---
+  private int guardStamina; // valor atual
+  private int maxGuardStamina; // máximo atual (vem do escudo equipado)
+  private int guardStaminaRecoveryCounter = 0;
+
+  private static final int GUARD_STAMINA_DRAIN_INTERVAL = 4; // a cada 4 frames segurando
+  private static final int GUARD_STAMINA_DRAIN_AMOUNT = 1; // gasta 1
+  private static final int GUARD_STAMINA_RECOVERY_INTERVAL = 6; // a cada 6 frames sem guardar
+  private static final int GUARD_STAMINA_RECOVERY_AMOUNT = 1; // recupera 1
+
   public Player(GamePanel gp, KeyHandler keyH) {
     super(gp);
     this.keyH = keyH;
@@ -81,6 +91,8 @@ public class Player extends Entity {
     setAttack(getAttack());
     setDefense(getDefense());
 
+    updateMaxGuardStaminaFromShield(true);
+
     getImage();
     getAttackImage();
     getGuardImage();
@@ -110,6 +122,8 @@ public class Player extends Entity {
     setGuarding(false);
     setKnockBack(false);
     setLightUpdated(true);
+
+    updateMaxGuardStaminaFromShield(true);
   }
 
   public void setItems() {
@@ -287,7 +301,7 @@ public class Player extends Entity {
       processKnockBack();
     } else if (isAttacking()) {
       performAttack();
-    } else if (keyH.isSpacePressed() && hasActiveShield()) {
+    } else if (keyH.isSpacePressed() && canGuard()) {
       handleGuard();
     } else if (isMovementOrActionPressed()) {
       handleMovementAndInteractions();
@@ -300,6 +314,7 @@ public class Player extends Entity {
     updateShotCounter();
     clampVitals();
     handleDeath();
+    handleGuardStaminaRegeneration();
   }
 
   private boolean hasActiveShield() {
@@ -346,13 +361,18 @@ public class Player extends Entity {
   }
 
   private void handleGuard() {
-    if (!hasActiveShield()) {
+    if (!canGuard()) {
       setGuarding(false);
       setGuardCounter(0);
       return;
     }
+
     setGuarding(true);
     setGuardCounter(getGuardCounter() + 1);
+
+    if (getGuardCounter() % GUARD_STAMINA_DRAIN_INTERVAL == 0) {
+      spendGuardStamina(GUARD_STAMINA_DRAIN_AMOUNT);
+    }
   }
 
   private void handleMovementAndInteractions() {
@@ -724,6 +744,7 @@ public class Player extends Entity {
       setCurrentShield(selectedItem);
     }
     setDefense(getDefense());
+    updateMaxGuardStaminaFromShield(true);
   }
 
   private void handleLightSelection(Entity selectedItem) {
@@ -879,6 +900,81 @@ public class Player extends Entity {
     return first ? firstImg : secondImg;
   }
 
+  private int getShieldGuardCapacity() {
+    Entity shield = getCurrentShield();
+    if (shield == null) {
+      return 0;
+    }
+    return shield.getGuardStaminaCapacity();
+  }
+
+  private void updateMaxGuardStaminaFromShield(boolean refill) {
+    int newMax = getShieldGuardCapacity();
+    setMaxGuardStamina(newMax);
+
+    if (refill) {
+      setGuardStamina(newMax);
+    } else if (getGuardStamina() > newMax) {
+      setGuardStamina(newMax);
+    }
+
+    if (newMax <= 0) {
+      setGuarding(false);
+    }
+  }
+
+  private void spendGuardStamina(int amount) {
+    if (amount <= 0 || getMaxGuardStamina() <= 0) {
+      return;
+    }
+
+    int newValue = getGuardStamina() - amount;
+    if (newValue <= 0) {
+      newValue = 0;
+      setGuarding(false);
+      keyH.setSpacePressed(false);
+    }
+    setGuardStamina(newValue);
+  }
+
+  public void onGuardHit(int monsterAttack) {
+    if (monsterAttack <= 0 || getMaxGuardStamina() <= 0) {
+      return;
+    }
+
+    // custo baseado na força do monstro
+    int cost = Math.max(4, monsterAttack); // sempre tira pelo menos 4
+    spendGuardStamina(cost);
+  }
+
+  private void handleGuardStaminaRegeneration() {
+    if (getMaxGuardStamina() <= 0) {
+      guardStaminaRecoveryCounter = 0;
+      return;
+    }
+
+    if (isGuarding()) {
+      guardStaminaRecoveryCounter = 0;
+      return;
+    }
+
+    if (getGuardStamina() >= getMaxGuardStamina()) {
+      guardStaminaRecoveryCounter = 0;
+      return;
+    }
+
+    guardStaminaRecoveryCounter++;
+    if (guardStaminaRecoveryCounter >= GUARD_STAMINA_RECOVERY_INTERVAL) {
+      guardStaminaRecoveryCounter = 0;
+      setGuardStamina(
+          Math.min(getMaxGuardStamina(), getGuardStamina() + GUARD_STAMINA_RECOVERY_AMOUNT));
+    }
+  }
+
+  private boolean canGuard() {
+    return hasActiveShield() && getGuardStamina() > 0;
+  }
+
   // ===== Accessors =====
   public boolean isAttackCanceled() {
     return attackCanceled;
@@ -902,5 +998,21 @@ public class Player extends Entity {
 
   public void setDebugCollision(boolean debugCollision) {
     this.debugCollision = debugCollision;
+  }
+
+  public int getGuardStamina() {
+    return guardStamina;
+  }
+
+  public void setGuardStamina(int guardStamina) {
+    this.guardStamina = guardStamina;
+  }
+
+  public int getMaxGuardStamina() {
+    return maxGuardStamina;
+  }
+
+  public void setMaxGuardStamina(int maxGuardStamina) {
+    this.maxGuardStamina = maxGuardStamina;
   }
 }

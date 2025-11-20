@@ -17,6 +17,7 @@ public class ObjShieldBlue extends Entity {
     down1 = setup("/objects/shield_blue", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
 
     setDefenseValue(3);
+    setGuardStaminaCapacity(140);
     setPrice(300);
   }
 }

@@ -26,6 +26,7 @@ class HudUi {
     int x = GamePanel.TILE_SIZE;
     int y = GamePanel.TILE_SIZE / 2;
 
+    // HP
     HudBarLayout lifeLayout = new HudBarLayout(x, y, barWidth, barHeight);
     drawHudBar(
         lifeLayout,
@@ -34,6 +35,7 @@ class HudUi {
         ui.t("ui.stats.hp"),
         new Color(210, 70, 70));
 
+    // MP
     y += barHeight + 8;
     HudBarLayout manaLayout = new HudBarLayout(x, y, barWidth, barHeight);
     drawHudBar(
@@ -42,6 +44,19 @@ class HudUi {
         player.getMaxMana(),
         ui.t("ui.stats.mp"),
         new Color(70, 120, 220));
+
+    // GUARD STAMINA (só mostra se tiver escudo/capacidade)
+    int guardMax = player.getMaxGuardStamina();
+    if (guardMax > 0) {
+      y += barHeight + 8;
+      HudBarLayout guardLayout = new HudBarLayout(x, y, barWidth, barHeight);
+      drawHudBar(
+          guardLayout,
+          player.getGuardStamina(),
+          guardMax,
+          ui.t("ui.stats.guard"), // adiciona essa key no teu LanguageManager
+          new Color(120, 200, 120)); // verde/teal de stamina
+    }
   }
 
   void drawXpTopBar() {
