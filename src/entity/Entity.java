@@ -180,10 +180,10 @@ public class Entity {
   private boolean stackable = false;
   private int amount = 1;
   private int lightRadius;
+  private int guardStaminaCapacity;
 
-  // NOVOS CAMPOS PARA IDENTIFICAÇÃO / I18N
-  private String internalId; // id estável: ex: "item.axe"
-  private String translationKey; // chave base para i18n: ex: "item.axe"
+  private String internalId;
+  private String translationKey;
 
   private int type; // usar TYPE_*
 
@@ -806,11 +806,17 @@ public class Entity {
     String canGuardDirection = getOppositeDirection(direction);
 
     boolean hasActiveShield = player.getCurrentShield() != null;
+    boolean hasGuardStamina = player.getMaxGuardStamina() > 0 && player.getGuardStamina() > 0;
+
     boolean isGuardingWithShield = hasActiveShield
+        && hasGuardStamina
         && player.isGuarding()
         && player.getDirection().equals(canGuardDirection);
 
     if (isGuardingWithShield) {
+
+      player.onGuardHit(attack);
+
       if (player.getGuardCounter() < 10) {
         damage = 0;
         gp.playSE(16);
@@ -1785,5 +1791,13 @@ public class Entity {
 
   public void setTranslationKey(String translationKey) {
     this.translationKey = translationKey;
+  }
+
+  public int getGuardStaminaCapacity() {
+    return guardStaminaCapacity;
+  }
+
+  public void setGuardStaminaCapacity(int guardStaminaCapacity) {
+    this.guardStaminaCapacity = guardStaminaCapacity;
   }
 }

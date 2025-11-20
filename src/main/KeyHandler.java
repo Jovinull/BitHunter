@@ -650,7 +650,6 @@ public class KeyHandler implements KeyListener {
     return godModeOn;
   }
 
-  // Setter necessário para consumo de ENTER pela UI/Player
   public void setEnterPressed(boolean value) {
     this.enterPressed = value;
   }
