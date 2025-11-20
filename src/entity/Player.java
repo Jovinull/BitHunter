@@ -287,7 +287,7 @@ public class Player extends Entity {
       processKnockBack();
     } else if (isAttacking()) {
       performAttack();
-    } else if (keyH.isSpacePressed()) {
+    } else if (keyH.isSpacePressed() && hasActiveShield()) {
       handleGuard();
     } else if (isMovementOrActionPressed()) {
       handleMovementAndInteractions();
@@ -300,6 +300,10 @@ public class Player extends Entity {
     updateShotCounter();
     clampVitals();
     handleDeath();
+  }
+
+  private boolean hasActiveShield() {
+    return getCurrentShield() != null;
   }
 
   private boolean isMovementOrActionPressed() {
@@ -342,6 +346,11 @@ public class Player extends Entity {
   }
 
   private void handleGuard() {
+    if (!hasActiveShield()) {
+      setGuarding(false);
+      setGuardCounter(0);
+      return;
+    }
     setGuarding(true);
     setGuardCounter(getGuardCounter() + 1);
   }
@@ -682,43 +691,81 @@ public class Player extends Entity {
     }
 
     Entity selectedItem = inv.get(itemIndex);
+    handleItemSelection(selectedItem, itemIndex);
+  }
 
+  private void handleItemSelection(Entity selectedItem, int itemIndex) {
     switch (selectedItem.getType()) {
-      case TYPE_SWORD, TYPE_AXE, TYPE_PICKAXE -> {
-        setCurrentWeapon(selectedItem);
-        setAttack(getAttack());
-        getAttackImage();
-      }
-      case TYPE_SHIELD -> {
-        setCurrentShield(selectedItem);
-        setDefense(getDefense());
-      }
-      case TYPE_LIGHT -> {
-        setCurrentLight(getCurrentLight() == selectedItem ? null : selectedItem);
-        setLightUpdated(true);
-      }
-      case TYPE_BOOTS -> {
-        setCurrentBoots(selectedItem);
-        recalculateSpeedFromEquipment();
-        setDefense(getDefense()); // boots podem dar defesa também
-      }
-      case TYPE_HELMET -> {
-        setCurrentHelmet(selectedItem);
-        setDefense(getDefense());
-      }
-      case TYPE_CHEST -> {
-        setCurrentChest(selectedItem);
-        setDefense(getDefense());
-      }
-      case TYPE_LEGS -> {
-        setCurrentLegs(selectedItem);
-        setDefense(getDefense());
-      }
+      case TYPE_SWORD, TYPE_AXE, TYPE_PICKAXE -> handleWeaponSelection(selectedItem);
+      case TYPE_SHIELD -> handleShieldSelection(selectedItem);
+      case TYPE_LIGHT -> handleLightSelection(selectedItem);
+      case TYPE_BOOTS -> handleBootsSelection(selectedItem);
+      case TYPE_HELMET -> handleHelmetSelection(selectedItem);
+      case TYPE_CHEST -> handleChestSelection(selectedItem);
+      case TYPE_LEGS -> handleLegsSelection(selectedItem);
       case TYPE_CONSUMABLE -> handleConsumableSelection(selectedItem, itemIndex);
       default -> {
-        /* tipo de item não suportado, ignora */
+        // tipo não suportado -> ignora
       }
     }
+  }
+
+  private void handleWeaponSelection(Entity selectedItem) {
+    // Não estou permitindo "desarmar" ainda – várias coisas assumem arma válida
+    setCurrentWeapon(selectedItem);
+    setAttack(getAttack());
+    getAttackImage();
+  }
+
+  private void handleShieldSelection(Entity selectedItem) {
+    if (getCurrentShield() == selectedItem) {
+      setCurrentShield(null);
+    } else {
+      setCurrentShield(selectedItem);
+    }
+    setDefense(getDefense());
+  }
+
+  private void handleLightSelection(Entity selectedItem) {
+    setCurrentLight(getCurrentLight() == selectedItem ? null : selectedItem);
+    setLightUpdated(true);
+  }
+
+  private void handleBootsSelection(Entity selectedItem) {
+    if (getCurrentBoots() == selectedItem) {
+      setCurrentBoots(null);
+    } else {
+      setCurrentBoots(selectedItem);
+    }
+    recalculateSpeedFromEquipment();
+    setDefense(getDefense());
+  }
+
+  private void handleHelmetSelection(Entity selectedItem) {
+    if (getCurrentHelmet() == selectedItem) {
+      setCurrentHelmet(null);
+    } else {
+      setCurrentHelmet(selectedItem);
+    }
+    setDefense(getDefense());
+  }
+
+  private void handleChestSelection(Entity selectedItem) {
+    if (getCurrentChest() == selectedItem) {
+      setCurrentChest(null);
+    } else {
+      setCurrentChest(selectedItem);
+    }
+    setDefense(getDefense());
+  }
+
+  private void handleLegsSelection(Entity selectedItem) {
+    if (getCurrentLegs() == selectedItem) {
+      setCurrentLegs(null);
+    } else {
+      setCurrentLegs(selectedItem);
+    }
+    setDefense(getDefense());
   }
 
   private void handleConsumableSelection(Entity selectedItem, int itemIndex) {
@@ -815,7 +862,7 @@ public class Player extends Entity {
   }
 
   private BufferedImage resolveSprite(String dir, boolean attacking, boolean guarding, int spriteNum) {
-    if (guarding) {
+    if (guarding && hasActiveShield()) {
       return byDir(dir, guardUp, guardDown, guardLeft, guardRight);
     }
 

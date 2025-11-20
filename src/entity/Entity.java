@@ -805,13 +805,18 @@ public class Entity {
     int damage = attack - player.getDefense();
     String canGuardDirection = getOppositeDirection(direction);
 
-    if (player.isGuarding() && player.getDirection().equals(canGuardDirection)) {
+    boolean hasActiveShield = player.getCurrentShield() != null;
+    boolean isGuardingWithShield = hasActiveShield
+        && player.isGuarding()
+        && player.getDirection().equals(canGuardDirection);
+
+    if (isGuardingWithShield) {
       if (player.getGuardCounter() < 10) {
         damage = 0;
         gp.playSE(16);
         setKnockBack(this, player, knockBackPower);
-        offBalance = true;
-        spriteCounter -= 60;
+        setOffBalance(true);
+        setSpriteCounter(getSpriteCounter() - 60);
       } else {
         damage = damage / 3;
         gp.playSE(15);
