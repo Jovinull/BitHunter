@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 import main.GamePanel;
 import main.KeyHandler;
@@ -13,8 +15,10 @@ import object.ObjKey;
 import object.ObjLantern;
 import object.ObjShieldWood;
 import object.ObjSwordNormal;
-import pets.YellowSnail;
 import pets.PetEntity;
+import pets.PetFactory;
+import pets.YellowSnail;
+import pets.YellowSnailEgg;
 import tile_interactive.InteractiveTile;
 
 public class Player extends Entity {
@@ -30,6 +34,9 @@ public class Player extends Entity {
   private boolean debugCollision = false;
 
   private PetEntity pet;
+
+  private final List<String> ownedPets = new ArrayList<>();
+  private String activePetId;
 
   private int guardStamina;
   private int maxGuardStamina;
@@ -144,6 +151,7 @@ public class Player extends Entity {
     inv.add(getCurrentShield());
     inv.add(new ObjKey(gp));
     inv.add(new ObjLantern(gp));
+    inv.add(new YellowSnailEgg(gp));
   }
 
   public void recalculateSpeedFromEquipment() {
@@ -1006,13 +1014,18 @@ public class Player extends Entity {
   }
 
   private void initDefaultPet() {
-    if (pet == null) {
-      pet = new YellowSnail(gp, this);
+    // garante que o Caracol Amarelo esteja na coleção inicial do jogador
+    if (ownedPets.isEmpty()) {
+      addOwnedPet(PetFactory.PET_YELLOW_SNAIL);
     }
 
-    // posiciona perto do jogador (atrás dele)
-    pet.setWorldX(getWorldX() - GamePanel.TILE_SIZE);
-    pet.setWorldY(getWorldY());
+    // se ainda não existir um pet ativo, equipa o padrão
+    if (activePetId == null) {
+      equipPetById(PetFactory.PET_YELLOW_SNAIL);
+    } else {
+      // reconstroi a instância a partir do id salvo (savegame, etc.)
+      equipPetById(activePetId);
+    }
   }
 
   // ===== Accessors =====
@@ -1057,6 +1070,55 @@ public class Player extends Entity {
   }
 
   public PetEntity getPet() {
+    return pet;
+  }
+
+  public List<String> getOwnedPets() {
+    return ownedPets;
+  }
+
+  public void addOwnedPet(String petId) {
+    if (petId == null || petId.isBlank()) {
+      return;
+    }
+    if (!ownedPets.contains(petId)) {
+      ownedPets.add(petId);
+    }
+  }
+
+  public String getActivePetId() {
+    return activePetId;
+  }
+
+  /**
+   * Equipa um pet pelo seu id estável (PetFactory.PET_*).
+   * Retorna true em caso de sucesso.
+   */
+  public boolean equipPetById(String petId) {
+    if (petId == null || petId.isBlank()) {
+      unequipPet();
+      return true;
+    }
+
+    PetEntity newPet = PetFactory.createPet(petId, gp, this);
+    if (newPet == null) {
+      return false;
+    }
+
+    this.activePetId = petId;
+    this.pet = newPet;
+
+    pet.setWorldX(getWorldX() - GamePanel.TILE_SIZE);
+    pet.setWorldY(getWorldY());
+    return true;
+  }
+
+  public void unequipPet() {
+    this.activePetId = null;
+    this.pet = null;
+  }
+
+  public PetEntity getPetEntity() {
     return pet;
   }
 }
