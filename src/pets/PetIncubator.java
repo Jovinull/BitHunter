@@ -67,16 +67,17 @@ public class PetIncubator {
     }
   }
 
+  /**
+   * Finaliza a incubação:
+   * - adiciona o pet à coleção do jogador (se ainda não tiver)
+   * - NÃO equipa automaticamente o pet; o jogador deve ir ao Pet Yard para
+   * equipar
+   */
   private void finishIncubation() {
     active = false;
 
     Player player = gp.getPlayer();
     player.addOwnedPet(petId);
-
-    // se não tiver pet equipado ainda, equipa automaticamente
-    if (player.getActivePetId() == null) {
-      player.equipPetById(petId);
-    }
 
     String petName = gp.getLanguageManager().text(petId + ".name");
     String msgTemplate = gp.getLanguageManager().text("ui.petYard.hatchCompleted");

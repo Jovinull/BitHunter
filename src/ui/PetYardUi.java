@@ -139,8 +139,6 @@ class PetYardUi {
       return;
     }
 
-    String activePetId = player.getActivePetId();
-
     for (int i = 0; i < pets.size(); i++) {
       String petId = pets.get(i);
       int itemY = listStartY + i * lineHeight;
@@ -169,14 +167,14 @@ class PetYardUi {
       int textX = rowX + GamePanel.TILE_SIZE + 12;
       g2.drawString(name, textX, itemY);
 
-      if (petId.equals(activePetId)) {
+      if (petId.equals(player.getActivePetId())) {
         g2.setColor(UI.COL_TEXT_DIM);
         g2.setFont(tagFont);
         g2.drawString(ui.t("ui.petYard.currentPetTag"), textX + 200, itemY);
       }
     }
 
-    // descrição do pet selecionado (subida 1 tile pra não pegar o hint)
+    // descrição do pet selecionado
     int descX = frameX + 24;
     int descY = frameY + frameHeight - GamePanel.TILE_SIZE * 2;
     int descWidth = frameWidth - 48;
@@ -203,7 +201,7 @@ class PetYardUi {
     g2.setColor(UI.COL_TEXT_DIM);
     g2.drawString(ui.t("ui.petYard.hintEquip"), frameX + 24, hintY);
 
-    // ENTER => equipa pet
+    // ENTER => equipa / desequipa pet
     var keyH = gp.getKeyH();
     if (keyH.isEnterPressed() && !pets.isEmpty()) {
       int index = ui.getCommandNum();
@@ -212,12 +210,24 @@ class PetYardUi {
       }
 
       String chosenId = pets.get(index);
-      boolean equipped = player.equipPetById(chosenId);
-      if (equipped) {
+
+      // Se já é o pet ativo, ENTER vira "desequipar"
+      if (chosenId.equals(player.getActivePetId())) {
+        player.unequipPet();
+
         String petName = ui.t(chosenId + ".name");
-        String template = ui.t("ui.petYard.petEquipped");
+        String template = ui.t("ui.petYard.petUnequipped");
         String msg = String.format(template, petName);
         gp.getGameUi().addMessage(msg);
+      } else {
+        // Senão, equipa normalmente
+        boolean equipped = player.equipPetById(chosenId);
+        if (equipped) {
+          String petName = ui.t(chosenId + ".name");
+          String template = ui.t("ui.petYard.petEquipped");
+          String msg = String.format(template, petName);
+          gp.getGameUi().addMessage(msg);
+        }
       }
     }
   }
@@ -232,13 +242,14 @@ class PetYardUi {
     Font titleFont = baseFont.deriveFont(Font.BOLD, 20F);
     Font descFont = baseFont.deriveFont(Font.PLAIN, 20F);
 
-    // inventário do player com cursor
+    // inventário do player com cursor (desenha mochila + descrição)
     inventoryUi.drawInventory(player, true);
 
     int infoX = GamePanel.TILE_SIZE * 2;
-    int infoY = GamePanel.TILE_SIZE * 9;
-    int infoWidth = GamePanel.TILE_SIZE * 16;
-    int infoHeight = GamePanel.TILE_SIZE * 2 + 8;
+    int infoY = GamePanel.TILE_SIZE * 6 + 20;
+    int infoWidth = GamePanel.TILE_SIZE * 10;
+    int infoHeight = GamePanel.TILE_SIZE * 3;
+
     ui.drawSubWindow(infoX, infoY, infoWidth, infoHeight);
 
     // hint
@@ -255,7 +266,7 @@ class PetYardUi {
     if (!(item instanceof PetEgg egg)) {
       g2.setColor(UI.COL_TEXT_DIM);
       g2.setFont(descFont);
-      g2.drawString(ui.t("ui.petYard.eggInvalid"), infoX + 24, infoY + 58);
+      g2.drawString(ui.t("ui.petYard.eggInvalid"), infoX + 24, infoY + 64);
       return;
     }
 
@@ -269,14 +280,24 @@ class PetYardUi {
 
     g2.setColor(UI.COL_TEXT);
 
-    // nome do ovo como "título" (igual nome do item no trade)
+    // nome do ovo como "título"
     g2.setFont(titleFont);
-    g2.drawString(eggName, infoX + 24, infoY + 58);
+    g2.drawString(eggName, infoX + 24, infoY + 64);
 
     // custo + tempo como "descrição"
     g2.setFont(descFont);
-    g2.drawString(lineCost, infoX + 24, infoY + 82);
-    g2.drawString(lineTime, infoX + 220, infoY + 82);
+    g2.drawString(lineCost, infoX + 24, infoY + 88);
+    g2.drawString(lineTime, infoX + 260, infoY + 88);
+
+    // já possuo esse pet?
+    boolean alreadyOwned = player.getOwnedPets().contains(egg.getPetId());
+    if (alreadyOwned) {
+      g2.setFont(descFont);
+      g2.setColor(UI.COL_ACCENT);
+      int warnY = infoY + infoHeight - 20;
+      g2.drawString(ui.t("ui.petYard.petAlreadyOwned"), infoX + 24, warnY);
+      return;
+    }
 
     var keyH = gp.getKeyH();
     if (keyH.isEnterPressed()) {
