@@ -46,10 +46,6 @@ class PetYardUi {
    * - Gerenciar pets
    * - Chocar ovo
    * - Sair
-   *
-   * Aqui deixamos a fonte exatamente como o Trade:
-   * o UI já configurou o Graphics2D com MaruMonica 16F,
-   * então NÃO sobrescrevemos o tamanho da fonte.
    */
   private void drawMainMenu() {
     Graphics2D g2 = ui.g2;
@@ -129,7 +125,7 @@ class PetYardUi {
     g2.setFont(titleFont);
     ui.drawTextShadow(ui.t("ui.petYard.manageTitle"), frameX + 24, titleY, UI.COL_TEXT, Color.black, 2);
 
-    int listStartY = titleY + 24;
+    int listStartY = titleY + GamePanel.TILE_SIZE + 16;
     int lineHeight = GamePanel.TILE_SIZE + 4;
 
     if (pets.isEmpty()) {

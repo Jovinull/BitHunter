@@ -21,6 +21,7 @@ public final class PetFactory {
 
   // IDs estáveis – use sempre essas constantes
   public static final String PET_YELLOW_SNAIL = "pet.yellowSnail";
+  public static final String PET_GREEN_SNAIL = "pet.greenSnail";
 
   public static PetEntity createPet(String petId, GamePanel gp, Player owner) {
     if (petId == null || gp == null || owner == null) {
@@ -29,6 +30,7 @@ public final class PetFactory {
 
     return switch (petId) {
       case PET_YELLOW_SNAIL -> new YellowSnail(gp, owner);
+      case PET_GREEN_SNAIL -> new GreenSnail(gp, owner);
       default -> null;
     };
   }

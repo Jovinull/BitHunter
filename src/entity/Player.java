@@ -15,9 +15,9 @@ import object.ObjKey;
 import object.ObjLantern;
 import object.ObjShieldWood;
 import object.ObjSwordNormal;
+import pets.GreenSnailEgg;
 import pets.PetEntity;
 import pets.PetFactory;
-import pets.YellowSnail;
 import pets.YellowSnailEgg;
 import tile_interactive.InteractiveTile;
 
@@ -152,6 +152,7 @@ public class Player extends Entity {
     inv.add(new ObjKey(gp));
     inv.add(new ObjLantern(gp));
     inv.add(new YellowSnailEgg(gp));
+    inv.add(new GreenSnailEgg(gp));
   }
 
   public void recalculateSpeedFromEquipment() {
