@@ -1,5 +1,7 @@
 package entity;
 
+import java.awt.Rectangle;
+
 import main.GamePanel;
 
 /**
@@ -18,6 +20,14 @@ public class NpcPetYardKeeper extends Entity {
 
     setDirection(DIR_DOWN);
     setSpeed(1);
+
+    Rectangle sa = getSolidArea();
+    sa.x = 8;
+    sa.y = 16;
+    setSolidAreaDefaultX(sa.x);
+    setSolidAreaDefaultY(sa.y);
+    sa.width = 30;
+    sa.height = 30;
 
     getImage();
     setDialogues();
