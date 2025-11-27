@@ -8,6 +8,8 @@ import main.GamePanel;
  */
 public class YellowSnailEgg extends PetEgg {
 
+  public static final String OBJ_ID = "egg.yellowSnail";
+
   // 20 segundos para chocar, a 60 FPS
   private static final int HATCH_TIME_SECONDS = 20;
   private static final int HATCH_TIME_TICKS = HATCH_TIME_SECONDS * 60;
@@ -16,8 +18,8 @@ public class YellowSnailEgg extends PetEgg {
   public YellowSnailEgg(GamePanel gp) {
     super(gp, PetFactory.PET_YELLOW_SNAIL, HATCH_TIME_TICKS, HATCH_COST);
 
-    setInternalId("egg.yellowSnail");
-    setTranslationKey("egg.yellowSnail");
+    setInternalId(OBJ_ID);
+    setTranslationKey(OBJ_ID);
 
     int size = GamePanel.TILE_SIZE;
     var eggImg = setup("/eggs/yellow_snail_egg", size, size);

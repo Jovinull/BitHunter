@@ -29,6 +29,16 @@ public class DataStorage implements Serializable {
   private int currentShieldSlot;
   private int currentBootsSlot;
 
+  // ===== PETS =====
+  private final List<String> ownedPetIds = new ArrayList<>();
+  private String activePetId;
+
+  // ===== PET INCUBATOR =====
+  private boolean incubatorActive;
+  private String incubatorPetId;
+  private int incubatorRemainingTicks;
+  private String incubatorEggName;
+
   // OBJECT ON MAP
   private String[][] mapObjectNames;
   private int[][] mapObjectWorldX;
@@ -186,5 +196,49 @@ public class DataStorage implements Serializable {
 
   public void setCurrentBootsSlot(int currentBootsSlot) {
     this.currentBootsSlot = currentBootsSlot;
+  }
+
+  public List<String> getOwnedPetIds() {
+    return ownedPetIds;
+  }
+
+  public String getActivePetId() {
+    return activePetId;
+  }
+
+  public void setActivePetId(String activePetId) {
+    this.activePetId = activePetId;
+  }
+
+  public boolean isIncubatorActive() {
+    return incubatorActive;
+  }
+
+  public void setIncubatorActive(boolean incubatorActive) {
+    this.incubatorActive = incubatorActive;
+  }
+
+  public String getIncubatorPetId() {
+    return incubatorPetId;
+  }
+
+  public void setIncubatorPetId(String incubatorPetId) {
+    this.incubatorPetId = incubatorPetId;
+  }
+
+  public int getIncubatorRemainingTicks() {
+    return incubatorRemainingTicks;
+  }
+
+  public void setIncubatorRemainingTicks(int incubatorRemainingTicks) {
+    this.incubatorRemainingTicks = incubatorRemainingTicks;
+  }
+
+  public String getIncubatorEggName() {
+    return incubatorEggName;
+  }
+
+  public void setIncubatorEggName(String incubatorEggName) {
+    this.incubatorEggName = incubatorEggName;
   }
 }

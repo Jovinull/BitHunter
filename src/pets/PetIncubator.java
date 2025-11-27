@@ -91,4 +91,25 @@ public class PetIncubator {
     remainingTicks = 0;
     eggName = null;
   }
+
+  /**
+   * Restaura o estado da incubação a partir de dados de save.
+   * Se os dados forem inválidos, o incubador é resetado.
+   */
+  public void restoreFromSave(
+      boolean active,
+      String petId,
+      int remainingTicks,
+      String eggName) {
+
+    if (!active || petId == null || petId.isBlank() || remainingTicks <= 0) {
+      reset();
+      return;
+    }
+
+    this.active = true;
+    this.petId = petId;
+    this.remainingTicks = remainingTicks;
+    this.eggName = eggName;
+  }
 }

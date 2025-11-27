@@ -15,8 +15,8 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 import main.GamePanel;
-import main.UtilityTool;
 import main.LanguageManager;
+import main.UtilityTool;
 
 public class Entity {
 
@@ -47,6 +47,7 @@ public class Entity {
   public static final int TYPE_CHEST = 13;
   public static final int TYPE_LEGS = 14;
   public static final int TYPE_PET = 15;
+  public static final int TYPE_EGG = 16;
 
   public static final int MAX_INVENTORY_SIZE = 20;
 

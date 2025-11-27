@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 import entity.Entity;
 import main.GamePanel;
+import pets.PetIncubator;
 
 public class SaveLoad {
 
@@ -79,6 +80,8 @@ public class SaveLoad {
     copyPlayerStatsToStorage(ds);
     copyInventoryToStorage(ds);
     copyEquipmentToStorage(ds);
+    copyPetsToStorage(ds);
+    copyIncubatorToStorage(ds);
     copyMapObjectsToStorage(ds);
     return ds;
   }
@@ -88,6 +91,8 @@ public class SaveLoad {
     applyInventory(ds);
     applyMapObjects(ds);
     applyEquipment(ds);
+    applyPets(ds);
+    applyIncubator(ds);
 
     // Recalcular atributos derivados
     var player = gp.getPlayer();
@@ -243,5 +248,67 @@ public class SaveLoad {
     if (bootsSlot >= 0 && bootsSlot < inv.size()) {
       player.setCurrentBoots(inv.get(bootsSlot));
     }
+  }
+
+  private void copyPetsToStorage(DataStorage ds) {
+    var player = gp.getPlayer();
+
+    // limpa e copia lista de pets possuídos
+    ds.getOwnedPetIds().clear();
+    ds.getOwnedPetIds().addAll(player.getOwnedPets());
+
+    // pet ativo (pode ser null)
+    ds.setActivePetId(player.getActivePetId());
+  }
+
+  private void applyPets(DataStorage ds) {
+    var player = gp.getPlayer();
+
+    player.getOwnedPets().clear();
+    player.getOwnedPets().addAll(ds.getOwnedPetIds());
+
+    String activeId = ds.getActivePetId();
+    if (activeId != null && !activeId.isBlank() && player.getOwnedPets().contains(activeId)) {
+      player.equipPetById(activeId);
+    } else {
+      player.unequipPet();
+    }
+  }
+
+  private void copyIncubatorToStorage(DataStorage ds) {
+    PetIncubator incubator = gp.getPetIncubator();
+    if (incubator == null) {
+      ds.setIncubatorActive(false);
+      ds.setIncubatorPetId(null);
+      ds.setIncubatorRemainingTicks(0);
+      ds.setIncubatorEggName(null);
+      return;
+    }
+
+    boolean active = incubator.hasActiveEgg();
+    ds.setIncubatorActive(active);
+
+    if (active) {
+      ds.setIncubatorPetId(incubator.getPetId());
+      ds.setIncubatorRemainingTicks(incubator.getRemainingTicks());
+      ds.setIncubatorEggName(incubator.getEggName());
+    } else {
+      ds.setIncubatorPetId(null);
+      ds.setIncubatorRemainingTicks(0);
+      ds.setIncubatorEggName(null);
+    }
+  }
+
+  private void applyIncubator(DataStorage ds) {
+    PetIncubator incubator = gp.getPetIncubator();
+    if (incubator == null) {
+      return;
+    }
+
+    incubator.restoreFromSave(
+        ds.isIncubatorActive(),
+        ds.getIncubatorPetId(),
+        ds.getIncubatorRemainingTicks(),
+        ds.getIncubatorEggName());
   }
 }

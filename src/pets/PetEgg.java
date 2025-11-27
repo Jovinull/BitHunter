@@ -24,6 +24,7 @@ public abstract class PetEgg extends Entity {
     this.hatchCost = hatchCost;
 
     setStackable(false);
+    setType(TYPE_EGG);
   }
 
   public String getPetId() {
