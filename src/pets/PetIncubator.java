@@ -16,6 +16,10 @@ public class PetIncubator {
   private boolean active;
   private String petId;
   private int remainingTicks;
+
+  // NOVO: tempo total pra calcular % de progresso e tempo restante
+  private int totalTicks;
+
   private String eggName;
 
   public PetIncubator(GamePanel gp) {
@@ -30,12 +34,34 @@ public class PetIncubator {
     return remainingTicks;
   }
 
+  // NOVO: expor o total para UI
+  public int getTotalTicks() {
+    return totalTicks;
+  }
+
   public String getPetId() {
     return petId;
   }
 
   public String getEggName() {
     return eggName;
+  }
+
+  /**
+   * % de progresso [0..100].
+   */
+  public int getProgressPercent() {
+    if (!active || totalTicks <= 0) {
+      return 0;
+    }
+    int done = totalTicks - remainingTicks;
+    if (done <= 0) {
+      return 0;
+    }
+    if (done >= totalTicks) {
+      return 100;
+    }
+    return (done * 100) / totalTicks;
   }
 
   public void startIncubation(PetEgg egg) {
@@ -46,6 +72,7 @@ public class PetIncubator {
     active = true;
     petId = egg.getPetId();
     remainingTicks = egg.getHatchTimeTicks();
+    totalTicks = egg.getHatchTimeTicks(); // NOVO: guarda o total
     eggName = egg.getDisplayName();
   }
 
@@ -83,18 +110,25 @@ public class PetIncubator {
     String msgTemplate = gp.getLanguageManager().text("ui.petYard.hatchCompleted");
     String msg = String.format(msgTemplate, petName);
     gp.getGameUi().addMessage(msg);
+
+    // limpa estado antigo
+    totalTicks = 0;
+    remainingTicks = 0;
+    eggName = null;
+    petId = null;
   }
 
   public void reset() {
     active = false;
     petId = null;
     remainingTicks = 0;
+    totalTicks = 0;
     eggName = null;
   }
 
   /**
    * Restaura o estado da incubação a partir de dados de save.
-   * Se os dados forem inválidos, o incubador é resetado.
+   * Versão antiga (sem totalTicks) – mantém compatibilidade.
    */
   public void restoreFromSave(
       boolean active,
@@ -102,7 +136,22 @@ public class PetIncubator {
       int remainingTicks,
       String eggName) {
 
-    if (!active || petId == null || petId.isBlank() || remainingTicks <= 0) {
+    // Se vier de um save antigo, assume totalTicks = remainingTicks atual.
+    restoreFromSave(active, petId, remainingTicks, eggName, remainingTicks);
+  }
+
+  /**
+   * Nova versão, permitindo informar também o totalTicks.
+   * Se os dados forem inválidos, o incubador é resetado.
+   */
+  public void restoreFromSave(
+      boolean active,
+      String petId,
+      int remainingTicks,
+      String eggName,
+      int totalTicks) {
+
+    if (!active || petId == null || petId.isBlank() || remainingTicks <= 0 || totalTicks <= 0) {
       reset();
       return;
     }
@@ -110,6 +159,7 @@ public class PetIncubator {
     this.active = true;
     this.petId = petId;
     this.remainingTicks = remainingTicks;
+    this.totalTicks = totalTicks;
     this.eggName = eggName;
   }
 }

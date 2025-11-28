@@ -99,6 +99,14 @@ class PetYardUi {
         gp.setGameState(GamePanel.PLAY_STATE);
       }
     }
+
+    // --- Painel da incubadora no canto inferior direito do Pet Yard ---
+    int panelWidth = GamePanel.TILE_SIZE * 6;
+    int panelHeight = GamePanel.TILE_SIZE * 3;
+    int panelX = GamePanel.TILE_SIZE * 3;
+    int panelY = GamePanel.TILE_SIZE * 7;
+
+    drawIncubatorStatusPanel(panelX, panelY, panelWidth, panelHeight);
   }
 
   private void drawPetList() {
@@ -299,6 +307,14 @@ class PetYardUi {
     if (keyH.isEnterPressed()) {
       tryStartIncubation(player, egg, itemIndex);
     }
+
+    // --- Painel da incubadora logo abaixo das informações do ovo ---
+    int panelX = infoX;
+    int panelY = infoY + infoHeight + 16;
+    int panelWidth = infoWidth;
+    int panelHeight = GamePanel.TILE_SIZE * 2;
+
+    drawIncubatorStatusPanel(panelX, panelY, panelWidth, panelHeight);
   }
 
   private void tryStartIncubation(Player player, PetEgg egg, int itemIndex) {
@@ -332,5 +348,138 @@ class PetYardUi {
     String msgTemplate = ui.t("ui.petYard.hatchStarted");
     String msg = String.format(msgTemplate, egg.getDisplayName());
     gp.getGameUi().addMessage(msg);
+  }
+
+  /**
+   * Painel de status da incubadora:
+   * - mostra ovo/pet atual
+   * - tempo restante
+   * - barra de progresso (%)
+   *
+   * Pode ser chamado em qualquer subState do Pet Yard.
+   */
+  private void drawIncubatorStatusPanel(int frameX, int frameY, int frameWidth, int frameHeight) {
+    Graphics2D g2 = ui.g2;
+    GamePanel gp = ui.getGamePanel();
+
+    if (gp == null) {
+      return;
+    }
+
+    PetIncubator incubator = gp.getPetIncubator();
+    if (incubator == null) {
+      return;
+    }
+
+    // Janela base
+    ui.drawSubWindow(frameX, frameY, frameWidth, frameHeight);
+
+    // Fonte padrão da UI
+    Font baseFont = ui.getMaruMonica() != null ? ui.getMaruMonica() : g2.getFont();
+    Font titleFont = baseFont.deriveFont(Font.BOLD, 20F);
+    Font infoFont = baseFont.deriveFont(Font.PLAIN, 16F);
+    Font percentFont = baseFont.deriveFont(Font.BOLD, 14F);
+
+    int padding = 24;
+    int textX = frameX + padding;
+    int textY = frameY + padding;
+
+    // Título da caixa (ex.: "Incubadora")
+    g2.setFont(titleFont);
+    ui.drawTextShadow(
+        ui.t("ui.petYard.incubatorTitle"),
+        textX,
+        textY,
+        UI.COL_TEXT,
+        Color.black,
+        2);
+
+    textY += 24;
+
+    if (!incubator.hasActiveEgg()) {
+      // Sem ovo sendo chocado: mensagem simples
+      g2.setFont(infoFont);
+      g2.setColor(UI.COL_TEXT_DIM);
+      g2.drawString(ui.t("ui.petYard.noEggIncubating"), textX, textY + 8);
+      return;
+    }
+
+    // Há um ovo em progresso
+    String eggName = incubator.getEggName();
+    if (eggName == null || eggName.isBlank()) {
+      // fallback: nome do pet que vai nascer
+      String petId = incubator.getPetId();
+      if (petId != null) {
+        eggName = ui.t(petId + ".name");
+      } else {
+        eggName = ui.t("ui.petYard.unknownEgg");
+      }
+    }
+
+    int remainingTicks = incubator.getRemainingTicks();
+    int totalTicks = incubator.getTotalTicks();
+    int progress = incubator.getProgressPercent();
+
+    int remainingSeconds = Math.max(0, remainingTicks / 60);
+    int remMinutes = remainingSeconds / 60;
+    int remSeconds = remainingSeconds % 60;
+    String timeLabel = ui.t("ui.petYard.timeRemainingLabel"); // ex.: "Tempo restante"
+    String timeText = String.format("%s %02d:%02d", timeLabel, remMinutes, remSeconds);
+
+    // Nome do ovo/pet
+    g2.setFont(infoFont);
+    g2.setColor(UI.COL_TEXT);
+    g2.drawString(eggName, textX, textY + 8);
+
+    // Tempo restante logo abaixo
+    g2.setColor(UI.COL_TEXT_DIM);
+    g2.drawString(timeText, textX, textY + 26);
+
+    // Barra de progresso na parte de baixo da janela
+    int barPaddingX = 24;
+    int barPaddingY = 16;
+    int barWidth = frameWidth - barPaddingX * 2;
+    int barHeight = 18;
+    int barX = frameX + barPaddingX;
+    int barY = frameY + frameHeight - barHeight - barPaddingY;
+
+    // Fundo da barra
+    g2.setColor(new Color(0, 0, 0, 160));
+    g2.fillRoundRect(barX, barY, barWidth, barHeight, 10, 10);
+
+    // Borda da barra
+    g2.setColor(UI.COL_PANEL_BORDER);
+    g2.drawRoundRect(barX, barY, barWidth, barHeight, 10, 10);
+
+    // Parte preenchida
+    if (totalTicks > 0 && progress > 0) {
+      int filledWidth = (barWidth - 4) * progress / 100;
+      g2.setColor(UI.COL_ACCENT);
+      g2.fillRoundRect(barX + 2, barY + 2, filledWidth, barHeight - 4, 8, 8);
+    }
+
+    // Texto da % no centro da barra
+    String percentText = progress + "%";
+    g2.setFont(percentFont);
+    g2.setColor(Color.white);
+    int textWidth = g2.getFontMetrics().stringWidth(percentText);
+    int percentX = barX + (barWidth - textWidth) / 2;
+    int percentY = barY + barHeight - 4;
+    g2.drawString(percentText, percentX, percentY);
+
+    // Ícone do pet (estilo RPG AAA, canto direito da janela)
+    try {
+      if (incubator.getPetId() != null) {
+        BufferedImage icon = PetFactory.getPetIcon(incubator.getPetId(), gp, gp.getPlayer());
+        if (icon != null) {
+          int iconSize = GamePanel.TILE_SIZE;
+          int iconX = frameX + frameWidth - iconSize - 16;
+          int iconY = frameY + 16;
+          g2.drawImage(icon, iconX, iconY, null);
+        }
+      }
+    } catch (Exception e) {
+      // Se der erro ao carregar sprite, ignora só o ícone.
+    }
   }
 }
