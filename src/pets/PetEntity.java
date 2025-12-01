@@ -23,6 +23,73 @@ public abstract class PetEntity extends Entity {
   // Intervalo simples de animação
   private static final int ANIM_INTERVAL = 40;
 
+  // ===== PROGRESSÃO DO PET =====
+  private int petLevel = 1;
+  private int petExp = 0;
+  private int petNextLevelExp = 50;
+  private static final int PET_MAX_LEVEL = 20;
+
+  public int getPetLevel() {
+    return petLevel;
+  }
+
+  public int getPetExp() {
+    return petExp;
+  }
+
+  public int getPetNextLevelExp() {
+    return petNextLevelExp;
+  }
+
+  public int getPetMaxLevel() {
+    return PET_MAX_LEVEL;
+  }
+
+  public void addPetExp(int amount) {
+    if (amount <= 0 || petLevel >= PET_MAX_LEVEL) {
+      return;
+    }
+
+    petExp += amount;
+
+    // Loop de level up (pode subir mais de um nível de uma vez)
+    while (petExp >= petNextLevelExp && petLevel < PET_MAX_LEVEL) {
+      petExp -= petNextLevelExp;
+      petLevel++;
+      petNextLevelExp = computeNextPetLevelExp(petLevel);
+      onPetLevelUp();
+    }
+    syncPetProgressToOwner();
+  }
+
+  /** Curva de XP do pet – quadrática (demora BEM mais nos níveis altos). */
+  protected int computeNextPetLevelExp(int level) {
+    // lvl 1->2: 55, lvl 5->6: 215, lvl 10->11: 1.640, etc.
+    return 40 + level * level * 15;
+  }
+
+  /** Mensagem de level up do pet. */
+  protected void onPetLevelUp() {
+    String petName = getDisplayName();
+    String msg = String.format(t("pet.message.levelUp"), petName, petLevel);
+    gp.getGameUi().addMessage(msg);
+  }
+
+  /** Usado pelo Player para espelhar o progresso em estruturas de save. */
+  protected void syncPetProgressToOwner() {
+    if (getOwner() != null) {
+      getOwner().onPetProgressUpdated(this);
+    }
+  }
+
+  /** Permite restaurar level/XP do save ou do Player. */
+  public void setPetProgress(int level, int exp) {
+    // Faz clamp explícito para garantir que o nível fique entre 1 e PET_MAX_LEVEL
+    this.petLevel = Math.clamp(level, 1, PET_MAX_LEVEL);
+    this.petExp = Math.max(0, exp);
+    this.petNextLevelExp = computeNextPetLevelExp(this.petLevel);
+  }
+
   protected PetEntity(GamePanel gp, Player owner) {
     super(gp);
     this.owner = Objects.requireNonNull(owner, "owner");

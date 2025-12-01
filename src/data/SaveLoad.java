@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -253,9 +254,15 @@ public class SaveLoad {
   private void copyPetsToStorage(DataStorage ds) {
     var player = gp.getPlayer();
 
-    // limpa e copia lista de pets possuídos
     ds.getOwnedPetIds().clear();
-    ds.getOwnedPetIds().addAll(player.getOwnedPets());
+    ds.getPetLevels().clear();
+    ds.getPetExps().clear();
+
+    for (String petId : player.getOwnedPets()) {
+      ds.getOwnedPetIds().add(petId);
+      ds.getPetLevels().add(player.getPetLevelFor(petId));
+      ds.getPetExps().add(player.getPetExpFor(petId));
+    }
 
     // pet ativo (pode ser null)
     ds.setActivePetId(player.getActivePetId());
@@ -265,7 +272,26 @@ public class SaveLoad {
     var player = gp.getPlayer();
 
     player.getOwnedPets().clear();
-    player.getOwnedPets().addAll(ds.getOwnedPetIds());
+    player.clearPetProgress();
+
+    List<String> ids = ds.getOwnedPetIds();
+    List<Integer> levels = ds.getPetLevels();
+    List<Integer> exps = ds.getPetExps();
+
+    int size = ids.size();
+    for (int i = 0; i < size; i++) {
+      String petId = ids.get(i);
+      if (petId == null || petId.isBlank()) {
+        continue;
+      }
+
+      player.addOwnedPet(petId);
+
+      int lvl = (i < levels.size()) ? levels.get(i) : 1;
+      int xp = (i < exps.size()) ? exps.get(i) : 0;
+
+      player.restorePetProgress(petId, lvl, xp);
+    }
 
     String activeId = ds.getActivePetId();
     if (activeId != null && !activeId.isBlank() && player.getOwnedPets().contains(activeId)) {
@@ -282,6 +308,7 @@ public class SaveLoad {
       ds.setIncubatorPetId(null);
       ds.setIncubatorRemainingTicks(0);
       ds.setIncubatorEggName(null);
+      ds.setIncubatorTotalTicks(0);
       return;
     }
 
@@ -292,10 +319,12 @@ public class SaveLoad {
       ds.setIncubatorPetId(incubator.getPetId());
       ds.setIncubatorRemainingTicks(incubator.getRemainingTicks());
       ds.setIncubatorEggName(incubator.getEggName());
+      ds.setIncubatorTotalTicks(incubator.getTotalTicks());
     } else {
       ds.setIncubatorPetId(null);
       ds.setIncubatorRemainingTicks(0);
       ds.setIncubatorEggName(null);
+      ds.setIncubatorTotalTicks(0);
     }
   }
 
@@ -309,6 +338,7 @@ public class SaveLoad {
         ds.isIncubatorActive(),
         ds.getIncubatorPetId(),
         ds.getIncubatorRemainingTicks(),
-        ds.getIncubatorEggName());
+        ds.getIncubatorEggName(),
+        ds.getIncubatorTotalTicks());
   }
 }

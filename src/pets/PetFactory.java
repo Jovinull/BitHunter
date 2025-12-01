@@ -19,9 +19,14 @@ public final class PetFactory {
     // utilitário estático
   }
 
-  // IDs estáveis – use sempre essas constantes
-  public static final String PET_YELLOW_SNAIL = "pet.yellowSnail";
-  public static final String PET_GREEN_SNAIL = "pet.greenSnail";
+  /**
+   * IDs estáveis – use sempre essas constantes.
+   *
+   * Elas apontam para as constantes ID de cada classe de Pet,
+   * evitando duplicar as strings em vários lugares.
+   */
+  public static final String PET_YELLOW_SNAIL = YellowSnail.ID;
+  public static final String PET_GREEN_SNAIL = GreenSnail.ID;
 
   public static PetEntity createPet(String petId, GamePanel gp, Player owner) {
     if (petId == null || gp == null || owner == null) {

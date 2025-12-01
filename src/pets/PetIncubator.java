@@ -17,7 +17,7 @@ public class PetIncubator {
   private String petId;
   private int remainingTicks;
 
-  // NOVO: tempo total pra calcular % de progresso e tempo restante
+  // tempo total pra calcular % de progresso e tempo restante
   private int totalTicks;
 
   private String eggName;
@@ -34,7 +34,6 @@ public class PetIncubator {
     return remainingTicks;
   }
 
-  // NOVO: expor o total para UI
   public int getTotalTicks() {
     return totalTicks;
   }
@@ -72,7 +71,7 @@ public class PetIncubator {
     active = true;
     petId = egg.getPetId();
     remainingTicks = egg.getHatchTimeTicks();
-    totalTicks = egg.getHatchTimeTicks(); // NOVO: guarda o total
+    totalTicks = egg.getHatchTimeTicks();
     eggName = egg.getDisplayName();
   }
 

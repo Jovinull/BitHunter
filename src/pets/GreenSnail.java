@@ -17,11 +17,24 @@ import main.GamePanel;
  */
 public class GreenSnail extends PetEntity {
 
+  /**
+   * ID lógico estável do PET.
+   *
+   * Este ID é usado como:
+   * - internalId da entidade (save/load, Player, DataStorage)
+   * - chave em PetFactory.PET_GREEN_SNAIL
+   * - chave em ownedPets / petLevels / petExps
+   */
+  public static final String ID = "pet.greenSnail";
+
   private static final int BASE_SPEED = 4;
 
-  // Mana: 1 de MP a cada X ticks
-  private static final int MANA_INTERVAL_TICKS = 1800;
-  private static final int MANA_AMOUNT = 1;
+  // Intervalo base e mínimo (em ticks)
+  private static final int BASE_MANA_INTERVAL_TICKS = 60 * 60; // 60s no nível 1
+  private static final int MIN_MANA_INTERVAL_TICKS = 15 * 60; // 15s no nível máximo
+
+  // Mana base por proc
+  private static final int BASE_MANA_AMOUNT = 1;
 
   // Duração do brilho (frames)
   private static final int MANA_GLOW_DURATION_TICKS = 30;
@@ -35,8 +48,9 @@ public class GreenSnail extends PetEntity {
   public GreenSnail(GamePanel gp, Player owner) {
     super(gp, owner);
 
-    setInternalId("pet.greenSnail");
-    setTranslationKey("pet.greenSnail");
+    // Usa sempre a constante ID, nada de string solta
+    setInternalId(ID);
+    setTranslationKey(ID);
 
     setSpeed(BASE_SPEED);
     setDefaultSpeed(BASE_SPEED);
@@ -80,13 +94,13 @@ public class GreenSnail extends PetEntity {
     Player player = getOwner();
 
     if (player.getMana() >= player.getMaxMana()) {
-      // mana cheia, não acumula contador
       manaCounter = 0;
       return;
     }
 
     manaCounter++;
-    if (manaCounter < MANA_INTERVAL_TICKS) {
+    int interval = getEffectiveManaInterval();
+    if (manaCounter < interval) {
       return;
     }
 
@@ -95,21 +109,37 @@ public class GreenSnail extends PetEntity {
     int currentMana = player.getMana();
     int maxMana = player.getMaxMana();
 
-    int effectiveRestore = Math.min(MANA_AMOUNT, maxMana - currentMana);
+    int restoreAmount = getEffectiveManaAmount();
+    int effectiveRestore = Math.min(restoreAmount, maxMana - currentMana);
     if (effectiveRestore <= 0) {
       return;
     }
 
-    // Aplica regeneração de mana
     player.setMana(currentMana + effectiveRestore);
 
-    // Brilho por alguns frames
     manaGlowCounter = MANA_GLOW_DURATION_TICKS;
 
-    // Mensagem no log (usando key específica de mana)
     String petName = getDisplayName();
     String msg = String.format(t("pet.message.mana"), petName, effectiveRestore);
     gp.getGameUi().addMessage(msg);
+  }
+
+  /** Intervalo efetivo do proc de mana, dependente do nível do pet. */
+  private int getEffectiveManaInterval() {
+    int level = getPetLevel(); // vem de PetEntity
+    int maxLvl = getPetMaxLevel();
+
+    int range = BASE_MANA_INTERVAL_TICKS - MIN_MANA_INTERVAL_TICKS;
+    int steps = Math.max(1, maxLvl - 1);
+
+    int reduction = range * (level - 1) / steps;
+    return BASE_MANA_INTERVAL_TICKS - reduction;
+  }
+
+  /** Quantidade de mana restaurada por proc. */
+  private int getEffectiveManaAmount() {
+    // 1 MP nos níveis 1–4, 2 nos 5–9, 3 nos 10–14, 4 nos 15+
+    return BASE_MANA_AMOUNT + (getPetLevel() - 1) / 5;
   }
 
   // -------- Partículas específicas da GreenSnail --------

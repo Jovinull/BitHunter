@@ -10,9 +10,9 @@ public class GreenSnailEgg extends PetEgg {
 
   public static final String OBJ_ID = "egg.greenSnail";
 
-  private static final int HATCH_TIME_SECONDS = 60;
+  private static final int HATCH_TIME_SECONDS = 6;
   private static final int HATCH_TIME_TICKS = HATCH_TIME_SECONDS * 60;
-  private static final int HATCH_COST = 80;
+  private static final int HATCH_COST = 4;
 
   public GreenSnailEgg(GamePanel gp) {
     super(gp, PetFactory.PET_GREEN_SNAIL, HATCH_TIME_TICKS, HATCH_COST);

@@ -10,6 +10,7 @@ import entity.Entity;
 import entity.Player;
 import main.GamePanel;
 import pets.PetEgg;
+import pets.PetEntity;
 import pets.PetFactory;
 import pets.PetIncubator;
 
@@ -114,6 +115,7 @@ class PetYardUi {
     GamePanel gp = ui.getGamePanel();
     Player player = gp.getPlayer();
     List<String> pets = player.getOwnedPets();
+    PetEntity activePet = player.getPet();
 
     int frameX = GamePanel.TILE_SIZE * 2;
     int frameY = GamePanel.TILE_SIZE;
@@ -166,10 +168,18 @@ class PetYardUi {
       }
 
       String name = ui.t(petId + ".name");
+
+      // Se este for o pet ativo, mostra o level dele ao lado
+      String label = name;
+      if (activePet != null && petId.equals(activePet.getInternalId())) {
+        int level = activePet.getPetLevel();
+        label = name + " (Lv. " + level + ")";
+      }
+
       g2.setFont(titleFont);
       g2.setColor(selected ? UI.COL_ACCENT : UI.COL_TEXT);
       int textX = rowX + GamePanel.TILE_SIZE + 12;
-      g2.drawString(name, textX, itemY);
+      g2.drawString(label, textX, itemY);
 
       if (petId.equals(player.getActivePetId())) {
         g2.setColor(UI.COL_TEXT_DIM);
@@ -178,7 +188,7 @@ class PetYardUi {
       }
     }
 
-    // descrição do pet selecionado
+    // descrição + XP do pet selecionado
     int descX = frameX + 24;
     int descY = frameY + frameHeight - GamePanel.TILE_SIZE * 2;
     int descWidth = frameWidth - 48;
@@ -189,10 +199,57 @@ class PetYardUi {
       String petId = pets.get(ui.getCommandNum());
       String desc = ui.t(petId + ".desc");
 
+      int textY = descY;
+
+      // Se o pet selecionado for o pet ativo, exibe Lv + barra de XP
+      if (activePet != null && petId.equals(activePet.getInternalId())) {
+        int level = activePet.getPetLevel();
+        int exp = activePet.getPetExp();
+        int next = activePet.getPetNextLevelExp();
+
+        g2.setFont(descFont);
+        g2.setColor(UI.COL_ACCENT);
+        g2.drawString("Lv. " + level, descX, textY);
+        textY += 20;
+
+        // Barra de XP
+        int barWidth = descWidth - 40;
+        int barHeight = 10;
+        int barX = descX;
+        int barY = textY + 4;
+
+        double ratio = (next > 0) ? Math.min(1.0, exp / (double) next) : 0.0;
+        int filled = (int) (barWidth * ratio);
+
+        g2.setColor(new Color(0, 0, 0, 160));
+        g2.fillRoundRect(barX, barY, barWidth, barHeight, 6, 6);
+        g2.setColor(UI.COL_PANEL_BORDER);
+        g2.drawRoundRect(barX, barY, barWidth, barHeight, 6, 6);
+
+        if (filled > 0) {
+          g2.setColor(UI.COL_ACCENT);
+          g2.fillRoundRect(barX + 2, barY + 2, filled - 4, barHeight - 4, 4, 4);
+        }
+
+        // Texto XP abaixo da barra
+        String xpText = "XP " + exp + " / " + next;
+        g2.setFont(descFont.deriveFont(14F));
+        g2.setColor(UI.COL_TEXT_DIM);
+        g2.drawString(xpText, barX, barY + barHeight + 14);
+
+        textY = barY + barHeight + 30;
+      } else {
+        // Pet não está ativo -> mensagem simples
+        g2.setFont(descFont.deriveFont(14F));
+        g2.setColor(UI.COL_TEXT_DIM);
+        g2.drawString(ui.t("ui.petYard.inactivePetHint"), descX, textY);
+        textY += 24;
+      }
+
+      // Descrição do pet logo abaixo
       g2.setFont(descFont);
       g2.setColor(UI.COL_TEXT);
 
-      int textY = descY;
       for (String line : desc.split("\n")) {
         g2.drawString(line, descX, textY);
         textY += 22;

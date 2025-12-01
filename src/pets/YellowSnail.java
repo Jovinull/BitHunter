@@ -16,11 +16,24 @@ import main.GamePanel;
  */
 public class YellowSnail extends PetEntity {
 
+  /**
+   * ID lógico estável do PET.
+   *
+   * Este ID é usado como:
+   * - internalId da entidade (save/load, Player, DataStorage)
+   * - chave em PetFactory.PET_YELLOW_SNAIL
+   * - chave em ownedPets / petLevels / petExps
+   */
+  public static final String ID = "pet.yellowSnail";
+
   private static final int BASE_SPEED = 4;
 
-  // Cura: 1 de HP a cada X ticks
-  private static final int HEAL_INTERVAL_TICKS = 1800;
-  private static final int HEAL_AMOUNT = 1;
+  // Intervalo base e mínimo (em ticks)
+  private static final int BASE_HEAL_INTERVAL_TICKS = 60 * 60; // 60s no nível 1
+  private static final int MIN_HEAL_INTERVAL_TICKS = 15 * 60; // 15s no nível máximo
+
+  // Cura base por proc
+  private static final int BASE_HEAL_AMOUNT = 1;
 
   // Duração do brilho verde (frames)
   private static final int HEAL_GLOW_DURATION_TICKS = 30;
@@ -34,8 +47,9 @@ public class YellowSnail extends PetEntity {
   public YellowSnail(GamePanel gp, Player owner) {
     super(gp, owner);
 
-    setInternalId("pet.yellowSnail");
-    setTranslationKey("pet.yellowSnail");
+    // Usa sempre a constante ID, nada de string solta
+    setInternalId(ID);
+    setTranslationKey(ID);
 
     setSpeed(BASE_SPEED);
     setDefaultSpeed(BASE_SPEED);
@@ -85,7 +99,8 @@ public class YellowSnail extends PetEntity {
     }
 
     healCounter++;
-    if (healCounter < HEAL_INTERVAL_TICKS) {
+    int interval = getEffectiveHealInterval();
+    if (healCounter < interval) {
       return;
     }
 
@@ -94,7 +109,8 @@ public class YellowSnail extends PetEntity {
     int currentLife = player.getLife();
     int maxLife = player.getMaxLife();
 
-    int effectiveHeal = Math.min(HEAL_AMOUNT, maxLife - currentLife);
+    int healAmount = getEffectiveHealAmount();
+    int effectiveHeal = Math.min(healAmount, maxLife - currentLife);
     if (effectiveHeal <= 0) {
       return;
     }
@@ -109,6 +125,24 @@ public class YellowSnail extends PetEntity {
     String petName = getDisplayName();
     String msg = String.format(t("pet.message.heal"), petName, effectiveHeal);
     gp.getGameUi().addMessage(msg);
+  }
+
+  /** Intervalo efetivo da cura, dependente do nível do pet. */
+  private int getEffectiveHealInterval() {
+    int level = getPetLevel();
+    int maxLvl = getPetMaxLevel();
+
+    int range = BASE_HEAL_INTERVAL_TICKS - MIN_HEAL_INTERVAL_TICKS;
+    int steps = Math.max(1, maxLvl - 1);
+
+    int reduction = range * (level - 1) / steps;
+    return BASE_HEAL_INTERVAL_TICKS - reduction;
+  }
+
+  /** Quantidade de HP curada por proc. */
+  private int getEffectiveHealAmount() {
+    // 1 HP nos níveis 1–4, 2 nos 5–9, 3 nos 10–14, 4 nos 15+
+    return BASE_HEAL_AMOUNT + (getPetLevel() - 1) / 5;
   }
 
   // -------- Partículas específicas da YellowSnail --------

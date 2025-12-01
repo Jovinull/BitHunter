@@ -33,11 +33,16 @@ public class DataStorage implements Serializable {
   private final List<String> ownedPetIds = new ArrayList<>();
   private String activePetId;
 
+  // nível e xp na mesma ordem de ownedPetIds
+  private final List<Integer> petLevels = new ArrayList<>();
+  private final List<Integer> petExps = new ArrayList<>();
+
   // ===== PET INCUBATOR =====
   private boolean incubatorActive;
   private String incubatorPetId;
   private int incubatorRemainingTicks;
   private String incubatorEggName;
+  private int incubatorTotalTicks;
 
   // OBJECT ON MAP
   private String[][] mapObjectNames;
@@ -210,6 +215,14 @@ public class DataStorage implements Serializable {
     this.activePetId = activePetId;
   }
 
+  public List<Integer> getPetLevels() {
+    return petLevels;
+  }
+
+  public List<Integer> getPetExps() {
+    return petExps;
+  }
+
   public boolean isIncubatorActive() {
     return incubatorActive;
   }
@@ -240,5 +253,13 @@ public class DataStorage implements Serializable {
 
   public void setIncubatorEggName(String incubatorEggName) {
     this.incubatorEggName = incubatorEggName;
+  }
+
+  public int getIncubatorTotalTicks() {
+    return incubatorTotalTicks;
+  }
+
+  public void setIncubatorTotalTicks(int incubatorTotalTicks) {
+    this.incubatorTotalTicks = incubatorTotalTicks;
   }
 }
