@@ -99,7 +99,7 @@ public class YellowSnail extends PetEntity {
     }
 
     healCounter++;
-    int interval = getEffectiveHealInterval();
+    int interval = getEffectiveHealIntervalTicks();
     if (healCounter < interval) {
       return;
     }
@@ -127,8 +127,12 @@ public class YellowSnail extends PetEntity {
     gp.getGameUi().addMessage(msg);
   }
 
-  /** Intervalo efetivo da cura, dependente do nível do pet. */
-  private int getEffectiveHealInterval() {
+  /**
+   * Intervalo efetivo da cura, dependente do nível do pet (em ticks).
+   *
+   * Exposto publicamente para a UI mostrar os valores.
+   */
+  public int getEffectiveHealIntervalTicks() {
     int level = getPetLevel();
     int maxLvl = getPetMaxLevel();
 
@@ -139,8 +143,12 @@ public class YellowSnail extends PetEntity {
     return BASE_HEAL_INTERVAL_TICKS - reduction;
   }
 
-  /** Quantidade de HP curada por proc. */
-  private int getEffectiveHealAmount() {
+  /**
+   * Quantidade de HP curada por proc.
+   *
+   * Exposto publicamente para a UI mostrar os valores.
+   */
+  public int getEffectiveHealAmount() {
     // 1 HP nos níveis 1–4, 2 nos 5–9, 3 nos 10–14, 4 nos 15+
     return BASE_HEAL_AMOUNT + (getPetLevel() - 1) / 5;
   }

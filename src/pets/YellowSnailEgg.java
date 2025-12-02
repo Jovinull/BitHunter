@@ -10,7 +10,6 @@ public class YellowSnailEgg extends PetEgg {
 
   public static final String OBJ_ID = "egg.yellowSnail";
 
-  // 20 segundos para chocar, a 60 FPS
   private static final int HATCH_TIME_SECONDS = 600;
   private static final int HATCH_TIME_TICKS = HATCH_TIME_SECONDS * 60;
   private static final int HATCH_COST = 400;

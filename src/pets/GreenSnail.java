@@ -99,7 +99,7 @@ public class GreenSnail extends PetEntity {
     }
 
     manaCounter++;
-    int interval = getEffectiveManaInterval();
+    int interval = getEffectiveManaIntervalTicks();
     if (manaCounter < interval) {
       return;
     }
@@ -124,8 +124,12 @@ public class GreenSnail extends PetEntity {
     gp.getGameUi().addMessage(msg);
   }
 
-  /** Intervalo efetivo do proc de mana, dependente do nível do pet. */
-  private int getEffectiveManaInterval() {
+  /**
+   * Intervalo efetivo do proc de mana, dependente do nível do pet (em ticks).
+   *
+   * Exposto publicamente para a UI.
+   */
+  public int getEffectiveManaIntervalTicks() {
     int level = getPetLevel(); // vem de PetEntity
     int maxLvl = getPetMaxLevel();
 
@@ -136,8 +140,12 @@ public class GreenSnail extends PetEntity {
     return BASE_MANA_INTERVAL_TICKS - reduction;
   }
 
-  /** Quantidade de mana restaurada por proc. */
-  private int getEffectiveManaAmount() {
+  /**
+   * Quantidade de mana restaurada por proc.
+   *
+   * Exposto publicamente para a UI.
+   */
+  public int getEffectiveManaAmount() {
     // 1 MP nos níveis 1–4, 2 nos 5–9, 3 nos 10–14, 4 nos 15+
     return BASE_MANA_AMOUNT + (getPetLevel() - 1) / 5;
   }
