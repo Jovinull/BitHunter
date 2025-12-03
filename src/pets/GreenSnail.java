@@ -226,4 +226,13 @@ public class GreenSnail extends PetEntity {
       default -> down;
     };
   }
+
+  @Override
+  public String buildPetStatsLineForUi() {
+    int manaAmount = getEffectiveManaAmount();
+    int manaIntervalSec = getEffectiveManaIntervalTicks() / 60;
+
+    String template = t("ui.petYard.stats.mana"); // ex.: "Recupera %d MP a cada %ds"
+    return String.format(template, manaAmount, manaIntervalSec);
+  }
 }

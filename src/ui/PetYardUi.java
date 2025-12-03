@@ -9,12 +9,10 @@ import java.util.List;
 import entity.Entity;
 import entity.Player;
 import main.GamePanel;
-import pets.GreenSnail;
 import pets.PetEgg;
 import pets.PetEntity;
 import pets.PetFactory;
 import pets.PetIncubator;
-import pets.YellowSnail;
 
 /**
  * Tela de gerenciamento de pets (Pet Yard).
@@ -367,21 +365,12 @@ class PetYardUi {
 
       textY = barY + barHeight + 30;
 
-      // ---- Stats numéricos específicos do pet ativo ----
-      g2.setFont(descFont);
-      g2.setColor(UI.COL_TEXT);
-
-      if (activePet instanceof YellowSnail ys) {
-        int healAmount = ys.getEffectiveHealAmount();
-        int healIntervalSec = ys.getEffectiveHealIntervalTicks() / 60;
-        String line = String.format(ui.t("ui.petYard.stats.heal"), healAmount, healIntervalSec);
-        g2.drawString(line, textX, textY);
-        textY += 22;
-      } else if (activePet instanceof GreenSnail gs) {
-        int manaAmount = gs.getEffectiveManaAmount();
-        int manaIntervalSec = gs.getEffectiveManaIntervalTicks() / 60;
-        String line = String.format(ui.t("ui.petYard.stats.mana"), manaAmount, manaIntervalSec);
-        g2.drawString(line, textX, textY);
+      // ---- Stats numéricos específicos do pet ativo (delegados ao próprio Pet) ----
+      String statsLine = activePet.buildPetStatsLineForUi();
+      if (statsLine != null && !statsLine.isBlank()) {
+        g2.setFont(descFont);
+        g2.setColor(UI.COL_TEXT);
+        g2.drawString(statsLine, textX, textY);
         textY += 22;
       }
 
@@ -440,12 +429,15 @@ class PetYardUi {
     }
 
     Entity item = player.getInventory().get(itemIndex);
-    if (!(item instanceof PetEgg egg)) {
+
+    if (item == null || item.getType() != Entity.TYPE_EGG) {
       g2.setColor(UI.COL_TEXT_DIM);
       g2.setFont(descFont);
       g2.drawString(ui.t("ui.petYard.eggInvalid"), infoX + 24, infoY + 64);
       return;
     }
+
+    PetEgg egg = (PetEgg) item;
 
     // detalhes do ovo válido selecionado
     String eggName = egg.getDisplayName();

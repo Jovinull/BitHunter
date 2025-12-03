@@ -229,4 +229,13 @@ public class YellowSnail extends PetEntity {
       default -> down;
     };
   }
+
+  @Override
+  public String buildPetStatsLineForUi() {
+    int healAmount = getEffectiveHealAmount();
+    int healIntervalSec = getEffectiveHealIntervalTicks() / 60;
+
+    String template = t("ui.petYard.stats.heal");
+    return String.format(template, healAmount, healIntervalSec);
+  }
 }

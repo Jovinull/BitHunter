@@ -149,4 +149,16 @@ public abstract class PetEntity extends Entity {
   public Player getOwner() {
     return owner;
   }
+
+  /**
+   * Texto de stats para exibição em telas de UI (por exemplo, Pet Yard).
+   *
+   * Implementações concretas podem sobrescrever para retornar uma linha
+   * como "Cura 3 HP a cada 20s" ou "Recupera 2 MP a cada 15s".
+   *
+   * Retorne null ou string vazia quando não houver stats específicos.
+   */
+  public String buildPetStatsLineForUi() {
+    return null;
+  }
 }
