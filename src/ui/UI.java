@@ -91,6 +91,7 @@ public class UI {
   private final TransitionUi transitionUi;
   private final CharacterUi characterUi;
   private final GameOverUi gameOverUi;
+  private final PetYardUi petYardUi;
 
   public UI(GamePanel gp) {
     this.gp = gp;
@@ -134,6 +135,7 @@ public class UI {
     transitionUi = new TransitionUi(this);
     characterUi = new CharacterUi(this);
     gameOverUi = new GameOverUi(this);
+    petYardUi = new PetYardUi(this, inventoryUi);
   }
 
   // ---- Helper de tradução ----
@@ -196,6 +198,7 @@ public class UI {
     if (state == GamePanel.PLAY_STATE) {
       hudUi.drawXpTopBar();
       hudUi.drawPlayerLife();
+      hudUi.drawPetHud();
       hudUi.drawMonsterLife();
       hudUi.drawMessage();
     } else if (state == GamePanel.PAUSE_STATE) {
@@ -215,6 +218,8 @@ public class UI {
       transitionUi.drawTransition();
     } else if (state == GamePanel.TRADE_STATE) {
       tradeUi.drawTradeScreen();
+    } else if (state == GamePanel.PET_YARD_STATE) {
+      petYardUi.drawPetYardScreen();
     } else if (state == GamePanel.SLEEP_STATE) {
       transitionUi.drawSleepScreen();
     }

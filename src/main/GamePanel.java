@@ -22,6 +22,7 @@ import data.SaveLoad;
 import entity.Entity;
 import entity.Player;
 import environment.EnvironmentManager;
+import pets.PetIncubator;
 import tile.Map;
 import tile.TileManager;
 import tile_interactive.InteractiveTile;
@@ -77,6 +78,7 @@ public class GamePanel extends JPanel implements Runnable {
   transient SaveLoad saveLoad = new SaveLoad(this);
   private transient EntityGenerator eGenerator = new EntityGenerator(this);
   private transient CutsceneManager csManager = new CutsceneManager(this);
+  private transient PetIncubator petIncubator = new PetIncubator(this);
   transient Thread gameThread; // Thread para rodar o loop do jogo
 
   // ENTITY AND OBJECTS
@@ -103,6 +105,7 @@ public class GamePanel extends JPanel implements Runnable {
   public static final int SLEEP_STATE = 9;
   public static final int MAP_STATE = 10;
   public static final int CUTSCENE_STATE = 11;
+  public static final int PET_YARD_STATE = 12;
 
   // others
   private boolean bossBattleOn = false;
@@ -237,6 +240,7 @@ public class GamePanel extends JPanel implements Runnable {
     updateParticles();
     updateInteractiveTiles();
     eManager.update();
+    petIncubator.update();
   }
 
   private void updatePlayer() {
@@ -641,5 +645,9 @@ public class GamePanel extends JPanel implements Runnable {
 
   public SaveLoad getSaveLoad() {
     return saveLoad;
+  }
+
+  public PetIncubator getPetIncubator() {
+    return petIncubator;
   }
 }

@@ -5,6 +5,7 @@ import entity.Entity;
 import entity.NpcBigRock;
 import entity.NpcMerchant;
 import entity.NpcOldMan;
+import entity.NpcPetYardKeeper;
 import monster.MonBat;
 import monster.MonGreenSlime;
 import monster.MonOrc;
@@ -121,7 +122,10 @@ public class AssetSetter {
 
     // MAP WORLD
     npcs[mapNum][i] = new NpcOldMan(gp);
-    place(npcs[mapNum][i], 21, 21);
+    place(npcs[mapNum][i++], 21, 21);
+
+    npcs[mapNum][i] = new NpcPetYardKeeper(gp);
+    place(npcs[mapNum][i], 22, 25);
 
     // MAP HOUSE
     mapNum = MAP_HOUSE;

@@ -19,6 +19,8 @@ import object.ObjShieldBlue;
 import object.ObjShieldWood;
 import object.ObjSwordNormal;
 import object.ObjTent;
+import pets.GreenSnailEgg;
+import pets.YellowSnailEgg;
 
 public class EntityGenerator {
 
@@ -126,6 +128,16 @@ public class EntityGenerator {
       // Tenda
       case ObjTent.OBJ_ID:
         obj = new ObjTent(gp);
+        break;
+
+      // Ovo do Caracol Amarelo
+      case YellowSnailEgg.OBJ_ID:
+        obj = new YellowSnailEgg(gp);
+        break;
+
+      // Ovo do Caracol Verde
+      case GreenSnailEgg.OBJ_ID:
+        obj = new GreenSnailEgg(gp);
         break;
 
       default:

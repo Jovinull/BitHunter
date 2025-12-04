@@ -79,6 +79,12 @@ public class KeyHandler implements KeyListener {
     if (state == GamePanel.TRADE_STATE) {
       tradeState(key);
     }
+
+    if (state == GamePanel.PET_YARD_STATE) {
+      petYardState(key);
+      return;
+    }
+
     if (state == GamePanel.MAP_STATE) {
       mapState(key);
     }
@@ -121,6 +127,99 @@ public class KeyHandler implements KeyListener {
         gp.playMusic(0);
       }
       case 2 -> System.exit(0); // Sair
+      default -> {
+        // noop
+      }
+    }
+  }
+
+  /**
+   * Estado: Pet Yard (gerenciador de pets).
+   */
+  public void petYardState(int code) {
+    if (code == KeyEvent.VK_ENTER) {
+      enterPressed = true;
+      return;
+    }
+
+    var ui = gp.getGameUi();
+
+    switch (ui.getSubState()) {
+      case 0 -> handlePetYardMenuNavigation(code);
+      case 1 -> handlePetListNavigation(code);
+      case 2 -> {
+        playerInventory(code);
+        if (code == KeyEvent.VK_ESCAPE) {
+          ui.setSubState(0);
+        }
+      }
+      default -> {
+        // noop
+      }
+    }
+  }
+
+  private void handlePetYardMenuNavigation(int code) {
+    var ui = gp.getGameUi();
+
+    switch (code) {
+      case KeyEvent.VK_W -> {
+        int commandNum = ui.getCommandNum();
+        commandNum--;
+        if (commandNum < 0) {
+          commandNum = 2;
+        }
+        ui.setCommandNum(commandNum);
+        gp.playSE(9);
+      }
+      case KeyEvent.VK_S -> {
+        int commandNum = ui.getCommandNum();
+        commandNum++;
+        if (commandNum > 2) {
+          commandNum = 0;
+        }
+        ui.setCommandNum(commandNum);
+        gp.playSE(9);
+      }
+      case KeyEvent.VK_ESCAPE -> gp.setGameState(GamePanel.PLAY_STATE);
+      default -> {
+        // noop
+      }
+    }
+  }
+
+  private void handlePetListNavigation(int code) {
+    var ui = gp.getGameUi();
+    var player = gp.getPlayer();
+    int petCount = player.getOwnedPets().size();
+
+    if (petCount <= 0) {
+      if (code == KeyEvent.VK_ESCAPE) {
+        ui.setSubState(0);
+      }
+      return;
+    }
+
+    int commandNum = ui.getCommandNum();
+
+    switch (code) {
+      case KeyEvent.VK_W -> {
+        commandNum--;
+        if (commandNum < 0) {
+          commandNum = petCount - 1;
+        }
+        ui.setCommandNum(commandNum);
+        gp.playSE(9);
+      }
+      case KeyEvent.VK_S -> {
+        commandNum++;
+        if (commandNum > petCount - 1) {
+          commandNum = 0;
+        }
+        ui.setCommandNum(commandNum);
+        gp.playSE(9);
+      }
+      case KeyEvent.VK_ESCAPE -> ui.setSubState(0);
       default -> {
         // noop
       }

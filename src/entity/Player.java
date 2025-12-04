@@ -5,6 +5,10 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import main.GamePanel;
 import main.KeyHandler;
@@ -13,6 +17,10 @@ import object.ObjKey;
 import object.ObjLantern;
 import object.ObjShieldWood;
 import object.ObjSwordNormal;
+import pets.GreenSnailEgg;
+import pets.PetEntity;
+import pets.PetFactory;
+import pets.YellowSnailEgg;
 import tile_interactive.InteractiveTile;
 
 public class Player extends Entity {
@@ -27,10 +35,25 @@ public class Player extends Entity {
   private boolean lightUpdated = false;
   private boolean debugCollision = false;
 
+  private PetEntity pet;
+
+  private final List<String> ownedPets = new ArrayList<>();
+  private String activePetId;
+
+  // progresso dos pets por ID
+  private final Map<String, Integer> petLevels = new HashMap<>();
+  private final Map<String, Integer> petExps = new HashMap<>();
+
   private int guardStamina;
   private int maxGuardStamina;
   private int guardStaminaRecoveryCounter = 0;
   private int guardReleaseCounter = 0;
+
+  // % da XP do monstro que vai para o pet (2% na sua config)
+  private static final int PET_XP_PERCENT = 2;
+
+  // contador para XP passivo do pet com o tempo
+  private int petTimeCounter = 0;
 
   private static final int GUARD_STAMINA_DRAIN_INTERVAL = 4;
   private static final int GUARD_STAMINA_DRAIN_AMOUNT = 1;
@@ -99,6 +122,7 @@ public class Player extends Entity {
     getGuardImage();
     setItems();
     setDialogue();
+    initDefaultPet();
   }
 
   public void setDefaultPositions() {
@@ -106,6 +130,11 @@ public class Player extends Entity {
     setWorldX(GamePanel.TILE_SIZE * 23);
     setWorldY(GamePanel.TILE_SIZE * 21);
     setDirection(DIR_DOWN);
+
+    if (pet != null) {
+      pet.setWorldX(getWorldX() - GamePanel.TILE_SIZE);
+      pet.setWorldY(getWorldY());
+    }
   }
 
   public void setDialogue() {
@@ -134,6 +163,8 @@ public class Player extends Entity {
     inv.add(getCurrentShield());
     inv.add(new ObjKey(gp));
     inv.add(new ObjLantern(gp));
+    inv.add(new YellowSnailEgg(gp));
+    inv.add(new GreenSnailEgg(gp));
   }
 
   public void recalculateSpeedFromEquipment() {
@@ -316,6 +347,11 @@ public class Player extends Entity {
     clampVitals();
     handleDeath();
     handleGuardStaminaRegeneration();
+    handlePetTimeExp();
+
+    if (pet != null) {
+      pet.update();
+    }
   }
 
   private boolean hasActiveShield() {
@@ -619,6 +655,7 @@ public class Player extends Entity {
 
         setExp(getExp() + mon.getExp());
         checkLevelUp();
+        grantPetExp(mon.getExp());
       }
     }
   }
@@ -840,6 +877,10 @@ public class Player extends Entity {
     int tempScreenX = screenX;
     int tempScreenY = screenY;
 
+    if (pet != null) {
+      pet.draw(g2);
+    }
+
     // Ajuste de posição para ataques UP/LEFT
     if (isAttacking()) {
       if (DIR_UP.equals(getDirection())) {
@@ -987,6 +1028,35 @@ public class Player extends Entity {
     return hasActiveShield() && getGuardStamina() > 0;
   }
 
+  private void handlePetTimeExp() {
+    if (pet == null) {
+      petTimeCounter = 0;
+      return;
+    }
+
+    petTimeCounter++;
+    // 1 XP de tempo a cada ~10s (600 ticks em 60 FPS)
+    if (petTimeCounter >= 600) {
+      petTimeCounter = 0;
+      pet.addPetExp(1);
+    }
+  }
+
+  private void initDefaultPet() {
+    // garante que o Caracol Amarelo esteja na coleção inicial do jogador
+    if (ownedPets.isEmpty()) {
+      addOwnedPet(PetFactory.PET_YELLOW_SNAIL);
+    }
+
+    // se ainda não existir um pet ativo, equipa o padrão
+    if (activePetId == null) {
+      equipPetById(PetFactory.PET_YELLOW_SNAIL);
+    } else {
+      // reconstroi a instância a partir do id salvo (savegame, etc.)
+      equipPetById(activePetId);
+    }
+  }
+
   // ===== Accessors =====
   public boolean isAttackCanceled() {
     return attackCanceled;
@@ -1026,5 +1096,128 @@ public class Player extends Entity {
 
   public void setMaxGuardStamina(int maxGuardStamina) {
     this.maxGuardStamina = maxGuardStamina;
+  }
+
+  public PetEntity getPet() {
+    return pet;
+  }
+
+  public List<String> getOwnedPets() {
+    return ownedPets;
+  }
+
+  public void addOwnedPet(String petId) {
+    if (petId == null || petId.isBlank()) {
+      return;
+    }
+    if (!ownedPets.contains(petId)) {
+      ownedPets.add(petId);
+    }
+    // valores padrão de progresso, caso ainda não exista
+    petLevels.putIfAbsent(petId, 1);
+    petExps.putIfAbsent(petId, 0);
+  }
+
+  public String getActivePetId() {
+    return activePetId;
+  }
+
+  /**
+   * Equipa um pet pelo seu id estável (PetFactory.PET_*).
+   * Retorna true em caso de sucesso.
+   */
+  public boolean equipPetById(String petId) {
+    if (petId == null || petId.isBlank()) {
+      unequipPet();
+      return true;
+    }
+
+    // garante que este pet está registrado na coleção do jogador
+    addOwnedPet(petId);
+
+    PetEntity newPet = PetFactory.createPet(petId, gp, this);
+    if (newPet == null) {
+      return false;
+    }
+
+    int lvl = getPetLevelFor(petId);
+    int xp = getPetExpFor(petId);
+    newPet.setPetProgress(lvl, xp);
+
+    // sincroniza para garantir que os mapas estejam coerentes
+    onPetProgressUpdated(newPet);
+
+    this.activePetId = petId;
+    this.pet = newPet;
+
+    pet.setWorldX(getWorldX() - GamePanel.TILE_SIZE);
+    pet.setWorldY(getWorldY());
+    return true;
+  }
+
+  public void unequipPet() {
+    this.activePetId = null;
+    this.pet = null;
+  }
+
+  private void grantPetExp(int monsterExp) {
+    if (pet == null || monsterExp <= 0) {
+      return;
+    }
+
+    int petXp = Math.max(1, monsterExp * PET_XP_PERCENT / 100);
+    pet.addPetExp(petXp);
+  }
+
+  /**
+   * Chamado pelo PetEntity sempre que level/XP muda.
+   */
+  public void onPetProgressUpdated(PetEntity petEntity) {
+    if (petEntity == null) {
+      return;
+    }
+
+    // Sempre que possível, usamos o internalId do pet,
+    // que é o mesmo usado em PetFactory.PET_*, ownedPets e DataStorage.
+    String key = petEntity.getInternalId();
+
+    // fallback em caso de alguma configuração antiga
+    if (key == null || key.isBlank()) {
+      key = activePetId;
+    }
+
+    if (key == null || key.isBlank()) {
+      return;
+    }
+
+    petLevels.put(key, petEntity.getPetLevel());
+    petExps.put(key, petEntity.getPetExp());
+  }
+
+  public int getPetLevelFor(String petId) {
+    if (petId == null || petId.isBlank()) {
+      return 1;
+    }
+    return petLevels.getOrDefault(petId, 1);
+  }
+
+  public int getPetExpFor(String petId) {
+    if (petId == null || petId.isBlank()) {
+      return 0;
+    }
+    return petExps.getOrDefault(petId, 0);
+  }
+
+  public void clearPetProgress() {
+    petLevels.clear();
+    petExps.clear();
+  }
+
+  public void restorePetProgress(String petId, int level, int exp) {
+    if (petId == null || petId.isBlank()) {
+      return;
+    }
+    petLevels.put(petId, Math.max(1, level));
+    petExps.put(petId, Math.max(0, exp));
   }
 }

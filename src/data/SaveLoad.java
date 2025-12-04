@@ -6,11 +6,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import entity.Entity;
 import main.GamePanel;
+import pets.PetIncubator;
 
 public class SaveLoad {
 
@@ -79,6 +81,8 @@ public class SaveLoad {
     copyPlayerStatsToStorage(ds);
     copyInventoryToStorage(ds);
     copyEquipmentToStorage(ds);
+    copyPetsToStorage(ds);
+    copyIncubatorToStorage(ds);
     copyMapObjectsToStorage(ds);
     return ds;
   }
@@ -88,6 +92,8 @@ public class SaveLoad {
     applyInventory(ds);
     applyMapObjects(ds);
     applyEquipment(ds);
+    applyPets(ds);
+    applyIncubator(ds);
 
     // Recalcular atributos derivados
     var player = gp.getPlayer();
@@ -243,5 +249,96 @@ public class SaveLoad {
     if (bootsSlot >= 0 && bootsSlot < inv.size()) {
       player.setCurrentBoots(inv.get(bootsSlot));
     }
+  }
+
+  private void copyPetsToStorage(DataStorage ds) {
+    var player = gp.getPlayer();
+
+    ds.getOwnedPetIds().clear();
+    ds.getPetLevels().clear();
+    ds.getPetExps().clear();
+
+    for (String petId : player.getOwnedPets()) {
+      ds.getOwnedPetIds().add(petId);
+      ds.getPetLevels().add(player.getPetLevelFor(petId));
+      ds.getPetExps().add(player.getPetExpFor(petId));
+    }
+
+    // pet ativo (pode ser null)
+    ds.setActivePetId(player.getActivePetId());
+  }
+
+  private void applyPets(DataStorage ds) {
+    var player = gp.getPlayer();
+
+    player.getOwnedPets().clear();
+    player.clearPetProgress();
+
+    List<String> ids = ds.getOwnedPetIds();
+    List<Integer> levels = ds.getPetLevels();
+    List<Integer> exps = ds.getPetExps();
+
+    int size = ids.size();
+    for (int i = 0; i < size; i++) {
+      String petId = ids.get(i);
+      if (petId == null || petId.isBlank()) {
+        continue;
+      }
+
+      player.addOwnedPet(petId);
+
+      int lvl = (i < levels.size()) ? levels.get(i) : 1;
+      int xp = (i < exps.size()) ? exps.get(i) : 0;
+
+      player.restorePetProgress(petId, lvl, xp);
+    }
+
+    String activeId = ds.getActivePetId();
+    if (activeId != null && !activeId.isBlank() && player.getOwnedPets().contains(activeId)) {
+      player.equipPetById(activeId);
+    } else {
+      player.unequipPet();
+    }
+  }
+
+  private void copyIncubatorToStorage(DataStorage ds) {
+    PetIncubator incubator = gp.getPetIncubator();
+    if (incubator == null) {
+      ds.setIncubatorActive(false);
+      ds.setIncubatorPetId(null);
+      ds.setIncubatorRemainingTicks(0);
+      ds.setIncubatorEggName(null);
+      ds.setIncubatorTotalTicks(0);
+      return;
+    }
+
+    boolean active = incubator.hasActiveEgg();
+    ds.setIncubatorActive(active);
+
+    if (active) {
+      ds.setIncubatorPetId(incubator.getPetId());
+      ds.setIncubatorRemainingTicks(incubator.getRemainingTicks());
+      ds.setIncubatorEggName(incubator.getEggName());
+      ds.setIncubatorTotalTicks(incubator.getTotalTicks());
+    } else {
+      ds.setIncubatorPetId(null);
+      ds.setIncubatorRemainingTicks(0);
+      ds.setIncubatorEggName(null);
+      ds.setIncubatorTotalTicks(0);
+    }
+  }
+
+  private void applyIncubator(DataStorage ds) {
+    PetIncubator incubator = gp.getPetIncubator();
+    if (incubator == null) {
+      return;
+    }
+
+    incubator.restoreFromSave(
+        ds.isIncubatorActive(),
+        ds.getIncubatorPetId(),
+        ds.getIncubatorRemainingTicks(),
+        ds.getIncubatorEggName(),
+        ds.getIncubatorTotalTicks());
   }
 }

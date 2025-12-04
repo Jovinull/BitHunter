@@ -4,9 +4,11 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 import entity.Entity;
 import main.GamePanel;
+import pets.PetFactory;
 
 class HudUi {
 
@@ -56,6 +58,102 @@ class HudUi {
           guardMax,
           ui.t("ui.stats.guard"),
           new Color(120, 200, 120));
+    }
+  }
+
+  /**
+   * Mini HUD do pet:
+   * - Ícone do pet ativo
+   * - "Pet Lv. X"
+   * - Barra de XP pequena
+   */
+  void drawPetHud() {
+    var gp = ui.getGamePanel();
+    var player = gp.getPlayer();
+    var pet = player.getPet();
+
+    if (pet == null) {
+      return;
+    }
+
+    Graphics2D g2 = ui.g2;
+
+    int barWidth = GamePanel.TILE_SIZE * 3;
+    int barHeight = 24;
+    int spacing = 8;
+
+    int baseX = GamePanel.TILE_SIZE;
+    int baseY = GamePanel.TILE_SIZE / 2;
+
+    // Posiciona logo abaixo de HP/MP/(Guard)
+    int y = baseY + (barHeight + spacing) * 2;
+    if (player.getMaxGuardStamina() > 0) {
+      y += barHeight + spacing;
+    }
+
+    int panelX = baseX;
+    int panelY = y;
+    int panelWidth = barWidth;
+    int panelHeight = 22;
+
+    // Fundo do painel
+    g2.setColor(new Color(0, 0, 0, 180));
+    g2.fillRoundRect(panelX - 2, panelY - 2, panelWidth + 4, panelHeight + 4, 8, 8);
+
+    var oldStroke = g2.getStroke();
+    g2.setStroke(new BasicStroke(2f));
+    g2.setColor(UI.COL_PANEL_BORDER);
+    g2.drawRoundRect(panelX - 2, panelY - 2, panelWidth + 4, panelHeight + 4, 8, 8);
+    g2.setStroke(oldStroke);
+
+    // Ícone do pet
+    int iconSize = GamePanel.TILE_SIZE / 2;
+    int iconX = panelX;
+    int iconY = panelY + (panelHeight - iconSize) / 2;
+
+    BufferedImage icon = null;
+    try {
+      String activePetId = player.getActivePetId();
+      if (activePetId != null) {
+        icon = PetFactory.getPetIcon(activePetId, gp, player);
+      }
+    } catch (Exception _) {
+      // ignore: se falhar ao carregar o ícone, só não desenha nada
+    }
+    if (icon != null) {
+      g2.drawImage(icon, iconX, iconY, iconSize, iconSize, null);
+    }
+
+    int textX = iconX + iconSize + 6;
+    int textY = panelY + 14;
+
+    int level = pet.getPetLevel();
+    int exp = pet.getPetExp();
+    int next = pet.getPetNextLevelExp();
+
+    Font baseFont = ui.getMaruMonica() != null ? ui.getMaruMonica() : g2.getFont();
+    Font hudFont = baseFont.deriveFont(Font.BOLD, 14F);
+    g2.setFont(hudFont);
+    g2.setColor(UI.COL_TEXT);
+
+    String label = "Pet Lv. " + level;
+    g2.drawString(label, textX, textY);
+
+    // Barra de XP mini
+    int xpBarWidth = panelWidth - (textX - panelX) - 8;
+    int xpBarHeight = 6;
+    int xpBarX = textX;
+    int xpBarY = panelY + panelHeight - xpBarHeight - 4;
+
+    double ratio = (next > 0) ? Math.min(1.0, exp / (double) next) : 0.0;
+    int filledWidth = (int) (xpBarWidth * ratio);
+
+    g2.setColor(new Color(0, 0, 0, 160));
+    g2.fillRoundRect(xpBarX, xpBarY, xpBarWidth, xpBarHeight, 4, 4);
+
+    if (filledWidth > 0) {
+      g2.setColor(UI.COL_ACCENT);
+      g2.fillRoundRect(xpBarX, xpBarY, filledWidth, xpBarHeight, 4, 4);
     }
   }
 
