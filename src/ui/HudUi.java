@@ -117,8 +117,8 @@ class HudUi {
       if (activePetId != null) {
         icon = PetFactory.getPetIcon(activePetId, gp, player);
       }
-    } catch (Exception e) {
-      icon = null;
+    } catch (Exception _) {
+      // ignore: se falhar ao carregar o ícone, só não desenha nada
     }
     if (icon != null) {
       g2.drawImage(icon, iconX, iconY, iconSize, iconSize, null);
