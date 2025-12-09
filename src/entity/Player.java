@@ -1220,4 +1220,57 @@ public class Player extends Entity {
     petLevels.put(petId, Math.max(1, level));
     petExps.put(petId, Math.max(0, exp));
   }
+
+  /**
+   * Força "pura" do personagem.
+   */
+  public int getAttackBaseStat() {
+    return getStrength();
+  }
+
+  /**
+   * Bônus de ataque vindo dos equipamentos.
+   * Aqui usamos diretamente o attackValue da arma,
+   * sem tentar reproduzir o dano real.
+   */
+  public int getAttackEquipBonusStat() {
+    Entity weapon = getCurrentWeapon();
+    if (weapon == null) {
+      return 0;
+    }
+    return weapon.getAttackValue();
+  }
+
+  /**
+   * Destreza "pura" do personagem.
+   */
+  public int getDefenseBaseStat() {
+    return getDexterity();
+  }
+
+  /**
+   * Bônus de defesa vindo das peças equipadas.
+   * Também usamos somente os defenseValue dos itens.
+   */
+  public int getDefenseEquipBonusStat() {
+    int bonus = 0;
+
+    if (getCurrentShield() != null) {
+      bonus += getCurrentShield().getDefenseValue();
+    }
+    if (getCurrentBoots() != null) {
+      bonus += getCurrentBoots().getDefenseValue();
+    }
+    if (getCurrentHelmet() != null) {
+      bonus += getCurrentHelmet().getDefenseValue();
+    }
+    if (getCurrentChest() != null) {
+      bonus += getCurrentChest().getDefenseValue();
+    }
+    if (getCurrentLegs() != null) {
+      bonus += getCurrentLegs().getDefenseValue();
+    }
+
+    return bonus;
+  }
 }

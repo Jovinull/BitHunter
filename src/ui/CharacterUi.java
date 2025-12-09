@@ -111,22 +111,48 @@ class CharacterUi {
         ui.t("ui.character.stat.coins")
     };
 
-    String[] values = {
-        String.valueOf(player.getStrength()),
-        String.valueOf(player.getDexterity()),
-        String.valueOf(player.getAttack()),
-        String.valueOf(player.getDefense()),
-        String.valueOf(player.getCoin())
-    };
-
     int tailX = frameX + frameWidth / 2 - 30;
 
     for (int i = 0; i < labels.length; i++) {
       g2.setColor(UI.COL_TEXT_DIM);
       g2.drawString(labels[i], statsBlockX, statsBlockY);
+
       g2.setColor(UI.COL_TEXT);
-      String value = values[i];
-      g2.drawString(value, ui.getXforAlignToRightText(value, tailX), statsBlockY);
+
+      String valueText;
+      switch (i) {
+        case 0 -> {
+          // Força: hoje é só personagem (sem bônus de item)
+          valueText = formatBaseWithBonus(player.getStrength(), 0);
+        }
+        case 1 -> {
+          // Destreza: mesma coisa, só base
+          valueText = formatBaseWithBonus(player.getDexterity(), 0);
+        }
+        case 2 -> {
+          // Ataque: base do personagem + bônus de equipamento
+          int base = player.getAttackBaseStat();
+          int bonus = player.getAttackEquipBonusStat();
+          valueText = formatBaseWithBonus(base, bonus);
+        }
+        case 3 -> {
+          // Defesa: base do personagem + bônus de equipamento
+          int base = player.getDefenseBaseStat();
+          int bonus = player.getDefenseEquipBonusStat();
+          valueText = formatBaseWithBonus(base, bonus);
+        }
+        case 4 -> {
+          // Moedas: só o valor direto
+          valueText = String.valueOf(player.getCoin());
+        }
+        default -> valueText = "";
+      }
+
+      g2.drawString(
+          valueText,
+          ui.getXforAlignToRightText(valueText, tailX),
+          statsBlockY);
+
       statsBlockY += lineHeight;
     }
 
@@ -264,5 +290,20 @@ class CharacterUi {
     g2.drawString(text, textX + 1, textY + 1);
     g2.setColor(UI.COL_TEXT);
     g2.drawString(text, textX, textY);
+  }
+
+  /**
+   * Formata stats no padrão:
+   * base -> "5"
+   * base+bonus -> "5 (+2)"
+   */
+  private String formatBaseWithBonus(int base, int bonus) {
+    if (bonus == 0) {
+      return String.valueOf(base);
+    }
+
+    String sign = bonus > 0 ? "+" : "-";
+    int absBonus = Math.abs(bonus);
+    return base + " (" + sign + absBonus + ")";
   }
 }
