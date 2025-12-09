@@ -59,6 +59,11 @@ public class Entity {
   private int respawnCounter;
   private boolean dropHandled;
 
+  // Piscar rápido ao renascer (ex.: ~1 segundo)
+  private boolean spawning; // true logo após respawn
+  private int spawnBlinkCounter; // contador em frames
+  private static final int SPAWN_BLINK_DURATION_FRAMES = 60; // 1s a 60 FPS
+
   public static final int MAX_INVENTORY_SIZE = 20;
 
   private static final Random RNG = new Random();
@@ -873,8 +878,7 @@ public class Entity {
   }
 
   public void draw(Graphics2D g2) {
-    // Morto e sem animação de morte: não desenha (ex.: aguardando respawn)
-    if (!alive && !dying) {
+    if (!alive && !dying && !spawning) {
       return;
     }
 
@@ -886,6 +890,15 @@ public class Entity {
     int y = getScreenY();
 
     Frame f = resolveFrameAndOffsets(x, y);
+
+    // Se está em animação de respawn (antes de "nascer"), pisca no lugar
+    if (spawning) {
+      int blinkInterval = 6; // alterna visível/invisível a cada 6 frames
+      boolean visible = ((spawnBlinkCounter / blinkInterval) % 2) == 0;
+      if (!visible) {
+        return; // neste frame não desenha nada
+      }
+    }
 
     if (invincible) {
       hpBarOn = true;
@@ -1210,60 +1223,78 @@ public class Entity {
       return;
     }
 
-    // Se, por algum motivo, já voltou à vida, zera contador e sai
+    // Se, por algum motivo, já voltou à vida, zera estado de respawn e sai
     if (isAlive()) {
       respawnCounter = 0;
+      spawning = false;
+      spawnBlinkCounter = 0;
       return;
     }
 
-    // Espera o tempo configurado de respawn
+    // Fase 2: já está piscando no ponto de spawn, esperando "nascer"
+    if (spawning) {
+      spawnBlinkCounter++;
+
+      if (spawnBlinkCounter >= SPAWN_BLINK_DURATION_FRAMES) {
+        spawning = false;
+        spawnBlinkCounter = 0;
+        respawnCounter = 0;
+
+        // Garante que está exatamente no ponto de spawn
+        setWorldX(spawnWorldX);
+        setWorldY(spawnWorldY);
+
+        // Reseta status básico e "nasce" de verdade
+        setLife(getMaxLife());
+        setDying(false);
+        setAlive(true);
+        setInvincible(false);
+        setTransparent(false);
+        resetCounter();
+
+        knockBack = false;
+        knockBackDirection = null;
+        collisionOn = false;
+        speed = defaultSpeed;
+      }
+
+      return;
+    }
+
+    // Fase 1: aguardando o tempo de respawn "invisível"
     if (respawnCounter < respawnDelayFrames) {
       respawnCounter++;
       return;
     }
 
-    // Aqui o "tempo já deu". Só respawna se o player NÃO estiver em cima da posição
-    // de spawn.
     if (gp != null) {
       var player = gp.getPlayer();
       if (player != null) {
-        // Retângulo da área de spawn do monstro
         Rectangle spawnRect = new Rectangle(
             spawnWorldX + getSolidArea().x,
             spawnWorldY + getSolidArea().y,
             getSolidArea().width,
             getSolidArea().height);
 
-        // Retângulo atual do player
         Rectangle playerRect = new Rectangle(
             player.getWorldX() + player.getSolidArea().x,
             player.getWorldY() + player.getSolidArea().y,
             player.getSolidArea().width,
             player.getSolidArea().height);
 
-        // Se o player ainda está ocupando o tile de respawn, segura o respawn
+        // Player ainda está ocupando o tile de respawn -> segura
         if (spawnRect.intersects(playerRect)) {
-          // Mantém o contador travado no limite, assim não volta a contar do zero
           respawnCounter = respawnDelayFrames;
           return;
         }
       }
     }
 
-    // Player já saiu da posição -> respawna normalmente
-    respawnCounter = 0;
-
-    // Volta para o ponto de spawn
+    // Player saiu da área -> começa animação de spawn (fantasma piscando)
     setWorldX(spawnWorldX);
     setWorldY(spawnWorldY);
-
-    // Reseta status básico
-    setLife(getMaxLife());
-    setDying(false);
-    setAlive(true);
-    setInvincible(false);
-    setTransparent(false);
-    resetCounter();
+    spawning = true;
+    spawnBlinkCounter = 0;
   }
 
   // =========================
