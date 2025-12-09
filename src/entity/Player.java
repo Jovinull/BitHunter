@@ -596,7 +596,15 @@ public class Player extends Entity {
     int currentMapIndex = gp.getCurrentMap();
     Entity mon = monsters[currentMapIndex][i];
 
-    if (!isInvincible() && !mon.isDying()) {
+    if (mon == null) {
+      return;
+    }
+
+    boolean deadOrDying = !mon.isAlive()
+        || mon.isDying()
+        || (mon.getType() == TYPE_MONSTER && mon.getLife() <= 0);
+
+    if (!isInvincible() && !deadOrDying) {
       gp.playSE(6);
       int damage = mon.getAttack() - getDefense();
       if (damage < 1) {

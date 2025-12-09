@@ -156,6 +156,16 @@ public class CollisionChecker {
         continue;
       }
 
+      // Não colide com entidades já "mortas" ou em animação de morte
+      if (!other.isAlive() || other.isDying()) {
+        continue;
+      }
+
+      // Para monstros em específico, também ignora se o HP já acabou
+      if (other.getType() == Entity.TYPE_MONSTER && other.getLife() <= 0) {
+        continue;
+      }
+
       Rectangle eRect = toWorldRect(entity);
       Rectangle oRect = toWorldRect(other);
 
@@ -189,6 +199,13 @@ public class CollisionChecker {
   public boolean checKPlayer(Entity entity) {
 
     boolean contactPlayer = false;
+
+    // Monstro morto/morrendo não bate mais no player
+    if (entity.getType() == Entity.TYPE_MONSTER) {
+      if (!entity.isAlive() || entity.isDying() || entity.getLife() <= 0) {
+        return false;
+      }
+    }
 
     var player = gp.getPlayer();
 
