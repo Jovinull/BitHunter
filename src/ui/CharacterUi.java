@@ -117,41 +117,54 @@ class CharacterUi {
       g2.setColor(UI.COL_TEXT_DIM);
       g2.drawString(labels[i], statsBlockX, statsBlockY);
 
-      g2.setColor(UI.COL_TEXT);
+      int base = 0;
+      int bonus = 0;
+      String valueText = "";
+      boolean usesBonusFormat = false;
 
-      String valueText;
       switch (i) {
         case 0 -> {
-          // Força: hoje é só personagem (sem bônus de item)
-          valueText = formatBaseWithBonus(player.getStrength(), 0);
+          // Força: só base (por enquanto)
+          base = player.getStrength();
+          bonus = 0;
+          usesBonusFormat = true;
         }
         case 1 -> {
-          // Destreza: mesma coisa, só base
-          valueText = formatBaseWithBonus(player.getDexterity(), 0);
+          // Destreza: só base (por enquanto)
+          base = player.getDexterity();
+          bonus = 0;
+          usesBonusFormat = true;
         }
         case 2 -> {
           // Ataque: base do personagem + bônus de equipamento
-          int base = player.getAttackBaseStat();
-          int bonus = player.getAttackEquipBonusStat();
-          valueText = formatBaseWithBonus(base, bonus);
+          base = player.getAttackBaseStat();
+          bonus = player.getAttackEquipBonusStat();
+          usesBonusFormat = true;
         }
         case 3 -> {
           // Defesa: base do personagem + bônus de equipamento
-          int base = player.getDefenseBaseStat();
-          int bonus = player.getDefenseEquipBonusStat();
-          valueText = formatBaseWithBonus(base, bonus);
+          base = player.getDefenseBaseStat();
+          bonus = player.getDefenseEquipBonusStat();
+          usesBonusFormat = true;
         }
         case 4 -> {
           // Moedas: só o valor direto
           valueText = String.valueOf(player.getCoin());
         }
-        default -> valueText = "";
+        default -> {
+        }
       }
 
-      g2.drawString(
-          valueText,
-          ui.getXforAlignToRightText(valueText, tailX),
-          statsBlockY);
+      if (usesBonusFormat) {
+        // Desenha "base" + "(+X)" com cores diferentes, alinhado à direita
+        drawBaseAndBonusRightAligned(base, bonus, tailX, statsBlockY);
+      } else {
+        g2.setColor(UI.COL_TEXT);
+        g2.drawString(
+            valueText,
+            ui.getXforAlignToRightText(valueText, tailX),
+            statsBlockY);
+      }
 
       statsBlockY += lineHeight;
     }
@@ -293,17 +306,49 @@ class CharacterUi {
   }
 
   /**
-   * Formata stats no padrão:
+   * Desenha stats no padrão:
    * base -> "5"
    * base+bonus -> "5 (+2)"
+   * com o bônus em outra cor, alinhado à direita em tailX.
    */
-  private String formatBaseWithBonus(int base, int bonus) {
+  private void drawBaseAndBonusRightAligned(int base, int bonus, int tailX, int y) {
+    Graphics2D g2 = ui.g2;
+
+    // Sem bônus: desenha só o base, normal
     if (bonus == 0) {
-      return String.valueOf(base);
+      String baseText = String.valueOf(base);
+      int x = ui.getXforAlignToRightText(baseText, tailX);
+      g2.setColor(UI.COL_TEXT);
+      g2.drawString(baseText, x, y);
+      return;
     }
 
     String sign = bonus > 0 ? "+" : "-";
     int absBonus = Math.abs(bonus);
-    return base + " (" + sign + absBonus + ")";
+
+    String baseText = String.valueOf(base) + " ";
+    String bonusText = "(" + sign + absBonus + ")";
+
+    // Usa o texto completo só para calcular o alinhamento à direita
+    String fullText = baseText + bonusText;
+    int fullX = ui.getXforAlignToRightText(fullText, tailX);
+
+    var fm = g2.getFontMetrics();
+    int baseWidth = fm.stringWidth(baseText);
+
+    int baseX = fullX;
+    int bonusX = fullX + baseWidth;
+
+    // Base na cor normal
+    g2.setColor(UI.COL_TEXT);
+    g2.drawString(baseText, baseX, y);
+
+    // Bônus em outra cor (aqui usei o accent)
+    g2.setColor(UI.COL_ACCENT);
+    g2.drawString(bonusText, bonusX, y);
+
+    // volta pra cor padrão pra não vazar pro restante
+    g2.setColor(UI.COL_TEXT);
   }
+
 }
