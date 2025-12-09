@@ -29,6 +29,7 @@ public class MonBat extends Entity {
     setAttack(4);
     setDefense(0);
     setExp(5);
+    enableRespawn(60 * 10);
 
     // solidArea (usa o objeto exposto por getSolidArea())
     getSolidArea().x = 3;

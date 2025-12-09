@@ -259,14 +259,33 @@ public class GamePanel extends JPanel implements Runnable {
 
   private void updateMonsters() {
     Entity[] currentMonsters = monster[currentMap];
+
     for (int i = 0; i < currentMonsters.length; i++) {
       Entity currentMonster = currentMonsters[i];
-      if (currentMonster != null) {
-        if (currentMonster.isAlive() && !currentMonster.isDying()) {
-          currentMonster.update();
-        }
-        if (!currentMonster.isAlive()) {
+      if (currentMonster == null) {
+        continue;
+      }
+
+      // Vivo e não está na animação de morte -> comportamento normal
+      if (currentMonster.isAlive() && !currentMonster.isDying()) {
+        currentMonster.update();
+        continue;
+      }
+
+      // Aqui ele já "morreu" (alive == false) e terminou a animação
+      if (!currentMonster.isAlive()) {
+
+        // Garante que o drop acontece só uma vez por morte
+        if (!currentMonster.isDropHandled()) {
           currentMonster.checkDrop();
+          currentMonster.setDropHandled(true);
+        }
+
+        // Se estiver configurado para respawnar, só atualiza o timer
+        if (currentMonster.isRespawnEnabled()) {
+          currentMonster.updateRespawn();
+        } else {
+          // Sem respawn -> some pra sempre (comportamento original)
           currentMonsters[i] = null;
         }
       }

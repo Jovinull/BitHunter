@@ -49,6 +49,16 @@ public class Entity {
   public static final int TYPE_PET = 15;
   public static final int TYPE_EGG = 16;
 
+  // =========================
+  // RESPAWN
+  // =========================
+  private int spawnWorldX;
+  private int spawnWorldY;
+  private boolean respawnEnabled;
+  private int respawnDelayFrames;
+  private int respawnCounter;
+  private boolean dropHandled;
+
   public static final int MAX_INVENTORY_SIZE = 20;
 
   private static final Random RNG = new Random();
@@ -863,6 +873,11 @@ public class Entity {
   }
 
   public void draw(Graphics2D g2) {
+    // Morto e sem animação de morte: não desenha (ex.: aguardando respawn)
+    if (!alive && !dying) {
+      return;
+    }
+
     if (!inCamera()) {
       return;
     }
@@ -879,7 +894,14 @@ public class Entity {
     }
 
     if (dying) {
+      // Roda animação de morte
       dyingAnimation(g2);
+
+      // Se a animação terminou e já marcou como morto, não desenha o frame normal
+      if (!alive) {
+        changeAlpha(g2, 1f);
+        return;
+      }
     }
 
     g2.drawImage(f.img, f.x, f.y, null);
@@ -948,7 +970,10 @@ public class Entity {
     changeAlpha(g2, visible ? 1f : 0f);
 
     if (phase > 8) {
+      // Fim da animação de morte
       alive = false;
+      dying = false;
+      dyingCounter = 0;
     }
   }
 
@@ -1153,6 +1178,56 @@ public class Entity {
 
     String candidateId = t.getInternalId();
     return candidateId != null && candidateId.equals(targetInternalId);
+  }
+
+  /**
+   * Define o ponto de spawn (usado para respawn).
+   */
+  public void setSpawnPoint(int worldX, int worldY) {
+    this.spawnWorldX = worldX;
+    this.spawnWorldY = worldY;
+  }
+
+  /**
+   * Ativa respawn para esta entidade e define o tempo em frames.
+   * Ex.: 60 * 10 = 10 segundos se o jogo roda a 60 FPS.
+   */
+  public void enableRespawn(int delayFrames) {
+    this.respawnEnabled = true;
+    this.respawnDelayFrames = delayFrames;
+    this.respawnCounter = 0;
+  }
+
+  public boolean isRespawnEnabled() {
+    return respawnEnabled;
+  }
+
+  /**
+   * Atualiza apenas a lógica de respawn (chamar quando alive == false).
+   */
+  public void updateRespawn() {
+    if (!respawnEnabled) {
+      return;
+    }
+
+    respawnCounter++;
+
+    if (respawnCounter >= respawnDelayFrames) {
+      respawnCounter = 0;
+
+      // Volta para o ponto de spawn
+      setWorldX(spawnWorldX);
+      setWorldY(spawnWorldY);
+
+      // Reseta status básico
+      setLife(getMaxLife());
+      setDying(false);
+      setAlive(true);
+      setInvincible(false);
+      setTransparent(false);
+      dropHandled = false; // pode dropar de novo na próxima morte
+      resetCounter();
+    }
   }
 
   // =========================
@@ -1801,5 +1876,13 @@ public class Entity {
 
   public void setGuardStaminaCapacity(int guardStaminaCapacity) {
     this.guardStaminaCapacity = guardStaminaCapacity;
+  }
+
+  public boolean isDropHandled() {
+    return dropHandled;
+  }
+
+  public void setDropHandled(boolean dropHandled) {
+    this.dropHandled = dropHandled;
   }
 }
