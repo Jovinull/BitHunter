@@ -251,6 +251,15 @@ class HudUi {
         continue;
       }
 
+      // Se morreu / está na animação de morte, some com a barra na hora
+      if (!monster.isAlive()
+          || monster.isDying()
+          || (monster.getType() == Entity.TYPE_MONSTER && monster.getLife() <= 0)) {
+        monster.setHpBarOn(false);
+        monster.setHpBarCounter(0);
+        continue;
+      }
+
       if (monster.isHpBarOn() && !monster.isBoss()) {
         double oneScale = (double) GamePanel.TILE_SIZE / monster.getMaxLife();
         double hpBarValue = oneScale * monster.getLife();

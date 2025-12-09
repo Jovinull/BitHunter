@@ -30,6 +30,7 @@ public class MonGreenSlime extends Entity {
     setAttack(3);
     setDefense(0);
     setExp(3);
+    enableRespawn(60 * 20);
     setProjectile(new ObjRock(gp));
 
     // solidArea (usar o objeto via getter, Rectangle tem campos públicos)

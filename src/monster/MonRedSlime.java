@@ -31,6 +31,7 @@ public class MonRedSlime extends Entity {
     setAttack(7);
     setDefense(2);
     setExp(10);
+    enableRespawn(60 * 30);
     setProjectile(new ObjRock(gp));
 
     // Colisão

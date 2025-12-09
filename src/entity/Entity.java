@@ -49,6 +49,21 @@ public class Entity {
   public static final int TYPE_PET = 15;
   public static final int TYPE_EGG = 16;
 
+  // =========================
+  // RESPAWN
+  // =========================
+  private int spawnWorldX;
+  private int spawnWorldY;
+  private boolean respawnEnabled;
+  private int respawnDelayFrames;
+  private int respawnCounter;
+  private boolean dropHandled;
+
+  // Piscar rápido ao renascer (ex.: ~1 segundo)
+  private boolean spawning; // true logo após respawn
+  private int spawnBlinkCounter; // contador em frames
+  private static final int SPAWN_BLINK_DURATION_FRAMES = 60; // 1s a 60 FPS
+
   public static final int MAX_INVENTORY_SIZE = 20;
 
   private static final Random RNG = new Random();
@@ -863,6 +878,10 @@ public class Entity {
   }
 
   public void draw(Graphics2D g2) {
+    if (!alive && !dying && !spawning) {
+      return;
+    }
+
     if (!inCamera()) {
       return;
     }
@@ -872,6 +891,15 @@ public class Entity {
 
     Frame f = resolveFrameAndOffsets(x, y);
 
+    // Se está em animação de respawn (antes de "nascer"), pisca no lugar
+    if (spawning) {
+      int blinkInterval = 6; // alterna visível/invisível a cada 6 frames
+      boolean visible = ((spawnBlinkCounter / blinkInterval) % 2) == 0;
+      if (!visible) {
+        return; // neste frame não desenha nada
+      }
+    }
+
     if (invincible) {
       hpBarOn = true;
       hpBarCounter = 0;
@@ -879,7 +907,14 @@ public class Entity {
     }
 
     if (dying) {
+      // Roda animação de morte
       dyingAnimation(g2);
+
+      // Se a animação terminou e já marcou como morto, não desenha o frame normal
+      if (!alive) {
+        changeAlpha(g2, 1f);
+        return;
+      }
     }
 
     g2.drawImage(f.img, f.x, f.y, null);
@@ -948,7 +983,10 @@ public class Entity {
     changeAlpha(g2, visible ? 1f : 0f);
 
     if (phase > 8) {
+      // Fim da animação de morte
       alive = false;
+      dying = false;
+      dyingCounter = 0;
     }
   }
 
@@ -1153,6 +1191,110 @@ public class Entity {
 
     String candidateId = t.getInternalId();
     return candidateId != null && candidateId.equals(targetInternalId);
+  }
+
+  /**
+   * Define o ponto de spawn (usado para respawn).
+   */
+  public void setSpawnPoint(int worldX, int worldY) {
+    this.spawnWorldX = worldX;
+    this.spawnWorldY = worldY;
+  }
+
+  /**
+   * Ativa respawn para esta entidade e define o tempo em frames.
+   * Ex.: 60 * 10 = 10 segundos se o jogo roda a 60 FPS.
+   */
+  public void enableRespawn(int delayFrames) {
+    this.respawnEnabled = true;
+    this.respawnDelayFrames = delayFrames;
+    this.respawnCounter = 0;
+  }
+
+  public boolean isRespawnEnabled() {
+    return respawnEnabled;
+  }
+
+  /**
+   * Atualiza apenas a lógica de respawn (chamar quando alive == false).
+   */
+  public void updateRespawn() {
+    if (!respawnEnabled) {
+      return;
+    }
+
+    // Se, por algum motivo, já voltou à vida, zera estado de respawn e sai
+    if (isAlive()) {
+      respawnCounter = 0;
+      spawning = false;
+      spawnBlinkCounter = 0;
+      return;
+    }
+
+    // Fase 2: já está piscando no ponto de spawn, esperando "nascer"
+    if (spawning) {
+      spawnBlinkCounter++;
+
+      if (spawnBlinkCounter >= SPAWN_BLINK_DURATION_FRAMES) {
+        spawning = false;
+        spawnBlinkCounter = 0;
+        respawnCounter = 0;
+
+        // Garante que está exatamente no ponto de spawn
+        setWorldX(spawnWorldX);
+        setWorldY(spawnWorldY);
+
+        // Reseta status básico e "nasce" de verdade
+        setLife(getMaxLife());
+        setDying(false);
+        setAlive(true);
+        setInvincible(false);
+        setTransparent(false);
+        resetCounter();
+
+        knockBack = false;
+        knockBackDirection = null;
+        collisionOn = false;
+        speed = defaultSpeed;
+      }
+
+      return;
+    }
+
+    // Fase 1: aguardando o tempo de respawn "invisível"
+    if (respawnCounter < respawnDelayFrames) {
+      respawnCounter++;
+      return;
+    }
+
+    if (gp != null) {
+      var player = gp.getPlayer();
+      if (player != null) {
+        Rectangle spawnRect = new Rectangle(
+            spawnWorldX + getSolidArea().x,
+            spawnWorldY + getSolidArea().y,
+            getSolidArea().width,
+            getSolidArea().height);
+
+        Rectangle playerRect = new Rectangle(
+            player.getWorldX() + player.getSolidArea().x,
+            player.getWorldY() + player.getSolidArea().y,
+            player.getSolidArea().width,
+            player.getSolidArea().height);
+
+        // Player ainda está ocupando o tile de respawn -> segura
+        if (spawnRect.intersects(playerRect)) {
+          respawnCounter = respawnDelayFrames;
+          return;
+        }
+      }
+    }
+
+    // Player saiu da área -> começa animação de spawn (fantasma piscando)
+    setWorldX(spawnWorldX);
+    setWorldY(spawnWorldY);
+    spawning = true;
+    spawnBlinkCounter = 0;
   }
 
   // =========================
@@ -1801,5 +1943,13 @@ public class Entity {
 
   public void setGuardStaminaCapacity(int guardStaminaCapacity) {
     this.guardStaminaCapacity = guardStaminaCapacity;
+  }
+
+  public boolean isDropHandled() {
+    return dropHandled;
+  }
+
+  public void setDropHandled(boolean dropHandled) {
+    this.dropHandled = dropHandled;
   }
 }

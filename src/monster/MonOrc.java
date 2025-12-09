@@ -27,6 +27,7 @@ public class MonOrc extends Entity {
     setAttack(9);
     setDefense(3);
     setExp(20);
+    enableRespawn(60 * 40);
     setKnockBackPower(5);
 
     // Colisão / Ataque

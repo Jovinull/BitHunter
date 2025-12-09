@@ -261,9 +261,15 @@ public class AssetSetter {
     interactiveTiles[mapNum][i] = new ItMetalPlate(gp, 39, 31);
   }
 
-  /** Posiciona uma entidade em (col,row) -> (worldX, worldY). */
+  /** Posiciona uma entidade em (col,row) -> (worldX, worldY) e registra spawn. */
   private void place(Entity entity, int col, int row) {
-    entity.setWorldX(GamePanel.TILE_SIZE * col);
-    entity.setWorldY(GamePanel.TILE_SIZE * row);
+    int worldX = GamePanel.TILE_SIZE * col;
+    int worldY = GamePanel.TILE_SIZE * row;
+
+    entity.setWorldX(worldX);
+    entity.setWorldY(worldY);
+
+    // Ponto padrão de respawn = ponto onde a entidade nasce
+    entity.setSpawnPoint(worldX, worldY);
   }
 }
