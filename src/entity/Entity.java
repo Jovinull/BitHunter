@@ -1210,24 +1210,60 @@ public class Entity {
       return;
     }
 
-    respawnCounter++;
-
-    if (respawnCounter >= respawnDelayFrames) {
+    // Se, por algum motivo, já voltou à vida, zera contador e sai
+    if (isAlive()) {
       respawnCounter = 0;
-
-      // Volta para o ponto de spawn
-      setWorldX(spawnWorldX);
-      setWorldY(spawnWorldY);
-
-      // Reseta status básico
-      setLife(getMaxLife());
-      setDying(false);
-      setAlive(true);
-      setInvincible(false);
-      setTransparent(false);
-      dropHandled = false; // pode dropar de novo na próxima morte
-      resetCounter();
+      return;
     }
+
+    // Espera o tempo configurado de respawn
+    if (respawnCounter < respawnDelayFrames) {
+      respawnCounter++;
+      return;
+    }
+
+    // Aqui o "tempo já deu". Só respawna se o player NÃO estiver em cima da posição
+    // de spawn.
+    if (gp != null) {
+      var player = gp.getPlayer();
+      if (player != null) {
+        // Retângulo da área de spawn do monstro
+        Rectangle spawnRect = new Rectangle(
+            spawnWorldX + getSolidArea().x,
+            spawnWorldY + getSolidArea().y,
+            getSolidArea().width,
+            getSolidArea().height);
+
+        // Retângulo atual do player
+        Rectangle playerRect = new Rectangle(
+            player.getWorldX() + player.getSolidArea().x,
+            player.getWorldY() + player.getSolidArea().y,
+            player.getSolidArea().width,
+            player.getSolidArea().height);
+
+        // Se o player ainda está ocupando o tile de respawn, segura o respawn
+        if (spawnRect.intersects(playerRect)) {
+          // Mantém o contador travado no limite, assim não volta a contar do zero
+          respawnCounter = respawnDelayFrames;
+          return;
+        }
+      }
+    }
+
+    // Player já saiu da posição -> respawna normalmente
+    respawnCounter = 0;
+
+    // Volta para o ponto de spawn
+    setWorldX(spawnWorldX);
+    setWorldY(spawnWorldY);
+
+    // Reseta status básico
+    setLife(getMaxLife());
+    setDying(false);
+    setAlive(true);
+    setInvincible(false);
+    setTransparent(false);
+    resetCounter();
   }
 
   // =========================
