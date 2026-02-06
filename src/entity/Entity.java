@@ -14,6 +14,10 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 
+import entity.components.CombatComponent;
+import entity.components.MovementComponent;
+import entity.components.PathfindingComponent;
+import entity.components.RespawnComponent;
 import main.GamePanel;
 import main.LanguageManager;
 import main.UtilityTool;
@@ -52,23 +56,17 @@ public class Entity {
   // =========================
   // RESPAWN
   // =========================
-  private int spawnWorldX;
-  private int spawnWorldY;
-  private boolean respawnEnabled;
-  private int respawnDelayFrames;
-  private int respawnCounter;
-  private boolean dropHandled;
-
-  // Piscar rápido ao renascer (ex.: ~1 segundo)
-  private boolean spawning; // true logo após respawn
-  private int spawnBlinkCounter; // contador em frames
-  private static final int SPAWN_BLINK_DURATION_FRAMES = 60; // 1s a 60 FPS
+  private final RespawnComponent respawn;
 
   public static final int MAX_INVENTORY_SIZE = 20;
 
   private static final Random RNG = new Random();
 
   protected final GamePanel gp;
+  private final MovementComponent movement;
+  private final CombatComponent combat;
+  private final PathfindingComponent pathfinding;
+  private final EntityRenderer renderer;
 
   // Sprites de movimento
   protected BufferedImage up1;
@@ -206,6 +204,11 @@ public class Entity {
 
   public Entity(GamePanel gp) {
     this.gp = gp;
+    this.respawn = new RespawnComponent(this);
+    this.movement = new MovementComponent(this);
+    this.combat = new CombatComponent(this);
+    this.pathfinding = new PathfindingComponent(this);
+    this.renderer = new EntityRenderer();
   }
 
   // =========================
@@ -220,6 +223,14 @@ public class Entity {
   public int getScreenY() {
     var player = gp.getPlayer();
     return worldY - player.getWorldY() + player.screenY;
+  }
+
+  public GamePanel getGp() {
+    return gp;
+  }
+
+  public int randomInt(int bound) {
+    return RNG.nextInt(bound);
   }
 
   public int getLeftX() {
@@ -445,91 +456,16 @@ public class Entity {
     }
 
     if (knockBack) {
-      handleKnockBack();
+      movement.handleKnockBack();
     } else if (attacking) {
-      performAttack();
+      combat.performAttack();
     } else {
-      handleActionAndMovement();
+      movement.handleActionAndMovement();
     }
 
-    handleInvincibility();
-    handleShotCooldown();
-    handleOffBalance();
-  }
-
-  private void handleKnockBack() {
-    checkCollision();
-
-    if (collisionOn) {
-      knockBackCounter = 0;
-      knockBack = false;
-      speed = defaultSpeed;
-    } else {
-      switch (knockBackDirection) {
-        case DIR_UP:
-          worldY -= speed;
-          break;
-        case DIR_DOWN:
-          worldY += speed;
-          break;
-        case DIR_LEFT:
-          worldX -= speed;
-          break;
-        case DIR_RIGHT:
-          worldX += speed;
-          break;
-        default:
-          break;
-      }
-    }
-
-    if (++knockBackCounter == 10) {
-      knockBackCounter = 0;
-      knockBack = false;
-      speed = defaultSpeed;
-    }
-  }
-
-  private void handleActionAndMovement() {
-    setAction();
-    checkCollision();
-
-    if (!collisionOn) {
-      switch (direction) {
-        case DIR_UP:
-          worldY -= speed;
-          break;
-        case DIR_DOWN:
-          worldY += speed;
-          break;
-        case DIR_LEFT:
-          worldX -= speed;
-          break;
-        case DIR_RIGHT:
-          worldX += speed;
-          break;
-        default:
-          break;
-      }
-    }
-
-    if (++spriteCounter > 24) {
-      spriteNum = (spriteNum == 1) ? 2 : 1;
-      spriteCounter = 0;
-    }
-  }
-
-  private void handleInvincibility() {
-    if (invincible && ++invincibleCounter > 20) {
-      invincible = false;
-      invincibleCounter = 0;
-    }
-  }
-
-  private void handleShotCooldown() {
-    if (shotAvailableCounter < 30) {
-      shotAvailableCounter++;
-    }
+    movement.handleInvincibility();
+    movement.handleShotCooldown();
+    movement.handleOffBalance();
   }
 
   /**
@@ -596,105 +532,28 @@ public class Entity {
     }
   }
 
-  private void handleOffBalance() {
-    if (offBalance && ++offBalanceCounter > 60) {
-      offBalance = false;
-      offBalanceCounter = 0;
-    }
-  }
-
   public void checkAttackOrNot(int rate, int straight, int horizontal) {
-    if (isTargetInFront(gp.getPlayer(), straight, horizontal) && RNG.nextInt(rate) == 0) {
-      attacking = true;
-      spriteNum = 1;
-      spriteCounter = 0;
-      shotAvailableCounter = 0;
-    }
-  }
-
-  private boolean isTargetInFront(Entity target, int straight, int horizontal) {
-    int dx = target.getCenterX() - getCenterX();
-    int dy = target.getCenterY() - getCenterY();
-
-    switch (direction) {
-      case DIR_UP:
-        return dy < 0 && Math.abs(dy) < straight && Math.abs(dx) < horizontal;
-      case DIR_DOWN:
-        return dy > 0 && Math.abs(dy) < straight && Math.abs(dx) < horizontal;
-      case DIR_LEFT:
-        return dx < 0 && Math.abs(dx) < straight && Math.abs(dy) < horizontal;
-      case DIR_RIGHT:
-        return dx > 0 && Math.abs(dx) < straight && Math.abs(dy) < horizontal;
-      default:
-        return false;
-    }
+    movement.checkAttackOrNot(rate, straight, horizontal);
   }
 
   public void checkShootOrNot(int rate, int shotInterval) {
-    if (RNG.nextInt(rate) == 0
-        && projectile != null
-        && !projectile.isAlive()
-        && shotAvailableCounter == shotInterval) {
-
-      projectile.set(worldX, worldY, direction, true, this);
-
-      Entity[][] projectiles = gp.getProjectile();
-      int currentMapIndex = gp.getCurrentMap();
-
-      for (int j = 0; j < projectiles[currentMapIndex].length; j++) {
-        if (projectiles[currentMapIndex][j] == null) {
-          projectiles[currentMapIndex][j] = projectile;
-          break;
-        }
-      }
-      shotAvailableCounter = 0;
-    }
+    movement.checkShootOrNot(rate, shotInterval);
   }
 
   public void checkStartChasingOrNot(Entity target, int distance, int rate) {
-    if (getTileDistance(target) < distance && RNG.nextInt(rate) == 0) {
-      onPath = true;
-    }
+    movement.checkStartChasingOrNot(target, distance, rate);
   }
 
   public void checkStopChasingOrNot(Entity target, int distance, int rate) {
-    if (getTileDistance(target) > distance && RNG.nextInt(rate) == 0) {
-      onPath = false;
-    }
+    movement.checkStopChasingOrNot(target, distance, rate);
   }
 
   public void getRandomDirection(int interval) {
-    if (++actionLockCounter > interval) {
-      switch (RNG.nextInt(4)) {
-        case 0:
-          direction = DIR_UP;
-          break;
-        case 1:
-          direction = DIR_DOWN;
-          break;
-        case 2:
-          direction = DIR_LEFT;
-          break;
-        case 3:
-          direction = DIR_RIGHT;
-          break;
-        default:
-          break;
-      }
-      actionLockCounter = 0;
-    }
+    movement.getRandomDirection(interval);
   }
 
   public void moveTowardPlayer(int interval) {
-    if (++actionLockCounter > interval) {
-      var player = gp.getPlayer();
-      if (getXdistance(player) > getYdistance(player)) {
-        direction = (player.getCenterX() < getCenterX()) ? DIR_LEFT : DIR_RIGHT;
-      } else if (getXdistance(player) < getYdistance(player)) {
-        direction = (player.getCenterY() < getCenterY()) ? DIR_UP : DIR_DOWN;
-      }
-      actionLockCounter = 0;
-    }
+    movement.moveTowardPlayer(interval);
   }
 
   public String getOppositeDirection(String dir) {
@@ -713,97 +572,7 @@ public class Entity {
   }
 
   protected void performAttack() {
-    spriteCounter++;
-
-    updateAttackSprite();
-
-    if (isInDamageWindow() && !attackDamageApplied) {
-      applyAttackDamage();
-    }
-
-    if (spriteCounter > motion2Duration) {
-      endAttack();
-    }
-  }
-
-  private void updateAttackSprite() {
-    if (spriteCounter <= motion1Duration) {
-      spriteNum = 1;
-    } else if (spriteCounter <= motion2Duration) {
-      spriteNum = 2;
-    }
-  }
-
-  private boolean isInDamageWindow() {
-    return spriteCounter > motion1Duration && spriteCounter <= motion2Duration;
-  }
-
-  private void applyAttackDamage() {
-    int currentWorldX = worldX;
-    int currentWorldY = worldY;
-    int solidAreaWidth = solidArea.width;
-    int solidAreaHeight = solidArea.height;
-
-    moveAttackHitboxForward();
-
-    solidArea.width = attackArea.width;
-    solidArea.height = attackArea.height;
-
-    applyAttackCollision();
-
-    // restaura posição / hitbox
-    worldX = currentWorldX;
-    worldY = currentWorldY;
-    solidArea.width = solidAreaWidth;
-    solidArea.height = solidAreaHeight;
-
-    attackDamageApplied = true;
-  }
-
-  private void moveAttackHitboxForward() {
-    switch (direction) {
-      case DIR_UP:
-        worldY -= attackArea.height;
-        break;
-      case DIR_DOWN:
-        worldY += attackArea.height;
-        break;
-      case DIR_LEFT:
-        worldX -= attackArea.width;
-        break;
-      case DIR_RIGHT:
-        worldX += attackArea.width;
-        break;
-      default:
-        break;
-    }
-  }
-
-  private void applyAttackCollision() {
-    var collisionChecker = gp.getcChecker();
-    var player = gp.getPlayer();
-
-    if (type == TYPE_MONSTER) {
-      if (collisionChecker.checKPlayer(this)) {
-        damagePlayer(attack);
-      }
-    } else {
-      int monsterIndex = collisionChecker.checkEntity(this, gp.getMonster());
-      player.damageMonster(monsterIndex, this, attack, currentWeapon.knockBackPower);
-
-      int iTileIndex = collisionChecker.checkEntity(this, gp.getiTile());
-      player.damageInteractiveTile(iTileIndex);
-
-      int projectileIndex = collisionChecker.checkEntity(this, gp.getProjectile());
-      player.damageProjectile(projectileIndex);
-    }
-  }
-
-  private void endAttack() {
-    spriteNum = 1;
-    spriteCounter = 0;
-    attacking = false;
-    attackDamageApplied = false;
+    combat.performAttack();
   }
 
   public void applyOpenedAppearance() {
@@ -813,58 +582,11 @@ public class Entity {
   }
 
   public void damagePlayer(int attack) {
-    var player = gp.getPlayer();
-
-    if (player.isInvincible()) {
-      return;
-    }
-
-    int damage = attack - player.getDefense();
-    String canGuardDirection = getOppositeDirection(direction);
-
-    boolean hasActiveShield = player.getCurrentShield() != null;
-    boolean hasGuardStamina = player.getMaxGuardStamina() > 0 && player.getGuardStamina() > 0;
-
-    boolean isGuardingWithShield = hasActiveShield
-        && hasGuardStamina
-        && player.isGuarding()
-        && player.getDirection().equals(canGuardDirection);
-
-    if (isGuardingWithShield) {
-
-      player.onGuardHit(attack);
-
-      if (player.getGuardCounter() < 10) {
-        damage = 0;
-        gp.playSE(16);
-        setKnockBack(this, player, knockBackPower);
-        setOffBalance(true);
-        setSpriteCounter(getSpriteCounter() - 60);
-      } else {
-        damage = damage / 3;
-        gp.playSE(15);
-      }
-    } else {
-      gp.playSE(6);
-      if (damage < 1) {
-        damage = 1;
-      }
-    }
-
-    if (damage != 0) {
-      player.setTransparent(true);
-      setKnockBack(player, this, knockBackPower);
-    }
-
-    player.setLife(player.getLife() - damage);
-    player.setInvincible(true);
+    combat.damagePlayer(attack);
   }
 
   public void setKnockBack(Entity target, Entity attacker, int knockBackPower) {
-    this.attacker = attacker;
-    target.knockBackDirection = attacker.direction;
-    target.speed += knockBackPower;
-    target.knockBack = true;
+    combat.setKnockBack(target, attacker, knockBackPower);
   }
 
   public boolean inCamera() {
@@ -878,101 +600,7 @@ public class Entity {
   }
 
   public void draw(Graphics2D g2) {
-    if (!alive && !dying && !spawning) {
-      return;
-    }
-
-    if (!inCamera()) {
-      return;
-    }
-
-    int x = getScreenX();
-    int y = getScreenY();
-
-    Frame f = resolveFrameAndOffsets(x, y);
-
-    // Se está em animação de respawn (antes de "nascer"), pisca no lugar
-    if (spawning) {
-      int blinkInterval = 6; // alterna visível/invisível a cada 6 frames
-      boolean visible = ((spawnBlinkCounter / blinkInterval) % 2) == 0;
-      if (!visible) {
-        return; // neste frame não desenha nada
-      }
-    }
-
-    if (invincible) {
-      hpBarOn = true;
-      hpBarCounter = 0;
-      changeAlpha(g2, 0.4f);
-    }
-
-    if (dying) {
-      // Roda animação de morte
-      dyingAnimation(g2);
-
-      // Se a animação terminou e já marcou como morto, não desenha o frame normal
-      if (!alive) {
-        changeAlpha(g2, 1f);
-        return;
-      }
-    }
-
-    g2.drawImage(f.img, f.x, f.y, null);
-    changeAlpha(g2, 1f);
-  }
-
-  private Frame resolveFrameAndOffsets(int baseX, int baseY) {
-    BufferedImage img = null;
-    int x = baseX;
-    int y = baseY;
-
-    switch (direction) {
-      case DIR_UP:
-        if (attacking && up1 != null) {
-          y = baseY - up1.getHeight();
-        }
-        img = pickFrame(attackUp1, attackUp2, up1, up2);
-        break;
-
-      case DIR_DOWN:
-        img = pickFrame(attackDown1, attackDown2, down1, down2);
-        break;
-
-      case DIR_LEFT:
-        if (attacking && left1 != null) {
-          x = baseX - left1.getWidth();
-        }
-        img = pickFrame(attackLeft1, attackLeft2, left1, left2);
-        break;
-
-      case DIR_RIGHT:
-        img = pickFrame(attackRight1, attackRight2, right1, right2);
-        break;
-
-      default:
-        img = down1;
-        break;
-    }
-    return new Frame(img, x, y);
-  }
-
-  private BufferedImage pickFrame(BufferedImage atk1, BufferedImage atk2, BufferedImage idle1, BufferedImage idle2) {
-    if (attacking) {
-      return (spriteNum == 1) ? atk1 : atk2;
-    }
-    return (spriteNum == 1) ? idle1 : idle2;
-  }
-
-  private static final class Frame {
-    final BufferedImage img;
-    final int x;
-    final int y;
-
-    Frame(BufferedImage i, int x, int y) {
-      this.img = i;
-      this.x = x;
-      this.y = y;
-    }
+    renderer.draw(this, g2);
   }
 
   public void dyingAnimation(Graphics2D g2) {
@@ -1011,126 +639,7 @@ public class Entity {
   // PATHFINDING
   // =========================
   public void searchPath(int goalCol, int goalRow) {
-    int startCol = getCol();
-    int startRow = getRow();
-
-    var pathFinder = gp.getpFinder();
-    pathFinder.setNodes(startCol, startRow, goalCol, goalRow);
-
-    if (!pathFinder.search()) {
-      onPath = false;
-      return;
-    }
-
-    var path = pathFinder.getPathList();
-    if (path.isEmpty()) {
-      onPath = false;
-      return;
-    }
-
-    int nextCol = path.get(0).getCol();
-    int nextRow = path.get(0).getRow();
-
-    int nextX = nextCol * GamePanel.TILE_SIZE;
-    int nextY = nextRow * GamePanel.TILE_SIZE;
-
-    int enLeftX = getLeftX();
-    int enRightX = getRightX();
-    int enTopY = getTopY();
-    int enBottomY = getBottomY();
-
-    boolean alignedVertical = isAlignedVertical(enLeftX, enRightX, nextX);
-    boolean alignedHorizontal = isAlignedHorizontal(enTopY, enBottomY, nextY);
-
-    if (alignedVertical && moveVerticallyToward(enTopY, nextY)) {
-      checkGoalReached(goalCol, goalRow, nextCol, nextRow);
-      return;
-    }
-    if (alignedHorizontal && moveHorizontallyToward(enLeftX, nextX)) {
-      checkGoalReached(goalCol, goalRow, nextCol, nextRow);
-      return;
-    }
-
-    moveDiagonallyTowards(nextX, nextY, enLeftX, enRightX, enTopY, enBottomY);
-
-    checkGoalReached(goalCol, goalRow, nextCol, nextRow);
-  }
-
-  private boolean isAlignedVertical(int leftX, int rightX, int nextX) {
-    return leftX >= nextX && rightX < nextX + GamePanel.TILE_SIZE;
-  }
-
-  private boolean isAlignedHorizontal(int topY, int bottomY, int nextY) {
-    return topY >= nextY && bottomY < nextY + GamePanel.TILE_SIZE;
-  }
-
-  private boolean moveVerticallyToward(int enTopY, int nextY) {
-    if (enTopY > nextY) {
-      direction = DIR_UP;
-      return true;
-    } else if (enTopY < nextY) {
-      direction = DIR_DOWN;
-      return true;
-    }
-    return false;
-  }
-
-  private boolean moveHorizontallyToward(int enLeftX, int nextX) {
-    if (enLeftX > nextX) {
-      direction = DIR_LEFT;
-      return true;
-    } else if (enLeftX < nextX) {
-      direction = DIR_RIGHT;
-      return true;
-    }
-    return false;
-  }
-
-  private void moveDiagonallyTowards(int nextX, int nextY, int enLeftX, int enRightX, int enTopY, int enBottomY) {
-    final int centerX = (enLeftX + enRightX) / 2;
-    final int centerY = (enTopY + enBottomY) / 2;
-    final int targetCenterX = nextX + GamePanel.TILE_SIZE / 2;
-    final int targetCenterY = nextY + GamePanel.TILE_SIZE / 2;
-
-    final int dx = centerX - targetCenterX;
-    final int dy = centerY - targetCenterY;
-
-    final boolean horizontalPrimary = Math.abs(dx) > Math.abs(dy);
-
-    String primaryDir;
-    String fallbackDir;
-
-    if (horizontalPrimary) {
-      primaryDir = horizontalDir(dx);
-      fallbackDir = verticalDir(dy);
-    } else {
-      primaryDir = verticalDir(dy);
-      fallbackDir = horizontalDir(dx);
-    }
-
-    setDirectionAndCheck(primaryDir);
-    if (collisionOn) {
-      direction = fallbackDir;
-    }
-  }
-
-  private String horizontalDir(int dx) {
-    return (dx > 0) ? DIR_LEFT : DIR_RIGHT;
-  }
-
-  private String verticalDir(int dy) {
-    return (dy > 0) ? DIR_UP : DIR_DOWN;
-  }
-
-  private void setDirectionAndCheck(String dir) {
-    direction = dir;
-    checkCollision();
-  }
-
-  private void checkGoalReached(int goalCol, int goalRow, int nextCol, int nextRow) {
-    if (nextCol == goalCol && nextRow == goalRow) {
-      onPath = false;
-    }
+    pathfinding.searchPath(goalCol, goalRow);
   }
 
   public int getDetected(Entity user, Entity[][] target, String targetInternalId) {
@@ -1197,8 +706,7 @@ public class Entity {
    * Define o ponto de spawn (usado para respawn).
    */
   public void setSpawnPoint(int worldX, int worldY) {
-    this.spawnWorldX = worldX;
-    this.spawnWorldY = worldY;
+    respawn.setSpawnPoint(worldX, worldY);
   }
 
   /**
@@ -1206,95 +714,26 @@ public class Entity {
    * Ex.: 60 * 10 = 10 segundos se o jogo roda a 60 FPS.
    */
   public void enableRespawn(int delayFrames) {
-    this.respawnEnabled = true;
-    this.respawnDelayFrames = delayFrames;
-    this.respawnCounter = 0;
+    respawn.enableRespawn(delayFrames);
   }
 
   public boolean isRespawnEnabled() {
-    return respawnEnabled;
+    return respawn.isRespawnEnabled();
+  }
+
+  boolean isSpawning() {
+    return respawn.isSpawning();
+  }
+
+  int getSpawnBlinkCounter() {
+    return respawn.getSpawnBlinkCounter();
   }
 
   /**
    * Atualiza apenas a lógica de respawn (chamar quando alive == false).
    */
   public void updateRespawn() {
-    if (!respawnEnabled) {
-      return;
-    }
-
-    // Se, por algum motivo, já voltou à vida, zera estado de respawn e sai
-    if (isAlive()) {
-      respawnCounter = 0;
-      spawning = false;
-      spawnBlinkCounter = 0;
-      return;
-    }
-
-    // Fase 2: já está piscando no ponto de spawn, esperando "nascer"
-    if (spawning) {
-      spawnBlinkCounter++;
-
-      if (spawnBlinkCounter >= SPAWN_BLINK_DURATION_FRAMES) {
-        spawning = false;
-        spawnBlinkCounter = 0;
-        respawnCounter = 0;
-
-        // Garante que está exatamente no ponto de spawn
-        setWorldX(spawnWorldX);
-        setWorldY(spawnWorldY);
-
-        // Reseta status básico e "nasce" de verdade
-        setLife(getMaxLife());
-        setDying(false);
-        setAlive(true);
-        setInvincible(false);
-        setTransparent(false);
-        resetCounter();
-
-        knockBack = false;
-        knockBackDirection = null;
-        collisionOn = false;
-        speed = defaultSpeed;
-      }
-
-      return;
-    }
-
-    // Fase 1: aguardando o tempo de respawn "invisível"
-    if (respawnCounter < respawnDelayFrames) {
-      respawnCounter++;
-      return;
-    }
-
-    if (gp != null) {
-      var player = gp.getPlayer();
-      if (player != null) {
-        Rectangle spawnRect = new Rectangle(
-            spawnWorldX + getSolidArea().x,
-            spawnWorldY + getSolidArea().y,
-            getSolidArea().width,
-            getSolidArea().height);
-
-        Rectangle playerRect = new Rectangle(
-            player.getWorldX() + player.getSolidArea().x,
-            player.getWorldY() + player.getSolidArea().y,
-            player.getSolidArea().width,
-            player.getSolidArea().height);
-
-        // Player ainda está ocupando o tile de respawn -> segura
-        if (spawnRect.intersects(playerRect)) {
-          respawnCounter = respawnDelayFrames;
-          return;
-        }
-      }
-    }
-
-    // Player saiu da área -> começa animação de spawn (fantasma piscando)
-    setWorldX(spawnWorldX);
-    setWorldY(spawnWorldY);
-    spawning = true;
-    spawnBlinkCounter = 0;
+    respawn.updateRespawn();
   }
 
   // =========================
@@ -1539,6 +978,14 @@ public class Entity {
 
   public void setDrawing(boolean drawing) {
     this.drawing = drawing;
+  }
+
+  public boolean isAttackDamageApplied() {
+    return attackDamageApplied;
+  }
+
+  public void setAttackDamageApplied(boolean attackDamageApplied) {
+    this.attackDamageApplied = attackDamageApplied;
   }
 
   public int getSpriteCounter() {
@@ -1946,10 +1393,10 @@ public class Entity {
   }
 
   public boolean isDropHandled() {
-    return dropHandled;
+    return respawn.isDropHandled();
   }
 
   public void setDropHandled(boolean dropHandled) {
-    this.dropHandled = dropHandled;
+    respawn.setDropHandled(dropHandled);
   }
 }
