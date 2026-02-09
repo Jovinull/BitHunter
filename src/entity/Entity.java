@@ -7,7 +7,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -15,6 +14,9 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 import entity.components.CombatComponent;
+import entity.components.EquipmentComponent;
+import entity.components.InventoryComponent;
+import entity.components.ItemAttributesComponent;
 import entity.components.MovementComponent;
 import entity.components.PathfindingComponent;
 import entity.components.RespawnComponent;
@@ -67,6 +69,9 @@ public class Entity {
   private final CombatComponent combat;
   private final PathfindingComponent pathfinding;
   private final EntityRenderer renderer;
+  private final InventoryComponent inventoryComponent;
+  private final EquipmentComponent equipment;
+  private final ItemAttributesComponent itemAttributes;
 
   // Sprites de movimento
   protected BufferedImage up1;
@@ -171,31 +176,11 @@ public class Entity {
   private int motion1Duration;
   private int motion2Duration;
 
-  private Entity currentWeapon;
-  private Entity currentShield;
-  private Entity currentLight;
-  private Entity currentBoots;
-  private Entity currentHelmet;
-  private Entity currentChest;
-  private Entity currentLegs;
-
   private Projectile projectile;
   private boolean boss;
 
   // ITEM ATRIBUTES
-  private final List<Entity> inventory = new ArrayList<>();
-  private int value;
-  private int attackValue;
-  private int defenseValue;
-  private int speedValue;
-  private String description = "";
-  private int useCost;
-  private int price;
-  private int knockBackPower = 0;
-  private boolean stackable = false;
-  private int amount = 1;
-  private int lightRadius;
-  private int guardStaminaCapacity;
+  // mantido via componentes dedicados
 
   private String internalId;
   private String translationKey;
@@ -209,6 +194,9 @@ public class Entity {
     this.combat = new CombatComponent(this);
     this.pathfinding = new PathfindingComponent(this);
     this.renderer = new EntityRenderer();
+    this.inventoryComponent = new InventoryComponent();
+    this.equipment = new EquipmentComponent();
+    this.itemAttributes = new ItemAttributesComponent();
   }
 
   // =========================
@@ -508,7 +496,8 @@ public class Entity {
     }
 
     // Fallback: usa a descrição que eventualmente foi preenchida manualmente
-    return description != null ? description : "";
+    String desc = getDescription();
+    return desc != null ? desc : "";
   }
 
   /**
@@ -1197,35 +1186,35 @@ public class Entity {
   }
 
   public Entity getCurrentWeapon() {
-    return currentWeapon;
+    return equipment.getCurrentWeapon();
   }
 
   public void setCurrentWeapon(Entity currentWeapon) {
-    this.currentWeapon = currentWeapon;
+    equipment.setCurrentWeapon(currentWeapon);
   }
 
   public Entity getCurrentShield() {
-    return currentShield;
+    return equipment.getCurrentShield();
   }
 
   public void setCurrentShield(Entity currentShield) {
-    this.currentShield = currentShield;
+    equipment.setCurrentShield(currentShield);
   }
 
   public Entity getCurrentBoots() {
-    return currentBoots;
+    return equipment.getCurrentBoots();
   }
 
   public void setCurrentBoots(Entity currentBoots) {
-    this.currentBoots = currentBoots;
+    equipment.setCurrentBoots(currentBoots);
   }
 
   public Entity getCurrentLight() {
-    return currentLight;
+    return equipment.getCurrentLight();
   }
 
   public void setCurrentLight(Entity currentLight) {
-    this.currentLight = currentLight;
+    equipment.setCurrentLight(currentLight);
   }
 
   public Projectile getProjectile() {
@@ -1245,95 +1234,95 @@ public class Entity {
   }
 
   public List<Entity> getInventory() {
-    return inventory;
+    return inventoryComponent.getInventory();
   }
 
   public int getValue() {
-    return value;
+    return itemAttributes.getValue();
   }
 
   public void setValue(int value) {
-    this.value = value;
+    itemAttributes.setValue(value);
   }
 
   public int getAttackValue() {
-    return attackValue;
+    return itemAttributes.getAttackValue();
   }
 
   public void setAttackValue(int attackValue) {
-    this.attackValue = attackValue;
+    itemAttributes.setAttackValue(attackValue);
   }
 
   public int getDefenseValue() {
-    return defenseValue;
+    return itemAttributes.getDefenseValue();
   }
 
   public void setDefenseValue(int defenseValue) {
-    this.defenseValue = defenseValue;
+    itemAttributes.setDefenseValue(defenseValue);
   }
 
   public int getSpeedValue() {
-    return speedValue;
+    return itemAttributes.getSpeedValue();
   }
 
   public void setSpeedValue(int speedValue) {
-    this.speedValue = speedValue;
+    itemAttributes.setSpeedValue(speedValue);
   }
 
   public String getDescription() {
-    return description;
+    return itemAttributes.getDescription();
   }
 
   public void setDescription(String description) {
-    this.description = description;
+    itemAttributes.setDescription(description);
   }
 
   public int getUseCost() {
-    return useCost;
+    return itemAttributes.getUseCost();
   }
 
   public void setUseCost(int useCost) {
-    this.useCost = useCost;
+    itemAttributes.setUseCost(useCost);
   }
 
   public int getPrice() {
-    return price;
+    return itemAttributes.getPrice();
   }
 
   public void setPrice(int price) {
-    this.price = price;
+    itemAttributes.setPrice(price);
   }
 
   public int getKnockBackPower() {
-    return knockBackPower;
+    return itemAttributes.getKnockBackPower();
   }
 
   public void setKnockBackPower(int knockBackPower) {
-    this.knockBackPower = knockBackPower;
+    itemAttributes.setKnockBackPower(knockBackPower);
   }
 
   public boolean isStackable() {
-    return stackable;
+    return itemAttributes.isStackable();
   }
 
   public void setStackable(boolean stackable) {
-    this.stackable = stackable;
+    itemAttributes.setStackable(stackable);
   }
 
   public int getAmount() {
-    return amount;
+    return itemAttributes.getAmount();
   }
 
   public void setAmount(int amount) {
-    this.amount = amount;
+    itemAttributes.setAmount(amount);
   }
 
   public int getLightRadius() {
-    return lightRadius;
+    return itemAttributes.getLightRadius();
   }
 
   public void setLightRadius(int lightRadius) {
-    this.lightRadius = lightRadius;
+    itemAttributes.setLightRadius(lightRadius);
   }
 
   public int getType() {
@@ -1345,27 +1334,27 @@ public class Entity {
   }
 
   public Entity getCurrentHelmet() {
-    return currentHelmet;
+    return equipment.getCurrentHelmet();
   }
 
   public void setCurrentHelmet(Entity currentHelmet) {
-    this.currentHelmet = currentHelmet;
+    equipment.setCurrentHelmet(currentHelmet);
   }
 
   public Entity getCurrentChest() {
-    return currentChest;
+    return equipment.getCurrentChest();
   }
 
   public void setCurrentChest(Entity currentChest) {
-    this.currentChest = currentChest;
+    equipment.setCurrentChest(currentChest);
   }
 
   public Entity getCurrentLegs() {
-    return currentLegs;
+    return equipment.getCurrentLegs();
   }
 
   public void setCurrentLegs(Entity currentLegs) {
-    this.currentLegs = currentLegs;
+    equipment.setCurrentLegs(currentLegs);
   }
 
   public String getInternalId() {
@@ -1385,11 +1374,11 @@ public class Entity {
   }
 
   public int getGuardStaminaCapacity() {
-    return guardStaminaCapacity;
+    return itemAttributes.getGuardStaminaCapacity();
   }
 
   public void setGuardStaminaCapacity(int guardStaminaCapacity) {
-    this.guardStaminaCapacity = guardStaminaCapacity;
+    itemAttributes.setGuardStaminaCapacity(guardStaminaCapacity);
   }
 
   public boolean isDropHandled() {
