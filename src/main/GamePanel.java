@@ -33,6 +33,9 @@ import ui.UI;
 public class GamePanel extends JPanel implements Runnable {
 
   private static final Logger LOGGER = Logger.getLogger(GamePanel.class.getName());
+  private static final Font DEBUG_FONT = new Font("Arial", Font.PLAIN, 20);
+  private static final Comparator<Entity> ENTITY_Y_COMPARATOR =
+      Comparator.comparingInt(Entity::getWorldY);
 
   // ==== CONFIGURAÇÕES DE TELA (visível) ====
   private static final int ORIGINAL_TILE_SIZE = 16; // Tamanho base de um tile (16x16 pixels)
@@ -109,6 +112,11 @@ public class GamePanel extends JPanel implements Runnable {
 
   // others
   private boolean bossBattleOn = false;
+
+  // Debug/profiler (agregado por segundo quando debug está ativo)
+  private long debugUpdateNanos = 0L;
+  private long debugRenderNanos = 0L;
+  private int debugFrameCount = 0;
 
   // AREA
   private int currentArea;
@@ -207,17 +215,41 @@ public class GamePanel extends JPanel implements Runnable {
       lastTime = currentTime;
 
       if (delta >= 1) {
-        update();
-        drawToTempScreen();
-        drawToScreen();
+        boolean debugEnabled = keyH.isShowDebugText();
+        if (debugEnabled) {
+          long updateStart = System.nanoTime();
+          update();
+          debugUpdateNanos += System.nanoTime() - updateStart;
+
+          long renderStart = System.nanoTime();
+          drawToTempScreen();
+          drawToScreen();
+          debugRenderNanos += System.nanoTime() - renderStart;
+          debugFrameCount++;
+        } else {
+          update();
+          drawToTempScreen();
+          drawToScreen();
+        }
         delta--;
         drawCount++;
       }
 
       if (timer >= 1_000_000_000) {
         LOGGER.log(Level.INFO, "FPS: {0}", drawCount);
+        if (keyH.isShowDebugText() && debugFrameCount > 0) {
+          double avgUpdateMs = debugUpdateNanos / (double) debugFrameCount / 1_000_000.0;
+          double avgRenderMs = debugRenderNanos / (double) debugFrameCount / 1_000_000.0;
+          LOGGER.log(
+              Level.INFO,
+              "Perf avg(ms) update={0} render={1}",
+              new Object[] {avgUpdateMs, avgRenderMs});
+        }
         drawCount = 0;
         timer = 0;
+        debugUpdateNanos = 0L;
+        debugRenderNanos = 0L;
+        debugFrameCount = 0;
       }
     }
   }
@@ -416,7 +448,7 @@ public class GamePanel extends JPanel implements Runnable {
   }
 
   private void sortAndDrawEntities() {
-    Collections.sort(entityList, Comparator.comparingInt(Entity::getWorldY));
+    Collections.sort(entityList, ENTITY_Y_COMPARATOR);
     for (Entity entity : entityList) {
       entity.draw(g2);
     }
@@ -443,7 +475,7 @@ public class GamePanel extends JPanel implements Runnable {
     long drawEnd = System.nanoTime();
     long passed = drawEnd - drawStart;
 
-    g2.setFont(new Font("Arial", Font.PLAIN, 20));
+    g2.setFont(DEBUG_FONT);
     g2.setColor(Color.white);
     int x = 10;
     int y = 400;
