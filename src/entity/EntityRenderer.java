@@ -5,6 +5,8 @@ import java.awt.image.BufferedImage;
 
 final class EntityRenderer {
 
+  private final Frame frame = new Frame();
+
   void draw(Entity entity, Graphics2D g2) {
     if (!entity.isAlive() && !entity.isDying() && !entity.isSpawning()) {
       return;
@@ -85,7 +87,10 @@ final class EntityRenderer {
         img = entity.down1;
         break;
     }
-    return new Frame(img, x, y);
+    frame.img = img;
+    frame.x = x;
+    frame.y = y;
+    return frame;
   }
 
   private BufferedImage pickFrame(BufferedImage atk1, BufferedImage atk2, BufferedImage idle1, BufferedImage idle2,
@@ -97,14 +102,8 @@ final class EntityRenderer {
   }
 
   private static final class Frame {
-    final BufferedImage img;
-    final int x;
-    final int y;
-
-    Frame(BufferedImage i, int x, int y) {
-      this.img = i;
-      this.x = x;
-      this.y = y;
-    }
+    BufferedImage img;
+    int x;
+    int y;
   }
 }
