@@ -257,62 +257,68 @@ class HudUi {
     Entity[] currentMonsters = monsters[currentMapIndex];
 
     for (Entity monster : currentMonsters) {
-      if (monster == null || !monster.inCamera()) {
-        continue;
-      }
-
-      // Se morreu / está na animação de morte, some com a barra na hora
-      if (!monster.isAlive()
-          || monster.isDying()
-          || (monster.getType() == Entity.TYPE_MONSTER && monster.getLife() <= 0)) {
-        monster.setHpBarOn(false);
-        monster.setHpBarCounter(0);
-        continue;
-      }
-
-      if (monster.isHpBarOn() && !monster.isBoss()) {
-        double oneScale = (double) GamePanel.TILE_SIZE / monster.getMaxLife();
-        double hpBarValue = oneScale * monster.getLife();
-
-        g2.setColor(COL_MONSTER_BAR_BG);
-        g2.fillRect(
-            monster.getScreenX() - 1,
-            monster.getScreenY() - 16,
-            GamePanel.TILE_SIZE + 2,
-            12);
-
-        g2.setColor(COL_MONSTER_BAR_FILL);
-        g2.fillRect(
-            monster.getScreenX(),
-            monster.getScreenY() - 15,
-            (int) hpBarValue,
-            10);
-
-        monster.setHpBarCounter(monster.getHpBarCounter() + 1);
-        if (monster.getHpBarCounter() > 600) {
-          monster.setHpBarCounter(0);
+      if (monster != null && monster.inCamera()) {
+        if (shouldHideMonsterBar(monster)) {
           monster.setHpBarOn(false);
+          monster.setHpBarCounter(0);
+        } else if (monster.isBoss()) {
+          drawBossHpBar(g2, monster);
+        } else if (monster.isHpBarOn()) {
+          drawNormalHpBar(g2, monster);
         }
-      } else if (monster.isBoss()) {
-        double oneScale = (double) GamePanel.TILE_SIZE * 8 / monster.getMaxLife();
-        double hpBarValue = oneScale * monster.getLife();
-
-        int x = GamePanel.SCREEN_WIDTH / 2 - GamePanel.TILE_SIZE * 4;
-        int y = GamePanel.TILE_SIZE * 10;
-
-        g2.setColor(COL_MONSTER_BAR_BG);
-        g2.fillRect(x - 1, y - 1, GamePanel.TILE_SIZE * 8 + 2, 22);
-
-        g2.setColor(COL_MONSTER_BAR_FILL);
-        g2.fillRect(x, y, (int) hpBarValue, 20);
-
-        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 24f));
-        g2.setColor(Color.white);
-
-        String bossName = monster.getDisplayName();
-        g2.drawString(bossName, x + 4, y - 10);
       }
     }
+  }
+
+  private static boolean shouldHideMonsterBar(Entity monster) {
+    return !monster.isAlive()
+        || monster.isDying()
+        || (monster.getType() == Entity.TYPE_MONSTER && monster.getLife() <= 0);
+  }
+
+  private static void drawNormalHpBar(Graphics2D g2, Entity monster) {
+    double oneScale = (double) GamePanel.TILE_SIZE / monster.getMaxLife();
+    double hpBarValue = oneScale * monster.getLife();
+
+    g2.setColor(COL_MONSTER_BAR_BG);
+    g2.fillRect(
+        monster.getScreenX() - 1,
+        monster.getScreenY() - 16,
+        GamePanel.TILE_SIZE + 2,
+        12);
+
+    g2.setColor(COL_MONSTER_BAR_FILL);
+    g2.fillRect(
+        monster.getScreenX(),
+        monster.getScreenY() - 15,
+        (int) hpBarValue,
+        10);
+
+    monster.setHpBarCounter(monster.getHpBarCounter() + 1);
+    if (monster.getHpBarCounter() > 600) {
+      monster.setHpBarCounter(0);
+      monster.setHpBarOn(false);
+    }
+  }
+
+  private static void drawBossHpBar(Graphics2D g2, Entity monster) {
+    double oneScale = (double) GamePanel.TILE_SIZE * 8 / monster.getMaxLife();
+    double hpBarValue = oneScale * monster.getLife();
+
+    int x = GamePanel.SCREEN_WIDTH / 2 - GamePanel.TILE_SIZE * 4;
+    int y = GamePanel.TILE_SIZE * 10;
+
+    g2.setColor(COL_MONSTER_BAR_BG);
+    g2.fillRect(x - 1, y - 1, GamePanel.TILE_SIZE * 8 + 2, 22);
+
+    g2.setColor(COL_MONSTER_BAR_FILL);
+    g2.fillRect(x, y, (int) hpBarValue, 20);
+
+    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 24f));
+    g2.setColor(Color.white);
+
+    String bossName = monster.getDisplayName();
+    g2.drawString(bossName, x + 4, y - 10);
   }
 
   void drawMessage() {
@@ -325,6 +331,7 @@ class HudUi {
     int i = 0;
     while (i < ui.message.size()) {
       String m = ui.message.get(i);
+      boolean removed = false;
       if (m != null) {
         g2.setColor(Color.black);
         g2.drawString(m, messageX + 2, messageY + 2);
@@ -338,10 +345,12 @@ class HudUi {
         if (ui.messageCounter.get(i) > 180) {
           ui.message.remove(i);
           ui.messageCounter.remove(i);
-          continue;
+          removed = true;
         }
       }
-      i++;
+      if (!removed) {
+        i++;
+      }
     }
   }
 }

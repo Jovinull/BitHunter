@@ -231,7 +231,7 @@ public class GamePanel extends JPanel implements Runnable {
           drawToTempScreen();
           drawToScreen();
         }
-        delta--;
+        delta -= 1.0;
         drawCount++;
       }
 
@@ -301,26 +301,25 @@ public class GamePanel extends JPanel implements Runnable {
       // Vivo e não está na animação de morte -> comportamento normal
       if (currentMonster.isAlive() && !currentMonster.isDying()) {
         currentMonster.update();
-        continue;
+      } else if (!currentMonster.isAlive()) {
+        handleDeadMonster(currentMonster, currentMonsters, i);
       }
+    }
+  }
 
-      // Aqui ele já "morreu" (alive == false) e terminou a animação
-      if (!currentMonster.isAlive()) {
+  private void handleDeadMonster(Entity monster, Entity[] list, int index) {
+    // Garante que o drop acontece só uma vez por morte
+    if (!monster.isDropHandled()) {
+      monster.checkDrop();
+      monster.setDropHandled(true);
+    }
 
-        // Garante que o drop acontece só uma vez por morte
-        if (!currentMonster.isDropHandled()) {
-          currentMonster.checkDrop();
-          currentMonster.setDropHandled(true);
-        }
-
-        // Se estiver configurado para respawnar, só atualiza o timer
-        if (currentMonster.isRespawnEnabled()) {
-          currentMonster.updateRespawn();
-        } else {
-          // Sem respawn -> some pra sempre (comportamento original)
-          currentMonsters[i] = null;
-        }
-      }
+    // Se estiver configurado para respawnar, só atualiza o timer
+    if (monster.isRespawnEnabled()) {
+      monster.updateRespawn();
+    } else {
+      // Sem respawn -> some pra sempre (comportamento original)
+      list[index] = null;
     }
   }
 
