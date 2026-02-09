@@ -14,6 +14,7 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 import entity.components.CombatComponent;
+import entity.components.DialogueComponent;
 import entity.components.EquipmentComponent;
 import entity.components.InventoryComponent;
 import entity.components.ItemAttributesComponent;
@@ -21,7 +22,6 @@ import entity.components.MovementComponent;
 import entity.components.PathfindingComponent;
 import entity.components.RespawnComponent;
 import main.GamePanel;
-import main.LanguageManager;
 import main.UtilityTool;
 
 public class Entity {
@@ -72,6 +72,7 @@ public class Entity {
   private final InventoryComponent inventoryComponent;
   private final EquipmentComponent equipment;
   private final ItemAttributesComponent itemAttributes;
+  private final DialogueComponent dialogue;
 
   // Sprites de movimento
   protected BufferedImage up1;
@@ -111,9 +112,6 @@ public class Entity {
 
   private boolean collision = false;
 
-  // Diálogos
-  private final String[][] dialogues = new String[20][20];
-
   private Entity attacker;
   private Entity linkedEntity;
   private boolean temp = false;
@@ -123,8 +121,6 @@ public class Entity {
   private int worldY;
   private String direction = DIR_DOWN;
   private int spriteNum = 1;
-  private int dialogueSet = 0;
-  private int dialogueIndex = 0;
   private boolean collisionOn = false;
   private boolean invincible = false;
   private boolean attacking = false;
@@ -197,6 +193,7 @@ public class Entity {
     this.inventoryComponent = new InventoryComponent();
     this.equipment = new EquipmentComponent();
     this.itemAttributes = new ItemAttributesComponent();
+    this.dialogue = new DialogueComponent(this);
   }
 
   // =========================
@@ -355,9 +352,7 @@ public class Entity {
   }
 
   public void startDialogue(Entity entity, int setNum) {
-    gp.setGameState(GamePanel.DIALOGUE_STATE);
-    gp.getGameUi().setNpc(entity);
-    dialogueSet = setNum;
+    dialogue.startDialogue(entity, setNum);
   }
 
   public boolean use(Entity entity) {
@@ -461,20 +456,7 @@ public class Entity {
    * Por padrão usa translationKey + ".name".
    */
   public String getDisplayName() {
-    LanguageManager lm = gp != null ? gp.getLanguageManager() : null;
-
-    String baseKey = null;
-    if (translationKey != null && !translationKey.isEmpty()) {
-      baseKey = translationKey;
-    } else if (internalId != null && !internalId.isEmpty()) {
-      baseKey = internalId;
-    }
-
-    if (lm != null && baseKey != null) {
-      return lm.text(baseKey + ".name");
-    }
-
-    return name != null ? name : "";
+    return dialogue.getDisplayName();
   }
 
   /**
@@ -482,43 +464,18 @@ public class Entity {
    * Por padrão usa translationKey + ".desc".
    */
   public String getDisplayDescription() {
-    LanguageManager lm = gp != null ? gp.getLanguageManager() : null;
-
-    String baseKey = null;
-    if (translationKey != null && !translationKey.isEmpty()) {
-      baseKey = translationKey;
-    } else if (internalId != null && !internalId.isEmpty()) {
-      baseKey = internalId;
-    }
-
-    if (lm != null && baseKey != null) {
-      return lm.text(baseKey + ".desc");
-    }
-
-    // Fallback: usa a descrição que eventualmente foi preenchida manualmente
-    String desc = getDescription();
-    return desc != null ? desc : "";
+    return dialogue.getDisplayDescription();
   }
 
   /**
    * Helper básico de tradução para subclasses de Entity.
    */
   protected String t(String key) {
-    LanguageManager lm = gp != null ? gp.getLanguageManager() : null;
-    if (lm == null) {
-      return key;
-    }
-    return lm.text(key);
+    return dialogue.t(key);
   }
 
   protected void fillDialogueSet(int setIndex, String baseKey, int totalLines) {
-    if (baseKey == null || baseKey.isBlank()) {
-      return;
-    }
-
-    for (int i = 0; i < totalLines; i++) {
-      dialogues[setIndex][i] = t(baseKey + ".line" + (i + 1));
-    }
+    dialogue.fillDialogueSet(setIndex, baseKey, totalLines);
   }
 
   public void checkAttackOrNot(int rate, int straight, int horizontal) {
@@ -762,7 +719,7 @@ public class Entity {
   }
 
   public String[][] getDialogues() {
-    return dialogues;
+    return dialogue.getDialogues();
   }
 
   public Entity getAttacker() {
@@ -822,19 +779,19 @@ public class Entity {
   }
 
   public int getDialogueSet() {
-    return dialogueSet;
+    return dialogue.getDialogueSet();
   }
 
   public void setDialogueSet(int dialogueSet) {
-    this.dialogueSet = dialogueSet;
+    dialogue.setDialogueSet(dialogueSet);
   }
 
   public int getDialogueIndex() {
-    return dialogueIndex;
+    return dialogue.getDialogueIndex();
   }
 
   public void setDialogueIndex(int dialogueIndex) {
-    this.dialogueIndex = dialogueIndex;
+    dialogue.setDialogueIndex(dialogueIndex);
   }
 
   public boolean isCollisionOn() {
