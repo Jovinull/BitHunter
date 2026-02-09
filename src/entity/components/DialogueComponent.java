@@ -2,6 +2,7 @@ package entity.components;
 
 import entity.Entity;
 import main.GamePanel;
+import entity.services.TranslationService;
 import main.LanguageManager;
 
 public class DialogueComponent {
@@ -10,6 +11,7 @@ public class DialogueComponent {
   private final String[][] dialogues = new String[20][20];
   private int dialogueSet = 0;
   private int dialogueIndex = 0;
+  private final TranslationService translator = new TranslationService();
 
   public DialogueComponent(Entity entity) {
     this.entity = entity;
@@ -78,11 +80,7 @@ public class DialogueComponent {
   }
 
   public String t(String key) {
-    LanguageManager lm = entity.getGp() != null ? entity.getGp().getLanguageManager() : null;
-    if (lm == null) {
-      return key;
-    }
-    return lm.text(key);
+    return translator.text(entity.getGp(), key);
   }
 
   public void fillDialogueSet(int setIndex, String baseKey, int totalLines) {

@@ -3,7 +3,6 @@ package entity;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -21,6 +20,7 @@ import entity.components.ItemAttributesComponent;
 import entity.components.MovementComponent;
 import entity.components.PathfindingComponent;
 import entity.components.RespawnComponent;
+import entity.services.ParticleService;
 import main.GamePanel;
 import main.UtilityTool;
 
@@ -73,6 +73,7 @@ public class Entity {
   private final EquipmentComponent equipment;
   private final ItemAttributesComponent itemAttributes;
   private final DialogueComponent dialogue;
+  private final ParticleService particleService;
 
   // Sprites de movimento
   protected BufferedImage up1;
@@ -194,6 +195,7 @@ public class Entity {
     this.equipment = new EquipmentComponent();
     this.itemAttributes = new ItemAttributesComponent();
     this.dialogue = new DialogueComponent(this);
+    this.particleService = new ParticleService(this);
   }
 
   // =========================
@@ -400,21 +402,7 @@ public class Entity {
   }
 
   public void generateParticle(Entity generator, Entity target) {
-    Color color = generator.getParticleColor();
-    int size = generator.getParticleSize();
-    int speedVal = generator.getParticleSpeed();
-    int maxLifeVal = generator.getParticleMaxLife();
-
-    Particle p1 = new Particle(gp, target, color, size, speedVal, maxLifeVal, new Point(-2, -1));
-    Particle p2 = new Particle(gp, target, color, size, speedVal, maxLifeVal, new Point(2, -1));
-    Particle p3 = new Particle(gp, target, color, size, speedVal, maxLifeVal, new Point(-2, 1));
-    Particle p4 = new Particle(gp, target, color, size, speedVal, maxLifeVal, new Point(2, 1));
-
-    var particles = gp.getParticleList();
-    particles.add(p1);
-    particles.add(p2);
-    particles.add(p3);
-    particles.add(p4);
+    particleService.generateParticle(generator, target);
   }
 
   public void checkCollision() {
