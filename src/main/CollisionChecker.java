@@ -8,6 +8,8 @@ import entity.Entity;
 public class CollisionChecker {
 
   private final GamePanel gp; // Referência ao painel principal do jogo (acessa tiles e configurações)
+  private final Rectangle tempRect1 = new Rectangle();
+  private final Rectangle tempRect2 = new Rectangle();
 
   // Construtor: recebe o GamePanel para acessar o mundo e as tiles
   public CollisionChecker(GamePanel gp) {
@@ -99,6 +101,11 @@ public class CollisionChecker {
     int currentMapIndex = gp.getCurrentMap();
     int len = objects[currentMapIndex].length;
 
+    Rectangle eRect = tempRect1;
+    Rectangle oRect = tempRect2;
+    setWorldRect(entity, eRect);
+    applyMovement(direction, speed, eRect);
+
     for (int i = 0; i < len; i++) {
       Entity obj = objects[currentMapIndex][i];
       if (obj == null) {
@@ -106,26 +113,7 @@ public class CollisionChecker {
       }
 
       // Rects temporários em coords do mundo (não muta as solidArea reais)
-      Rectangle eRect = toWorldRect(entity);
-      Rectangle oRect = toWorldRect(obj);
-
-      // Simula o movimento da entidade
-      switch (direction) {
-        case Entity.DIR_UP:
-          eRect.y -= speed;
-          break;
-        case Entity.DIR_DOWN:
-          eRect.y += speed;
-          break;
-        case Entity.DIR_LEFT:
-          eRect.x -= speed;
-          break;
-        case Entity.DIR_RIGHT:
-          eRect.x += speed;
-          break;
-        default:
-          break;
-      }
+      setWorldRect(obj, oRect);
 
       if (eRect.intersects(oRect)) {
         if (obj.isCollision()) {
@@ -150,6 +138,11 @@ public class CollisionChecker {
     int currentMapIndex = gp.getCurrentMap();
     int len = target[currentMapIndex].length;
 
+    Rectangle eRect = tempRect1;
+    Rectangle oRect = tempRect2;
+    setWorldRect(entity, eRect);
+    applyMovement(direction, speed, eRect);
+
     for (int i = 0; i < len; i++) {
       Entity other = target[currentMapIndex][i];
       if (other == null) {
@@ -166,25 +159,7 @@ public class CollisionChecker {
         continue;
       }
 
-      Rectangle eRect = toWorldRect(entity);
-      Rectangle oRect = toWorldRect(other);
-
-      switch (direction) {
-        case Entity.DIR_UP:
-          eRect.y -= speed;
-          break;
-        case Entity.DIR_DOWN:
-          eRect.y += speed;
-          break;
-        case Entity.DIR_LEFT:
-          eRect.x -= speed;
-          break;
-        case Entity.DIR_RIGHT:
-          eRect.x += speed;
-          break;
-        default:
-          break;
-      }
+      setWorldRect(other, oRect);
 
       if (eRect.intersects(oRect) && other != entity) {
         entity.setCollisionOn(true);
@@ -209,28 +184,14 @@ public class CollisionChecker {
 
     var player = gp.getPlayer();
 
-    Rectangle eRect = toWorldRect(entity);
-    Rectangle pRect = toWorldRect(player);
-
     String direction = entity.isKnockBack() ? entity.getKnockBackDirection() : entity.getDirection();
     int speed = entity.getSpeed();
 
-    switch (direction) {
-      case Entity.DIR_UP:
-        eRect.y -= speed;
-        break;
-      case Entity.DIR_DOWN:
-        eRect.y += speed;
-        break;
-      case Entity.DIR_LEFT:
-        eRect.x -= speed;
-        break;
-      case Entity.DIR_RIGHT:
-        eRect.x += speed;
-        break;
-      default:
-        break;
-    }
+    Rectangle eRect = tempRect1;
+    Rectangle pRect = tempRect2;
+    setWorldRect(entity, eRect);
+    setWorldRect(player, pRect);
+    applyMovement(direction, speed, eRect);
 
     if (eRect.intersects(pRect)) {
       entity.setCollisionOn(true);
@@ -242,8 +203,27 @@ public class CollisionChecker {
 
   // ----- Helpers -----
 
-  private static Rectangle toWorldRect(Entity e) {
+  private static void setWorldRect(Entity e, Rectangle out) {
     Rectangle sa = e.getSolidArea();
-    return new Rectangle(e.getWorldX() + sa.x, e.getWorldY() + sa.y, sa.width, sa.height);
+    out.setBounds(e.getWorldX() + sa.x, e.getWorldY() + sa.y, sa.width, sa.height);
+  }
+
+  private static void applyMovement(String direction, int speed, Rectangle rect) {
+    switch (direction) {
+      case Entity.DIR_UP:
+        rect.y -= speed;
+        break;
+      case Entity.DIR_DOWN:
+        rect.y += speed;
+        break;
+      case Entity.DIR_LEFT:
+        rect.x -= speed;
+        break;
+      case Entity.DIR_RIGHT:
+        rect.x += speed;
+        break;
+      default:
+        break;
+    }
   }
 }
