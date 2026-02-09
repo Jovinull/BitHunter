@@ -22,6 +22,7 @@ import main.UtilityTool;
 public class TileManager {
 
   private static final Logger LOGGER = Logger.getLogger(TileManager.class.getName());
+  private static final Color PATH_COLOR = new Color(255, 0, 0, 70);
 
   // Referência ao painel do jogo (agora protegida, não pública – S1104)
   protected final GamePanel gp;
@@ -190,7 +191,7 @@ public class TileManager {
     var pathList = (pathFinder != null) ? pathFinder.getPathList() : null;
 
     if (drawPath && pathList != null) {
-      g2.setColor(new Color(255, 0, 0, 70));
+      g2.setColor(PATH_COLOR);
       for (var node : pathList) {
         int pathWorldX = node.getCol() * GamePanel.TILE_SIZE;
         int pathWorldY = node.getRow() * GamePanel.TILE_SIZE;
