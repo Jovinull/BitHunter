@@ -73,7 +73,7 @@ public class TileManager {
 
         mapTileNum = new int[GamePanel.MAX_MAP][worldSize][worldSize];
       }
-    } catch (Exception _) {
+    } catch (Exception ex) {
       LOGGER.severe("Erro ao obter maxWorldCol/maxWorldRow de /maps/world01.txt");
     }
 

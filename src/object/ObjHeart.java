@@ -45,7 +45,7 @@ public class ObjHeart extends Entity {
     String pattern = t(key + ".desc");
     try {
       return String.format(pattern, getValue());
-    } catch (IllegalArgumentException _) {
+    } catch (IllegalArgumentException ex) {
       return pattern;
     }
   }
