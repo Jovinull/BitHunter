@@ -554,9 +554,11 @@ public class KeyHandler implements KeyListener {
     if (code == KeyEvent.VK_ENTER) {
       int commandNum = gp.getGameUi().getCommandNum();
       if (commandNum == 0) {
+        gp.logRespawnDebug("respawn.start");
         gp.setGameState(GamePanel.PLAY_STATE);
         gp.resetGame(false);
         gp.playMusic(0);
+        gp.logRespawnDebug("respawn.end");
       } else if (commandNum == 1) {
         gp.stopMusic();
         gp.resetGame(true);

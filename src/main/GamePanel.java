@@ -33,6 +33,7 @@ import ui.UI;
 public class GamePanel extends JPanel implements Runnable {
 
   private static final Logger LOGGER = Logger.getLogger(GamePanel.class.getName());
+  private static final boolean DEBUG_RESPAWN = false;
   private static final Font DEBUG_FONT = new Font("Arial", Font.PLAIN, 20);
   private static final Comparator<Entity> ENTITY_Y_COMPARATOR =
       Comparator.comparingInt(Entity::getWorldY);
@@ -117,6 +118,8 @@ public class GamePanel extends JPanel implements Runnable {
   private long debugUpdateNanos = 0L;
   private long debugRenderNanos = 0L;
   private int debugFrameCount = 0;
+  private long respawnStartMs = -1L;
+  private boolean respawnUpdateLogPending = false;
 
   // AREA
   private int currentArea;
@@ -265,6 +268,10 @@ public class GamePanel extends JPanel implements Runnable {
   }
 
   private void updatePlayState() {
+    if (respawnUpdateLogPending) {
+      logRespawnDebug("update.resume");
+      respawnUpdateLogPending = false;
+    }
     updatePlayer();
     updateNpcs();
     updateMonsters();
@@ -540,6 +547,28 @@ public class GamePanel extends JPanel implements Runnable {
           obj[mapNum][i] = null;
         }
       }
+    }
+  }
+
+  public void logRespawnDebug(String marker) {
+    if (!DEBUG_RESPAWN) {
+      return;
+    }
+
+    long now = System.currentTimeMillis();
+    String thread = Thread.currentThread().getName();
+
+    if ("respawn.start".equals(marker)) {
+      respawnStartMs = now;
+      respawnUpdateLogPending = true;
+    }
+
+    LOGGER.log(Level.INFO, "[Respawn] {0} t={1} thread={2}", new Object[] {marker, now, thread});
+
+    if (respawnStartMs > 0
+        && ("respawn.end".equals(marker) || "update.resume".equals(marker))) {
+      long elapsed = now - respawnStartMs;
+      LOGGER.log(Level.INFO, "[Respawn] {0} elapsedMs={1}", new Object[] {marker, elapsed});
     }
   }
 

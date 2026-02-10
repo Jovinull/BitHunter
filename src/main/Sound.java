@@ -13,6 +13,7 @@ public class Sound {
   private Clip clip; // Controla o áudio que está sendo reproduzido
   private final URL[] soundURL = new URL[30]; // Armazena os caminhos dos arquivos de som
   private FloatControl fc; // Controla o volume do áudio
+  private int currentIndex = -1;
 
   // Nível de volume (0 a 5)
   private int volumeScale = 3;
@@ -50,11 +51,17 @@ public class Sound {
   // Prepara o áudio correspondente ao índice informado
   public void setFile(int i) {
     try {
+      if (i == currentIndex && clip != null) {
+        // Reutiliza o clip já carregado para evitar I/O bloqueante no respawn.
+        return;
+      }
+
       AudioInputStream ais = AudioSystem.getAudioInputStream(soundURL[i]); // Lê o áudio
       clip = AudioSystem.getClip(); // Cria um reprodutor de som
       clip.open(ais); // Carrega o áudio no reprodutor
       fc = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN); // Controla o volume
       checkVolume(); // Ajusta o volume conforme volumeScale
+      currentIndex = i;
     } catch (Exception e) {
       e.printStackTrace(); // Mostra o erro se o som não puder ser carregado
     }
