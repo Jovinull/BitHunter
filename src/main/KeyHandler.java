@@ -3,16 +3,46 @@ package main;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import ui.UI;
+
 /**
  * Lida com eventos de teclado e delega o comportamento conforme o estado atual
  * do jogo. Mantém flags de input para o loop principal (GamePanel) consumir.
  */
 public class KeyHandler implements KeyListener {
 
-  // Referência ao painel do jogo para ler/alterar estados
+  // -----------------------
+  // Constants
+  // -----------------------
+
+  /** ID do SFX de navegação (UI). */
+  private static final int NAVIGATE_SFX_ID = 9;
+
+  /** Limites de índices dos menus de título. */
+  private static final int MENU_MAIN_MAX_INDEX = 2; // [Novo jogo, Carregar, Sair]
+  private static final int MENU_CLASS_MAX_INDEX = 3; // [Guerreiro, Ladrão, Feiticeiro, Voltar]
+
+  /** Limites de índices de menus com navegação W/S (wrap). */
+  private static final int TRADE_MENU_MAX_INDEX = 2;
+  private static final int PET_YARD_MENU_MAX_INDEX = 2;
+  private static final int GAME_OVER_MAX_INDEX = 1;
+
+  /** Limites do grid de slots na tela de personagem. */
+  private static final int SLOT_ROW_MAX = 3;
+  private static final int SLOT_COL_MAX = 4;
+
+  /** Limites de escala de volume (Sound). */
+  private static final int VOLUME_SCALE_MIN = 0;
+  private static final int VOLUME_SCALE_MAX = 5;
+
+  // -----------------------
+  // Fields
+  // -----------------------
+
+  /** Referência ao painel do jogo para ler/alterar estados. */
   private final GamePanel gp;
 
-  // Flags de input contínuo (consumidas no update do jogo)
+  /** Flags de input contínuo (consumidas no update do jogo). */
   private boolean upPressed;
   private boolean downPressed;
   private boolean leftPressed;
@@ -21,21 +51,17 @@ public class KeyHandler implements KeyListener {
   private boolean shotKeyPressed;
   private boolean spacePressed;
 
-  // DEBUG/God mode encapsulados
-  private boolean showDebugText = false;
-  private boolean godModeOn = false;
-
-  // Limites de índices dos menus de título (evita "números mágicos")
-  private static final int MENU_MAIN_MAX_INDEX = 2; // [Novo jogo, Carregar, Sair]
-  private static final int MENU_CLASS_MAX_INDEX = 3; // [Guerreiro, Ladrão, Feiticeiro, Voltar]
-
-  // Limites do grid de slots na tela de personagem
-  private static final int SLOT_ROW_MAX = 3;
-  private static final int SLOT_COL_MAX = 4;
+  /** Flags de debug/dev. */
+  private boolean showDebugText;
+  private boolean godModeOn;
 
   public KeyHandler(GamePanel gp) {
     this.gp = gp;
   }
+
+  // -----------------------
+  // KeyListener
+  // -----------------------
 
   /** Não utilizado (entrada de caracteres). */
   @Override
@@ -43,83 +69,112 @@ public class KeyHandler implements KeyListener {
     // Intencionalmente vazio
   }
 
-  /**
-   * Dispara ao pressionar uma tecla. Encaminha para o "estado" atual do jogo.
-   */
+  /** Dispara ao pressionar uma tecla. Encaminha para o estado atual do jogo. */
   @Override
   public void keyPressed(KeyEvent e) {
-    final int key = e.getKeyCode();
+    final int code = e.getKeyCode();
     final int state = gp.getGameState();
 
-    if (state == GamePanel.TITLE_STATE) {
-      titleState(key);
-      return;
-    }
-    if (state == GamePanel.PLAY_STATE) {
-      playState(key);
-      return;
-    }
-    if (state == GamePanel.PAUSE_STATE) {
-      pauseState(key);
-      return;
-    }
-    if (state == GamePanel.DIALOGUE_STATE || state == GamePanel.CUTSCENE_STATE) {
-      dialogueState(key);
-      return;
-    }
-    if (state == GamePanel.CHARACTER_STATE) {
-      characterState(key);
-    }
-    if (state == GamePanel.OPTIONS_STATE) {
-      optionsState(key);
-    }
-    if (state == GamePanel.GAME_OVER_STATE) {
-      gameOverState(key);
-    }
-    if (state == GamePanel.TRADE_STATE) {
-      tradeState(key);
-    }
-
-    if (state == GamePanel.PET_YARD_STATE) {
-      petYardState(key);
-      return;
-    }
-
-    if (state == GamePanel.MAP_STATE) {
-      mapState(key);
+    switch (state) {
+      case GamePanel.TITLE_STATE -> {
+        titleState(code);
+        return;
+      }
+      case GamePanel.PLAY_STATE -> {
+        playState(code);
+        return;
+      }
+      case GamePanel.PAUSE_STATE -> {
+        pauseState(code);
+        return;
+      }
+      case GamePanel.DIALOGUE_STATE, GamePanel.CUTSCENE_STATE -> {
+        dialogueState(code);
+        return;
+      }
+      case GamePanel.CHARACTER_STATE -> {
+        characterState(code);
+        return;
+      }
+      case GamePanel.OPTIONS_STATE -> {
+        optionsState(code);
+        return;
+      }
+      case GamePanel.GAME_OVER_STATE -> {
+        gameOverState(code);
+        return;
+      }
+      case GamePanel.TRADE_STATE -> {
+        tradeState(code);
+        return;
+      }
+      case GamePanel.PET_YARD_STATE -> {
+        petYardState(code);
+        return;
+      }
+      case GamePanel.MAP_STATE -> {
+        mapState(code);
+        return;
+      }
+      default -> {
+        // noop
+      }
     }
   }
+
+  /** Dispara ao SOLTAR uma tecla. Zera flags de movimento correspondentes. */
+  @Override
+  public void keyReleased(KeyEvent e) {
+    final int key = e.getKeyCode();
+    switch (key) {
+      case KeyEvent.VK_W -> upPressed = false;
+      case KeyEvent.VK_S -> downPressed = false;
+      case KeyEvent.VK_A -> leftPressed = false;
+      case KeyEvent.VK_D -> rightPressed = false;
+      case KeyEvent.VK_F -> shotKeyPressed = false;
+      case KeyEvent.VK_ENTER -> enterPressed = false;
+      case KeyEvent.VK_SPACE -> spacePressed = false;
+      default -> {
+        // noop
+      }
+    }
+  }
+
+  // -----------------------
+  // State handlers
+  // -----------------------
 
   /**
    * Estado: Tela de título (menus iniciais).
    * titleScreenState 0 = menu principal; 1 = seleção de classe/personagem.
    */
   public void titleState(int code) {
-    switch (gp.getGameUi().getTitleScreenState()) {
-      case 0 -> handleTitleMainMenu(code);
-      case 1 -> handleTitleClassSelect(code);
+    final UI ui = gp.getGameUi();
+    switch (ui.getTitleScreenState()) {
+      case 0 -> handleTitleMainMenu(code, ui);
+      case 1 -> handleTitleClassSelect(code, ui);
       default -> {
         // noop
       }
     }
   }
 
-  private void handleTitleMainMenu(int code) {
+  private void handleTitleMainMenu(int code, UI ui) {
     switch (code) {
-      case KeyEvent.VK_W -> navigateUp(MENU_MAIN_MAX_INDEX);
-      case KeyEvent.VK_S -> navigateDown(MENU_MAIN_MAX_INDEX);
-      case KeyEvent.VK_ENTER -> handleTitleMainEnter();
+      case KeyEvent.VK_W -> navigateUp(ui, MENU_MAIN_MAX_INDEX);
+      case KeyEvent.VK_S -> navigateDown(ui, MENU_MAIN_MAX_INDEX);
+      case KeyEvent.VK_ENTER -> handleTitleMainEnter(ui);
       default -> {
         // noop
       }
     }
   }
 
-  private void handleTitleMainEnter() {
-    switch (gp.getGameUi().getCommandNum()) {
+  private void handleTitleMainEnter(UI ui) {
+    switch (ui.getCommandNum()) {
       case 0 -> { // Novo jogo -> vai para seleção de classe
-        gp.getGameUi().setTitleScreenState(1);
-        gp.getGameUi().setCommandNum(0);
+        ui.setTitleScreenState(1);
+        ui.setCommandNum(0);
       }
       case 1 -> { // Carregar jogo
         gp.saveLoad.load();
@@ -133,115 +188,22 @@ public class KeyHandler implements KeyListener {
     }
   }
 
-  /**
-   * Estado: Pet Yard (gerenciador de pets).
-   */
-  public void petYardState(int code) {
-    if (code == KeyEvent.VK_ENTER) {
-      enterPressed = true;
-      return;
-    }
-
-    var ui = gp.getGameUi();
-
-    switch (ui.getSubState()) {
-      case 0 -> handlePetYardMenuNavigation(code);
-      case 1 -> handlePetListNavigation(code);
-      case 2 -> {
-        playerInventory(code);
-        if (code == KeyEvent.VK_ESCAPE) {
-          ui.setSubState(0);
-        }
-      }
-      default -> {
-        // noop
-      }
-    }
-  }
-
-  private void handlePetYardMenuNavigation(int code) {
-    var ui = gp.getGameUi();
-
+  private void handleTitleClassSelect(int code, UI ui) {
     switch (code) {
-      case KeyEvent.VK_W -> {
-        int commandNum = ui.getCommandNum();
-        commandNum--;
-        if (commandNum < 0) {
-          commandNum = 2;
-        }
-        ui.setCommandNum(commandNum);
-        gp.playSE(9);
-      }
-      case KeyEvent.VK_S -> {
-        int commandNum = ui.getCommandNum();
-        commandNum++;
-        if (commandNum > 2) {
-          commandNum = 0;
-        }
-        ui.setCommandNum(commandNum);
-        gp.playSE(9);
-      }
-      case KeyEvent.VK_ESCAPE -> gp.setGameState(GamePanel.PLAY_STATE);
-      default -> {
-        // noop
-      }
-    }
-  }
-
-  private void handlePetListNavigation(int code) {
-    var ui = gp.getGameUi();
-    var player = gp.getPlayer();
-    int petCount = player.getOwnedPets().size();
-
-    if (petCount <= 0) {
-      if (code == KeyEvent.VK_ESCAPE) {
-        ui.setSubState(0);
-      }
-      return;
-    }
-
-    int commandNum = ui.getCommandNum();
-
-    switch (code) {
-      case KeyEvent.VK_W -> {
-        commandNum--;
-        if (commandNum < 0) {
-          commandNum = petCount - 1;
-        }
-        ui.setCommandNum(commandNum);
-        gp.playSE(9);
-      }
-      case KeyEvent.VK_S -> {
-        commandNum++;
-        if (commandNum > petCount - 1) {
-          commandNum = 0;
-        }
-        ui.setCommandNum(commandNum);
-        gp.playSE(9);
-      }
-      case KeyEvent.VK_ESCAPE -> ui.setSubState(0);
-      default -> {
-        // noop
-      }
-    }
-  }
-
-  private void handleTitleClassSelect(int code) {
-    switch (code) {
-      case KeyEvent.VK_W -> navigateUp(MENU_CLASS_MAX_INDEX);
-      case KeyEvent.VK_S -> navigateDown(MENU_CLASS_MAX_INDEX);
+      case KeyEvent.VK_W -> navigateUp(ui, MENU_CLASS_MAX_INDEX);
+      case KeyEvent.VK_S -> navigateDown(ui, MENU_CLASS_MAX_INDEX);
       case KeyEvent.VK_ENTER -> {
-        if (gp.getGameUi().getCommandNum() == 3) { // Voltar
-          gp.getGameUi().setTitleScreenState(0);
-          gp.getGameUi().setCommandNum(0);
+        if (ui.getCommandNum() == MENU_CLASS_MAX_INDEX) { // Voltar
+          ui.setTitleScreenState(0);
+          ui.setCommandNum(0);
         } else {
           gp.setGameState(GamePanel.PLAY_STATE);
           gp.playMusic(0);
         }
       }
       case KeyEvent.VK_ESCAPE -> {
-        gp.getGameUi().setTitleScreenState(0);
-        gp.getGameUi().setCommandNum(0);
+        ui.setTitleScreenState(0);
+        ui.setCommandNum(0);
       }
       default -> {
         // noop
@@ -286,21 +248,6 @@ public class KeyHandler implements KeyListener {
     }
   }
 
-  private void toggleDebug() {
-    showDebugText = !showDebugText;
-    gp.getTileM().setDrawPath(showDebugText);
-  }
-
-  private void reloadCurrentMap() {
-    switch (gp.getCurrentMap()) {
-      case 0 -> gp.getTileM().loadMap("/maps/world01.txt", 0);
-      case 1 -> gp.getTileM().loadMap("/maps/interior01.txt", 1);
-      default -> {
-        // noop
-      }
-    }
-  }
-
   /**
    * Estado: Pausado.
    */
@@ -336,6 +283,9 @@ public class KeyHandler implements KeyListener {
    * Estado: Opções.
    */
   public void optionsState(int code) {
+    final UI ui = gp.getGameUi();
+    final int subState = ui.getSubState();
+
     if (code == KeyEvent.VK_ESCAPE) {
       gp.setGameState(GamePanel.PLAY_STATE);
       return;
@@ -346,27 +296,25 @@ public class KeyHandler implements KeyListener {
     }
 
     // Navegação ESPECIAL para o submenu de idiomas (subState 4)
-    if (gp.getGameUi().getSubState() == 4
-        && (code == KeyEvent.VK_W || code == KeyEvent.VK_S)) {
-      handleLanguageMenuNavigation(code);
+    if (subState == 4 && (code == KeyEvent.VK_W || code == KeyEvent.VK_S)) {
+      handleLanguageMenuNavigation(code, ui);
       return;
     }
 
     // Navegação ESPECIAL para a tela de controles (subState 2): troca de página com
     // A/D
-    if (gp.getGameUi().getSubState() == 2
-        && (code == KeyEvent.VK_A || code == KeyEvent.VK_D)) {
-      handleControlsPageNavigation(code);
+    if (subState == 2 && (code == KeyEvent.VK_A || code == KeyEvent.VK_D)) {
+      handleControlsPageNavigation(code, ui);
       return;
     }
 
-    final int maxCommandNum = getOptionsMaxCommandNum();
+    final int maxCommandNum = getOptionsMaxCommandNum(subState);
 
     switch (code) {
-      case KeyEvent.VK_W -> moveCommandNum(-1, maxCommandNum);
-      case KeyEvent.VK_S -> moveCommandNum(+1, maxCommandNum);
-      case KeyEvent.VK_A -> adjustVolume(-1);
-      case KeyEvent.VK_D -> adjustVolume(+1);
+      case KeyEvent.VK_W -> moveCommandNum(ui, -1, maxCommandNum);
+      case KeyEvent.VK_S -> moveCommandNum(ui, +1, maxCommandNum);
+      case KeyEvent.VK_A -> adjustVolume(ui, subState, -1);
+      case KeyEvent.VK_D -> adjustVolume(ui, subState, +1);
       default -> {
         // noop
       }
@@ -388,10 +336,8 @@ public class KeyHandler implements KeyListener {
    * - S no último idioma -> "Voltar"
    * - S em "Voltar" -> primeiro idioma (0)
    */
-  private void handleLanguageMenuNavigation(int code) {
-    var ui = gp.getGameUi();
+  private void handleLanguageMenuNavigation(int code, UI ui) {
     var langManager = gp.getLanguageManager();
-
     int totalLanguages = langManager.getAvailableLanguages().size();
     int backIndex = totalLanguages;
     int commandNum = ui.getCommandNum();
@@ -424,7 +370,7 @@ public class KeyHandler implements KeyListener {
     }
 
     ui.setCommandNum(commandNum);
-    gp.playSE(9);
+    playNavigateSfx();
   }
 
   /**
@@ -434,8 +380,7 @@ public class KeyHandler implements KeyListener {
    * - D -> próxima página
    * (com wrap-around)
    */
-  private void handleControlsPageNavigation(int code) {
-    var ui = gp.getGameUi();
+  private void handleControlsPageNavigation(int code, UI ui) {
     int pageCount = ui.getControlsPageCount();
     if (pageCount <= 1) {
       return;
@@ -444,19 +389,13 @@ public class KeyHandler implements KeyListener {
     int page = ui.getControlsPage();
 
     if (code == KeyEvent.VK_A) {
-      page--;
-      if (page < 0) {
-        page = pageCount - 1;
-      }
+      page = wrapDecrement(page, pageCount - 1);
     } else if (code == KeyEvent.VK_D) {
-      page++;
-      if (page > pageCount - 1) {
-        page = 0;
-      }
+      page = wrapIncrement(page, pageCount - 1);
     }
 
     ui.setControlsPage(page);
-    gp.playSE(9);
+    playNavigateSfx();
   }
 
   /**
@@ -469,8 +408,8 @@ public class KeyHandler implements KeyListener {
    * subState 3 -> confirmação de encerrar jogo ("Sim"/"Não", índices 0..1)
    * subState 4 -> seleção de idioma (0..N idiomas, + "Voltar" em N)
    */
-  private int getOptionsMaxCommandNum() {
-    return switch (gp.getGameUi().getSubState()) {
+  private int getOptionsMaxCommandNum(int subState) {
+    return switch (subState) {
       case 0 -> 5;
       case 1, 2 -> 0;
       case 3 -> 1;
@@ -479,8 +418,8 @@ public class KeyHandler implements KeyListener {
     };
   }
 
-  private void moveCommandNum(int delta, int max) {
-    int commandNum = gp.getGameUi().getCommandNum();
+  private void moveCommandNum(UI ui, int delta, int max) {
+    int commandNum = ui.getCommandNum();
     commandNum += delta;
     if (commandNum < 0) {
       commandNum = max;
@@ -488,17 +427,17 @@ public class KeyHandler implements KeyListener {
     if (commandNum > max) {
       commandNum = 0;
     }
-    gp.getGameUi().setCommandNum(commandNum);
-    gp.playSE(9);
+    ui.setCommandNum(commandNum);
+    playNavigateSfx();
   }
 
-  private void adjustVolume(int direction) {
+  private void adjustVolume(UI ui, int subState, int direction) {
     // só ajusta volume no topo das opções
-    if (gp.getGameUi().getSubState() != 0) {
+    if (subState != 0) {
       return;
     }
 
-    int commandNum = gp.getGameUi().getCommandNum();
+    int commandNum = ui.getCommandNum();
 
     switch (commandNum) {
       case 1 -> { // música
@@ -506,9 +445,9 @@ public class KeyHandler implements KeyListener {
         int current = music.getVolumeScale();
         int next = current + direction;
 
-        if (next >= 0 && next <= 5) {
+        if (next >= VOLUME_SCALE_MIN && next <= VOLUME_SCALE_MAX) {
           music.setVolumeScale(next); // checkVolume() é chamado dentro do setter
-          gp.playSE(9);
+          playNavigateSfx();
         }
       }
       case 2 -> { // efeitos
@@ -516,9 +455,9 @@ public class KeyHandler implements KeyListener {
         int current = se.getVolumeScale();
         int next = current + direction;
 
-        if (next >= 0 && next <= 5) {
+        if (next >= VOLUME_SCALE_MIN && next <= VOLUME_SCALE_MAX) {
           se.setVolumeScale(next);
-          gp.playSE(9);
+          playNavigateSfx();
         }
       }
       default -> {
@@ -531,41 +470,30 @@ public class KeyHandler implements KeyListener {
    * Estado: Game Over.
    */
   public void gameOverState(int code) {
-    if (code == KeyEvent.VK_W) {
-      int commandNum = gp.getGameUi().getCommandNum();
-      commandNum--;
-      if (commandNum < 0) {
-        commandNum = 1;
-      }
-      gp.getGameUi().setCommandNum(commandNum);
-      gp.playSE(9);
-    }
+    final UI ui = gp.getGameUi();
 
-    if (code == KeyEvent.VK_S) {
-      int commandNum = gp.getGameUi().getCommandNum();
-      commandNum++;
-      if (commandNum > 1) {
-        commandNum = 0;
+    switch (code) {
+      case KeyEvent.VK_W -> setCommandNumAndNavigateSfx(ui, wrapDecrement(ui.getCommandNum(), GAME_OVER_MAX_INDEX));
+      case KeyEvent.VK_S -> setCommandNumAndNavigateSfx(ui, wrapIncrement(ui.getCommandNum(), GAME_OVER_MAX_INDEX));
+      case KeyEvent.VK_ENTER -> {
+        int commandNum = ui.getCommandNum();
+        if (commandNum == 0) {
+          gp.logRespawnDebug("respawn.start");
+          gp.setGameState(GamePanel.PLAY_STATE);
+          gp.resetGame(false);
+          gp.playMusic(0);
+          gp.logRespawnDebug("respawn.end");
+        } else if (commandNum == 1) {
+          gp.stopMusic();
+          gp.resetGame(true);
+          ui.setTitleScreenState(0);
+          ui.setCommandNum(0);
+          ui.setSubState(0);
+          gp.setGameState(GamePanel.TITLE_STATE);
+        }
       }
-      gp.getGameUi().setCommandNum(commandNum);
-      gp.playSE(9);
-    }
-
-    if (code == KeyEvent.VK_ENTER) {
-      int commandNum = gp.getGameUi().getCommandNum();
-      if (commandNum == 0) {
-        gp.logRespawnDebug("respawn.start");
-        gp.setGameState(GamePanel.PLAY_STATE);
-        gp.resetGame(false);
-        gp.playMusic(0);
-        gp.logRespawnDebug("respawn.end");
-      } else if (commandNum == 1) {
-        gp.stopMusic();
-        gp.resetGame(true);
-        gp.getGameUi().setTitleScreenState(0);
-        gp.getGameUi().setCommandNum(0);
-        gp.getGameUi().setSubState(0);
-        gp.setGameState(GamePanel.TITLE_STATE);
+      default -> {
+        // noop
       }
     }
   }
@@ -579,18 +507,19 @@ public class KeyHandler implements KeyListener {
       return;
     }
 
-    switch (gp.getGameUi().getSubState()) {
-      case 0 -> handleTradeMenuNavigation(code);
+    final UI ui = gp.getGameUi();
+    switch (ui.getSubState()) {
+      case 0 -> handleTradeMenuNavigation(code, ui);
       case 1 -> {
         npcInventory(code);
         if (code == KeyEvent.VK_ESCAPE) {
-          gp.getGameUi().setSubState(0);
+          ui.setSubState(0);
         }
       }
       case 2 -> {
         playerInventory(code);
         if (code == KeyEvent.VK_ESCAPE) {
-          gp.getGameUi().setSubState(0);
+          ui.setSubState(0);
         }
       }
       default -> {
@@ -599,26 +528,68 @@ public class KeyHandler implements KeyListener {
     }
   }
 
-  private void handleTradeMenuNavigation(int code) {
+  private void handleTradeMenuNavigation(int code, UI ui) {
     switch (code) {
-      case KeyEvent.VK_W -> {
-        int commandNum = gp.getGameUi().getCommandNum();
-        commandNum--;
-        if (commandNum < 0) {
-          commandNum = 2;
-        }
-        gp.getGameUi().setCommandNum(commandNum);
-        gp.playSE(9);
+      case KeyEvent.VK_W -> setCommandNumAndNavigateSfx(ui, wrapDecrement(ui.getCommandNum(), TRADE_MENU_MAX_INDEX));
+      case KeyEvent.VK_S -> setCommandNumAndNavigateSfx(ui, wrapIncrement(ui.getCommandNum(), TRADE_MENU_MAX_INDEX));
+      default -> {
+        // noop
       }
-      case KeyEvent.VK_S -> {
-        int commandNum = gp.getGameUi().getCommandNum();
-        commandNum++;
-        if (commandNum > 2) {
-          commandNum = 0;
+    }
+  }
+
+  /** Estado: Pet Yard (gerenciador de pets). */
+  public void petYardState(int code) {
+    if (code == KeyEvent.VK_ENTER) {
+      enterPressed = true;
+      return;
+    }
+
+    final UI ui = gp.getGameUi();
+
+    switch (ui.getSubState()) {
+      case 0 -> handlePetYardMenuNavigation(code, ui);
+      case 1 -> handlePetListNavigation(code, ui);
+      case 2 -> {
+        // Mantém a ordem: navega inventário, depois trata ESC.
+        playerInventory(code);
+        if (code == KeyEvent.VK_ESCAPE) {
+          ui.setSubState(0);
         }
-        gp.getGameUi().setCommandNum(commandNum);
-        gp.playSE(9);
       }
+      default -> {
+        // noop
+      }
+    }
+  }
+
+  private void handlePetYardMenuNavigation(int code, UI ui) {
+    switch (code) {
+      case KeyEvent.VK_W -> setCommandNumAndNavigateSfx(ui, wrapDecrement(ui.getCommandNum(), PET_YARD_MENU_MAX_INDEX));
+      case KeyEvent.VK_S -> setCommandNumAndNavigateSfx(ui, wrapIncrement(ui.getCommandNum(), PET_YARD_MENU_MAX_INDEX));
+      case KeyEvent.VK_ESCAPE -> gp.setGameState(GamePanel.PLAY_STATE);
+      default -> {
+        // noop
+      }
+    }
+  }
+
+  private void handlePetListNavigation(int code, UI ui) {
+    var player = gp.getPlayer();
+    int petCount = player.getOwnedPets().size();
+
+    if (petCount <= 0) {
+      if (code == KeyEvent.VK_ESCAPE) {
+        ui.setSubState(0);
+      }
+      return;
+    }
+
+    int maxIndex = petCount - 1;
+    switch (code) {
+      case KeyEvent.VK_W -> setCommandNumAndNavigateSfx(ui, wrapDecrement(ui.getCommandNum(), maxIndex));
+      case KeyEvent.VK_S -> setCommandNumAndNavigateSfx(ui, wrapIncrement(ui.getCommandNum(), maxIndex));
+      case KeyEvent.VK_ESCAPE -> ui.setSubState(0);
       default -> {
         // noop
       }
@@ -631,85 +602,102 @@ public class KeyHandler implements KeyListener {
     }
   }
 
+  // -----------------------
+  // Inventory navigation
+  // -----------------------
+
   public void playerInventory(int code) {
-    int row = gp.getGameUi().getPlayerSlotRow();
-    int col = gp.getGameUi().getPlayerSlotCol();
+    final UI ui = gp.getGameUi();
+    int row = ui.getPlayerSlotRow();
+    int col = ui.getPlayerSlotCol();
 
     if (code == KeyEvent.VK_W && row != 0) {
-      gp.getGameUi().setPlayerSlotRow(row - 1);
-      gp.playSE(9);
+      ui.setPlayerSlotRow(row - 1);
+      playNavigateSfx();
     } else if (code == KeyEvent.VK_A && col != 0) {
-      gp.getGameUi().setPlayerSlotCol(col - 1);
-      gp.playSE(9);
+      ui.setPlayerSlotCol(col - 1);
+      playNavigateSfx();
     } else if (code == KeyEvent.VK_S && row != SLOT_ROW_MAX) {
-      gp.getGameUi().setPlayerSlotRow(row + 1);
-      gp.playSE(9);
+      ui.setPlayerSlotRow(row + 1);
+      playNavigateSfx();
     } else if (code == KeyEvent.VK_D && col != SLOT_COL_MAX) {
-      gp.getGameUi().setPlayerSlotCol(col + 1);
-      gp.playSE(9);
+      ui.setPlayerSlotCol(col + 1);
+      playNavigateSfx();
     }
   }
 
   public void npcInventory(int code) {
-    int row = gp.getGameUi().getNpcSlotRow();
-    int col = gp.getGameUi().getNpcSlotCol();
+    final UI ui = gp.getGameUi();
+    int row = ui.getNpcSlotRow();
+    int col = ui.getNpcSlotCol();
 
     if (code == KeyEvent.VK_W && row != 0) {
-      gp.getGameUi().setNpcSlotRow(row - 1);
-      gp.playSE(9);
+      ui.setNpcSlotRow(row - 1);
+      playNavigateSfx();
     } else if (code == KeyEvent.VK_A && col != 0) {
-      gp.getGameUi().setNpcSlotCol(col - 1);
-      gp.playSE(9);
+      ui.setNpcSlotCol(col - 1);
+      playNavigateSfx();
     } else if (code == KeyEvent.VK_S && row != SLOT_ROW_MAX) {
-      gp.getGameUi().setNpcSlotRow(row + 1);
-      gp.playSE(9);
+      ui.setNpcSlotRow(row + 1);
+      playNavigateSfx();
     } else if (code == KeyEvent.VK_D && col != SLOT_COL_MAX) {
-      gp.getGameUi().setNpcSlotCol(col + 1);
-      gp.playSE(9);
+      ui.setNpcSlotCol(col + 1);
+      playNavigateSfx();
     }
   }
 
-  /**
-   * Dispara ao SOLTAR uma tecla. Zera flags de movimento correspondentes.
-   */
-  @Override
-  public void keyReleased(KeyEvent e) {
-    final int key = e.getKeyCode();
-    switch (key) {
-      case KeyEvent.VK_W -> upPressed = false;
-      case KeyEvent.VK_S -> downPressed = false;
-      case KeyEvent.VK_A -> leftPressed = false;
-      case KeyEvent.VK_D -> rightPressed = false;
-      case KeyEvent.VK_F -> shotKeyPressed = false;
-      case KeyEvent.VK_ENTER -> enterPressed = false;
-      case KeyEvent.VK_SPACE -> spacePressed = false;
+  // -----------------------
+  // Private helpers (no behavior change)
+  // -----------------------
+
+  private void playNavigateSfx() {
+    gp.playSE(NAVIGATE_SFX_ID);
+  }
+
+  private void setCommandNumAndNavigateSfx(UI ui, int commandNum) {
+    ui.setCommandNum(commandNum);
+    playNavigateSfx();
+  }
+
+  private int wrapDecrement(int value, int max) {
+    value--;
+    if (value < 0) {
+      value = max;
+    }
+    return value;
+  }
+
+  private int wrapIncrement(int value, int max) {
+    value++;
+    if (value > max) {
+      value = 0;
+    }
+    return value;
+  }
+
+  /** Move seleção para cima no menu de título (sem SFX). */
+  private void navigateUp(UI ui, int maxIndex) {
+    ui.setCommandNum(wrapDecrement(ui.getCommandNum(), maxIndex));
+  }
+
+  /** Move seleção para baixo no menu de título (sem SFX). */
+  private void navigateDown(UI ui, int maxIndex) {
+    ui.setCommandNum(wrapIncrement(ui.getCommandNum(), maxIndex));
+  }
+
+  private void toggleDebug() {
+    showDebugText = !showDebugText;
+    gp.getTileM().setDrawPath(showDebugText);
+  }
+
+  private void reloadCurrentMap() {
+    switch (gp.getCurrentMap()) {
+      case 0 -> gp.getTileM().loadMap("/maps/world01.txt", 0);
+      case 1 -> gp.getTileM().loadMap("/maps/interior01.txt", 1);
       default -> {
-        /* noop */ }
+        // noop
+      }
     }
-  }
-
-  // -----------------------
-  // Helpers privados
-  // -----------------------
-
-  /** Move seleção para cima no menu com wrap-around. */
-  private void navigateUp(int maxIndex) {
-    int commandNum = gp.getGameUi().getCommandNum();
-    commandNum--;
-    if (commandNum < 0) {
-      commandNum = maxIndex;
-    }
-    gp.getGameUi().setCommandNum(commandNum);
-  }
-
-  /** Move seleção para baixo no menu com wrap-around. */
-  private void navigateDown(int maxIndex) {
-    int commandNum = gp.getGameUi().getCommandNum();
-    commandNum++;
-    if (commandNum > maxIndex) {
-      commandNum = 0;
-    }
-    gp.getGameUi().setCommandNum(commandNum);
   }
 
   // -----------------------
