@@ -533,6 +533,7 @@ public class Player extends Entity {
 
   private void handleDeath() {
     if (!keyH.isGodModeOn() && getLife() <= 0) {
+      gp.logRespawnDebug("death.start");
       gp.stopMusic();
       gp.setGameState(GamePanel.GAME_OVER_STATE);
       gp.getGameUi().setCommandNum(-1);

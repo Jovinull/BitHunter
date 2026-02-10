@@ -70,7 +70,7 @@ public class SaveLoad {
 
     try {
       return (DataStorage) raw;
-    } catch (ClassCastException _) { // variável descartada (unnamed pattern)
+    } catch (ClassCastException ex) { // variável descartada (unnamed pattern)
       LOG.warning("Invalid save file format (not a DataStorage).");
       return null;
     }

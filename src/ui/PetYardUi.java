@@ -769,7 +769,7 @@ class PetYardUi {
         int iconY = frameY + 16;
         ui.g2.drawImage(icon, iconX, iconY, null);
       }
-    } catch (Exception _) {
+    } catch (Exception ignored) {
       // Se der erro ao carregar sprite, ignora só o ícone.
     }
   }

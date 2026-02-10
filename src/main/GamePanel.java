@@ -33,6 +33,10 @@ import ui.UI;
 public class GamePanel extends JPanel implements Runnable {
 
   private static final Logger LOGGER = Logger.getLogger(GamePanel.class.getName());
+  private static final boolean DEBUG_RESPAWN = false;
+  private static final Font DEBUG_FONT = new Font("Arial", Font.PLAIN, 20);
+  private static final Comparator<Entity> ENTITY_Y_COMPARATOR =
+      Comparator.comparingInt(Entity::getWorldY);
 
   // ==== CONFIGURAÇÕES DE TELA (visível) ====
   private static final int ORIGINAL_TILE_SIZE = 16; // Tamanho base de um tile (16x16 pixels)
@@ -109,6 +113,13 @@ public class GamePanel extends JPanel implements Runnable {
 
   // others
   private boolean bossBattleOn = false;
+
+  // Debug/profiler (agregado por segundo quando debug está ativo)
+  private long debugUpdateNanos = 0L;
+  private long debugRenderNanos = 0L;
+  private int debugFrameCount = 0;
+  private long respawnStartMs = -1L;
+  private boolean respawnUpdateLogPending = false;
 
   // AREA
   private int currentArea;
@@ -207,17 +218,41 @@ public class GamePanel extends JPanel implements Runnable {
       lastTime = currentTime;
 
       if (delta >= 1) {
-        update();
-        drawToTempScreen();
-        drawToScreen();
-        delta--;
+        boolean debugEnabled = keyH.isShowDebugText();
+        if (debugEnabled) {
+          long updateStart = System.nanoTime();
+          update();
+          debugUpdateNanos += System.nanoTime() - updateStart;
+
+          long renderStart = System.nanoTime();
+          drawToTempScreen();
+          drawToScreen();
+          debugRenderNanos += System.nanoTime() - renderStart;
+          debugFrameCount++;
+        } else {
+          update();
+          drawToTempScreen();
+          drawToScreen();
+        }
+        delta -= 1.0;
         drawCount++;
       }
 
       if (timer >= 1_000_000_000) {
         LOGGER.log(Level.INFO, "FPS: {0}", drawCount);
+        if (keyH.isShowDebugText() && debugFrameCount > 0) {
+          double avgUpdateMs = debugUpdateNanos / (double) debugFrameCount / 1_000_000.0;
+          double avgRenderMs = debugRenderNanos / (double) debugFrameCount / 1_000_000.0;
+          LOGGER.log(
+              Level.INFO,
+              "Perf avg(ms) update={0} render={1}",
+              new Object[] {avgUpdateMs, avgRenderMs});
+        }
         drawCount = 0;
         timer = 0;
+        debugUpdateNanos = 0L;
+        debugRenderNanos = 0L;
+        debugFrameCount = 0;
       }
     }
   }
@@ -233,6 +268,10 @@ public class GamePanel extends JPanel implements Runnable {
   }
 
   private void updatePlayState() {
+    if (respawnUpdateLogPending) {
+      logRespawnDebug("update.resume");
+      respawnUpdateLogPending = false;
+    }
     updatePlayer();
     updateNpcs();
     updateMonsters();
@@ -269,26 +308,25 @@ public class GamePanel extends JPanel implements Runnable {
       // Vivo e não está na animação de morte -> comportamento normal
       if (currentMonster.isAlive() && !currentMonster.isDying()) {
         currentMonster.update();
-        continue;
+      } else if (!currentMonster.isAlive()) {
+        handleDeadMonster(currentMonster, currentMonsters, i);
       }
+    }
+  }
 
-      // Aqui ele já "morreu" (alive == false) e terminou a animação
-      if (!currentMonster.isAlive()) {
+  private void handleDeadMonster(Entity monster, Entity[] list, int index) {
+    // Garante que o drop acontece só uma vez por morte
+    if (!monster.isDropHandled()) {
+      monster.checkDrop();
+      monster.setDropHandled(true);
+    }
 
-        // Garante que o drop acontece só uma vez por morte
-        if (!currentMonster.isDropHandled()) {
-          currentMonster.checkDrop();
-          currentMonster.setDropHandled(true);
-        }
-
-        // Se estiver configurado para respawnar, só atualiza o timer
-        if (currentMonster.isRespawnEnabled()) {
-          currentMonster.updateRespawn();
-        } else {
-          // Sem respawn -> some pra sempre (comportamento original)
-          currentMonsters[i] = null;
-        }
-      }
+    // Se estiver configurado para respawnar, só atualiza o timer
+    if (monster.isRespawnEnabled()) {
+      monster.updateRespawn();
+    } else {
+      // Sem respawn -> some pra sempre (comportamento original)
+      list[index] = null;
     }
   }
 
@@ -416,7 +454,7 @@ public class GamePanel extends JPanel implements Runnable {
   }
 
   private void sortAndDrawEntities() {
-    Collections.sort(entityList, Comparator.comparingInt(Entity::getWorldY));
+    Collections.sort(entityList, ENTITY_Y_COMPARATOR);
     for (Entity entity : entityList) {
       entity.draw(g2);
     }
@@ -443,7 +481,7 @@ public class GamePanel extends JPanel implements Runnable {
     long drawEnd = System.nanoTime();
     long passed = drawEnd - drawStart;
 
-    g2.setFont(new Font("Arial", Font.PLAIN, 20));
+    g2.setFont(DEBUG_FONT);
     g2.setColor(Color.white);
     int x = 10;
     int y = 400;
@@ -509,6 +547,28 @@ public class GamePanel extends JPanel implements Runnable {
           obj[mapNum][i] = null;
         }
       }
+    }
+  }
+
+  public void logRespawnDebug(String marker) {
+    if (!DEBUG_RESPAWN) {
+      return;
+    }
+
+    long now = System.currentTimeMillis();
+    String thread = Thread.currentThread().getName();
+
+    if ("respawn.start".equals(marker)) {
+      respawnStartMs = now;
+      respawnUpdateLogPending = true;
+    }
+
+    LOGGER.log(Level.INFO, "[Respawn] {0} t={1} thread={2}", new Object[] {marker, now, thread});
+
+    if (respawnStartMs > 0
+        && ("respawn.end".equals(marker) || "update.resume".equals(marker))) {
+      long elapsed = now - respawnStartMs;
+      LOGGER.log(Level.INFO, "[Respawn] {0} elapsedMs={1}", new Object[] {marker, elapsed});
     }
   }
 

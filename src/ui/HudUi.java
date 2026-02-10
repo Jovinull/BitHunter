@@ -12,6 +12,16 @@ import pets.PetFactory;
 
 class HudUi {
 
+  private static final Color COL_HP = new Color(210, 70, 70);
+  private static final Color COL_MP = new Color(70, 120, 220);
+  private static final Color COL_GUARD = new Color(120, 200, 120);
+  private static final Color COL_PANEL_BG = new Color(0, 0, 0, 180);
+  private static final Color COL_PANEL_BG_DIM = new Color(0, 0, 0, 160);
+  private static final Color COL_XP_BG = new Color(5, 12, 30, 220);
+  private static final Color COL_XP_FILL = new Color(70, 140, 255);
+  private static final Color COL_MONSTER_BAR_BG = new Color(35, 35, 35);
+  private static final Color COL_MONSTER_BAR_FILL = new Color(255, 0, 30);
+
   private final UI ui;
 
   HudUi(UI ui) {
@@ -35,7 +45,7 @@ class HudUi {
         player.getLife(),
         player.getMaxLife(),
         ui.t("ui.stats.hp"),
-        new Color(210, 70, 70));
+        COL_HP);
 
     // MP
     y += barHeight + 8;
@@ -45,7 +55,7 @@ class HudUi {
         player.getMana(),
         player.getMaxMana(),
         ui.t("ui.stats.mp"),
-        new Color(70, 120, 220));
+        COL_MP);
 
     // Guard Stamina
     int guardMax = player.getMaxGuardStamina();
@@ -57,7 +67,7 @@ class HudUi {
           player.getGuardStamina(),
           guardMax,
           ui.t("ui.stats.guard"),
-          new Color(120, 200, 120));
+          COL_GUARD);
     }
   }
 
@@ -97,7 +107,7 @@ class HudUi {
     int panelHeight = 22;
 
     // Fundo do painel
-    g2.setColor(new Color(0, 0, 0, 180));
+    g2.setColor(COL_PANEL_BG);
     g2.fillRoundRect(panelX - 2, panelY - 2, panelWidth + 4, panelHeight + 4, 8, 8);
 
     var oldStroke = g2.getStroke();
@@ -117,7 +127,7 @@ class HudUi {
       if (activePetId != null) {
         icon = PetFactory.getPetIcon(activePetId, gp, player);
       }
-    } catch (Exception _) {
+    } catch (Exception ignored) {
       // ignore: se falhar ao carregar o ícone, só não desenha nada
     }
     if (icon != null) {
@@ -148,7 +158,7 @@ class HudUi {
     double ratio = (next > 0) ? Math.min(1.0, exp / (double) next) : 0.0;
     int filledWidth = (int) (xpBarWidth * ratio);
 
-    g2.setColor(new Color(0, 0, 0, 160));
+    g2.setColor(COL_PANEL_BG_DIM);
     g2.fillRoundRect(xpBarX, xpBarY, xpBarWidth, xpBarHeight, 4, 4);
 
     if (filledWidth > 0) {
@@ -177,17 +187,17 @@ class HudUi {
     int height = 6;
 
     // Fundo da barra
-    g2.setColor(new Color(5, 12, 30, 220));
+    g2.setColor(COL_XP_BG);
     g2.fillRect(x, y, width, height);
 
     // Preenchimento de XP
     int filledWidth = (int) (width * ratio);
     if (filledWidth > 0) {
-      g2.setColor(new Color(70, 140, 255));
+      g2.setColor(COL_XP_FILL);
       g2.fillRect(x, y, filledWidth, height);
     }
 
-    g2.setColor(new Color(0, 0, 0, 160));
+    g2.setColor(COL_PANEL_BG_DIM);
     g2.drawLine(x, y + height, x + width, y + height);
   }
 
@@ -207,7 +217,7 @@ class HudUi {
     int width = layout.width();
     int height = layout.height();
 
-    g2.setColor(new Color(0, 0, 0, 180));
+    g2.setColor(COL_PANEL_BG);
     g2.fillRoundRect(x - 2, y - 2, width + 4, height + 4, 8, 8);
 
     var oldStroke = g2.getStroke();
@@ -247,62 +257,68 @@ class HudUi {
     Entity[] currentMonsters = monsters[currentMapIndex];
 
     for (Entity monster : currentMonsters) {
-      if (monster == null || !monster.inCamera()) {
-        continue;
-      }
-
-      // Se morreu / está na animação de morte, some com a barra na hora
-      if (!monster.isAlive()
-          || monster.isDying()
-          || (monster.getType() == Entity.TYPE_MONSTER && monster.getLife() <= 0)) {
-        monster.setHpBarOn(false);
-        monster.setHpBarCounter(0);
-        continue;
-      }
-
-      if (monster.isHpBarOn() && !monster.isBoss()) {
-        double oneScale = (double) GamePanel.TILE_SIZE / monster.getMaxLife();
-        double hpBarValue = oneScale * monster.getLife();
-
-        g2.setColor(new Color(35, 35, 35));
-        g2.fillRect(
-            monster.getScreenX() - 1,
-            monster.getScreenY() - 16,
-            GamePanel.TILE_SIZE + 2,
-            12);
-
-        g2.setColor(new Color(255, 0, 30));
-        g2.fillRect(
-            monster.getScreenX(),
-            monster.getScreenY() - 15,
-            (int) hpBarValue,
-            10);
-
-        monster.setHpBarCounter(monster.getHpBarCounter() + 1);
-        if (monster.getHpBarCounter() > 600) {
-          monster.setHpBarCounter(0);
+      if (monster != null && monster.inCamera()) {
+        if (shouldHideMonsterBar(monster)) {
           monster.setHpBarOn(false);
+          monster.setHpBarCounter(0);
+        } else if (monster.isBoss()) {
+          drawBossHpBar(g2, monster);
+        } else if (monster.isHpBarOn()) {
+          drawNormalHpBar(g2, monster);
         }
-      } else if (monster.isBoss()) {
-        double oneScale = (double) GamePanel.TILE_SIZE * 8 / monster.getMaxLife();
-        double hpBarValue = oneScale * monster.getLife();
-
-        int x = GamePanel.SCREEN_WIDTH / 2 - GamePanel.TILE_SIZE * 4;
-        int y = GamePanel.TILE_SIZE * 10;
-
-        g2.setColor(new Color(35, 35, 35));
-        g2.fillRect(x - 1, y - 1, GamePanel.TILE_SIZE * 8 + 2, 22);
-
-        g2.setColor(new Color(255, 0, 30));
-        g2.fillRect(x, y, (int) hpBarValue, 20);
-
-        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 24f));
-        g2.setColor(Color.white);
-
-        String bossName = monster.getDisplayName();
-        g2.drawString(bossName, x + 4, y - 10);
       }
     }
+  }
+
+  private static boolean shouldHideMonsterBar(Entity monster) {
+    return !monster.isAlive()
+        || monster.isDying()
+        || (monster.getType() == Entity.TYPE_MONSTER && monster.getLife() <= 0);
+  }
+
+  private static void drawNormalHpBar(Graphics2D g2, Entity monster) {
+    double oneScale = (double) GamePanel.TILE_SIZE / monster.getMaxLife();
+    double hpBarValue = oneScale * monster.getLife();
+
+    g2.setColor(COL_MONSTER_BAR_BG);
+    g2.fillRect(
+        monster.getScreenX() - 1,
+        monster.getScreenY() - 16,
+        GamePanel.TILE_SIZE + 2,
+        12);
+
+    g2.setColor(COL_MONSTER_BAR_FILL);
+    g2.fillRect(
+        monster.getScreenX(),
+        monster.getScreenY() - 15,
+        (int) hpBarValue,
+        10);
+
+    monster.setHpBarCounter(monster.getHpBarCounter() + 1);
+    if (monster.getHpBarCounter() > 600) {
+      monster.setHpBarCounter(0);
+      monster.setHpBarOn(false);
+    }
+  }
+
+  private static void drawBossHpBar(Graphics2D g2, Entity monster) {
+    double oneScale = (double) GamePanel.TILE_SIZE * 8 / monster.getMaxLife();
+    double hpBarValue = oneScale * monster.getLife();
+
+    int x = GamePanel.SCREEN_WIDTH / 2 - GamePanel.TILE_SIZE * 4;
+    int y = GamePanel.TILE_SIZE * 10;
+
+    g2.setColor(COL_MONSTER_BAR_BG);
+    g2.fillRect(x - 1, y - 1, GamePanel.TILE_SIZE * 8 + 2, 22);
+
+    g2.setColor(COL_MONSTER_BAR_FILL);
+    g2.fillRect(x, y, (int) hpBarValue, 20);
+
+    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 24f));
+    g2.setColor(Color.white);
+
+    String bossName = monster.getDisplayName();
+    g2.drawString(bossName, x + 4, y - 10);
   }
 
   void drawMessage() {
@@ -315,6 +331,7 @@ class HudUi {
     int i = 0;
     while (i < ui.message.size()) {
       String m = ui.message.get(i);
+      boolean removed = false;
       if (m != null) {
         g2.setColor(Color.black);
         g2.drawString(m, messageX + 2, messageY + 2);
@@ -328,10 +345,12 @@ class HudUi {
         if (ui.messageCounter.get(i) > 180) {
           ui.message.remove(i);
           ui.messageCounter.remove(i);
-          continue;
+          removed = true;
         }
       }
-      i++;
+      if (!removed) {
+        i++;
+      }
     }
   }
 }
