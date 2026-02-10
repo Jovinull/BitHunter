@@ -35,6 +35,21 @@ public class KeyHandler implements KeyListener {
   private static final int VOLUME_SCALE_MIN = 0;
   private static final int VOLUME_SCALE_MAX = 5;
 
+  /**
+   * Catálogo mínimo de mapas para o atalho de dev (VK_R).
+   *
+   * Importante:
+   * - O índice deve bater com {@code gp.getCurrentMap()}.
+   * - Mantém compatibilidade com os mapas já carregados pelo {@code TileManager}.
+   * - Se um índice não tiver path aqui, o reload faz no-op (seguro).
+   */
+  private static final String[] DEV_RELOAD_MAP_PATHS = {
+      "/maps/world01.txt", // 0
+      "/maps/indoor01.txt", // 1
+      "/maps/dungeon01.txt", // 2
+      "/maps/dungeon02.txt", // 3
+  };
+
   // -----------------------
   // Fields
   // -----------------------
@@ -691,13 +706,17 @@ public class KeyHandler implements KeyListener {
   }
 
   private void reloadCurrentMap() {
-    switch (gp.getCurrentMap()) {
-      case 0 -> gp.getTileM().loadMap("/maps/world01.txt", 0);
-      case 1 -> gp.getTileM().loadMap("/maps/interior01.txt", 1);
-      default -> {
-        // noop
-      }
+    int mapIndex = gp.getCurrentMap();
+    if (mapIndex < 0 || mapIndex >= DEV_RELOAD_MAP_PATHS.length) {
+      return; // no-op seguro para mapas não catalogados
     }
+
+    String path = DEV_RELOAD_MAP_PATHS[mapIndex];
+    if (path == null || path.isBlank()) {
+      return; // no-op seguro
+    }
+
+    gp.getTileM().loadMap(path, mapIndex);
   }
 
   // -----------------------
