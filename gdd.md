@@ -1,3 +1,988 @@
+# <div align="center">Game Design Document — <b>BitHunter</b></div>
+<div align="center"><sub>RPG 2D top-down de ação e exploração • progressão longa • leitura visual limpa • Java (AWT/Swing)</sub></div>
+<br/>
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="left">
+        <b>📌 One-liner</b><br/>
+        Explore um mundo interconectado e desça por dungeons de profundidade crescente, otimizando rotas de risco/recompensa para evoluir personagem, equipamentos e (no futuro) builds de longo prazo.
+      </td>
+      <td align="left">
+        <b>🧾 Versão do documento</b><br/>
+        <code>GDD v1.0</code> (revisão e finalização a partir do <code>gdd.md</code>)<br/>
+        <b>Status do jogo</b>: protótipo/sistemas-base (com vários módulos já implementados)
+      </td>
+    </tr>
+    <tr>
+      <td align="left">
+        <b>🧠 Legenda de maturidade</b><br/>
+        ✅ <b>Implementado</b> • 🧭 <b>Planejado</b> • 💡 <b>Sugestão</b> • ⚠️ <b>Risco</b>
+      </td>
+      <td align="left">
+        <b>🧩 Escopo deste GDD</b><br/>
+        Define a essência do BitHunter sem inventar “como se já existisse”. Quando algo existe no código, é marcado ✅; quando é visão/backlog, 🧭; quando é proposta editorial/ajuste, 💡.
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br/>
+
+> ✅ **Implementado** não significa “final”: significa “há evidência de funcionamento no código”.  
+> 🧭 **Planejado** é intenção (pode mudar).  
+> 💡 **Sugestão** é uma proposta de design/pipeline para reduzir risco e acelerar iteração.
+
+---
+
+## Sumário “inteligente”
+
+<details open>
+  <summary><b>📚 Abrir/fechar Sumário</b></summary>
+  <br/>
+
+- [1. Visão geral](#1-visão-geral)
+  - [1.1 Introdução](#11-introdução)
+  - [1.2 Pitch do jogo](#12-pitch-do-jogo)
+  - [1.3 Diferenciais de proposta](#13-diferenciais-de-proposta)
+  - [1.4 Público-alvo](#14-público-alvo)
+  - [1.5 Plataformas e tecnologias](#15-plataformas-e-tecnologias)
+- [2. Pilares e anti-pilares](#2-pilares-e-anti-pilares)
+  - [2.1 Pilares (Design Pillars)](#21-pilares-design-pillars)
+  - [2.2 Anti-pilares (o que BitHunter NÃO será)](#22-anti-pilares-o-que-bithunter-não-será)
+  - [2.3 Fantasia do jogador & promessas](#23-fantasia-do-jogador--promessas)
+  - [2.4 Experiência-alvo (Target Experience)](#24-experiência-alvo-target-experience)
+  - [2.5 Diretrizes de arte e áudio](#25-diretrizes-de-arte-e-áudio)
+- [3. Loop central e loops secundários](#3-loop-central-e-loops-secundários)
+  - [3.1 Loop central (Mermaid)](#31-loop-central-mermaid)
+  - [3.2 Loops secundários](#32-loops-secundários)
+- [4. Progressão](#4-progressão)
+  - [4.1 Early / Mid / Late / Endgame](#41-early--mid--late--endgame)
+  - [4.2 Ascensão](#42-ascensão)
+- [5. Sistemas principais](#5-sistemas-principais)
+  - [5.1 Controles e inputs](#51-controles-e-inputs)
+  - [5.2 Combate](#52-combate)
+  - [5.3 Guarda (stamina de escudo)](#53-guarda-stamina-de-escudo)
+  - [5.4 Magias e projéteis](#54-magias-e-projéteis)
+  - [5.5 IA e pathfinding](#55-ia-e-pathfinding)
+  - [5.6 Loot, drops e economia](#56-loot-drops-e-economia)
+  - [5.7 Inventário e equipamentos](#57-inventário-e-equipamentos)
+  - [5.8 Trade (comprar/vender)](#58-trade-comprarvender)
+  - [5.9 Pets & incubadora](#59-pets--incubadora)
+  - [5.10 Save/Load](#510-saveload)
+  - [5.11 i18n (traduções) e IDs estáveis](#511-i18n-traduções-e-ids-estáveis)
+  - [5.12 Mundo: mapas, mini-mapa e teleporte](#512-mundo-mapas-mini-mapa-e-teleporte)
+  - [5.13 Iluminação e ciclo dia/noite](#513-iluminação-e-ciclo-dianoite)
+  - [5.14 Cutscenes e boss battle](#514-cutscenes-e-boss-battle)
+- [6. Mundo e geração](#6-mundo-e-geração)
+- [7. UX/HUD e fluxo de telas](#7-uxhud-e-fluxo-de-telas)
+  - [7.1 HUD](#71-hud)
+  - [7.2 Mapa de estados/telas (Mermaid)](#72-mapa-de-estadostelas-mermaid)
+  - [7.3 Diretrizes de UX](#73-diretrizes-de-ux)
+  - [7.4 Acessibilidade](#74-acessibilidade)
+- [8. Conteúdo (templates para expansão)](#8-conteúdo-templates-para-expansão)
+  - [8.1 Inimigos e bosses](#81-inimigos-e-bosses)
+  - [8.2 Itens e equipamentos](#82-itens-e-equipamentos)
+  - [8.3 Facções, biomas e regiões](#83-facções-biomas-e-regiões)
+- [9. Balanceamento](#9-balanceamento)
+  - [9.1 Filosofia](#91-filosofia)
+  - [9.2 Parâmetros e limites](#92-parâmetros-e-limites)
+  - [9.3 Tabelas atuais (preservadas) + justificativas](#93-tabelas-atuais-preservadas--justificativas)
+  - [9.4 Método de balanceamento (como ajustar sem quebrar)](#94-método-de-balanceamento-como-ajustar-sem-quebrar)
+  - [9.5 Telemetria opcional (offline)](#95-telemetria-opcional-offline)
+- [10. Pipeline de conteúdo](#10-pipeline-de-conteúdo)
+  - [10.1 Templates prontos](#101-templates-prontos)
+  - [10.2 Checklist de integração](#102-checklist-de-integração)
+- [11. Definition of Done (DoD)](#11-definition-of-done-dod)
+- [12. Plano de testes de gameplay + checklist de build](#12-plano-de-testes-de-gameplay--checklist-de-build)
+- [13. Roadmap & backlog priorizado](#13-roadmap--backlog-priorizado)
+- [14. Riscos e mitigação](#14-riscos-e-mitigação)
+- [15. Glossário](#15-glossário)
+- [Apêndices](#apêndices)
+  - [A. Fórmulas e tabelas do GDD base (preservadas)](#a-fórmulas-e-tabelas-do-gdd-base-preservadas)
+  - [B. Sistema de IDs e i18n (texto expandido)](#b-sistema-de-ids-e-i18n-texto-expandido)
+  - [C. GDD base original (preservação integral)](#c-gdd-base-original-preservação-integral)
+
+</details>
+
+---
+
+## 1) Visão geral
+
+### 1.1) Introdução
+
+**BitHunter** é um RPG 2D top-down de ação e exploração. O jogador é lançado em um mundo desconhecido, sem uma narrativa prévia ou uma história linear que se desenvolva ao longo do jogo. O foco é uma **aventura praticamente infinita**, em que o jogador pode **explorar e reexplorar** ambientes (no estilo **Tibia**).
+
+No longo prazo, haverá **dungeons infinitas** nas quais o jogador desce e avança continuamente, com **aumento progressivo de dificuldade** e **recompensas melhores** (inspiradas na **Torre de DanMachi** e na **Mina de Caverna** de *Stardew Valley*).
+
+Também está nos planos um **modo multijogador colaborativo** e mecânicas de **end-game**, como **refinamento e nivelamento de equipamentos**, **roda de habilidades** (como em **Tibia**) e um sistema de **ascensão**, no qual o personagem é resetado em troca de **bônus permanentes**.
+
+**Inspirações**
+
+- **Pokémon FireRed**
+- **The Legend of Zelda: A Link to the Past (SNES)**
+- **Rucoy Online**
+- **Tibia** (loop de exploração/reexploração e progressão longa)
+- **DanMachi** (conceito de torre/andar)
+- **Stardew Valley** (minas com progressão de profundidade)
+
+### 1.2) Pitch do jogo
+
+**BitHunter** é um RPG 2D top-down de ação e exploração focado em progressão consistente e rejogabilidade. Em um mundo sem narrativa linear, o jogador avança por áreas interconectadas e **dungeons de profundidade infinita**, onde a dificuldade cresce de forma previsível e as recompensas acompanham o risco. O ciclo central é direto: **explorar → enfrentar inimigos → obter recursos → evoluir o personagem e o equipamento**.
+
+O projeto prioriza **clareza mecânica**, **leitura visual limpa** e **desempenho estável**, com sistemas de progressão de longo prazo (refino e nivelamento de equipamentos, árvore/roda de habilidades e **ascensão** com bônus permanentes). A visão inclui **modo cooperativo** para coordenação de rotas e papéis, mantendo o foco em decisões táticas e domínio do mapa.
+
+### 1.3) Diferenciais de proposta
+
+- Progressão longa sem depender de enredo: desafio e recompensa como motor do jogo.
+- Dungeons infinitas com escalonamento transparente de risco/recompensa.
+- End-game orientado a builds, metas pessoais e eficiência de rotas.
+- Base técnica enxuta para atualizações frequentes de conteúdo e balanceamento.
+
+### 1.4) Público-alvo
+
+- **Eu/estudo pessoal:** projeto de aprendizado e prática de engenharia de jogos em **Java**, priorizando performance, clareza e ciclos curtos de iteração.
+- **Amigos/testers e comunidade indie:** jogadores de **RPG 2D top-down** que curtem progresso longo, exploração recorrente e **dungeons de profundidade** sem foco em narrativa linear.
+- **Dev-entusiastas/open source:** interessados em ler, testar e contribuir com código limpo (HUD, IA simples, iluminação, balanceamento de risco/recompensa).
+- **Perfil de jogo esperado:** sessões curtas a médias, progresso cumulativo, leitura visual clara, dificuldade crescente previsível e baixo consumo de recursos.
+
+### 1.5) Plataformas e tecnologias
+
+- **Plataforma:** PC (Windows/Linux/Mac)
+- **Engine/Stack:** Java puro + AWT/Swing (render 2D), projeto modular
+- **Arte:** Pixel art
+- **Áudio:** efeitos leves e trilhas em loop (formato otimizado)
+
+---
+
+## 2) Pilares e anti-pilares
+
+### 2.1) Pilares (Design Pillars)
+
+<div>
+  <table>
+    <tr>
+      <td width="50%">
+        <b>1) Legibilidade acima de “complexidade”</b><br/>
+        O jogador entende o que aconteceu e por quê (dano, risco, recompensa, falha). UI, feedbacks e regras são consistentes.
+      </td>
+      <td width="50%">
+        <b>2) Risco/Recompensa transparente</b><br/>
+        O jogo deixa claro “o quanto custa” avançar (dano, consumo, tempo) e “o quanto vale” (loot, XP, rotas).
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <b>3) Progressão longa sem depender de narrativa</b><br/>
+        O motor de motivação é melhoria incremental + domínio de rota + builds (no futuro).
+      </td>
+      <td>
+        <b>4) Base enxuta e performática</b><br/>
+        Sistemas simples, extensíveis e baratos (overlay de iluminação, UI modular, tiles + entidades ordenadas).
+      </td>
+    </tr>
+  </table>
+</div>
+
+### 2.2) Anti-pilares (o que BitHunter NÃO será)
+
+- **Não** será um RPG focado em “história linear obrigatória” (anti-pilar: cutscenes longas e intrusivas).
+- **Não** será um jogo com “buildcrafting” hiper opaco (anti-pilar: 40 stats escondidos sem explicação).
+- **Não** será “hardcore punitivo por padrão” (anti-pilar: perda total de progressão por morte).  
+  🧭 A punição de morte deve existir, mas ser **justa** e **aprendível**.
+- **Não** dependerá de grind infinito sem decisões (anti-pilar: farm sem escolhas).
+
+### 2.3) Fantasia do jogador & promessas
+
+**Fantasia principal:** “Eu sou um caçador/aventureiro que aprende o mapa, domina o combate e fica cada vez mais eficiente — como uma rotina de progresso ‘infinita’, mas controlada.”
+
+**Promessas do jogo (Player Promises)**
+
+- **Promessa 1 — domínio do espaço:** rotas e atalhos importam.
+- **Promessa 2 — upgrades sentem no gameplay:** cada aumento de poder muda o jeito de jogar (mesmo que pouco).
+- **Promessa 3 — feedback honesto:** dano/erro é legível; o jogador sabe o que fez de certo/errado.
+- **Promessa 4 — tempo respeitado:** sessões curtas funcionam; o jogo não exige “maratonas”.
+
+### 2.4) Experiência-alvo (Target Experience)
+
+> 🧭 **Planejado**: metas de “experiência alvo” são parâmetros de design; não significam que o jogo já entrega isso em 100%.
+
+| Dimensão | Meta | Observações |
+|---|---|---|
+| Ritmo | ciclos curtos “explorar → lutar → loot → decidir” | reduzir downtime, manter decisões frequentes |
+| Densidade | encontros curtos com pausas seguras | evitar “sala vazia demais” e evitar “overwhelm” |
+| Dificuldade | curva previsível (progressiva) | o jogador deve conseguir prever risco |
+| Sessão | 10–25 min (jogável) / 30–60 min (otimização) | 💡 ideal para playtests rápidos |
+| Meta-objetivo | “melhorar rota” + “melhorar build” | build entra mais forte no endgame 🧭 |
+
+### 2.5) Diretrizes de arte e áudio
+
+✅ **Implementado (diretriz já declarada no GDD base)**: **Pixel Art**.
+
+🧭 **Planejado**: diretrizes mais explícitas (para produção consistente de assets e leitura de gameplay).
+
+<div>
+  <table>
+    <tr>
+      <td width="50%">
+        <b>Arte (high-level)</b><br/>
+        - Silhuetas claras (player/inimigos/itens)<br/>
+        - Contraste funcional (HUD e mundo)<br/>
+        - Telegráfos simples: animação curta + postura + cor<br/>
+      </td>
+      <td width="50%">
+        <b>Áudio (high-level)</b><br/>
+        - SFX curtos e “secos” (sem mascarar informação)<br/>
+        - Trilhas em loop discretas por região/estado<br/>
+        - Mix favorável à clareza (hit, pickup, menu, boss)<br/>
+      </td>
+    </tr>
+  </table>
+</div>
+
+💡 **Sugestão (paleta e linguagem visual, sem engessar)**:
+
+- **Mundo**: base mais escura/sóbria para favorecer leitura de HUD e efeitos (iluminação, partículas).
+- **Destaques**:
+  - interação (porta/baú) com outline/realce
+  - perigo (pit/hazard) com leitura antes do dano
+  - drops importantes com brilho/outline leve (evitar poluição)
+- **UI**: 3 cores “fixas” (texto, fundo, acento) + 1 cor de alerta (baixo HP, falta de mana).
+
+---
+
+## 3) Loop central e loops secundários
+
+### 3.1) Loop central (Mermaid)
+
+```mermaid
+flowchart TD
+  A[Explorar] --> B[Identificar risco/recompensa]
+  B --> C[Combater]
+  C --> D[Coletar loot/XP/moedas]
+  D --> E{Decisão}
+  E -->|Voltar / gastar| F[Gerenciar inventário/loja/pets]
+  E -->|Avançar| A
+  F --> A
+  C -->|Morte| G[Fail loop: retorno + perda justa]
+  G --> A
+```
+
+### 3.2) Loops secundários
+
+#### Economia (compra/venda / sinks)
+
+- 🧭 **Planejado**: “sinks” de upgrades/refino e desbloqueios.
+- ✅ **Implementado**: trade comprar/vender com checagem de moedas/inventário (sistema base).
+
+#### Dungeon (profundidade, checkpoints, escalonamento)
+
+- 🧭 **Planejado**: dungeons “de profundidade” com checkpoints e escalonamento transparente.
+- ✅ **Implementado** (base): múltiplos mapas e teleporte entre áreas; boss room com cutscene e progress flag.
+
+#### Pets (coleção, incubação, progresso)
+
+- ✅ **Implementado**: colecionar pets, equipar/desequipar, ganhar XP, incubar ovos com custo e tempo.
+
+---
+
+## 4) Progressão
+
+### 4.1) Early / Mid / Late / Endgame
+
+> 🧭 **Planejado**: o GDD define o “arco”; o conteúdo final depende de número de regiões, itens e inimigos.
+
+<div>
+  <table>
+    <tr>
+      <td width="25%"><b>Early</b><br/><sub>Aprender leitura + regras</sub></td>
+      <td width="25%"><b>Mid</b><br/><sub>Otimizar rota + tradeoffs</sub></td>
+      <td width="25%"><b>Late</b><br/><sub>Especializar build</sub></td>
+      <td width="25%"><b>Endgame</b><br/><sub>Metas longas</sub></td>
+    </tr>
+    <tr>
+      <td>
+        ✅ loop básico, itens iniciais, primeiros inimigos<br/>
+        ✅ UI/HUD legível<br/>
+        ✅ eventos de mundo (teleporte, cura, etc.)<br/>
+      </td>
+      <td>
+        🧭 diversidade de inimigos/salas<br/>
+        🧭 economia com sinks reais (refino, crafting)<br/>
+        🧭 “soft gates” por recomendação de poder<br/>
+      </td>
+      <td>
+        🧭 talentos/roda de habilidades<br/>
+        🧭 variações de resistência/elementos<br/>
+        🧭 endereçar power spikes (builds)<br/>
+      </td>
+      <td>
+        🧭 ascensão + bônus permanentes<br/>
+        🧭 dungeons infinitas “de verdade”<br/>
+        🧭 metas pessoais e otimização de eficiência<br/>
+      </td>
+    </tr>
+  </table>
+</div>
+
+### 4.2) Ascensão
+
+- 🧭 **Planejado**: resetar parte da progressão do personagem em troca de bônus permanentes (QoL + pequenos percentuais).  
+- 💡 **Sugestão**: formalizar uma **tabela de bônus** com limites (caps) e custos crescentes para evitar “ascension power creep” irreversível.
+
+---
+
+## 5) Sistemas principais
+
+### 5.1) Controles e inputs
+
+✅ **Implementado** (baseado no `KeyHandler`):
+
+- **W/A/S/D**: mover (e navegar em grids de inventário)
+- **Enter**: confirmar/interagir/atacar
+- **P**: pausar/retomar
+- **C**: abrir/fechar status do personagem
+- **Esc**: abrir opções / voltar
+- **F**: disparo/magia (projétil)
+- **Space**: guarda (quando possível)
+- **M**: tela de mapa
+- **X**: alternar mini-mapa
+- **T**: debug/path (dev)
+- **R**: recarregar mapa (dev)
+- **G**: “god mode” (dev)
+
+⚠️ **Risco (consistência)**: o atalho `R` recarrega um arquivo com nome diferente do arquivo existente (`interior01` vs `indoor01`).  
+💡 **Sugestão**: padronizar nomenclatura e criar uma tabela única de mapas (IDs) para reduzir drift.
+
+### 5.2) Combate
+
+✅ **Implementado**
+
+- **Ataque melee**: acionado por `Enter`, com hitbox temporária.
+- **Dano base**: \( \text{dano} = \text{ataque} - \text{defesa} \), com clamp mínimo (depende do contexto: player vs monstro).
+- **i-frames**: player tem janela maior (~60 frames no código); entidades genéricas possuem invincibilidade curta (~20 frames).
+- **Knockback**: armas podem empurrar; monstros também podem empurrar o player.
+
+🧭 **Planejado**
+
+- ataques pesados
+- stagger/poise
+- elementos/resistências
+- telegráfos mais ricos (sem perder legibilidade)
+
+💡 **Sugestão (sem quebrar essência)**: formalizar “camadas” do combate:
+
+- **Camada 1 (core)**: posição, tempo, leitura (já existe).
+- **Camada 2 (variação)**: status/elementos (planejado).
+- **Camada 3 (build)**: talentos/equipamentos com sinergias (planejado).
+
+### 5.3) Guarda (stamina de escudo)
+
+✅ **Implementado**
+
+- cada escudo tem `GuardStaminaCap` (capacidade)
+- segurar `Space` drena stamina com intervalo
+- tomar hit em guarda consome stamina proporcional ao ataque do monstro (mínimo)
+- stamina regenera com delay após soltar `Space`
+
+🧭 **Planejado**
+
+- expandir para “parry” com timing mais explícito (hoje já existe uma janela implícita por `guardCounter`)
+- adicionar feedback de “perfeito/ok/falhou” na UI
+
+### 5.4) Magias e projéteis
+
+✅ **Implementado**
+
+- `F` dispara projétil (ex.: Fireball) se houver recurso (mana) e cooldown.
+
+🧭 **Planejado**
+
+- skill wheel/árvore de habilidades
+- variações de projéteis (com custo, utilidade, CC)
+
+### 5.5) IA e pathfinding
+
+✅ **Implementado**
+
+- base de entidades com `setAction()`, `onPath`, e A* (`PathFinder`)
+- máscara de sólidos inclui tiles e tiles interativos destrutíveis
+
+🧭 **Planejado**
+
+- FSM formal (patrulha→perseguir→atacar→recuar)
+- percepção (raio/cone) e aggro timers
+
+### 5.6) Loot, drops e economia
+
+✅ **Implementado**
+
+- estrutura de loot: `checkDrop()` + `dropItem()`
+- moedas/consumíveis básicos e trade (comprar/vender)
+
+🧭 **Planejado**
+
+- bad-luck protection e tabelas de drop com piso/teto
+- sinks: crafting/imbuir, refino, desbloqueios
+- materiais e raridade por profundidade
+
+### 5.7) Inventário e equipamentos
+
+✅ **Implementado**
+
+- inventário até 20 itens (grid 5 colunas)
+- stack (`amount`)
+- destaque de equipados (arma/escudo/luz/botas/armaduras)
+- descrições via i18n (nome/desc)
+
+🧭 **Planejado**
+
+- slots adicionais (armadura completa) com conteúdo real e progressão
+- atalhos rápidos (consumível, etc.)
+
+### 5.8) Trade (comprar/vender)
+
+✅ **Implementado**
+
+- compra: valida coins e capacidade de inventário
+- venda: vende por metade do preço; impede vender equipados (com diálogo)
+
+🧭 **Planejado**
+
+- estoque dinâmico
+- preços por região/dificuldade
+- itens raros/rotativos
+
+### 5.9) Pets & incubadora
+
+✅ **Implementado**
+
+- coleção de pets (IDs estáveis)
+- pet ativo com level/XP e HUD dedicado
+- incubação: custo em moedas + tempo em ticks, progresso e mensagens
+
+🧭 **Planejado**
+
+- variedade de pets com papéis claros (ofensivo/defensivo/utilitário)
+- sinergias com biomas/inimigos
+
+### 5.10) Save/Load
+
+✅ **Implementado**
+
+- salva `DataStorage` em `save.dat`
+- restaura stats, inventário (por `internalId`), equipamentos (por slots), objetos no mapa (id/pos/loot/opened), pets e incubadora
+
+⚠️ **Risco (compatibilidade)**: mudanças em `internalId`, slots ou `DataStorage` podem quebrar saves antigos.  
+💡 **Sugestão**: criar estratégia de versão do save (ex.: `saveVersion`) e migração leve (tolerância a campos faltantes).
+
+### 5.11) i18n (traduções) e IDs estáveis
+
+✅ **Implementado**
+
+- `internalId` (ID técnico estável para save/load e geração)
+- `translationKey` (chave base para `.properties`)
+- fallback `??key??` quando falta tradução
+
+> Veja Apêndice [B](#b-sistema-de-ids-e-i18n-texto-expandido) para o texto expandido e exemplos.
+
+### 5.12) Mundo: mapas, mini-mapa e teleporte
+
+✅ **Implementado**
+
+- múltiplos mapas (`resource/maps/*.txt`)
+- **tela de mapa** e **mini-mapa** (toggle)
+- teleporte e eventos por tiles (pit, pool de cura, entradas/saídas, trigger de boss)
+
+🧭 **Planejado**
+
+- dungeons infinitas (geração procedural real)
+- marcadores e leitura de risco/recompensa por sala
+
+### 5.13) Iluminação e ciclo dia/noite
+
+✅ **Implementado**
+
+- overlay com gradiente radial quando há fonte de luz
+- fases do dia (DAY/DUSK/NIGHT/DAWN) ajustando alpha
+
+🧭 **Planejado**
+
+- clima (chuva/névoa)
+- impacto real em spawn/percepção/IA (além do visual)
+
+### 5.14) Cutscenes e boss battle
+
+✅ **Implementado**
+
+- cutscene do Skeleton Lord: fecha porta, move player, acorda boss, diálogo, troca música
+- flag de progresso: `Progress.isSkeletonLordDefeated()`
+
+💡 **Sugestão**: padronizar “estrutura de boss”:
+
+- **Entrada**: trava arena + setup
+- **Faseamento**: thresholds (HP%, timers)
+- **Saída**: drop + desbloqueio + progress flag + cleanup
+
+---
+
+## 6) Mundo e geração
+
+✅ **Implementado** (base)
+
+- mundo com mapas fixos em texto
+- áreas (Outside/Indoor/Dungeon) influenciam música e iluminação
+- eventos por tiles (teleporte, pit, heal pool, boss trigger)
+
+🧭 **Planejado** (expansão sem mudar essência)
+
+- **regiões** com identidade (bioma + inimigos + loot)
+- **dungeons de profundidade**:
+  - escalonamento previsível (HP/ATK/DEF/loot)
+  - checkpoints a cada \(N\) andares
+  - “regras de sala” (ex.: elite, evento, tesouro, cura)
+
+💡 **Sugestão**: definir **contratos de geração** antes do procedural:
+
+- **Input**: “andar X”, seed, bioma
+- **Output**: grade de salas + conectividade + spawn table
+- **Restrições**: garantir rota mínima, garantir descanso periódico, evitar “soft lock”
+
+---
+
+## 7) UX/HUD e fluxo de telas
+
+### 7.1) HUD
+
+✅ **Implementado** (sistema atual)
+
+- barras HP/MP e (se houver) Guarda
+- XP no topo (barra fina)
+- mensagens rápidas (feed)
+- HUD do pet (ícone + nível + barra de XP)
+- HP bar de monstros (normal) e barra de boss (central)
+
+🧭 **Planejado**
+
+- indicadores de status (veneno/sangramento/buffs)
+- melhorias de acessibilidade (tamanho de fonte, redução de motion)
+
+### 7.2) Mapa de estados/telas (Mermaid)
+
+```mermaid
+stateDiagram-v2
+  [*] --> Title
+  Title --> Play: New Game / Load
+  Play --> Pause: P
+  Pause --> Play: P
+  Play --> Character: C
+  Character --> Play: C
+  Play --> Options: ESC
+  Options --> Play: ESC
+  Play --> Map: M
+  Map --> Play: M
+  Play --> Dialogue: Enter (contexto)
+  Dialogue --> Play: Enter
+  Play --> Trade: NPC merchant
+  Trade --> Play: ESC/leave
+  Play --> PetYard: NPC pet yard
+  PetYard --> Play: leave
+  Play --> Transition: teleport
+  Transition --> Play: fim transição
+  Play --> Cutscene: boss trigger
+  Cutscene --> Play: fim cutscene
+  Play --> GameOver: HP <= 0
+  GameOver --> Play: Retry
+  GameOver --> Title: Exit
+```
+
+### 7.3) Diretrizes de UX
+
+- **Um input, uma consequência**: evitar que a mesma tecla tenha resultados “surpresa” sem feedback.
+- **Feedback antes de punição**: telegráfos e sinais devem existir antes do dano (quando possível).
+- **UI como instrumento**: barras e mensagens devem acelerar a tomada de decisão (não “encher a tela”).
+
+### 7.4) Acessibilidade
+
+✅ **Implementado**
+
+- alto contraste funcional + sombra de texto
+- navegação por teclado com foco visual
+
+🧭 **Planejado**
+
+- ajuste de tamanho de fonte
+- redução de motion (fades/transições)
+- indicadores auditivos opcionais
+- modos de contraste (presets)
+
+💡 **Sugestão**: “Acessibilidade como presets”, não como 30 toggles:
+
+- Preset **Conforto**: menos motion + fontes maiores
+- Preset **Performance**: minimal UI, sem suavização
+- Preset **Contraste**: cores reforçadas + outline
+
+---
+
+## 8) Conteúdo (templates para expansão)
+
+### 8.1) Inimigos e bosses
+
+✅ **Conteúdo atual (GDD base)**: ver tabela preservada no Apêndice [A](#a-fórmulas-e-tabelas-do-gdd-base-preservadas).
+
+💡 **Template — Inimigo**
+
+| Campo | Tipo | Descrição |
+|---|---|---|
+| `internalId` | string | ex.: `monster.greenSlime` |
+| Papel | enum | `trash`, `skirmisher`, `elite`, `boss` |
+| HP/ATK/DEF/SPD | ints | stats base e escalonamento |
+| Telegráfos | texto | como o jogador “lê” ataques |
+| Drops | tabela | moedas, consumíveis, materiais |
+| Risco/recompensa | texto | por que lutar vs evitar |
+
+💡 **Template — Boss**
+
+- **Trigger**: como inicia (evento, porta, cutscene)
+- **Arena**: restrições e leitura
+- **Fases**: thresholds e mudanças
+- **Drops/Desbloqueios**: o que libera e como afeta o mundo
+- **Fail loop**: como morte é tratada (justiça + aprendizado)
+
+### 8.2) Itens e equipamentos
+
+✅ **Conteúdo atual (GDD base)**: armas, escudos/botas, poção e fireball (ver Apêndice A).
+
+💡 **Template — Item**
+
+| Campo | Descrição |
+|---|---|
+| `internalId` | ID estável para save/load/geração |
+| `translationKey` | base para `.name` / `.desc` / mensagens |
+| Tipo | arma, escudo, consumível, luz, etc. |
+| Stats | attack/defense/speed/lightRadius/guardCap |
+| Preço | compra e venda (regra de metade na venda) |
+| Stack | se empilha, cap (se houver) |
+
+### 8.3) Facções, biomas e regiões
+
+🧭 **Planejado**
+
+- facções por área para modular agressividade e loot
+- biomas com regras (visão, iluminação, inimigos, drops)
+
+💡 **Sugestão**: “bioma como pacote”:
+
+- paleta (alto nível)
+- inimigos típicos
+- drops e materiais
+- 1–2 regras de gameplay (ex.: visibilidade, slow, hazards)
+
+---
+
+## 9) Balanceamento
+
+### 9.1) Filosofia
+
+- **Legibilidade > surpresa**: o jogador precisa conseguir estimar risco.
+- **Progressão consistente**: upgrades pequenos, mas frequentes e perceptíveis.
+- **Sem degraus injustos**: spikes de dificuldade precisam de telegráfo e alternativa (rota, farm, item).
+
+### 9.2) Parâmetros e limites
+
+💡 **Sugestão**: tratar como “painel de knobs” (controláveis) para balancear sem reescrever sistemas:
+
+- XP: curva de `nextLevelExp`
+- HP/ATK/DEF: progressão do player por nível e por item
+- Preço: baseline por região
+- Drops: probabilidade e proteção contra azar
+- Guard: drain, regen, custo por hit, janela de parry
+
+### 9.3) Tabelas atuais (preservadas) + justificativas
+
+✅ **Preservadas** no Apêndice [A](#a-fórmulas-e-tabelas-do-gdd-base-preservadas).
+
+⚠️ **Inconsistência detectada (GDD vs código)**:
+
+- No texto base, a progressão de XP menciona “dobrar” `nextLevelExp`, mas a tabela/fórmula final e o código usam outra lógica.  
+- Este GDD final mantém a tabela/fórmula e recomenda alinhar o texto (ver método abaixo).
+
+### 9.4) Método de balanceamento (como ajustar sem quebrar)
+
+💡 **Processo recomendado (pragmático)**
+
+1. **Defina um alvo mensurável** por trecho de jogo (early/mid/boss):
+   - “quantos hits o player aguenta”
+   - “quantos hits para matar inimigo”
+   - “tempo médio para 1 nível”
+2. **Mexa em uma alavanca por vez** (XP ou HP ou drop), não em tudo.
+3. **Trave limites** para evitar regressão:
+   - clamp de dano mínimo (já existe em alguns casos)
+   - caps de bônus (planejado)
+4. **Valide com um micro-playtest** (ver seção de testes).
+
+💡 **Regras de ouro**
+
+- Se você aumenta dano dos monstros, revise também:
+  - custo/eficácia de consumíveis
+  - acesso a guarda (stamina) e ao trade
+- Se você aumenta XP, revise:
+  - preço de itens (economia)
+  - drops (porque XP mais rápido gera mais moedas por tempo)
+
+### 9.5) Telemetria opcional (offline)
+
+💡 **Sugestão**: mesmo sem analytics online, dá para registrar em arquivo local (ou log) para balancear:
+
+- tempo por sessão
+- mortes por área/inimigo
+- dano recebido por fonte (melee, projétil, hazard)
+- tempo para 1 nível
+- moedas ganhas/gastas por minuto
+- itens mais comprados/vendidos
+- taxa de uso de poções / “heal pool”
+- incubação: quantas iniciadas/concluídas
+
+---
+
+## 10) Pipeline de conteúdo
+
+### 10.1) Templates prontos
+
+- Template de inimigo (ver [8.1](#81-inimigos-e-bosses))
+- Template de item (ver [8.2](#82-itens-e-equipamentos))
+
+### 10.2) Checklist de integração
+
+✅ **Observado no código (padrão atual)**
+
+- **Item/objeto**:
+  - criar classe em `object/`
+  - definir `OBJ_ID` (`internalId`) estável
+  - adicionar ao `EntityGenerator.getObject(...)`
+  - adicionar chaves em `resource/lang/messages_*.properties`
+  - (opcional) posicionar em mundo via `AssetSetter`
+- **Pet/ovo**:
+  - criar `PetEntity` + `PetEgg`
+  - registrar em `PetFactory`
+  - chaves i18n para `.name/.desc` e mensagens do Pet Yard
+- **Monstro/boss**:
+  - criar classe em `monster/`
+  - definir drop e comportamento em `setAction()/checkDrop()`
+  - posicionar via `AssetSetter` e/ou eventos
+  - se boss: integrar em cutscene/progress
+
+💡 **Sugestão**: criar um arquivo único “registry” por conteúdo (monstros/itens/pets) para reduzir switch-case grande com o tempo.
+
+---
+
+## 11) Definition of Done (DoD)
+
+> 💡 **Sugestão**: critérios objetivos evitam “parece pronto, mas não está”.
+
+**DoD — Sistema**
+
+- Regras documentadas (este GDD)
+- Controles e feedback definidos
+- Estados e transições validados (não trava)
+- Pelo menos 3 test cases passando (ver seção 12)
+- i18n: chaves `pt_BR` presentes (e fallback não quebra UI)
+
+**DoD — Conteúdo (inimigo/item)**
+
+- `internalId` estável e registrado
+- Nome/descrição em i18n
+- Spawn/obtenção possível no jogo
+- Balanceamento básico (hits para matar / hits para morrer)
+- Drop/economia não explode (não gera moedas infinitas sem custo)
+
+---
+
+## 12) Plano de testes de gameplay + checklist de build
+
+### Test cases rápidos (gameplay)
+
+✅ **Baseado no que o jogo já suporta**
+
+- **T1 — loop de combate**: matar 3 inimigos sem soft-lock e ver mensagens de dano/XP.
+- **T2 — trade**: comprar 1 item com moedas suficientes e tentar comprar sem moedas (deve bloquear com diálogo).
+- **T3 — inventário**: empilhar item stackable e ver contador; vender item não-equipado; tentar vender equipado (bloquear).
+- **T4 — mapa**: abrir/fechar mapa; ligar/desligar mini-mapa.
+- **T5 — save/load**: salvar, fechar e carregar; inventário, equipamento e objetos no mapa devem persistir.
+- **T6 — pet yard**: incubar um ovo (com moedas) e ver progresso; concluir e equipar pet.
+- **T7 — guarda**: segurar `Space` e observar drain; receber hit em guarda e verificar consumo; regenerar após delay.
+
+### Checklist de build (mínimo)
+
+- O jogo abre e entra no `PLAY_STATE`
+- Troca de estados funciona (map/options/trade/pet yard)
+- Não há crash de resource load (assets no classpath)
+
+---
+
+## 13) Roadmap & backlog priorizado
+
+> 🧭 **Planejado**: prioridades ajudam a manter essência sem “feature creep”.
+
+### P0 (fundação jogável e confiável)
+
+- **Assets no repositório / pipeline de assets** (para rodar do zero)  
+  Critério: jogo roda sem missing resources.
+- **Alinhar inconsistências GDD↔código** (mapa/XP/teclas/fórmulas)  
+  Critério: GDD espelha o comportamento atual + separa claramente o planejado.
+- **Drops e economia mínima estável**  
+  Critério: comprar/vender + drops básicos não geram loops infinitos triviais.
+
+### P1 (profundidade e variedade)
+
+- **Variedade de inimigos** com papéis claros (trash/skirmisher/elite)  
+- **Mais eventos e “salas” com risco/recompensa**
+- **Sistema de materiais** (craft/imbuir) com sinks reais
+
+### P2 (visão longa)
+
+- **Dungeons infinitas procedurais**
+- **Talentos/roda de habilidades**
+- **Ascensão**
+- **Coop** (se e quando fizer sentido técnico)
+
+---
+
+## 14) Riscos e mitigação
+
+| Risco | Tipo | Impacto | Mitigação |
+|---|---|---:|---|
+| Assets não versionados (missing `.png/.wav/.ttf`) | Tech | Alto | P0: pipeline de assets + validação no boot |
+| Drift GDD↔código | Design/Prod | Médio | DoD: GDD atualizado por release; seção “Implementado vs Planejado” |
+| Save quebra com mudanças | Tech | Alto | versão do save + tolerância a campos |
+| Curva de dificuldade “espeta” | Design | Médio | método de balanceamento + micro-playtests |
+| Complexidade de registries (switch-case crescendo) | Tech | Médio | registrar conteúdo via tabelas/JSON ou registry central |
+| i18n sem suporte de fonte (alfabetos) | UX | Médio | limitar idiomas expostos ou embutir fontes adequadas |
+
+---
+
+## 15) Glossário
+
+- **i-frames**: frames de invencibilidade após tomar dano.
+- **Hard gate**: bloqueio “duro” (ex.: porta com chave) que impede passar.
+- **Soft gate**: recomendação de poder (passa, mas é difícil).
+- **Skill gate**: progressão por habilidade do jogador (leitura/timing).
+- **Fail loop**: ciclo após falha (morte) que devolve o jogador ao loop central sem destruir a motivação.
+- **Telegráfo**: pista visual/sonora que antecipa uma ameaça/ataque.
+- **Knockback**: recuo aplicado por ataque.
+- **Bad-luck protection**: regra que reduz o azar extremo em drops.
+
+---
+
+## Apêndices
+
+### A) Fórmulas e tabelas do GDD base (preservadas)
+
+> ✅ **Preservação**: as tabelas abaixo vêm do `gdd.md` base. Aqui elas estão reunidas para consulta e balanceamento.
+
+#### Player – Progressão de Status (Níveis 1–10)
+
+> Premissas:
+>
+> - HP inicial: 12, +3 por nível.
+> - MP inicial: 6, **não** aumenta por enquanto.
+> - STR: +1 por nível.
+> - DEX: +1 em níveis pares.
+> - Ataque c/ Espada Normal = `STR * 2`.
+> - Defesa c/ Escudo de Madeira = `DEX * 1`.
+
+| Nível | HP Máx | MP Máx | STR | DEX | Ataque (Espada Normal) | Defesa (Escudo Madeira) | XP total p/ próximo nível |
+| ----- | ------ | ------ | --- | --- | ---------------------- | ----------------------- | ------------------------- |
+| 1     | 12     | 6      | 2   | 1   | 4                      | 1                       | 10                        |
+| 2     | 15     | 6      | 3   | 2   | 6                      | 2                       | 21                        |
+| 3     | 18     | 6      | 4   | 2   | 8                      | 2                       | 35                        |
+| 4     | 21     | 6      | 5   | 3   | 10                     | 3                       | 52                        |
+| 5     | 24     | 6      | 6   | 3   | 12                     | 3                       | 72                        |
+| 6     | 27     | 6      | 7   | 4   | 14                     | 4                       | 95                        |
+| 7     | 30     | 6      | 8   | 4   | 16                     | 4                       | 121                       |
+| 8     | 33     | 6      | 9   | 5   | 18                     | 5                       | 150                       |
+| 9     | 36     | 6      | 10  | 5   | 20                     | 5                       | 182                       |
+| 10    | 39     | 6      | 11  | 6   | 22                     | 6                       | 217                       |
+
+#### Fórmulas de Combate (GDD)
+
+| Conceito                   | Fórmula / Regra                                                                                            |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Ataque base do Jogador     | `AttackJogador = STR * weapon.attackValue`                                                                 |
+| Defesa base do Jogador     | `DefenseJogador = DEX * shield.defenseValue + soma(defesaBoots + defesaHelmet + defesaChest + defesaLegs)` |
+| Dano do Jogador no Monstro | `dano = AttackJogador - DefenseMonstro` (se < 0, vira 0)                                                   |
+| Dano do Monstro no Jogador | `dano = AttackMonstro - DefenseJogador` (se < 1, vira 1)                                                   |
+| XP para próximo nível      | Começa em **10** no nível 1. Ao subir de nível: `NextLevelExp = NextLevelExp + 5 + (novoNível * 3)`        |
+
+#### Monstros – Status Gerais
+
+| ID Interno             | Nome (GDD)    | HP Máx | ATK                     | DEF | SPD (default)         | EXP | Observações de Comportamento / Drops |
+| ---------------------- | ------------- | ------ | ----------------------- | --- | --------------------- | --- | ------------------------------------ |
+| `monster.greenSlime`   | Green Slime   | 8      | 3                       | 0   | 1                     | 3   | Inimigo básico; drops base.          |
+| `monster.bat`          | Bat           | 10     | 4                       | 0   | 4                     | 5   | Rápido; drops base.                  |
+| `monster.redSlime`     | Red Slime     | 16     | 7                       | 2   | 2                     | 10  | Mid; mais agressivo.                 |
+| `monster.orc`          | Orc           | 30     | 9                       | 3   | 1                     | 20  | Elite; knockback.                    |
+| `monster.skeletonLord` | Skeleton Lord | 80     | 10 / 15                 | 4   | 1 / 2                 | 100 | Boss; rage em <50% HP.               |
+
+#### Equipamentos Ofensivos (Armas / Ferramentas)
+
+| ID Interno         | Nome (GDD)    | Tipo    | AttackValue | Área de Ataque (LxA) | KnockBack | Motion1 | Motion2 | Preço | Observações |
+| ------------------ | ------------- | ------- | ----------: | -------------------: | --------: | ------: | ------: | ----: | ----------- |
+| `item.swordNormal` | Espada Normal | Sword   |           2 |                36×36 |         2 |       5 |      25 |    30 | Arma inicial. |
+| `item.axe`         | Machado       | Axe     |           3 |                30×30 |        10 |      25 |      50 |   120 | Dano alto, lento. |
+| `item.pickaxe`     | Picareta      | Pickaxe |           2 |                30×30 |         6 |      15 |      30 |    60 | Ferramenta/arma. |
+
+#### Equipamentos Defensivos
+
+| ID Interno        | Nome (GDD)        | Tipo   | DefenseValue | GuardStaminaCap | SpeedValue | Preço | Observações |
+| ----------------- | ----------------- | ------ | -----------: | --------------: | ---------: | ----: | ----------- |
+| `item.shieldWood` | Escudo de Madeira | Shield |            1 |              40 |          0 |    40 | Early. |
+| `item.shieldBlue` | Escudo Azul       | Shield |            3 |              80 |          0 |   300 | Mid. |
+| `item.boots`      | Botas de Couro    | Boots  |            1 |               – |          1 |   400 | +speed. |
+
+#### Magias e Consumíveis
+
+| ID Interno      | Nome (GDD) | Tipo       |  ATK |  SPD | MaxLife (frames) | KnockBack | Custo de MP (`useCost`) | Observações |
+| --------------- | ---------- | ---------- | ---: | ---: | ---------------: | --------: | ----------------------: | ---------- |
+| `item.fireball` | Fireball   | Projectile |    3 |    5 |               80 |         4 |                       2 | Consome mana, gera partículas. |
+
+| ID Interno       | Nome (GDD)     | Tipo       | Valor (cura) | Stackable | Preço | Observações |
+| ---------------- | -------------- | ---------- | -----------: | --------: | ----: | ---------- |
+| `item.potionRed` | Poção Vermelha | Consumable |         5 HP |      true |    25 | Cura e toca SE. |
+
+#### Resumo rápido de balanceamento (GDD base)
+
+- **Early Game**: Player L1 (Atk≈4, Def≈1, HP 12). Slime morre em 2–3 hits; Bat em ~3 hits.
+- **Mid Game**: Player L3–L5 com melhor gear (Atk com Machado 8–18; defesa alta com DEX). Red Slime/Orc exigem poções/defesa.
+- **Boss**: Skeleton Lord (HP 80, DEF 4, ATK 10→15, SPD 1→2). Player por volta do nível 5.
+
+---
+
+### B) Sistema de IDs e i18n (texto expandido)
+
+> ✅ **Preservado e expandido** a partir do `gdd.md` base.
+
+- `internalId` → identificação técnica estável (save/load, geração, comparações)
+- `translationKey` → base para textos traduzidos (`.name`, `.desc`, `.pickup`, `.dialog.*`)
+
+💡 **Princípios**
+
+- `internalId` não deve mudar (quebra save)
+- `translationKey` pode evoluir sem quebrar save (quando desacoplado)
+- UI deve ser capaz de mostrar textos com fallback
+
+---
+
+### C) GDD base original (preservação integral)
+
+<details>
+  <summary><b>Abrir o texto original do <code>gdd.md</code> (preservado integralmente)</b></summary>
+  <br/>
+
+  > Este anexo preserva integralmente o conteúdo base do arquivo `gdd.md`.
+  > A versão “final” está no corpo principal deste documento.
+
 # Game Design Document — **BitHunter**
 
 ## Sumário
@@ -835,3 +1820,5 @@ Segue tudo organizado em formato de GDD, já com os **valores sugeridos** que co
 
   * HP 80, DEF 4, duas fases (ATK 10 → 15, SPD 1 → 2).
   * Complayer por volta do nível 5, luta dura ~10 hits bem encaixados e punidos se tomar combos na fase 2.
+
+</details>
