@@ -131,6 +131,10 @@ public class KeyHandler implements KeyListener {
         mapState(code);
         return;
       }
+      case GamePanel.BESTIARY_STATE -> {
+        bestiaryState(code);
+        return;
+      }
       default -> {
         // noop
       }
@@ -251,6 +255,12 @@ public class KeyHandler implements KeyListener {
       }
       case KeyEvent.VK_M -> gp.setGameState(GamePanel.MAP_STATE);
       case KeyEvent.VK_X -> gp.map.setMiniMapOn(!gp.map.isMiniMapOn());
+
+      // Bestiário
+      case KeyEvent.VK_B -> {
+        gp.getGameUi().getBestiaryUi().resetState();
+        gp.setGameState(GamePanel.BESTIARY_STATE);
+      }
 
       // Dev shortcuts
       case KeyEvent.VK_T -> toggleDebug();
@@ -607,6 +617,66 @@ public class KeyHandler implements KeyListener {
       case KeyEvent.VK_ESCAPE -> ui.setSubState(0);
       default -> {
         // noop
+      }
+    }
+  }
+
+  /**
+   * Estado: Bestiário (navegação por classes, criaturas e detalhes).
+   */
+  public void bestiaryState(int code) {
+    final UI ui = gp.getGameUi();
+    var bestiaryUi = ui.getBestiaryUi();
+    int subState = ui.getSubState();
+
+    switch (subState) {
+      case 0 -> { // Lista de classes
+        int maxIdx = bestiaryUi.getClassCount() - 1;
+        if (maxIdx < 0) maxIdx = 0;
+        switch (code) {
+          case KeyEvent.VK_W -> {
+            moveCommandNum(ui, -1, maxIdx);
+          }
+          case KeyEvent.VK_S -> {
+            moveCommandNum(ui, +1, maxIdx);
+          }
+          case KeyEvent.VK_ENTER -> {
+            bestiaryUi.setSelectedClassIndex(ui.getCommandNum());
+            bestiaryUi.enterSelectedClass();
+          }
+          case KeyEvent.VK_ESCAPE, KeyEvent.VK_B -> {
+            gp.setGameState(GamePanel.PLAY_STATE);
+          }
+          default -> { /* noop */ }
+        }
+      }
+      case 1 -> { // Lista de criaturas
+        switch (code) {
+          case KeyEvent.VK_W -> {
+            bestiaryUi.navigateUp();
+            playNavigateSfx();
+          }
+          case KeyEvent.VK_S -> {
+            bestiaryUi.navigateDown();
+            playNavigateSfx();
+          }
+          case KeyEvent.VK_ENTER -> bestiaryUi.enterSelectedCreature();
+          case KeyEvent.VK_ESCAPE -> bestiaryUi.goBack();
+          default -> { /* noop */ }
+        }
+      }
+      case 2 -> { // Detalhes da criatura
+        switch (code) {
+          case KeyEvent.VK_W -> bestiaryUi.navigateUp();
+          case KeyEvent.VK_S -> bestiaryUi.navigateDown();
+          case KeyEvent.VK_ESCAPE -> bestiaryUi.goBack();
+          default -> { /* noop */ }
+        }
+      }
+      default -> {
+        if (code == KeyEvent.VK_ESCAPE) {
+          gp.setGameState(GamePanel.PLAY_STATE);
+        }
       }
     }
   }

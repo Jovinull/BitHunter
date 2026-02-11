@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import javax.swing.JPanel;
 
 import ai.PathFinder;
+import bestiary.BestiaryService;
 import data.SaveLoad;
 import entity.Entity;
 import entity.Player;
@@ -83,6 +84,7 @@ public class GamePanel extends JPanel implements Runnable {
   private transient EntityGenerator eGenerator = new EntityGenerator(this);
   private transient CutsceneManager csManager = new CutsceneManager(this);
   private transient PetIncubator petIncubator = new PetIncubator(this);
+  private transient BestiaryService bestiaryService = new BestiaryService(this);
   transient Thread gameThread; // Thread para rodar o loop do jogo
 
   // ENTITY AND OBJECTS
@@ -110,6 +112,7 @@ public class GamePanel extends JPanel implements Runnable {
   public static final int MAP_STATE = 10;
   public static final int CUTSCENE_STATE = 11;
   public static final int PET_YARD_STATE = 12;
+  public static final int BESTIARY_STATE = 13; // Bestiário (Cyclopedia)
 
   // others
   private boolean bossBattleOn = false;
@@ -176,6 +179,7 @@ public class GamePanel extends JPanel implements Runnable {
       player.setDefaultValues();
       aSetter.setObject();
       aSetter.setInteractiveTile();
+      bestiaryService.reset();
 
       var lighting = eManager.getLighting();
       if (lighting != null) {
@@ -280,6 +284,7 @@ public class GamePanel extends JPanel implements Runnable {
     updateInteractiveTiles();
     eManager.update();
     petIncubator.update();
+    drainBestiaryNotifications();
   }
 
   private void updatePlayer() {
@@ -366,6 +371,14 @@ public class GamePanel extends JPanel implements Runnable {
       if (interactiveTile != null) {
         interactiveTile.update();
       }
+    }
+  }
+
+  /** Drena notificações do Bestiário e exibe como mensagem na HUD. */
+  private void drainBestiaryNotifications() {
+    String msg;
+    while ((msg = bestiaryService.pollNotification()) != null) {
+      gameUi.addMessage(msg);
     }
   }
 
@@ -728,5 +741,9 @@ public class GamePanel extends JPanel implements Runnable {
 
   public PetIncubator getPetIncubator() {
     return petIncubator;
+  }
+
+  public BestiaryService getBestiaryService() {
+    return bestiaryService;
   }
 }
