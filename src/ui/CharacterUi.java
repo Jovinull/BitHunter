@@ -149,12 +149,9 @@ class CharacterUi {
           bonus = player.getDefenseEquipBonusStat();
           usesBonusFormat = true;
         }
-        case 4 -> {
-          // Moedas: só o valor direto
-          valueText = String.valueOf(player.getCoin());
-        }
-        default -> {
-        }
+        // Moedas: só o valor direto
+        case 4 -> valueText = String.valueOf(player.getCoin());
+        default -> { /* índices fora do intervalo — nenhuma ação necessária */ }
       }
 
       if (usesBonusFormat) {
