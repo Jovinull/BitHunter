@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.logging.Logger;
 
 import bestiary.BestiaryCreature;
 import bestiary.BestiaryDrop;
@@ -28,6 +29,8 @@ import main.GamePanel;
  * Campo {@code searchQuery} para pesquisa rápida.</p>
  */
 public class BestiaryUi {
+
+  private static final Logger LOG = Logger.getLogger(BestiaryUi.class.getName());
 
   // --- Cores específicas do Bestiário ---
   private static final Color COL_LOCKED = new Color(40, 40, 50, 200);
@@ -71,10 +74,57 @@ public class BestiaryUi {
 
     switch (subState) {
       case 0 -> drawClassListScreen();
-      case 1 -> drawCreatureListScreen();
-      case 2 -> drawCreatureDetailScreen();
+      case 1 -> {
+        // Captura em variável local para eliminar race condition (TOCTOU)
+        // entre a thread do game loop (draw) e a EDT (KeyHandler).
+        CreatureClass safeClass = resolveCurrentClass();
+        if (safeClass == null) {
+          // Fallback: sem classes registradas — voltar para tela de classes
+          LOG.warning("[Bestiary] currentClass null in subState=1, falling back to class list");
+          ui.setSubState(0);
+          drawClassListScreen();
+        } else {
+          drawCreatureListScreen(safeClass);
+        }
+      }
+      case 2 -> {
+        CreatureClass safeClass = resolveCurrentClass();
+        if (safeClass == null) {
+          LOG.warning("[Bestiary] currentClass null in subState=2, falling back to class list");
+          ui.setSubState(0);
+          drawClassListScreen();
+        } else {
+          drawCreatureDetailScreen(safeClass);
+        }
+      }
       default -> drawClassListScreen();
     }
+  }
+
+  /**
+   * Resolve o currentClass de forma segura:
+   * 1. Se currentClass já tem valor, retorna-o.
+   * 2. Se é null, tenta usar a primeira classe disponível como fallback.
+   * 3. Se não há classes no registro, retorna null (cenário extremo).
+   *
+   * <p>Essa abordagem garante que nunca haverá NPE mesmo com race conditions
+   * entre a thread de draw e a EDT (KeyHandler).</p>
+   */
+  private CreatureClass resolveCurrentClass() {
+    CreatureClass cc = currentClass; // snapshot em variável local
+    if (cc != null) {
+      return cc;
+    }
+
+    // Fallback: selecionar primeira classe disponível
+    List<CreatureClass> classes = ui.getGamePanel().getBestiaryService()
+        .getRegistry().getOrderedClasses();
+    if (!classes.isEmpty()) {
+      cc = classes.get(0);
+      currentClass = cc; // propagar o fallback para evitar repetir
+      LOG.fine("[Bestiary] currentClass was null, defaulted to: " + cc.name());
+    }
+    return cc;
   }
 
   // ===== Tela 0: Lista de Classes =====
@@ -149,12 +199,15 @@ public class BestiaryUi {
 
   // ===== Tela 1: Lista de Criaturas =====
 
-  private void drawCreatureListScreen() {
+  /**
+   * Desenha a lista de criaturas de uma classe.
+   * Recebe a classe já resolvida (garantidamente não-null) via parâmetro
+   * para evitar race conditions com o campo de instância.
+   */
+  private void drawCreatureListScreen(CreatureClass safeClass) {
     Graphics2D g2 = ui.g2;
     var gp = ui.getGamePanel();
     BestiaryService service = gp.getBestiaryService();
-
-    if (currentClass == null) return;
 
     int frameX = GamePanel.TILE_SIZE;
     int frameY = GamePanel.TILE_SIZE / 2;
@@ -167,7 +220,7 @@ public class BestiaryUi {
 
     // Título: nome da classe
     g2.setFont(ui.fonts.pixelBold(26F));
-    ui.drawTextShadow(ui.t(currentClass.getTranslationKey()),
+    ui.drawTextShadow(ui.t(safeClass.getTranslationKey()),
         textX, textY, UI.COL_TEXT, Color.black, 2);
 
     textY += 36;
@@ -182,14 +235,16 @@ public class BestiaryUi {
       textY += 28;
     }
 
-    // Lista de criaturas
-    List<BestiaryCreature> creatures = getFilteredCreatures(service);
-    int visibleCount = Math.min(creatures.size() - scrollOffset, MAX_VISIBLE_ITEMS);
+    // Lista de criaturas (usa safeClass para thread-safety)
+    List<BestiaryCreature> creatures = getFilteredCreatures(service, safeClass);
+    int visibleCount = Math.min(
+        Math.max(0, creatures.size() - scrollOffset), MAX_VISIBLE_ITEMS);
 
     g2.setFont(ui.fonts.pixelPlain(20F));
 
     for (int i = 0; i < visibleCount; i++) {
       int idx = scrollOffset + i;
+      if (idx >= creatures.size()) break; // guarda defensiva extra
       BestiaryCreature creature = creatures.get(idx);
       BestiaryStage stage = service.getStage(creature.getId());
       boolean selected = (idx == selectedCreatureIndex);
@@ -267,14 +322,16 @@ public class BestiaryUi {
 
   // ===== Tela 2: Detalhes da Criatura =====
 
-  private void drawCreatureDetailScreen() {
+  /**
+   * Desenha os detalhes de uma criatura.
+   * Recebe a classe já resolvida (garantidamente não-null) via parâmetro.
+   */
+  private void drawCreatureDetailScreen(CreatureClass safeClass) {
     Graphics2D g2 = ui.g2;
     var gp = ui.getGamePanel();
     BestiaryService service = gp.getBestiaryService();
 
-    if (currentClass == null) return;
-
-    List<BestiaryCreature> creatures = getFilteredCreatures(service);
+    List<BestiaryCreature> creatures = getFilteredCreatures(service, safeClass);
     if (selectedCreatureIndex < 0 || selectedCreatureIndex >= creatures.size()) return;
 
     BestiaryCreature creature = creatures.get(selectedCreatureIndex);
@@ -683,8 +740,12 @@ public class BestiaryUi {
     g2.drawString(text, x + (w - textW) / 2, y);
   }
 
-  private List<BestiaryCreature> getFilteredCreatures(BestiaryService service) {
-    List<BestiaryCreature> all = service.getRegistry().getCreaturesByClass(currentClass);
+  /**
+   * Retorna criaturas da classe fornecida, filtradas pela query de pesquisa (se ativa).
+   * Recebe a classe como parâmetro para não depender do campo de instância.
+   */
+  private List<BestiaryCreature> getFilteredCreatures(BestiaryService service, CreatureClass cc) {
+    List<BestiaryCreature> all = service.getRegistry().getCreaturesByClass(cc);
     if (searchQuery.isEmpty()) return all;
 
     String query = searchQuery.toLowerCase();
@@ -694,6 +755,16 @@ public class BestiaryUi {
           return name.contains(query);
         })
         .toList();
+  }
+
+  /**
+   * Overload que usa currentClass (para chamadas de navegação que não passam pela draw path).
+   * Utiliza resolveCurrentClass() para segurança.
+   */
+  private List<BestiaryCreature> getFilteredCreatures(BestiaryService service) {
+    CreatureClass cc = resolveCurrentClass();
+    if (cc == null) return List.of();
+    return getFilteredCreatures(service, cc);
   }
 
   // ===== Navegação (chamado pelo KeyHandler) =====
@@ -737,13 +808,20 @@ public class BestiaryUi {
       ui.setSubState(1);
       ui.setCommandNum(0);
     } else if (sub == 1) {
-      currentClass = null;
+      // IMPORTANTE: mudar subState ANTES de limpar currentClass.
+      // Isso garante que a thread de draw nunca veja subState=1 com currentClass=null
+      // (race condition que causava NPE).
+      ui.setSubState(0);
+      ui.setCommandNum(selectedClassIndex);
+
+      // Agora é seguro limpar — a draw thread já vê subState=0 (tela de classes)
       selectedCreatureIndex = 0;
       scrollOffset = 0;
       searchQuery = "";
       searchMode = false;
-      ui.setSubState(0);
-      ui.setCommandNum(selectedClassIndex);
+      // Não anulamos currentClass — a resolveCurrentClass() + o snapshot local
+      // nas draw methods já garantem segurança. Manter o valor anterior
+      // como cache é seguro e evita a janela de race condition.
     } else {
       // Fechar bestiário
       ui.getGamePanel().setGameState(GamePanel.PLAY_STATE);
@@ -793,8 +871,14 @@ public class BestiaryUi {
     this.selectedClassIndex = index;
   }
 
-  /** Reseta estado ao abrir o bestiário. */
+  /**
+   * Reseta estado ao abrir o bestiário.
+   * Inicializa currentClass com a primeira classe disponível (nunca null se há dados).
+   * Garante que o estado é consistente para a draw thread.
+   */
   public void resetState() {
+    // Mudar subState primeiro (antes de qualquer outra coisa)
+    // para que a draw thread veja estado consistente
     ui.setSubState(0);
     ui.setCommandNum(0);
     selectedClassIndex = 0;
@@ -803,7 +887,11 @@ public class BestiaryUi {
     detailScrollOffset = 0;
     searchQuery = "";
     searchMode = false;
-    currentClass = null;
+
+    // Inicializar currentClass com default seguro (nunca null se há classes registradas)
+    List<CreatureClass> classes = ui.getGamePanel().getBestiaryService()
+        .getRegistry().getOrderedClasses();
+    currentClass = classes.isEmpty() ? null : classes.get(0);
   }
 
   /** Retorna o número máximo de itens no menu de classes. */
