@@ -15,7 +15,8 @@ public class ObjManaCrystal extends Entity {
     setTranslationKey(OBJ_ID);
     setValue(1);
 
-    down1 = setup("/objects/manacrystal_full", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
+    // Sprite usado para o DROP/LOOT no chão (novo asset dedicado)
+    down1 = setup("/objects/manacrystal", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     image = setup("/objects/manacrystal_full", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     image2 = setup("/objects/manacrystal_blank", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
   }
