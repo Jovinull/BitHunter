@@ -94,5 +94,3 @@ true
 true
 047.png
 true
-048.png
-true
