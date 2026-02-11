@@ -665,6 +665,9 @@ public class Player extends Entity {
         setExp(getExp() + mon.getExp());
         checkLevelUp();
         grantPetExp(mon.getExp());
+
+        // --- Bestiário: registrar kill ---
+        gp.getBestiaryService().recordKill(mon.getInternalId());
       }
     }
   }
