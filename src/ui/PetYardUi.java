@@ -1,7 +1,6 @@
 package ui;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -24,6 +23,7 @@ import pets.PetIncubator;
 class PetYardUi {
 
   private static final String PET_NAME_TRANSLATION_SUFFIX = ".name";
+  private static final Color COL_BAR_BG = new Color(0, 0, 0, 160);
 
   private final UI ui;
   private final InventoryUi inventoryUi;
@@ -129,16 +129,9 @@ class PetYardUi {
 
     ui.drawSubWindow(frameX, frameY, frameWidth, frameHeight);
 
-    // Fonte igual à descrição/título de item do trade
-    Font baseFont = ui.getMaruMonica() != null ? ui.getMaruMonica() : g2.getFont();
-    Font titleFont = baseFont.deriveFont(Font.PLAIN, 24F);
-    Font listFont = baseFont.deriveFont(Font.PLAIN, 20F);
-    Font tagFont = baseFont.deriveFont(Font.ITALIC, 16F);
-    Font hintFont = baseFont.deriveFont(Font.PLAIN, 16F);
-
     // Título
     int titleY = frameY + 32;
-    g2.setFont(titleFont);
+    g2.setFont(ui.fonts.pixelPlain(24F));
     ui.drawTextShadow(
         ui.t("ui.petYard.manageTitle"),
         frameX + 24,
@@ -153,14 +146,14 @@ class PetYardUi {
     int listAreaWidth = frameWidth / 2 - 24;
     int lineHeight = GamePanel.TILE_SIZE + 8;
 
-    g2.setFont(listFont);
+    g2.setFont(ui.fonts.pixelPlain(20F));
 
     if (pets.isEmpty()) {
       drawEmptyPetListMessage(g2, listAreaX, listAreaY);
       return;
     }
 
-    PetRowLayout rowLayout = new PetRowLayout(listAreaX, listAreaY, listAreaWidth, lineHeight, listFont, tagFont);
+    PetRowLayout rowLayout = new PetRowLayout(listAreaX, listAreaY, listAreaWidth, lineHeight);
 
     drawPetListRows(rowLayout);
 
@@ -179,7 +172,7 @@ class PetYardUi {
         detailsHeight);
 
     // dica (ENTER / ESC) no rodapé, alinhada à esquerda
-    drawPetListHint(g2, frameX, frameY, frameHeight, hintFont);
+    drawPetListHint(g2, frameX, frameY, frameHeight);
 
     // ENTER => equipa / desequipa pet
     handlePetSelectionInput(gp, player, pets);
@@ -263,13 +256,13 @@ class PetYardUi {
       int level = activePet.getPetLevel();
 
       // Tag [Ativo] à esquerda (acima do nome)
-      g2.setFont(layout.tagFont);
+      g2.setFont(ui.fonts.pixelItalic(16F));
       g2.setColor(UI.COL_TEXT_DIM);
       g2.drawString(ui.t("ui.petYard.currentPetTag"), textX, tagY);
 
       // Level alinhado à direita na mesma linha do [Ativo]
       String levelLabel = "Lv. " + level;
-      g2.setFont(layout.listFont);
+      g2.setFont(ui.fonts.pixelPlain(20F));
       g2.setColor(selected ? UI.COL_ACCENT : UI.COL_TEXT);
       var fmLevel = g2.getFontMetrics();
       int levelWidth = fmLevel.stringWidth(levelLabel);
@@ -278,15 +271,15 @@ class PetYardUi {
     }
 
     // Linha de baixo: nome do pet
-    g2.setFont(layout.listFont);
+    g2.setFont(ui.fonts.pixelPlain(20F));
     g2.setColor(selected ? UI.COL_ACCENT : UI.COL_TEXT);
     g2.drawString(name, textX, nameY);
   }
 
   private void drawPetListHint(
-      Graphics2D g2, int frameX, int frameY, int frameHeight, Font hintFont) {
+      Graphics2D g2, int frameX, int frameY, int frameHeight) {
     int hintY = frameY + frameHeight - 16;
-    g2.setFont(hintFont);
+    g2.setFont(ui.fonts.pixelPlain(16F));
     g2.setColor(UI.COL_TEXT_DIM);
     g2.drawString(ui.t("ui.petYard.hintEquip"), frameX + 24, hintY);
   }
@@ -370,17 +363,12 @@ class PetYardUi {
     String name = ui.t(petId + PET_NAME_TRANSLATION_SUFFIX);
     String desc = ui.t(petId + ".desc");
 
-    Font baseFont = ui.getMaruMonica() != null ? ui.getMaruMonica() : g2.getFont();
-    Font titleFont = baseFont.deriveFont(Font.BOLD, 22F);
-    Font descFont = baseFont.deriveFont(Font.PLAIN, 18F);
-    Font smallFont = baseFont.deriveFont(Font.PLAIN, 14F);
-
     int padding = 24;
     int textX = frameX + padding;
     int textY = frameY + padding + 8;
 
     // Nome do pet
-    g2.setFont(titleFont);
+    g2.setFont(ui.fonts.pixelBold(22F));
     g2.setColor(UI.COL_TEXT);
     g2.drawString(name, textX, textY);
 
@@ -388,19 +376,17 @@ class PetYardUi {
 
     boolean isActive = activePet != null && petId.equals(activePet.getInternalId());
 
-    PetDetailsLayout layout = new PetDetailsLayout(frameWidth, padding, descFont, smallFont);
-
     if (isActive) {
-      textY = drawActivePetDetails(activePet, textX, textY, layout);
+      textY = drawActivePetDetails(activePet, textX, textY, frameWidth, padding);
     } else {
-      textY = drawInactivePetHint(textX, textY, smallFont);
+      textY = drawInactivePetHint(textX, textY);
     }
 
-    drawPetDescription(desc, textX, textY, descFont);
+    drawPetDescription(desc, textX, textY);
   }
 
   private int drawActivePetDetails(
-      PetEntity activePet, int textX, int textY, PetDetailsLayout layout) {
+      PetEntity activePet, int textX, int textY, int frameWidth, int padding) {
 
     Graphics2D g2 = ui.g2;
 
@@ -408,13 +394,13 @@ class PetYardUi {
     int exp = activePet.getPetExp();
     int next = activePet.getPetNextLevelExp();
 
-    g2.setFont(layout.descFont);
+    g2.setFont(ui.fonts.pixelPlain(18F));
     g2.setColor(UI.COL_ACCENT);
     g2.drawString("Lv. " + level, textX, textY);
     textY += 22;
 
     // Barra de XP
-    int barWidth = layout.frameWidth - layout.padding * 2;
+    int barWidth = frameWidth - padding * 2;
     int barHeight = 12;
     int barX = textX;
     int barY = textY + 2;
@@ -422,7 +408,7 @@ class PetYardUi {
     double ratio = (next > 0) ? Math.min(1.0, exp / (double) next) : 0.0;
     int filled = (int) (barWidth * ratio);
 
-    g2.setColor(new Color(0, 0, 0, 160));
+    g2.setColor(COL_BAR_BG);
     g2.fillRoundRect(barX, barY, barWidth, barHeight, 6, 6);
     g2.setColor(UI.COL_PANEL_BORDER);
     g2.drawRoundRect(barX, barY, barWidth, barHeight, 6, 6);
@@ -433,7 +419,7 @@ class PetYardUi {
     }
 
     String xpText = "XP " + exp + " / " + next;
-    g2.setFont(layout.smallFont);
+    g2.setFont(ui.fonts.pixelPlain(14F));
     g2.setColor(UI.COL_TEXT_DIM);
     g2.drawString(xpText, barX, barY + barHeight + 14);
 
@@ -442,7 +428,7 @@ class PetYardUi {
     // ---- Stats numéricos específicos do pet ativo (delegados ao próprio Pet) ----
     String statsLine = activePet.buildPetStatsLineForUi();
     if (statsLine != null && !statsLine.isBlank()) {
-      g2.setFont(layout.descFont);
+      g2.setFont(ui.fonts.pixelPlain(18F));
       g2.setColor(UI.COL_TEXT);
       g2.drawString(statsLine, textX, currentTextY);
       currentTextY += 22;
@@ -451,12 +437,12 @@ class PetYardUi {
     return currentTextY;
   }
 
-  private int drawInactivePetHint(int textX, int textY, Font smallFont) {
+  private int drawInactivePetHint(int textX, int textY) {
 
     Graphics2D g2 = ui.g2;
 
     // Pet não ativo: dica para ativar (suporta quebra de linha com \n)
-    g2.setFont(smallFont);
+    g2.setFont(ui.fonts.pixelPlain(14F));
     g2.setColor(UI.COL_TEXT_DIM);
 
     String hint = ui.t("ui.petYard.inactivePetHint");
@@ -468,13 +454,12 @@ class PetYardUi {
     return textY + 8; // respiro antes da descrição
   }
 
-  private void drawPetDescription(
-      String desc, int textX, int textY, Font descFont) {
+  private void drawPetDescription(String desc, int textX, int textY) {
 
     Graphics2D g2 = ui.g2;
 
     // Descrição do pet
-    g2.setFont(descFont);
+    g2.setFont(ui.fonts.pixelPlain(18F));
     g2.setColor(UI.COL_TEXT);
 
     for (String line : desc.split("\n")) {
@@ -488,11 +473,6 @@ class PetYardUi {
     GamePanel gp = ui.getGamePanel();
     Player player = gp.getPlayer();
 
-    // Fonte igual à descrição/título de item do trade
-    Font baseFont = ui.getMaruMonica() != null ? ui.getMaruMonica() : g2.getFont();
-    Font titleFont = baseFont.deriveFont(Font.BOLD, 20F);
-    Font descFont = baseFont.deriveFont(Font.PLAIN, 20F);
-
     // inventário do player com cursor (desenha mochila + descrição)
     inventoryUi.drawInventory(player, true);
 
@@ -504,7 +484,7 @@ class PetYardUi {
     ui.drawSubWindow(infoX, infoY, infoWidth, infoHeight);
 
     // hint
-    g2.setFont(descFont);
+    g2.setFont(ui.fonts.pixelPlain(20F));
     g2.setColor(UI.COL_TEXT);
     g2.drawString(ui.t("ui.petYard.eggHint"), infoX + 24, infoY + 32);
 
@@ -517,7 +497,7 @@ class PetYardUi {
 
     if (item == null || item.getType() != Entity.TYPE_EGG) {
       g2.setColor(UI.COL_TEXT_DIM);
-      g2.setFont(descFont);
+      g2.setFont(ui.fonts.pixelPlain(20F));
       g2.drawString(ui.t("ui.petYard.eggInvalid"), infoX + 24, infoY + 64);
       return;
     }
@@ -535,18 +515,18 @@ class PetYardUi {
     g2.setColor(UI.COL_TEXT);
 
     // nome do ovo como "título"
-    g2.setFont(titleFont);
+    g2.setFont(ui.fonts.pixelBold(20F));
     g2.drawString(eggName, infoX + 24, infoY + 64);
 
     // custo + tempo como "descrição"
-    g2.setFont(descFont);
+    g2.setFont(ui.fonts.pixelPlain(20F));
     g2.drawString(lineCost, infoX + 24, infoY + 88);
     g2.drawString(lineTime, infoX + 260, infoY + 88);
 
     // já possuo esse pet?
     boolean alreadyOwned = player.getOwnedPets().contains(egg.getPetId());
     if (alreadyOwned) {
-      g2.setFont(descFont);
+      g2.setFont(ui.fonts.pixelPlain(20F));
       g2.setColor(UI.COL_ACCENT);
       int warnY = infoY + infoHeight - 20;
       g2.drawString(ui.t("ui.petYard.petAlreadyOwned"), infoX + 24, warnY);
@@ -624,17 +604,12 @@ class PetYardUi {
     // Janela base
     ui.drawSubWindow(frameX, frameY, frameWidth, frameHeight);
 
-    // Fonte padrão da UI
-    Font baseFont = ui.getMaruMonica() != null ? ui.getMaruMonica() : g2.getFont();
-    Font titleFont = baseFont.deriveFont(Font.BOLD, 20F);
-    Font infoFont = baseFont.deriveFont(Font.PLAIN, 16F);
-
     int padding = 24;
     int textX = frameX + padding;
     int textY = frameY + padding;
 
     // Título da caixa (ex.: "Incubadora")
-    g2.setFont(titleFont);
+    g2.setFont(ui.fonts.pixelBold(20F));
     ui.drawTextShadow(
         ui.t("ui.petYard.incubatorTitle"),
         textX,
@@ -646,11 +621,11 @@ class PetYardUi {
     textY += 24;
 
     if (!incubator.hasActiveEgg()) {
-      drawIncubatorEmptyMessage(textX, textY, infoFont);
+      drawIncubatorEmptyMessage(textX, textY);
       return;
     }
 
-    drawIncubatorEggNameAndTime(incubator, textX, textY, infoFont);
+    drawIncubatorEggNameAndTime(incubator, textX, textY);
 
     int progress = incubator.getProgressPercent();
     boolean hasTicks = incubator.getTotalTicks() > 0;
@@ -660,11 +635,11 @@ class PetYardUi {
     drawIncubatorPetIcon(incubator, gp, frameX, frameY, frameWidth);
   }
 
-  private void drawIncubatorEmptyMessage(int textX, int textY, Font infoFont) {
+  private void drawIncubatorEmptyMessage(int textX, int textY) {
 
     Graphics2D g2 = ui.g2;
 
-    g2.setFont(infoFont);
+    g2.setFont(ui.fonts.pixelPlain(16F));
     g2.setColor(UI.COL_TEXT_DIM);
     g2.drawString(ui.t("ui.petYard.noEggIncubating"), textX, textY + 8);
   }
@@ -672,8 +647,7 @@ class PetYardUi {
   private void drawIncubatorEggNameAndTime(
       PetIncubator incubator,
       int textX,
-      int textY,
-      Font infoFont) {
+      int textY) {
 
     Graphics2D g2 = ui.g2;
 
@@ -696,7 +670,7 @@ class PetYardUi {
     String timeText = String.format("%s %02d:%02d", timeLabel, remMinutes, remSeconds);
 
     // Nome do ovo/pet
-    g2.setFont(infoFont);
+    g2.setFont(ui.fonts.pixelPlain(16F));
     g2.setColor(UI.COL_TEXT);
     g2.drawString(eggName, textX, textY + 8);
 
@@ -714,8 +688,6 @@ class PetYardUi {
       boolean hasTicks) {
 
     Graphics2D g2 = ui.g2;
-    Font baseFont = ui.getMaruMonica() != null ? ui.getMaruMonica() : g2.getFont();
-    Font percentFont = baseFont.deriveFont(Font.BOLD, 14F);
 
     int barPaddingX = 24;
     int barPaddingY = 16;
@@ -725,7 +697,7 @@ class PetYardUi {
     int barY = frameY + frameHeight - barHeight - barPaddingY;
 
     // Fundo da barra
-    g2.setColor(new Color(0, 0, 0, 160));
+    g2.setColor(COL_BAR_BG);
     g2.fillRoundRect(barX, barY, barWidth, barHeight, 10, 10);
 
     // Borda da barra
@@ -741,7 +713,7 @@ class PetYardUi {
 
     // Texto da % no centro da barra
     String percentText = progress + "%";
-    g2.setFont(percentFont);
+    g2.setFont(ui.fonts.pixelBold(14F));
     g2.setColor(Color.white);
     int textWidth = g2.getFontMetrics().stringWidth(percentText);
     int percentX = barX + (barWidth - textWidth) / 2;
@@ -775,50 +747,8 @@ class PetYardUi {
   }
 
   /**
-   * Layout de uma linha da lista de pets.
+   * Layout de uma linha da lista de pets (apenas coordenadas).
    */
-  private static final class PetRowLayout {
-    final int listAreaX;
-    final int listAreaY;
-    final int listAreaWidth;
-    final int lineHeight;
-    final Font listFont;
-    final Font tagFont;
-
-    PetRowLayout(
-        int listAreaX,
-        int listAreaY,
-        int listAreaWidth,
-        int lineHeight,
-        Font listFont,
-        Font tagFont) {
-      this.listAreaX = listAreaX;
-      this.listAreaY = listAreaY;
-      this.listAreaWidth = listAreaWidth;
-      this.lineHeight = lineHeight;
-      this.listFont = listFont;
-      this.tagFont = tagFont;
-    }
-  }
-
-  /**
-   * Layout de detalhes do pet (painel da direita).
-   */
-  private static final class PetDetailsLayout {
-    final int frameWidth;
-    final int padding;
-    final Font descFont;
-    final Font smallFont;
-
-    PetDetailsLayout(
-        int frameWidth,
-        int padding,
-        Font descFont,
-        Font smallFont) {
-      this.frameWidth = frameWidth;
-      this.padding = padding;
-      this.descFont = descFont;
-      this.smallFont = smallFont;
-    }
+  private record PetRowLayout(int listAreaX, int listAreaY, int listAreaWidth, int lineHeight) {
   }
 }

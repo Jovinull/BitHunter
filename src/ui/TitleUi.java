@@ -1,7 +1,6 @@
 package ui;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 
 import main.GamePanel;
@@ -25,10 +24,7 @@ class TitleUi {
 
     // Tela principal
     if (state == 0) {
-      Font purisa = ui.getPurisaB();
-      if (purisa != null) {
-        g2.setFont(purisa.deriveFont(Font.BOLD, 112F));
-      }
+      g2.setFont(ui.fonts.displayBold(112F));
       ui.drawTextShadowCentered(
           ui.t("ui.title.gameName"),
           GamePanel.TILE_SIZE * 3,
@@ -46,18 +42,14 @@ class TitleUi {
           GamePanel.TILE_SIZE * 2,
           null);
 
-      if (purisa != null) {
-        g2.setFont(purisa.deriveFont(Font.BOLD, 48F));
-      }
+      g2.setFont(ui.fonts.displayBold(48F));
       int yMenuStart = yImg + (int) (GamePanel.TILE_SIZE * 3.2);
       ui.drawMenuItem(ui.t("ui.title.newGame"), yMenuStart, ui.getCommandNum() == 0);
       ui.drawMenuItem(ui.t("ui.title.loadGame"), yMenuStart + UI.MENU_LINE, ui.getCommandNum() == 1);
       ui.drawMenuItem(ui.t("ui.title.exit"), yMenuStart + UI.MENU_LINE * 2, ui.getCommandNum() == 2);
 
       ui.useCrispPixelText(g2);
-      if (ui.getMaruMonica() != null) {
-        g2.setFont(ui.getMaruMonica().deriveFont(Font.PLAIN, 16F));
-      }
+      g2.setFont(ui.fonts.pixelPlain(16F));
       String hint = ui.t("ui.title.hintNavigation");
       ui.drawTextShadowCentered(
           hint,
@@ -70,10 +62,7 @@ class TitleUi {
 
     // Tela de seleção de classe
     if (state == 1) {
-      Font purisa = ui.getPurisaB();
-      if (purisa != null) {
-        g2.setFont(purisa.deriveFont(Font.BOLD, 36F));
-      }
+      g2.setFont(ui.fonts.displayBold(36F));
       ui.drawSubWindowCenter(GamePanel.TILE_SIZE * 10, GamePanel.TILE_SIZE * 8);
       int cy = GamePanel.SCREEN_HEIGHT / 2 - GamePanel.TILE_SIZE;
 

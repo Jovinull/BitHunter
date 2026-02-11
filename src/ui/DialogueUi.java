@@ -1,6 +1,5 @@
 package ui;
 
-import java.awt.Font;
 import java.awt.Graphics2D;
 
 import entity.Entity;
@@ -27,10 +26,7 @@ class DialogueUi {
     int height = GamePanel.TILE_SIZE * 4;
     ui.drawSubWindow(x, y, width, height);
 
-    Font maru = ui.getMaruMonica();
-    if (maru != null) {
-      g2.setFont(maru.deriveFont(Font.PLAIN, 32F));
-    }
+    g2.setFont(ui.fonts.pixelPlain(32F));
     x += GamePanel.TILE_SIZE;
     y += GamePanel.TILE_SIZE;
 

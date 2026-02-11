@@ -2,7 +2,6 @@ package ui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 
 import entity.Entity;
@@ -11,6 +10,7 @@ import main.GamePanel;
 class InventoryUi {
 
   private static final int INVENTORY_COLS = 5;
+  private static final Color COL_AMOUNT_SHADOW = new Color(60, 60, 60);
 
   private final UI ui;
 
@@ -51,7 +51,7 @@ class InventoryUi {
         : ui.t("ui.inventory.npcTitle");
     int titleY = frameY + 32;
 
-    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 22F));
+    g2.setFont(ui.fonts.pixelBold(22F));
     ui.drawTextShadow(title, frameX + 20, titleY, UI.COL_TEXT, Color.black, 2);
 
     final int slotXstart = frameX + 20;
@@ -94,12 +94,12 @@ class InventoryUi {
           && entity == ui.getGamePanel().getPlayer()
           && item.getAmount() > 1) {
 
-        g2.setFont(g2.getFont().deriveFont(32f));
+        g2.setFont(ui.fonts.pixelBold(32F));
         String s = String.valueOf(item.getAmount());
         int amountX = ui.getXforAlignToRightText(s, slotX + 44);
         int amountY = slotY + GamePanel.TILE_SIZE;
 
-        g2.setColor(new Color(60, 60, 60));
+        g2.setColor(COL_AMOUNT_SHADOW);
         g2.drawString(s, amountX, amountY);
         g2.setColor(Color.white);
         g2.drawString(s, amountX - 3, amountY - 3);
@@ -178,17 +178,13 @@ class InventoryUi {
       int textY = dFrameY + GamePanel.TILE_SIZE;
       g2.setColor(UI.COL_TEXT);
 
-      Font baseFont = ui.getMaruMonica() != null ? ui.getMaruMonica() : g2.getFont();
-      Font titleFont = baseFont.deriveFont(Font.BOLD, 20F);
-      Font descFont = baseFont.deriveFont(Font.PLAIN, 20F);
-
       String displayName = item.getDisplayName();
-      g2.setFont(titleFont);
+      g2.setFont(ui.fonts.pixelBold(20F));
       g2.drawString("[" + displayName + "]", textX, textY);
       textY += 24;
 
       String desc = item.getDisplayDescription();
-      g2.setFont(descFont);
+      g2.setFont(ui.fonts.pixelPlain(20F));
 
       if (desc != null && !desc.isEmpty()) {
         String[] lines = desc.split("\n");

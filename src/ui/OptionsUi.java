@@ -21,7 +21,7 @@ class OptionsUi {
   void drawOptionsScreen() {
     var g2 = ui.g2;
     g2.setColor(UI.COL_TEXT);
-    g2.setFont(g2.getFont().deriveFont(32F));
+    g2.setFont(ui.fonts.pixelPlain(32F));
 
     int frameX = GamePanel.TILE_SIZE * 6;
     int frameY = GamePanel.TILE_SIZE;
