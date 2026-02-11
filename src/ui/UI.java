@@ -3,15 +3,10 @@ package ui;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.FontFormatException;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import entity.Entity;
 import main.GamePanel;
@@ -23,16 +18,14 @@ import object.ObjManaCrystal;
 
 public class UI {
 
-  // --- Logger ---
-  private static final Logger LOGGER = Logger.getLogger(UI.class.getName());
-
   // --- Referência do jogo ---
   private final GamePanel gp;
   Graphics2D g2;
 
-  // --- Fontes & HUD ---
-  private Font maruMonica;
-  private Font purisaB;
+  // --- Fontes (gerenciadas pelo FontManager) ---
+  final FontManager fonts;
+
+  // --- HUD ---
   BufferedImage heartFull;
   BufferedImage heartHalf;
   BufferedImage heartBlank;
@@ -95,22 +88,7 @@ public class UI {
 
   public UI(GamePanel gp) {
     this.gp = gp;
-
-    try (InputStream is = getClass().getResourceAsStream("/font/x12y16pxMaruMonica.ttf")) {
-      if (is != null) {
-        maruMonica = Font.createFont(Font.TRUETYPE_FONT, is);
-      }
-    } catch (FontFormatException | IOException e) {
-      LOGGER.log(Level.WARNING, "Falha ao carregar fonte MaruMonica", e);
-    }
-
-    try (InputStream is = getClass().getResourceAsStream("/font/Purisa Bold.ttf")) {
-      if (is != null) {
-        purisaB = Font.createFont(Font.TRUETYPE_FONT, is);
-      }
-    } catch (FontFormatException | IOException e) {
-      LOGGER.log(Level.WARNING, "Falha ao carregar fonte Purisa Bold", e);
-    }
+    this.fonts = new FontManager();
 
     Entity heart = new ObjHeart(gp);
     heartFull = heart.getBaseImage();
@@ -155,14 +133,6 @@ public class UI {
     return gp;
   }
 
-  Font getMaruMonica() {
-    return maruMonica;
-  }
-
-  Font getPurisaB() {
-    return purisaB;
-  }
-
   BufferedImage getCoinImage() {
     return coin;
   }
@@ -203,7 +173,6 @@ public class UI {
       hudUi.drawMessage();
     } else if (state == GamePanel.PAUSE_STATE) {
       hudUi.drawPlayerLife();
-      hudUi.drawPlayerLife();
       pauseUi.drawPauseScreen();
     } else if (state == GamePanel.DIALOGUE_STATE) {
       dialogueUi.drawDialogueScreen();
@@ -233,14 +202,10 @@ public class UI {
 
     if (smoothUi) {
       useSmoothUiText(g2);
-      if (purisaB != null) {
-        g2.setFont(purisaB.deriveFont(Font.PLAIN, 48F));
-      }
+      g2.setFont(fonts.displayPlain(48F));
     } else {
       useCrispPixelText(g2);
-      if (maruMonica != null) {
-        g2.setFont(maruMonica.deriveFont(Font.PLAIN, 16F));
-      }
+      g2.setFont(fonts.pixelPlain(16F));
     }
   }
 
@@ -339,7 +304,7 @@ public class UI {
   // --- Getters/Setters já existentes (mantidos p/ compatibilidade externa) ---
 
   public Font getMaruMonicaPublic() {
-    return maruMonica;
+    return fonts.getPixelBase();
   }
 
   public boolean isMessageOn() {

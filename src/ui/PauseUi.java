@@ -1,7 +1,6 @@
 package ui;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 
 import main.GamePanel;
@@ -24,10 +23,7 @@ class PauseUi {
 
     ui.drawSubWindow(x, y, w, h);
 
-    Font purisa = ui.getPurisaB();
-    if (purisa != null) {
-      g2.setFont(purisa.deriveFont(Font.PLAIN, 80F));
-    }
+    g2.setFont(ui.fonts.displayPlain(80F));
     String text = ui.t("ui.pause.title");
     ui.drawTextShadowCentered(text, y + (int) (h * 0.62), UI.COL_TEXT, Color.black, 3);
   }

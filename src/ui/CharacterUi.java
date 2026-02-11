@@ -1,13 +1,15 @@
 package ui;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 
 import entity.Entity;
 import main.GamePanel;
 
 class CharacterUi {
+
+  private static final Color COL_PORTRAIT_BG = new Color(10, 10, 15, 190);
+  private static final Color COL_EQUIP_SLOT_BG = new Color(20, 24, 32, 220);
 
   private final UI ui;
 
@@ -27,7 +29,7 @@ class CharacterUi {
     ui.drawSubWindow(frameX, frameY, frameWidth, frameHeight);
 
     g2.setColor(UI.COL_TEXT);
-    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 30F));
+    g2.setFont(ui.fonts.pixelBold(30F));
 
     final int padding = 24;
     int textX = frameX + padding;
@@ -46,7 +48,7 @@ class CharacterUi {
     int portraitX = textX;
     int portraitY = textY;
 
-    g2.setColor(new Color(10, 10, 15, 190));
+    g2.setColor(COL_PORTRAIT_BG);
     g2.fillRoundRect(portraitX, portraitY, portraitSize, portraitSize, 12, 12);
 
     g2.drawImage(
@@ -60,7 +62,7 @@ class CharacterUi {
     int infoX = portraitX + portraitSize + 24;
     int infoY = portraitY + 8;
 
-    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 22F));
+    g2.setFont(ui.fonts.pixelPlain(22F));
     String nivelLabel = ui.t("ui.character.levelPrefix") + " " + player.getLevel();
     ui.drawTextShadow(nivelLabel, infoX, infoY, UI.COL_TEXT, Color.black, 2);
     infoY += 30;
@@ -100,7 +102,7 @@ class CharacterUi {
     int statsBlockX = frameX + padding;
     int statsBlockY = portraitY + portraitSize + 40;
 
-    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 20F));
+    g2.setFont(ui.fonts.pixelPlain(20F));
     int lineHeight = 24;
 
     String[] labels = {
@@ -174,7 +176,7 @@ class CharacterUi {
     int equipAreaRight = frameX + frameWidth - equipAreaPadding;
     int equipAreaWidth = equipAreaRight - equipAreaX;
 
-    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 22F));
+    g2.setFont(ui.fonts.pixelBold(22F));
     int equipTitleY = portraitY + portraitSize + 32;
     if (equipTitleY > statsBlockY - 8) {
       equipTitleY = statsBlockY - 8;
@@ -242,7 +244,7 @@ class CharacterUi {
     Graphics2D g2 = ui.g2;
     int index = 0;
 
-    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 16F));
+    g2.setFont(ui.fonts.pixelPlain(16F));
 
     for (int row = 0; row < layout.rows(); row++) {
       for (int col = 0; col < layout.cols(); col++) {
@@ -259,7 +261,7 @@ class CharacterUi {
         int boxY = slotY;
         g2.setColor(UI.COL_PANEL_BORDER);
         g2.drawRoundRect(slotX, boxY, layout.slotSize(), layout.slotSize(), 10, 10);
-        g2.setColor(new Color(20, 24, 32, 220));
+        g2.setColor(COL_EQUIP_SLOT_BG);
         g2.fillRoundRect(
             slotX + 1,
             boxY + 1,
@@ -294,7 +296,7 @@ class CharacterUi {
       g2.fillRoundRect(x, y, filledWidth, height, 8, 8);
     }
 
-    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 18F));
+    g2.setFont(ui.fonts.pixelPlain(18F));
     String text = label + " " + current + "/" + max;
     int textX = x + 8;
     int textY = y + height - 4;

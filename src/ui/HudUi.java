@@ -2,7 +2,6 @@ package ui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
@@ -141,9 +140,7 @@ class HudUi {
     int exp = pet.getPetExp();
     int next = pet.getPetNextLevelExp();
 
-    Font baseFont = ui.getMaruMonica() != null ? ui.getMaruMonica() : g2.getFont();
-    Font hudFont = baseFont.deriveFont(Font.BOLD, 14F);
-    g2.setFont(hudFont);
+    g2.setFont(ui.fonts.pixelBold(14F));
     g2.setColor(UI.COL_TEXT);
 
     String label = "Pet Lv. " + level;
@@ -234,9 +231,7 @@ class HudUi {
     }
 
     String text = label + " " + current + "/" + max;
-    Font baseFont = ui.getMaruMonica() != null ? ui.getMaruMonica() : g2.getFont();
-    Font hudFont = baseFont.deriveFont(Font.BOLD, 18F);
-    g2.setFont(hudFont);
+    g2.setFont(ui.fonts.pixelBold(18F));
 
     var fm = g2.getFontMetrics();
     int textX = x + 8;
@@ -301,7 +296,7 @@ class HudUi {
     }
   }
 
-  private static void drawBossHpBar(Graphics2D g2, Entity monster) {
+  private void drawBossHpBar(Graphics2D g2, Entity monster) {
     double oneScale = (double) GamePanel.TILE_SIZE * 8 / monster.getMaxLife();
     double hpBarValue = oneScale * monster.getLife();
 
@@ -314,7 +309,7 @@ class HudUi {
     g2.setColor(COL_MONSTER_BAR_FILL);
     g2.fillRect(x, y, (int) hpBarValue, 20);
 
-    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 24f));
+    g2.setFont(ui.fonts.pixelBold(24F));
     g2.setColor(Color.white);
 
     String bossName = monster.getDisplayName();
@@ -326,7 +321,7 @@ class HudUi {
     int messageX = GamePanel.TILE_SIZE;
     int messageY = GamePanel.TILE_SIZE * 4;
 
-    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32F));
+    g2.setFont(ui.fonts.pixelBold(32F));
 
     int i = 0;
     while (i < ui.message.size()) {
