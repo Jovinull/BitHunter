@@ -68,7 +68,7 @@ public class CutsceneManager {
   private void phase1MovePlayerUp() {
     var player = gp.getPlayer();
     player.setWorldY(player.getWorldY() - 2);
-    if (player.getWorldY() < GamePanel.TILE_SIZE * 16) {
+    if (player.getWorldY() < GamePanel.TILE_SIZE * 40) {
       scenePhase++;
     }
   }
@@ -116,8 +116,8 @@ public class CutsceneManager {
     for (int i = 0; i < objects[currentMap].length; i++) {
       if (objects[currentMap][i] == null) {
         objects[currentMap][i] = new ObjDoorIron(gp);
-        objects[currentMap][i].setWorldX(GamePanel.TILE_SIZE * 25);
-        objects[currentMap][i].setWorldY(GamePanel.TILE_SIZE * 28);
+        objects[currentMap][i].setWorldX(GamePanel.TILE_SIZE * 50);
+        objects[currentMap][i].setWorldY(GamePanel.TILE_SIZE * 53);
         objects[currentMap][i].setTemp(true);
         gp.playSE(21);
         break;

@@ -81,8 +81,8 @@ public class Player extends Entity {
   }
 
   public void setDefaultValues() {
-    setWorldX(GamePanel.TILE_SIZE * 23);
-    setWorldY(GamePanel.TILE_SIZE * 21);
+    setWorldX(GamePanel.TILE_SIZE * 50);
+    setWorldY(GamePanel.TILE_SIZE * 50);
 
     setDefaultSpeed(3);
     recalculateSpeedFromEquipment();
@@ -127,8 +127,8 @@ public class Player extends Entity {
 
   public void setDefaultPositions() {
     gp.setCurrentMap(0);
-    setWorldX(GamePanel.TILE_SIZE * 23);
-    setWorldY(GamePanel.TILE_SIZE * 21);
+    setWorldX(GamePanel.TILE_SIZE * 50);
+    setWorldY(GamePanel.TILE_SIZE * 50);
     setDirection(DIR_DOWN);
 
     if (pet != null) {

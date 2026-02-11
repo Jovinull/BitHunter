@@ -119,50 +119,53 @@ public class EventHandler {
       return;
     }
 
-    // dano no buraco
-    if (hit(0, 27, 16, Entity.DIR_RIGHT)) {
+    // dano no buraco (leste do centro)
+    if (hit(0, 55, 55, Entity.DIR_RIGHT)) {
       damagePit(GamePanel.DIALOGUE_STATE);
       return;
     }
-    // fonte de cura
-    if (hit(0, 23, 12, Entity.DIR_UP)) {
+    // fonte de cura (norte da vila)
+    if (hit(0, 50, 42, Entity.DIR_UP)) {
       healingPool(GamePanel.DIALOGUE_STATE);
       return;
     }
-    // casa
-    if (hit(0, 10, 39, "any")) {
+    // casa - entrada (overworld → indoor)
+    if (hit(0, 25, 70, "any")) {
       teleport(1, 12, 13, GamePanel.INDOOR);
       return;
     }
+    // casa - saída (indoor → overworld)
     if (hit(1, 12, 13, "any")) {
-      teleport(0, 10, 39, GamePanel.OUTSIDE);
+      teleport(0, 25, 72, GamePanel.OUTSIDE);
       return;
     }
-    // falar com NPC
+    // falar com NPC merchant
     if (hit(1, 12, 9, Entity.DIR_UP)) {
       speak(gp.getNpc()[1][0]);
       return;
     }
-    // dungeon 1
-    if (hit(0, 12, 9, "any")) {
-      teleport(2, 9, 41, GamePanel.DUNGEON);
+    // dungeon 1 - entrada (overworld → dungeon)
+    if (hit(0, 75, 43, "any")) {
+      teleport(2, 25, 90, GamePanel.DUNGEON);
       return;
     }
-    if (hit(2, 9, 41, "any")) {
-      teleport(0, 12, 9, GamePanel.OUTSIDE);
+    // dungeon 1 - saída (dungeon → overworld)
+    if (hit(2, 25, 91, "any")) {
+      teleport(0, 75, 45, GamePanel.OUTSIDE);
       return;
     }
-    // dungeon 2 / boss room
-    if (hit(2, 8, 7, "any")) {
-      teleport(3, 26, 41, GamePanel.DUNGEON);
+    // dungeon 2 / boss room - entrada
+    if (hit(2, 25, 9, "any")) {
+      teleport(3, 50, 90, GamePanel.DUNGEON);
       return;
     }
-    if (hit(3, 26, 41, "any")) {
-      teleport(2, 8, 7, GamePanel.DUNGEON);
+    // boss room - saída (volta para dungeon)
+    if (hit(3, 50, 91, "any")) {
+      teleport(2, 25, 10, GamePanel.DUNGEON);
       return;
     }
-    // trigger do Skeleton Lord
-    if (hit(3, 25, 27, "any")) {
+    // trigger do Skeleton Lord (arena)
+    if (hit(3, 50, 55, "any")) {
       skeletonLord();
     }
   }
