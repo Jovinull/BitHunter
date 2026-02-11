@@ -46,37 +46,41 @@
 
 ## Navegação
 
-- [O que é](#o-que-é)
-- [Para quem é](#para-quem-é)
-- [Destaques confirmados no código](#destaques-confirmados-no-código)
-- [Demonstração](#demonstração)
-- [Stack e tecnologias (detectadas no repo)](#stack-e-tecnologias-detectadas-no-repo)
-- [Como rodar localmente](#como-rodar-localmente)
-  - [Via VS Code (config já no repo)](#via-vs-code-config-já-no-repo)
-  - [Config persistida (config.txt)](#config-persistida-configtxt)
-  - [Save/Load (save.dat)](#saveload-savedat)
-- [Estrutura do projeto](#estrutura-do-projeto)
-- [Arquitetura e fluxos](#arquitetura-e-fluxos)
-  - [Visão “de cima” (sistemas)](#visão-de-cima-sistemas)
-  - [Estados do jogo](#estados-do-jogo)
-  - [Mapas e tiles](#mapas-e-tiles)
-  - [Entidades, combate e progressão](#entidades-combate-e-progressão)
-  - [Pets + incubadora](#pets--incubadora)
-  - [Eventos, teleporte e cutscenes](#eventos-teleporte-e-cutscenes)
-  - [UI modular (HUD, inventário, trade, opções…)](#ui-modular-hud-inventário-trade-opções)
-  - [i18n (traduções)](#i18n-traduções)
-  - [Áudio](#áudio)
-  - [Iluminação / ciclo dia-noite](#iluminação--ciclo-dia-noite)
-- [Recursos (assets) e classpath](#recursos-assets-e-classpath)
-- [Padrões e convenções do repo](#padrões-e-convenções-do-repo)
-- [Testes e qualidade](#testes-e-qualidade)
-- [Troubleshooting (baseado no que o repo mostra)](#troubleshooting-baseado-no-que-o-repo-mostra)
-- [Automação / CI/CD](#automação--cicd)
-- [Roadmap](#roadmap)
-  - [Backlog existente (GDD)](#backlog-existente-gdd)
-  - [Próximos passos sugeridos (observando lacunas do repo)](#próximos-passos-sugeridos-observando-lacunas-do-repo)
-- [Contribuição](#contribuição)
-- [Licença](#licença)
+- [BitHunter](#bithunter)
+- [Um RPG 2D top-down em Java (AWT/Swing) — engine “na unha”, com foco em sistemas, legibilidade e iteração rápida.](#um-rpg-2d-top-down-em-java-awtswing--engine-na-unha-com-foco-em-sistemas-legibilidade-e-iteração-rápida)
+  - [Navegação](#navegação)
+  - [O que é](#o-que-é)
+  - [Para quem é](#para-quem-é)
+  - [Destaques confirmados no código](#destaques-confirmados-no-código)
+  - [Demonstração](#demonstração)
+  - [Stack e tecnologias (detectadas no repo)](#stack-e-tecnologias-detectadas-no-repo)
+  - [Como rodar localmente](#como-rodar-localmente)
+    - [Via VS Code (config já no repo)](#via-vs-code-config-já-no-repo)
+    - [Config persistida (config.txt)](#config-persistida-configtxt)
+    - [Save/Load (save.dat)](#saveload-savedat)
+  - [Estrutura do projeto](#estrutura-do-projeto)
+  - [Arquitetura e fluxos](#arquitetura-e-fluxos)
+    - [Visão “de cima” (sistemas)](#visão-de-cima-sistemas)
+    - [Estados do jogo](#estados-do-jogo)
+    - [Controles](#controles)
+    - [Mapas e tiles](#mapas-e-tiles)
+    - [Entidades, combate e progressão](#entidades-combate-e-progressão)
+    - [Pets + incubadora](#pets--incubadora)
+    - [Eventos, teleporte e cutscenes](#eventos-teleporte-e-cutscenes)
+    - [UI modular (HUD, inventário, trade, opções…)](#ui-modular-hud-inventário-trade-opções)
+    - [i18n (traduções)](#i18n-traduções)
+    - [Áudio](#áudio)
+    - [Iluminação / ciclo dia-noite](#iluminação--ciclo-dia-noite)
+  - [Recursos (assets) e classpath](#recursos-assets-e-classpath)
+  - [Padrões e convenções do repo](#padrões-e-convenções-do-repo)
+  - [Testes e qualidade](#testes-e-qualidade)
+  - [Troubleshooting (baseado no que o repo mostra)](#troubleshooting-baseado-no-que-o-repo-mostra)
+  - [Automação / CI/CD](#automação--cicd)
+  - [Roadmap](#roadmap)
+    - [Backlog existente (GDD)](#backlog-existente-gdd)
+    - [Próximos passos sugeridos (observando lacunas do repo)](#próximos-passos-sugeridos-observando-lacunas-do-repo)
+  - [Contribuição](#contribuição)
+  - [Licença](#licença)
 
 ---
 
@@ -204,7 +208,7 @@ O repositório inclui uma configuração de execução para Java:
   <summary><b>Task utilitária existente no repo</b></summary>
   <br/>
 
-  Em `.vscode/tasks.json` existe a task **“Clean build”** que remove a pasta `bin/` e imprime “limpo.”.  
+  Em `.vscode/tasks.json` existe a task **“Clean build”** que remove a pasta `bin/` e imprime “limpo.”.
   Observação: o comando configurado usa `rm -rf`, que é típico de ambientes Unix/macOS; em Windows pode não funcionar sem um shell compatível.
 </details>
 
@@ -214,12 +218,12 @@ O jogo salva/carrega preferências em `config.txt` (no diretório de trabalho).
 
 O formato atual, linha a linha (`main.Config`), é:
 
-| Linha | Conteúdo | Exemplo | Efeito |
-|------:|----------|---------|--------|
-| 1 | Fullscreen (`On`/`Off`) | `Off` | Liga/desliga tela cheia (efeito completo após reiniciar — ver UI) |
-| 2 | Volume música (0..5) | `3` | Ajusta `music.volumeScale` |
-| 3 | Volume efeitos (0..5) | `3` | Ajusta `se.volumeScale` |
-| 4 | Idioma (ex. `pt_BR`) | `pt_BR` | Define idioma via `LanguageManager` |
+| Linha | Conteúdo                | Exemplo | Efeito                                                            |
+| ----: | ----------------------- | ------- | ----------------------------------------------------------------- |
+|     1 | Fullscreen (`On`/`Off`) | `Off`   | Liga/desliga tela cheia (efeito completo após reiniciar — ver UI) |
+|     2 | Volume música (0..5)    | `3`     | Ajusta `music.volumeScale`                                        |
+|     3 | Volume efeitos (0..5)   | `3`     | Ajusta `se.volumeScale`                                           |
+|     4 | Idioma (ex. `pt_BR`)    | `pt_BR` | Define idioma via `LanguageManager`                               |
 
 ### Save/Load (save.dat)
 
@@ -300,23 +304,23 @@ Os estados são centralizados em `main.GamePanel` e consumidos por `main.KeyHand
 
 Baseado em `main.KeyHandler` e nos textos em `resource/lang/messages_*.properties`:
 
-| Contexto | Tecla | Ação |
-|---|---|---|
-| Gameplay | `W/A/S/D` | mover |
-| Gameplay | `ENTER` | confirmar / atacar / interagir (dependendo do contexto) |
-| Gameplay | `F` | atirar/conjurar (projétil/habilidade) |
-| Gameplay | `SPACE` | guarda (se houver stamina/escudo) |
-| Gameplay | `C` | tela do personagem |
-| Gameplay | `P` | pausar |
-| Gameplay | `ESC` | opções |
-| Gameplay | `M` | mapa (tela cheia) |
-| Gameplay | `X` | liga/desliga mini-mapa |
-| Dev (gameplay) | `T` | alterna debug (e desenha path) |
-| Dev (gameplay) | `R` | recarrega mapa atual (atalho) |
-| Dev (gameplay) | `G` | alterna “god mode” |
-| Menus | `W/S` | navegar |
-| Menus | `ENTER` | confirmar |
-| Menus | `ESC` | voltar (onde aplicável) |
+| Contexto       | Tecla     | Ação                                                    |
+| -------------- | --------- | ------------------------------------------------------- |
+| Gameplay       | `W/A/S/D` | mover                                                   |
+| Gameplay       | `ENTER`   | confirmar / atacar / interagir (dependendo do contexto) |
+| Gameplay       | `F`       | atirar/conjurar (projétil/habilidade)                   |
+| Gameplay       | `SPACE`   | guarda (se houver stamina/escudo)                       |
+| Gameplay       | `C`       | tela do personagem                                      |
+| Gameplay       | `P`       | pausar                                                  |
+| Gameplay       | `ESC`     | opções                                                  |
+| Gameplay       | `M`       | mapa (tela cheia)                                       |
+| Gameplay       | `X`       | liga/desliga mini-mapa                                  |
+| Dev (gameplay) | `T`       | alterna debug (e desenha path)                          |
+| Dev (gameplay) | `R`       | recarrega mapa atual (atalho)                           |
+| Dev (gameplay) | `G`       | alterna “god mode”                                      |
+| Menus          | `W/S`     | navegar                                                 |
+| Menus          | `ENTER`   | confirmar                                               |
+| Menus          | `ESC`     | voltar (onde aplicável)                                 |
 
 > Nota: o atalho `R` chama `loadMap("/maps/interior01.txt", 1)` em `KeyHandler`, mas o repo contém `resource/maps/indoor01.txt`. Isso sugere um **mismatch** de nome de mapa no atalho (ver [Troubleshooting](#troubleshooting-baseado-no-que-o-repo-mostra)).
 
@@ -430,7 +434,7 @@ O projeto carrega recursos via classpath (ex.: `getResourceAsStream("/maps/world
 
 ## Testes e qualidade
 
-No estado atual, o repositório **não contém** suíte de testes automatizados (não há evidência de JUnit/Gradle/Maven nem diretório de testes).  
+No estado atual, o repositório **não contém** suíte de testes automatizados (não há evidência de JUnit/Gradle/Maven nem diretório de testes).
 Ainda assim, alguns pontos que já ajudam a manter qualidade:
 
 - UI e gameplay separam responsabilidades por pacotes (`ui/`, `entity/`, `tile/`, `data/`, `main/`, etc.).
@@ -445,7 +449,7 @@ Ainda assim, alguns pontos que já ajudam a manter qualidade:
   <summary><b>1) Jogo abre “quebrado”, sem sprites/sons/fontes, ou crasha ao carregar recursos</b></summary>
   <br/>
 
-  **Causa provável:** o código referencia recursos (`.png`, `.wav`, `.ttf`) via classpath, mas o repo não contém esses arquivos.  
+  **Causa provável:** o código referencia recursos (`.png`, `.wav`, `.ttf`) via classpath, mas o repo não contém esses arquivos.
   **Como confirmar:** procure pelos paths em `entity.Entity.setup(...)`, `main.Sound`, `ui.UI`, `tile.TileManager` e compare com a estrutura existente em `resource/`.
   <br/><br/>
   **Ação:** adicione os assets em `resource/` seguindo os paths esperados (ver [Recursos (assets) e classpath](#recursos-assets-e-classpath)).
@@ -455,8 +459,8 @@ Ainda assim, alguns pontos que já ajudam a manter qualidade:
   <summary><b>2) Atalho de dev “R” não recarrega o mapa indoor</b></summary>
   <br/>
 
-  `KeyHandler` chama `loadMap("/maps/interior01.txt", 1)`, mas o repositório contém `resource/maps/indoor01.txt` (sem “interior”).  
-  **Sintoma:** recarregar o mapa pode falhar/silenciar erro (dependendo de logging/exception).  
+  `KeyHandler` chama `loadMap("/maps/interior01.txt", 1)`, mas o repositório contém `resource/maps/indoor01.txt` (sem “interior”).
+  **Sintoma:** recarregar o mapa pode falhar/silenciar erro (dependendo de logging/exception).
   **Ação:** alinhar o nome do arquivo (código vs resource).
 </details>
 
@@ -464,7 +468,7 @@ Ainda assim, alguns pontos que já ajudam a manter qualidade:
   <summary><b>3) “Clean build” no Windows não funciona</b></summary>
   <br/>
 
-  A task do VS Code usa `rm -rf bin`. Em Windows, isso depende do shell.  
+  A task do VS Code usa `rm -rf bin`. Em Windows, isso depende do shell.
   **Ação:** rodar a task em ambiente compatível ou ajustar o comando na task para o seu shell.
 </details>
 
@@ -472,7 +476,7 @@ Ainda assim, alguns pontos que já ajudam a manter qualidade:
   <summary><b>4) Tela cheia só aplica após reiniciar</b></summary>
   <br/>
 
-  A UI exibe um aviso específico: `ui.options.fullscreenNotice` (“A alteração terá efeito após reiniciar o jogo.”).  
+  A UI exibe um aviso específico: `ui.options.fullscreenNotice` (“A alteração terá efeito após reiniciar o jogo.”).
   Isso é consistente com `main.Main`, que decide `setUndecorated(true)` no boot baseado na flag carregada.
 </details>
 
@@ -480,7 +484,7 @@ Ainda assim, alguns pontos que já ajudam a manter qualidade:
 
 ## Automação / CI/CD
 
-O repositório **não contém** `.github/workflows/` nem pipelines de CI detectáveis.  
+O repositório **não contém** `.github/workflows/` nem pipelines de CI detectáveis.
 Também não há `Dockerfile`/`docker-compose`/Makefile.
 
 Se você quiser evoluir isso, uma direção segura (sem “assumir stack”) é:
