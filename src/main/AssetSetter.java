@@ -13,6 +13,7 @@ import monster.MonRedSlime;
 import monster.MonSkeletonLord;
 import object.ObjAxe;
 import object.ObjChest;
+import object.ObjChestSecret;
 import object.ObjCoinBronze;
 import object.ObjDoor;
 import object.ObjDoorIron;
@@ -22,6 +23,7 @@ import object.ObjManaCrystal;
 import object.ObjPickaxe;
 import object.ObjPotionRed;
 import object.ObjShieldBlue;
+import object.ObjShieldJava;
 import object.ObjTent;
 import tile_interactive.ItDestructibleWall;
 import tile_interactive.ItDryTree;
@@ -120,7 +122,12 @@ public class AssetSetter {
 
     // Porta de ferro bloqueando acesso ao boss
     objects[mapNum][i] = new ObjDoorIron(gp);
-    place(objects[mapNum][i], 25, 15);
+    place(objects[mapNum][i++], 25, 15);
+
+    // Baú secreto com o Escudo do Compilador (Java) — requer moedas para abrir
+    objects[mapNum][i] = new ObjChestSecret(gp);
+    objects[mapNum][i].setLoot(new ObjShieldJava(gp));
+    place(objects[mapNum][i], 16, 26);
 
     // MAP BOSS ROOM
     mapNum = MAP_BOSS_ROOM;
