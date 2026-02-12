@@ -150,7 +150,9 @@ public class CombatComponent {
       setKnockBack(player, entity, entity.getKnockBackPower());
     }
 
-    player.setLife(player.getLife() - damage);
+    // Usa receiveFinalDamage para integrar mecânicas do Escudo do Compilador
+    // (absorção GC, try/catch, contagem de hits)
+    player.receiveFinalDamage(damage);
     player.setInvincible(true);
   }
 

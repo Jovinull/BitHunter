@@ -15,6 +15,7 @@ import main.KeyHandler;
 import object.ObjFireball;
 import object.ObjKey;
 import object.ObjLantern;
+import object.ObjShieldJava;
 import object.ObjShieldWood;
 import object.ObjSwordNormal;
 import pets.GreenSnailEgg;
@@ -60,6 +61,20 @@ public class Player extends Entity {
   private static final int GUARD_STAMINA_RECOVERY_INTERVAL = 6;
   private static final int GUARD_STAMINA_RECOVERY_AMOUNT = 1;
   private static final int GUARD_STAMINA_RECOVERY_DELAY = 30;
+
+  // ====================================================================
+  // Escudo do Compilador (Java) — estado de runtime (transiente)
+  // Estes contadores NÃO precisam ser salvos: resetam ao carregar o jogo,
+  // o que é comportamento padrão para cooldowns de equipamento.
+  // ====================================================================
+  /** Contador de hits recebidos para o Garbage Collector. */
+  private int javaShieldGcHitCounter = 0;
+  /** Cooldown restante do try/catch, em frames. */
+  private int javaShieldTryCatchCooldown = 0;
+  /** HP restante do escudo temporário gerado pelo GC. */
+  private int javaShieldTempShieldHp = 0;
+  /** Timer restante do escudo temporário, em frames. */
+  private int javaShieldTempShieldTimer = 0;
 
   public Player(GamePanel gp, KeyHandler keyH) {
     super(gp);
@@ -165,6 +180,7 @@ public class Player extends Entity {
     inv.add(new ObjLantern(gp));
     inv.add(new YellowSnailEgg(gp));
     inv.add(new GreenSnailEgg(gp));
+    inv.add(new ObjShieldJava(gp));
   }
 
   public void recalculateSpeedFromEquipment() {
@@ -348,6 +364,7 @@ public class Player extends Entity {
     handleDeath();
     handleGuardStaminaRegeneration();
     handlePetTimeExp();
+    updateJavaShieldTimers();
 
     if (pet != null) {
       pet.update();
@@ -611,7 +628,7 @@ public class Player extends Entity {
       if (damage < 1) {
         damage = 1;
       }
-      setLife(getLife() - damage);
+      receiveFinalDamage(damage);
       setInvincible(true);
       setTransparent(true);
     }
@@ -1284,5 +1301,134 @@ public class Player extends Entity {
     }
 
     return bonus;
+  }
+
+  // ====================================================================
+  // Escudo do Compilador (Java) — mecânicas especiais
+  // ====================================================================
+
+  /**
+   * Verifica se o Escudo do Compilador (Java) está equipado.
+   */
+  public boolean isCompilerShieldEquipped() {
+    Entity shield = getCurrentShield();
+    return shield != null && ObjShieldJava.OBJ_ID.equals(shield.getInternalId());
+  }
+
+  /**
+   * Método central para aplicar dano final ao player.
+   * Integra as mecânicas especiais do Escudo do Compilador:
+   * - Absorção via escudo temporário do GC
+   * - try/catch (previne morte)
+   * - Contagem de hits para o GC
+   */
+  public void receiveFinalDamage(int damage) {
+    if (damage <= 0) {
+      return;
+    }
+
+    // 1) Escudo temporário do GC absorve dano primeiro
+    if (javaShieldTempShieldHp > 0) {
+      if (damage <= javaShieldTempShieldHp) {
+        javaShieldTempShieldHp -= damage;
+        gp.getGameUi().addMessage(t("item.shieldJava.gc.absorbed"));
+        return; // dano totalmente absorvido
+      } else {
+        damage -= javaShieldTempShieldHp;
+        javaShieldTempShieldHp = 0;
+      }
+    }
+
+    // 2) Verifica try/catch antes de aplicar dano fatal
+    if (isCompilerShieldEquipped()
+        && javaShieldTryCatchCooldown <= 0
+        && getLife() - damage <= 0) {
+      // try/catch ativado! Player sobrevive com 1 HP
+      setLife(1);
+      setInvincible(true);
+      setTransparent(true);
+      // Estende invulnerabilidade: o counter normal termina em >60,
+      // então definimos um valor negativo para durar mais frames.
+      setInvincibleCounter(60 - ObjShieldJava.TRY_CATCH_INVINCIBILITY_FRAMES);
+      javaShieldTryCatchCooldown = ObjShieldJava.TRY_CATCH_COOLDOWN_FRAMES;
+      gp.getGameUi().addMessage(t("item.shieldJava.tryCatch.activated"));
+      gp.playSE(4);
+      return;
+    }
+
+    // 3) Aplica dano normal
+    setLife(getLife() - damage);
+
+    // 4) Conta hit para o Garbage Collector
+    if (isCompilerShieldEquipped()) {
+      javaShieldGcHitCounter++;
+      if (javaShieldGcHitCounter >= ObjShieldJava.GC_HITS_THRESHOLD) {
+        activateGarbageCollector();
+      }
+    }
+  }
+
+  /**
+   * Ativa a passiva "Garbage Collector":
+   * cura pequena + escudo temporário.
+   */
+  private void activateGarbageCollector() {
+    javaShieldGcHitCounter = 0;
+
+    // Cura pequena
+    int heal = ObjShieldJava.GC_HEAL_AMOUNT;
+    setLife(Math.min(getLife() + heal, getMaxLife()));
+
+    // Escudo temporário
+    javaShieldTempShieldHp = ObjShieldJava.GC_TEMP_SHIELD_HP;
+    javaShieldTempShieldTimer = ObjShieldJava.GC_TEMP_SHIELD_DURATION_FRAMES;
+
+    gp.getGameUi().addMessage(t("item.shieldJava.gc.activated"));
+  }
+
+  /**
+   * Atualiza timers do Escudo do Compilador (chamado a cada frame).
+   */
+  private void updateJavaShieldTimers() {
+    // Cooldown do try/catch decrementa mesmo sem o escudo equipado
+    // (evita exploit de trocar equipamento para resetar cooldown)
+    if (javaShieldTryCatchCooldown > 0) {
+      javaShieldTryCatchCooldown--;
+    }
+
+    // Timer do escudo temporário
+    if (javaShieldTempShieldTimer > 0) {
+      javaShieldTempShieldTimer--;
+      if (javaShieldTempShieldTimer <= 0) {
+        javaShieldTempShieldHp = 0;
+      }
+    }
+  }
+
+  /**
+   * Retorna o cooldown restante do try/catch (para exibição na UI/tooltip).
+   */
+  public int getJavaShieldTryCatchCooldown() {
+    return javaShieldTryCatchCooldown;
+  }
+
+  /**
+   * Retorna o HP restante do escudo temporário do GC.
+   */
+  public int getJavaShieldTempShieldHp() {
+    return javaShieldTempShieldHp;
+  }
+
+  /**
+   * Adiciona o Escudo do Compilador (Java) ao inventário do player.
+   * Usado pelo modo DEV (F9).
+   */
+  public void addJavaShieldToInventory() {
+    Entity shield = new ObjShieldJava(gp);
+    if (canObtainItem(shield)) {
+      gp.getGameUi().addMessage(t("item.shieldJava.dev.added"));
+    } else {
+      gp.getGameUi().addMessage(t("player.message.cannotCarryMore"));
+    }
   }
 }
