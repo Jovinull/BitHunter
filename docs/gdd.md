@@ -501,11 +501,48 @@ flowchart TD
 - múltiplos mapas (`resource/maps/*.txt`)
 - **tela de mapa** e **mini-mapa** (toggle)
 - teleporte e eventos por tiles (pit, pool de cura, entradas/saídas, trigger de boss)
+- **marcadores de entidades** no mapa e mini-mapa (ver abaixo)
+
+#### Marcadores no mapa e mini-mapa
+
+✅ **Implementado** — sistema de marcadores (markers) que exibe a posição de entidades relevantes tanto no **mini-mapa** (PLAY_STATE, canto superior direito) quanto no **mapa grande** (MAP_STATE, tela cheia).
+
+**Identificação visual dos marcadores:**
+
+| Tipo | Cor | Forma | Tecla toggle |
+|---|---|---|---|
+| NPC | Azul claro `#4FA8F5` | Círculo | 1 |
+| Monster | Vermelho `#E04040` | Círculo | 2 |
+| Boss | Vermelho forte `#FF2020` | Diamante (maior) | 2 |
+| Interactive | Amarelo `#F5C542` | Quadrado | 3 |
+| Drop | Turquesa `#4FD1C5` | Triângulo | 4 |
+
+- Todos os marcadores têm **contorno preto semi-transparente** para legibilidade sobre qualquer terreno.
+- Bosses usam o **diamante** com raio maior que monstros comuns, garantindo destaque visual.
+- Formas desenhadas via `Graphics2D` (sem sprites adicionais).
+- Toggles de camada funcionam via teclas **1–4** na tela de mapa grande (MAP_STATE); no mini-mapa, todas as camadas ficam visíveis por padrão.
+- Legenda visual com estado ligado/desligado é exibida abaixo do mapa grande.
+
+**Performance:**
+
+| Aspecto | Solução |
+|---|---|
+| Recalculação | Cache de ~180ms no `MapMarkerProvider` — o mini-mapa não recalcula a cada frame |
+| Troca de mapa | Invalidação automática do cache quando o mapa muda |
+| Renderização | Shapes via `Graphics2D` — zero sprites extras, zero alocação de imagens |
+| Visibilidade | Clipping — marcadores fora da área visível não são desenhados |
+
+**Arquitetura:**
+
+- `MapMarkerType` (enum) — define categoria, cor e forma de cada marcador
+- `MapMarker` (record) — dado imutável: tipo + posição world (x, y)
+- `MapMarkerProvider` — coleta marcadores das arrays do `GamePanel` (NPCs, monstros, objetos, tiles interativos) com cache TTL
+- `Map` — renderiza marcadores em ambos os contextos (mini-mapa e mapa grande), com conversão world→tela centralizada
 
 🧭 **Planejado**
 
 - dungeons infinitas (geração procedural real)
-- marcadores e leitura de risco/recompensa por sala
+- leitura de risco/recompensa por sala
 
 ### 5.13) Iluminação e ciclo dia/noite
 

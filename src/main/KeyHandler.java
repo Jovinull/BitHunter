@@ -687,8 +687,19 @@ public class KeyHandler implements KeyListener {
   }
 
   public void mapState(int code) {
-    if (code == KeyEvent.VK_M) {
-      gp.setGameState(GamePanel.PLAY_STATE);
+    switch (code) {
+      case KeyEvent.VK_M -> gp.setGameState(GamePanel.PLAY_STATE);
+
+      // Toggles de camadas de marcadores no mapa grande
+      case KeyEvent.VK_1 -> gp.map.toggleLayer(tile.MapMarkerType.NPC);
+      case KeyEvent.VK_2 -> {
+        gp.map.toggleLayer(tile.MapMarkerType.MONSTER);
+        gp.map.toggleLayer(tile.MapMarkerType.BOSS);
+      }
+      case KeyEvent.VK_3 -> gp.map.toggleLayer(tile.MapMarkerType.INTERACTIVE);
+      case KeyEvent.VK_4 -> gp.map.toggleLayer(tile.MapMarkerType.DROP);
+
+      default -> { /* noop */ }
     }
   }
 
