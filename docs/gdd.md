@@ -75,6 +75,7 @@
   - [5.12 Mundo: mapas, mini-mapa e teleporte](#512-mundo-mapas-mini-mapa-e-teleporte)
   - [5.13 Iluminação e ciclo dia/noite](#513-iluminação-e-ciclo-dianoite)
   - [5.14 Cutscenes e boss battle](#514-cutscenes-e-boss-battle)
+  - [5.15 Bestiário](#515-bestiário)
 - [6. Mundo e geração](#6-mundo-e-geração)
 - [7. UX/HUD e fluxo de telas](#7-uxhud-e-fluxo-de-telas)
   - [7.1 HUD](#71-hud)
@@ -285,6 +286,11 @@ flowchart TD
 
 - ✅ **Implementado**: colecionar pets, equipar/desequipar, ganhar XP, incubar ovos com custo e tempo.
 
+#### Bestiário (enciclopédia de criaturas)
+
+- ✅ **Implementado**: sistema completo de Bestiário com progressão por abates, 3 estágios de revelação, categorias de criaturas, pontos de recompensa e persistência em save/load.
+- Loop: **abater criaturas → desbloquear informações → completar entradas → ganhar Bestiary Points**.
+
 ---
 
 ## 4) Progressão
@@ -342,6 +348,7 @@ flowchart TD
 - **W/A/S/D**: mover (e navegar em grids de inventário)
 - **Enter**: confirmar/interagir/atacar
 - **P**: pausar/retomar
+- **B**: abrir/fechar bestiário
 - **C**: abrir/fechar status do personagem
 - **Esc**: abrir opções / voltar
 - **F**: disparo/magia (projétil)
@@ -525,6 +532,83 @@ flowchart TD
 - **Faseamento**: thresholds (HP%, timers)
 - **Saída**: drop + desbloqueio + progress flag + cleanup
 
+### 5.15) Bestiário
+
+✅ **Implementado**
+
+Sistema de enciclopédia de criaturas inspirado no Bestiário da Cyclopedia do Tibia. O jogador desbloqueia informações sobre monstros ao abatê-los, com revelação progressiva por estágios.
+
+**Arquitetura:**
+
+- `bestiary.BestiaryRegistry` — carrega definições de criaturas a partir de `resource/bestiary/creatures.properties` (data-driven)
+- `bestiary.BestiaryService` — lógica central: registra abates, calcula estágios, gera notificações, gerencia Bestiary Points, expõe dados para save/load
+- `ui.BestiaryUi` — interface do Bestiário: lista de classes, lista de criaturas (silhuetas para não-descobertos), tela de detalhes com blocos por estágio
+
+**Classificação de criaturas:**
+
+<div>
+  <table>
+    <tr>
+      <td><b>Classe</b></td>
+      <td><b>Criaturas</b></td>
+    </tr>
+    <tr>
+      <td>Slimes</td>
+      <td>Green Slime, Red Slime</td>
+    </tr>
+    <tr>
+      <td>Animais</td>
+      <td>Bat</td>
+    </tr>
+    <tr>
+      <td>Humanoides</td>
+      <td>Orc</td>
+    </tr>
+    <tr>
+      <td>Mortos-vivos</td>
+      <td>Skeleton Lord</td>
+    </tr>
+  </table>
+</div>
+
+**Progressão por estágios:**
+
+Cada criatura possui um **threshold de abates** por estágio, determinado pela combinação de **Dificuldade** e **Raridade**:
+
+| Estágio | Informações reveladas | Exemplo threshold (Inofensivo/Normal) |
+|---|---|---:|
+| Descoberto | Nome, sprite, dificuldade, raridade, contador de abates | 1 abate |
+| Estágio 1 | HP, Velocidade, Armadura, Comportamento, Espólios Comuns | 5 abates |
+| Estágio 2 | Espólios Incomuns, Resistências, Localizações | 25 abates |
+| Completo | Espólios Raros/Semi-raros, Bestiary Points concedidos | 50 abates |
+
+**Dificuldades:** Inofensivo, Trivial, Fácil, Médio, Difícil, Desafiador — cada uma com thresholds crescentes.
+
+**Raridades:** Normal, Muito Raro — `MUITO_RARO` multiplica os thresholds por 5.
+
+**Regra especial de itens Muito Raros:** itens com tier `VERY_RARE` só são revelados no Bestiário após o jogador dropar o item ao menos uma vez (`revealedVeryRareItems` persistido no save).
+
+**Bestiary Points:** ao completar a entrada de uma criatura, o jogador recebe pontos de Bestiário (definidos por criatura em `creatures.properties`). Persistidos no save.
+
+**Acesso:** tecla `B` durante gameplay → `BESTIARY_STATE`. Navegação: `W/S` (navegar), `ENTER` (selecionar/detalhar), `ESC` (voltar).
+
+**Persistência:** kill counts, very rare reveals e Bestiary Points são salvos em `DataStorage` via `SaveLoad`.
+
+**i18n:** todas as labels do Bestiário estão traduzidas em 10 idiomas (`bestiary.*` keys em `messages_*.properties`).
+
+🧭 **Planejado**
+
+- Expandir categorias conforme novos monstros forem adicionados
+- Recompensas adicionais por completar categorias inteiras (ex.: título, bônus passivo)
+- Integração com sistema de conquistas/achievements (quando existir)
+- Resistências reais (atualmente placeholder "não implementado")
+
+💡 **Sugestão**: usar Bestiary Points como currency para desbloquear:
+
+- Bônus passivos leves (ex.: +1% dano contra uma classe de criaturas)
+- Cosméticos ou títulos
+- Informações avançadas (ex.: padrões de spawn por horário do ciclo dia/noite)
+
 ---
 
 ## 6) Mundo e geração
@@ -588,6 +672,8 @@ stateDiagram-v2
   Trade --> Play: ESC/leave
   Play --> PetYard: NPC pet yard
   PetYard --> Play: leave
+  Play --> Bestiary: B
+  Bestiary --> Play: ESC/B
   Play --> Transition: teleport
   Transition --> Play: fim transição
   Play --> Cutscene: boss trigger
@@ -772,6 +858,7 @@ stateDiagram-v2
   - definir drop e comportamento em `setAction()/checkDrop()`
   - posicionar via `AssetSetter` e/ou eventos
   - se boss: integrar em cutscene/progress
+  - adicionar entrada no Bestiário: `resource/bestiary/creatures.properties` (classe, dificuldade, raridade, drops, localizações, pontos)
 
 💡 **Sugestão**: criar um arquivo único “registry” por conteúdo (monstros/itens/pets) para reduzir switch-case grande com o tempo.
 
@@ -812,11 +899,12 @@ stateDiagram-v2
 - **T5 — save/load**: salvar, fechar e carregar; inventário, equipamento e objetos no mapa devem persistir.
 - **T6 — pet yard**: incubar um ovo (com moedas) e ver progresso; concluir e equipar pet.
 - **T7 — guarda**: segurar `Space` e observar drain; receber hit em guarda e verificar consumo; regenerar após delay.
+- **T8 — bestiário**: abrir com `B`; matar uma criatura nova e verificar notificação "adicionado ao Bestiário"; abrir Bestiário e verificar que a criatura aparece como "Descoberto" com informações básicas; verificar navegação (W/S/Enter/ESC) entre classes, lista e detalhes.
 
 ### Checklist de build (mínimo)
 
 - O jogo abre e entra no `PLAY_STATE`
-- Troca de estados funciona (map/options/trade/pet yard)
+- Troca de estados funciona (map/options/trade/pet yard/bestiário)
 - Não há crash de resource load (assets no classpath)
 
 ---
