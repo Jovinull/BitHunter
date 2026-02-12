@@ -159,6 +159,12 @@ public class GamePanel extends JPanel implements Runnable {
     tempScreen = new BufferedImage(SCREEN_WIDTH, SCREEN_HEIGHT, BufferedImage.TYPE_INT_ARGB);
     g2 = (Graphics2D) tempScreen.getGraphics();
 
+    // Pre-warm debug font: the first font resolution through the OS font system
+    // (fontconfig on Linux) is expensive and would stall the game loop on first
+    // debug toggle. Paying that cost here, during setup, avoids the in-game freeze.
+    g2.setFont(DEBUG_FONT);
+    g2.drawString(" ", 0, 0);
+
     if (fullScreenOn) {
       setFullScreen();
     }
