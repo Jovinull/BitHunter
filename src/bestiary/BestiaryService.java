@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -21,13 +20,15 @@ import main.UtilityTool;
 /**
  * Serviço central do Bestiário.
  *
- * <p>Responsabilidades:</p>
+ * <p>
+ * Responsabilidades:
+ * </p>
  * <ul>
- *   <li>Registrar kills e calcular progressão de estágios</li>
- *   <li>Gerar notificações de mudança de estágio</li>
- *   <li>Fornecer dados para a UI (progresso, criaturas, sprites)</li>
- *   <li>Gerenciar Bestiary Points</li>
- *   <li>Expor dados para persistência (save/load)</li>
+ * <li>Registrar kills e calcular progressão de estágios</li>
+ * <li>Gerar notificações de mudança de estágio</li>
+ * <li>Fornecer dados para a UI (progresso, criaturas, sprites)</li>
+ * <li>Gerenciar Bestiary Points</li>
+ * <li>Expor dados para persistência (save/load)</li>
  * </ul>
  */
 public final class BestiaryService {
@@ -59,10 +60,12 @@ public final class BestiaryService {
   /**
    * Chamado quando um monstro é morto.
    *
-   * @param monsterRef o internalId do monstro (ex.: "monster.greenSlime")
+   * @param monsterRef
+   *          o internalId do monstro (ex.: "monster.greenSlime")
    */
   public void recordKill(String monsterRef) {
-    if (monsterRef == null || monsterRef.isBlank()) return;
+    if (monsterRef == null || monsterRef.isBlank())
+      return;
 
     String bestiaryId = registry.getBestiaryIdForMonster(monsterRef);
     if (bestiaryId == null) {
@@ -71,7 +74,8 @@ public final class BestiaryService {
     }
 
     BestiaryCreature creature = registry.getById(bestiaryId);
-    if (creature == null) return;
+    if (creature == null)
+      return;
 
     BestiaryProgress progress = progressMap.computeIfAbsent(bestiaryId, k -> new BestiaryProgress());
     BestiaryStage oldStage = progress.getStage(creature.getDifficulty(), creature.getRarity());
@@ -99,10 +103,12 @@ public final class BestiaryService {
    */
   public void revealVeryRareDrop(String monsterRef, String itemId) {
     String bestiaryId = registry.getBestiaryIdForMonster(monsterRef);
-    if (bestiaryId == null) return;
+    if (bestiaryId == null)
+      return;
 
     BestiaryProgress progress = progressMap.get(bestiaryId);
-    if (progress == null) return;
+    if (progress == null)
+      return;
 
     if (!progress.isVeryRareRevealed(itemId)) {
       progress.revealVeryRareItem(itemId);
@@ -133,7 +139,8 @@ public final class BestiaryService {
 
   public BestiaryStage getStage(String bestiaryId) {
     BestiaryCreature creature = registry.getById(bestiaryId);
-    if (creature == null) return BestiaryStage.LOCKED;
+    if (creature == null)
+      return BestiaryStage.LOCKED;
     return getProgress(bestiaryId).getStage(creature.getDifficulty(), creature.getRarity());
   }
 
@@ -281,11 +288,13 @@ public final class BestiaryService {
   }
 
   private BufferedImage loadSprite(String spriteRef) {
-    if (spriteRef == null || spriteRef.isBlank()) return null;
+    if (spriteRef == null || spriteRef.isBlank())
+      return null;
 
     try {
       var stream = getClass().getResourceAsStream(spriteRef + ".png");
-      if (stream == null) return null;
+      if (stream == null)
+        return null;
       BufferedImage raw = ImageIO.read(stream);
       UtilityTool tool = new UtilityTool();
       return tool.scaleImage(raw, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
