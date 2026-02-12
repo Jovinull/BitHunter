@@ -162,7 +162,15 @@ class InventoryUi {
     int dFrameX = frameX;
     int dFrameY = frameY + frameHeight;
     int dFrameWidth = frameWidth;
-    int dFrameHeight = GamePanel.TILE_SIZE * 3;
+    // Na tela de personagem, alinha o fundo da descrição com o fundo do painel de status
+    // (CharacterUi: y = TILE_SIZE, height = TILE_SIZE * 10 → bottom = TILE_SIZE * 11)
+    int dFrameHeight;
+    if (ui.getGamePanel().getGameState() == GamePanel.CHARACTER_STATE) {
+      int statusBottom = GamePanel.TILE_SIZE + GamePanel.TILE_SIZE * 10;
+      dFrameHeight = statusBottom - dFrameY;
+    } else {
+      dFrameHeight = GamePanel.TILE_SIZE * 3;
+    }
 
     int itemIndex = ui.getItemIndexOnSlot(slotCol, slotRow);
     if (itemIndex < entity.getInventory().size()) {
