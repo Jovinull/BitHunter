@@ -196,6 +196,33 @@ Este repositório (no estado atual) **não contém imagens/screencasts** version
 
 ---
 
+## Build (com resources)
+
+> **Requisito para rodar:** ter o **Java** instalado (JRE/JDK) e o comando `java` disponível no PATH.
+> **Requisito para buildar:** ter o **JDK** instalado (com `javac` disponível).
+
+```bash
+rm -rf build && mkdir -p build/classes
+
+# 1) Compila
+javac --release 24 -d build/classes $(find src -name "*.java")
+
+# 2) Copia resources para a raiz do classpath
+# (isso cria build/classes/maps e build/classes/tiles, etc.)
+cp -r resource/* build/classes/
+
+# 3) Empacota
+jar --create --file build/app.jar --main-class main.Main -C build/classes .
+
+# 4) Confirma que entrou
+jar tf build/app.jar | grep -E '^(maps|tiles)/' | head -n 50
+
+# 5) Roda
+java -jar build/app.jar
+```
+
+---
+
 ## Como rodar localmente
 
 ### Via VS Code (config já no repo)
