@@ -85,6 +85,7 @@ public class GamePanel extends JPanel implements Runnable {
   private transient CutsceneManager csManager = new CutsceneManager(this);
   private transient PetIncubator petIncubator = new PetIncubator(this);
   private transient BestiaryService bestiaryService = new BestiaryService(this);
+  private transient CheatCodeManager cheatCodeManager = new CheatCodeManager(this);
   transient Thread gameThread; // Thread para rodar o loop do jogo
 
   // ENTITY AND OBJECTS
@@ -285,6 +286,7 @@ public class GamePanel extends JPanel implements Runnable {
     eManager.update();
     petIncubator.update();
     drainBestiaryNotifications();
+    cheatCodeManager.tick();
   }
 
   private void updatePlayer() {
@@ -745,5 +747,9 @@ public class GamePanel extends JPanel implements Runnable {
 
   public BestiaryService getBestiaryService() {
     return bestiaryService;
+  }
+
+  public CheatCodeManager getCheatCodeManager() {
+    return cheatCodeManager;
   }
 }

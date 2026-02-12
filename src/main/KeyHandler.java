@@ -78,10 +78,16 @@ public class KeyHandler implements KeyListener {
   // KeyListener
   // -----------------------
 
-  /** Não utilizado (entrada de caracteres). */
+  /**
+   * Processa caracteres digitados. Utilizado pelo {@link CheatCodeManager}
+   * para capturar o caractere de ativação (aspas) e as letras do código.
+   * Só opera em {@link GamePanel#PLAY_STATE}.
+   */
   @Override
   public void keyTyped(KeyEvent e) {
-    // Intencionalmente vazio
+    if (gp.getGameState() == GamePanel.PLAY_STATE) {
+      gp.getCheatCodeManager().onCharTyped(e.getKeyChar());
+    }
   }
 
   /** Dispara ao pressionar uma tecla. Encaminha para o estado atual do jogo. */
@@ -89,6 +95,12 @@ public class KeyHandler implements KeyListener {
   public void keyPressed(KeyEvent e) {
     final int code = e.getKeyCode();
     final int state = gp.getGameState();
+
+    // Código secreto: durante captura, consome todas as teclas
+    // para impedir ações do jogo (WASD, T, R, etc.)
+    if (state == GamePanel.PLAY_STATE && gp.getCheatCodeManager().onKeyPressed(code)) {
+      return;
+    }
 
     switch (state) {
       case GamePanel.TITLE_STATE -> {
@@ -255,9 +267,6 @@ public class KeyHandler implements KeyListener {
       case KeyEvent.VK_T -> toggleDebug();
       case KeyEvent.VK_R -> reloadCurrentMap();
       case KeyEvent.VK_G -> godModeOn = !godModeOn;
-
-      // Dev mode: F9 adiciona o Escudo do Compilador (Java) ao inventário
-      case KeyEvent.VK_F9 -> handleDevSpawnShield();
 
       default -> {
         // noop
@@ -769,17 +778,6 @@ public class KeyHandler implements KeyListener {
   private void toggleDebug() {
     showDebugText = !showDebugText;
     gp.getTileM().setDrawPath(showDebugText);
-  }
-
-  /**
-   * Dev mode: adiciona o Escudo do Compilador (Java) ao inventário.
-   * Só funciona se devMode estiver ativo no config.
-   */
-  private void handleDevSpawnShield() {
-    if (!gp.isDevMode()) {
-      return; // no-op silencioso quando devMode está desativado
-    }
-    gp.getPlayer().addJavaShieldToInventory();
   }
 
   private void reloadCurrentMap() {

@@ -1421,12 +1421,13 @@ public class Player extends Entity {
 
   /**
    * Adiciona o Escudo do Compilador (Java) ao inventário do player.
-   * Usado pelo modo DEV (F9).
+   * Chamado pelo {@link main.CheatCodeManager} (código secreto "trycatch").
    */
   public void addJavaShieldToInventory() {
     Entity shield = new ObjShieldJava(gp);
     if (canObtainItem(shield)) {
-      gp.getGameUi().addMessage(t("item.shieldJava.dev.added"));
+      gp.getGameUi().addMessage(
+          String.format(t("player.message.itemObtained"), shield.getDisplayName()));
     } else {
       gp.getGameUi().addMessage(t("player.message.cannotCarryMore"));
     }
