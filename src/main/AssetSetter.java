@@ -231,7 +231,7 @@ public class AssetSetter {
 
     if (!Progress.isSkeletonLordDefeated()) {
       monsters[mapNum][i] = new MonSkeletonLord(gp);
-      place(monsters[mapNum][i], 50, 30);
+      place(monsters[mapNum][i], 49, 38);
     }
   }
 

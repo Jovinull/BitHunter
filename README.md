@@ -149,6 +149,16 @@ O repo também inclui um documento de design: `gdd.md` (**Game Design Document**
         Overlay com <code>RadialGradientPaint</code> e fases do dia em <code>environment.Lighting</code>.
       </td>
     </tr>
+    <tr>
+      <td>
+        <b>📖 Bestiário</b><br/>
+        Sistema de enciclopédia de criaturas com progressão por abates, 3 estágios de revelação, categorias e pontos de recompensa (<code>bestiary.*</code> + <code>ui.BestiaryUi</code>).
+      </td>
+      <td>
+        <b>🔧 Ferramentas de validação</b><br/>
+        Validador i18n (<code>tools/I18nValidator.java</code>) para garantir paridade de chaves entre todos os idiomas.
+      </td>
+    </tr>
   </table>
 </div>
 
@@ -183,6 +193,33 @@ Este repositório (no estado atual) **não contém imagens/screencasts** version
 - **i18n**: `java.util.Properties` + arquivos `.properties` em `resource/lang` (`main.LanguageManager`).
 - **Persistência**: serialização Java em `data.SaveLoad` (`save.dat`).
 - **Editor tooling**: configurações de VS Code em `.vscode/` (debug/launch/tasks + formatter).
+
+---
+
+## Build (com resources)
+
+> **Requisito para rodar:** ter o **Java** instalado (JRE/JDK) e o comando `java` disponível no PATH.
+> **Requisito para buildar:** ter o **JDK** instalado (com `javac` disponível).
+
+```bash
+rm -rf build && mkdir -p build/classes
+
+# 1) Compila
+javac --release 24 -d build/classes $(find src -name "*.java")
+
+# 2) Copia resources para a raiz do classpath
+# (isso cria build/classes/maps e build/classes/tiles, etc.)
+cp -r resource/* build/classes/
+
+# 3) Empacota
+jar --create --file build/app.jar --main-class main.Main -C build/classes .
+
+# 4) Confirma que entrou
+jar tf build/app.jar | grep -E '^(maps|tiles)/' | head -n 50
+
+# 5) Roda
+java -jar build/app.jar
+```
 
 ---
 
@@ -240,6 +277,7 @@ O formato atual, linha a linha (`main.Config`), é:
 .
 ├─ src/
 │  ├─ ai/                 # Pathfinding (A*)
+│  ├─ bestiary/           # Bestiário (registros, serviço, progressão)
 │  ├─ data/               # Save/Load + estruturas serializáveis
 │  ├─ entity/             # Entity base + Player + NPCs
 │  ├─ environment/        # Iluminação / ambiente
@@ -252,8 +290,12 @@ O formato atual, linha a linha (`main.Config`), é:
 │  └─ ui/                 # UI modular por telas/estados
 │
 ├─ resource/
+│  ├─ bestiary/           # dados do bestiário (creatures.properties)
 │  ├─ lang/               # i18n: messages_*.properties
 │  └─ maps/               # mapas em texto + tiledata.txt
+│
+├─ tools/
+│  └─ I18nValidator.java  # validador de chaves de tradução
 │
 ├─ .vscode/               # debug/launch/tasks + formatter + recomendações
 ├─ config.txt             # preferências (fullscreen/volumes/idioma)
@@ -298,7 +340,7 @@ Os estados são centralizados em `main.GamePanel` e consumidos por `main.KeyHand
 
 - `TITLE_STATE`, `PLAY_STATE`, `PAUSE_STATE`, `DIALOGUE_STATE`, `CHARACTER_STATE`
 - `OPTIONS_STATE`, `GAME_OVER_STATE`, `TRANSITION_STATE`, `TRADE_STATE`, `SLEEP_STATE`
-- `MAP_STATE`, `CUTSCENE_STATE`, `PET_YARD_STATE`
+- `MAP_STATE`, `CUTSCENE_STATE`, `PET_YARD_STATE`, `BESTIARY_STATE`
 
 ### Controles
 
@@ -310,6 +352,7 @@ Baseado em `main.KeyHandler` e nos textos em `resource/lang/messages_*.propertie
 | Gameplay       | `ENTER`   | confirmar / atacar / interagir (dependendo do contexto) |
 | Gameplay       | `F`       | atirar/conjurar (projétil/habilidade)                   |
 | Gameplay       | `SPACE`   | guarda (se houver stamina/escudo)                       |
+| Gameplay       | `B`       | bestiário                                               |
 | Gameplay       | `C`       | tela do personagem                                      |
 | Gameplay       | `P`       | pausar                                                  |
 | Gameplay       | `ESC`     | opções                                                  |
@@ -381,6 +424,44 @@ Baseado em `main.KeyHandler` e nos textos em `resource/lang/messages_*.propertie
 - Idiomas expostos no menu (hoje): definidos em `LanguageManager.getAvailableLanguages()`.
 - Estratégia: `LanguageManager.text(key)` retorna `??key??` quando não encontra (com fallback para `pt_BR` quando aplicável).
 
+<details>
+  <summary><b>Validador de chaves i18n (tools/I18nValidator.java)</b></summary>
+  <br/>
+
+  O projeto inclui um utilitário em `tools/I18nValidator.java` que compara todos os arquivos de idioma com o idioma base (`en_US`) e aponta chaves faltantes ou sobrando. Sem dependências externas — Java puro.
+
+  **Como usar:**
+
+  ```bash
+  # A partir da raiz do projeto
+  javac tools/I18nValidator.java -d tools
+  java -cp tools I18nValidator
+  ```
+
+  **Saída esperada (quando tudo está OK):**
+
+  ```
+  =============================================================
+   i18n Key Validator
+  =============================================================
+  Idioma base: messages_en_US.properties (245 chaves)
+  -------------------------------------------------------------
+
+  [OK] messages_de_DE.properties (245 chaves)
+    Todas as chaves estão presentes.
+  ...
+  =============================================================
+  RESULTADO: TODOS OS IDIOMAS ESTÃO COMPLETOS!
+  ```
+
+  **Exit codes:**
+  - `0` — todos os idiomas estão completos
+  - `1` — erro de configuração (diretório/arquivo base não encontrado)
+  - `2` — inconsistências detectadas (chaves faltantes ou sobrando)
+
+  > **Dica:** rode o validador sempre que adicionar novas chaves de tradução para garantir que todos os idiomas ficaram sincronizados.
+</details>
+
 ### Áudio
 
 `main.Sound` mapeia sons por índice carregando `.wav` via `getResource("/sounds/...")`, com volume ajustável por `volumeScale` (0..5).
@@ -437,9 +518,10 @@ O projeto carrega recursos via classpath (ex.: `getResourceAsStream("/maps/world
 No estado atual, o repositório **não contém** suíte de testes automatizados (não há evidência de JUnit/Gradle/Maven nem diretório de testes).
 Ainda assim, alguns pontos que já ajudam a manter qualidade:
 
-- UI e gameplay separam responsabilidades por pacotes (`ui/`, `entity/`, `tile/`, `data/`, `main/`, etc.).
+- UI e gameplay separam responsabilidades por pacotes (`ui/`, `entity/`, `tile/`, `data/`, `main/`, `bestiary/`, etc.).
 - `LanguageManager` e `Config` são módulos bem isolados.
 - O projeto registra e ignora artefatos locais (ex.: `save.dat`) via `.gitignore`.
+- **Validador i18n**: `tools/I18nValidator.java` verifica paridade de chaves entre todos os idiomas (ver seção [i18n](#i18n-traduções)).
 
 ---
 

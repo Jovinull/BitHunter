@@ -85,6 +85,7 @@ public class UI {
   private final CharacterUi characterUi;
   private final GameOverUi gameOverUi;
   private final PetYardUi petYardUi;
+  private final BestiaryUi bestiaryUi;
 
   public UI(GamePanel gp) {
     this.gp = gp;
@@ -114,6 +115,7 @@ public class UI {
     characterUi = new CharacterUi(this);
     gameOverUi = new GameOverUi(this);
     petYardUi = new PetYardUi(this, inventoryUi);
+    bestiaryUi = new BestiaryUi(this);
   }
 
   // ---- Helper de tradução ----
@@ -191,6 +193,8 @@ public class UI {
       petYardUi.drawPetYardScreen();
     } else if (state == GamePanel.SLEEP_STATE) {
       transitionUi.drawSleepScreen();
+    } else if (state == GamePanel.BESTIARY_STATE) {
+      bestiaryUi.drawBestiaryScreen();
     }
   }
 
@@ -299,6 +303,10 @@ public class UI {
     subState = 0;
     commandNum = 0;
     controlsPage = 0;
+  }
+
+  public BestiaryUi getBestiaryUi() {
+    return bestiaryUi;
   }
 
   // --- Getters/Setters já existentes (mantidos p/ compatibilidade externa) ---

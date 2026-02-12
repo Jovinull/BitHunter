@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import bestiary.BestiaryService;
 import entity.Entity;
 import main.GamePanel;
 import pets.PetIncubator;
@@ -84,6 +85,7 @@ public class SaveLoad {
     copyPetsToStorage(ds);
     copyIncubatorToStorage(ds);
     copyMapObjectsToStorage(ds);
+    copyBestiaryToStorage(ds);
     return ds;
   }
 
@@ -94,6 +96,7 @@ public class SaveLoad {
     applyEquipment(ds);
     applyPets(ds);
     applyIncubator(ds);
+    applyBestiary(ds);
 
     // Recalcular atributos derivados
     var player = gp.getPlayer();
@@ -340,5 +343,25 @@ public class SaveLoad {
         ds.getIncubatorRemainingTicks(),
         ds.getIncubatorEggName(),
         ds.getIncubatorTotalTicks());
+  }
+
+  /* ----- Bestiary (SAVE) ----- */
+
+  private void copyBestiaryToStorage(DataStorage ds) {
+    BestiaryService bestiary = gp.getBestiaryService();
+    ds.setBestiaryKills(bestiary.getKillsMap());
+    ds.setBestiaryRevealedVeryRare(bestiary.getRevealedVeryRareMap());
+    ds.setBestiaryPoints(bestiary.getBestiaryPoints());
+  }
+
+  /* ----- Bestiary (LOAD) ----- */
+
+  private void applyBestiary(DataStorage ds) {
+    BestiaryService bestiary = gp.getBestiaryService();
+    // Restaura com fallback seguro para saves antigos (campos podem ser null)
+    bestiary.restoreFromSave(
+        ds.getBestiaryKills(),
+        ds.getBestiaryRevealedVeryRare(),
+        ds.getBestiaryPoints());
   }
 }

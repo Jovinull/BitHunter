@@ -3,7 +3,10 @@ package data;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class DataStorage implements Serializable {
   @Serial
@@ -43,6 +46,11 @@ public class DataStorage implements Serializable {
   private int incubatorRemainingTicks;
   private String incubatorEggName;
   private int incubatorTotalTicks;
+
+  // ===== BESTIARY =====
+  private Map<String, Integer> bestiaryKills = new HashMap<>();
+  private Map<String, Set<String>> bestiaryRevealedVeryRare = new HashMap<>();
+  private int bestiaryPoints;
 
   // OBJECT ON MAP
   private String[][] mapObjectNames;
@@ -261,5 +269,32 @@ public class DataStorage implements Serializable {
 
   public void setIncubatorTotalTicks(int incubatorTotalTicks) {
     this.incubatorTotalTicks = incubatorTotalTicks;
+  }
+
+  // ===== BESTIARY getters/setters =====
+
+  public Map<String, Integer> getBestiaryKills() {
+    return bestiaryKills;
+  }
+
+  public void setBestiaryKills(Map<String, Integer> bestiaryKills) {
+    this.bestiaryKills = bestiaryKills != null ? bestiaryKills : new HashMap<>();
+  }
+
+  public Map<String, Set<String>> getBestiaryRevealedVeryRare() {
+    return bestiaryRevealedVeryRare;
+  }
+
+  public void setBestiaryRevealedVeryRare(Map<String, Set<String>> bestiaryRevealedVeryRare) {
+    this.bestiaryRevealedVeryRare = bestiaryRevealedVeryRare != null
+        ? bestiaryRevealedVeryRare : new HashMap<>();
+  }
+
+  public int getBestiaryPoints() {
+    return bestiaryPoints;
+  }
+
+  public void setBestiaryPoints(int bestiaryPoints) {
+    this.bestiaryPoints = bestiaryPoints;
   }
 }
