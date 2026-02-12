@@ -4,6 +4,7 @@ import entity.Entity;
 import object.ObjAxe;
 import object.ObjBoots;
 import object.ObjChest;
+import object.ObjChestSecret;
 import object.ObjCoinBronze;
 import object.ObjDoor;
 import object.ObjDoorIron;
@@ -16,6 +17,7 @@ import object.ObjPickaxe;
 import object.ObjPotionRed;
 import object.ObjRock;
 import object.ObjShieldBlue;
+import object.ObjShieldJava;
 import object.ObjShieldWood;
 import object.ObjSwordNormal;
 import object.ObjTent;
@@ -118,6 +120,16 @@ public class EntityGenerator {
       // Escudo de Madeira
       case ObjShieldWood.OBJ_ID:
         obj = new ObjShieldWood(gp);
+        break;
+
+      // Escudo do Compilador (Java) — lendário
+      case ObjShieldJava.OBJ_ID:
+        obj = new ObjShieldJava(gp);
+        break;
+
+      // Baú Secreto
+      case ObjChestSecret.OBJ_ID:
+        obj = new ObjChestSecret(gp);
         break;
 
       // Espada Comum
