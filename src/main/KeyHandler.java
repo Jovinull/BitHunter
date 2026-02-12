@@ -93,47 +93,36 @@ public class KeyHandler implements KeyListener {
     switch (state) {
       case GamePanel.TITLE_STATE -> {
         titleState(code);
-        return;
       }
       case GamePanel.PLAY_STATE -> {
         playState(code);
-        return;
       }
       case GamePanel.PAUSE_STATE -> {
         pauseState(code);
-        return;
       }
       case GamePanel.DIALOGUE_STATE, GamePanel.CUTSCENE_STATE -> {
         dialogueState(code);
-        return;
       }
       case GamePanel.CHARACTER_STATE -> {
         characterState(code);
-        return;
       }
       case GamePanel.OPTIONS_STATE -> {
         optionsState(code);
-        return;
       }
       case GamePanel.GAME_OVER_STATE -> {
         gameOverState(code);
-        return;
       }
       case GamePanel.TRADE_STATE -> {
         tradeState(code);
-        return;
       }
       case GamePanel.PET_YARD_STATE -> {
         petYardState(code);
-        return;
       }
       case GamePanel.MAP_STATE -> {
         mapState(code);
-        return;
       }
       case GamePanel.BESTIARY_STATE -> {
         bestiaryState(code);
-        return;
       }
       default -> {
         // noop
@@ -266,6 +255,9 @@ public class KeyHandler implements KeyListener {
       case KeyEvent.VK_T -> toggleDebug();
       case KeyEvent.VK_R -> reloadCurrentMap();
       case KeyEvent.VK_G -> godModeOn = !godModeOn;
+
+      // Dev mode: F9 adiciona o Escudo do Compilador (Java) ao inventário
+      case KeyEvent.VK_F9 -> handleDevSpawnShield();
 
       default -> {
         // noop
@@ -632,7 +624,8 @@ public class KeyHandler implements KeyListener {
     switch (subState) {
       case 0 -> { // Lista de classes
         int maxIdx = bestiaryUi.getClassCount() - 1;
-        if (maxIdx < 0) maxIdx = 0;
+        if (maxIdx < 0)
+          maxIdx = 0;
         switch (code) {
           case KeyEvent.VK_W -> {
             moveCommandNum(ui, -1, maxIdx);
@@ -647,7 +640,8 @@ public class KeyHandler implements KeyListener {
           case KeyEvent.VK_ESCAPE, KeyEvent.VK_B -> {
             gp.setGameState(GamePanel.PLAY_STATE);
           }
-          default -> { /* noop */ }
+          default -> {
+            /* noop */ }
         }
       }
       case 1 -> { // Lista de criaturas
@@ -662,7 +656,8 @@ public class KeyHandler implements KeyListener {
           }
           case KeyEvent.VK_ENTER -> bestiaryUi.enterSelectedCreature();
           case KeyEvent.VK_ESCAPE -> bestiaryUi.goBack();
-          default -> { /* noop */ }
+          default -> {
+            /* noop */ }
         }
       }
       case 2 -> { // Detalhes da criatura
@@ -670,7 +665,8 @@ public class KeyHandler implements KeyListener {
           case KeyEvent.VK_W -> bestiaryUi.navigateUp();
           case KeyEvent.VK_S -> bestiaryUi.navigateDown();
           case KeyEvent.VK_ESCAPE -> bestiaryUi.goBack();
-          default -> { /* noop */ }
+          default -> {
+            /* noop */ }
         }
       }
       default -> {
@@ -773,6 +769,17 @@ public class KeyHandler implements KeyListener {
   private void toggleDebug() {
     showDebugText = !showDebugText;
     gp.getTileM().setDrawPath(showDebugText);
+  }
+
+  /**
+   * Dev mode: adiciona o Escudo do Compilador (Java) ao inventário.
+   * Só funciona se devMode estiver ativo no config.
+   */
+  private void handleDevSpawnShield() {
+    if (!gp.isDevMode()) {
+      return; // no-op silencioso quando devMode está desativado
+    }
+    gp.getPlayer().addJavaShieldToInventory();
   }
 
   private void reloadCurrentMap() {
