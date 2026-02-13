@@ -2,7 +2,6 @@ package main;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
@@ -35,7 +34,6 @@ public class GamePanel extends JPanel implements Runnable {
 
   private static final Logger LOGGER = Logger.getLogger(GamePanel.class.getName());
   private static final boolean DEBUG_RESPAWN = false;
-  private static final Font DEBUG_FONT = new Font("Arial", Font.PLAIN, 20);
   private static final Comparator<Entity> ENTITY_Y_COMPARATOR =
       Comparator.comparingInt(Entity::getWorldY);
 
@@ -158,12 +156,6 @@ public class GamePanel extends JPanel implements Runnable {
 
     tempScreen = new BufferedImage(SCREEN_WIDTH, SCREEN_HEIGHT, BufferedImage.TYPE_INT_ARGB);
     g2 = (Graphics2D) tempScreen.getGraphics();
-
-    // Pre-warm debug font: the first font resolution through the OS font system
-    // (fontconfig on Linux) is expensive and would stall the game loop on first
-    // debug toggle. Paying that cost here, during setup, avoids the in-game freeze.
-    g2.setFont(DEBUG_FONT);
-    g2.drawString(" ", 0, 0);
 
     if (fullScreenOn) {
       setFullScreen();
@@ -502,7 +494,7 @@ public class GamePanel extends JPanel implements Runnable {
     long drawEnd = System.nanoTime();
     long passed = drawEnd - drawStart;
 
-    g2.setFont(DEBUG_FONT);
+    g2.setFont(gameUi.getDebugFont());
     g2.setColor(Color.white);
     int x = 10;
     int y = 400;
