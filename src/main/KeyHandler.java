@@ -844,6 +844,14 @@ public class KeyHandler implements KeyListener {
     return godModeOn;
   }
 
+  /**
+   * Alterna o Modo Deus (god mode) programaticamente.
+   * <p>Chamado pelo {@link CheatCodeManager} (código secreto "finalclass").</p>
+   */
+  public void toggleGodMode() {
+    godModeOn = !godModeOn;
+  }
+
   public void setEnterPressed(boolean value) {
     this.enterPressed = value;
   }

@@ -4,6 +4,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,6 +52,11 @@ public class DataStorage implements Serializable {
   private Map<String, Integer> bestiaryKills = new HashMap<>();
   private Map<String, Set<String>> bestiaryRevealedVeryRare = new HashMap<>();
   private int bestiaryPoints;
+
+  // ===== CHEAT CODES (ONE_TIME) =====
+  // Armazena os códigos ONE_TIME já utilizados para impedir reuso entre sessões.
+  // Pode ser null em saves antigos (antes desta feature); o getter trata isso.
+  private Set<String> usedCheatCodes;
 
   // OBJECT ON MAP
   private String[][] mapObjectNames;
@@ -296,5 +302,23 @@ public class DataStorage implements Serializable {
 
   public void setBestiaryPoints(int bestiaryPoints) {
     this.bestiaryPoints = bestiaryPoints;
+  }
+
+  // ===== CHEAT CODES getters/setters =====
+
+  /**
+   * Retorna os códigos ONE_TIME já usados.
+   * <p>Null-safe: retorna {@link HashSet} vazio para saves antigos
+   * que não possuíam este campo (desserialização atribui null).</p>
+   */
+  public Set<String> getUsedCheatCodes() {
+    if (usedCheatCodes == null) {
+      usedCheatCodes = new HashSet<>();
+    }
+    return usedCheatCodes;
+  }
+
+  public void setUsedCheatCodes(Set<String> usedCheatCodes) {
+    this.usedCheatCodes = usedCheatCodes != null ? usedCheatCodes : new HashSet<>();
   }
 }

@@ -86,6 +86,7 @@ public class SaveLoad {
     copyIncubatorToStorage(ds);
     copyMapObjectsToStorage(ds);
     copyBestiaryToStorage(ds);
+    copyCheatCodesToStorage(ds);
     return ds;
   }
 
@@ -97,6 +98,7 @@ public class SaveLoad {
     applyPets(ds);
     applyIncubator(ds);
     applyBestiary(ds);
+    applyCheatCodes(ds);
 
     // Recalcular atributos derivados
     var player = gp.getPlayer();
@@ -363,5 +365,26 @@ public class SaveLoad {
         ds.getBestiaryKills(),
         ds.getBestiaryRevealedVeryRare(),
         ds.getBestiaryPoints());
+  }
+
+  /* ----- Cheat Codes (SAVE) ----- */
+
+  /**
+   * Salva os códigos ONE_TIME já utilizados no DataStorage.
+   * Permite que o bloqueio de cheats ONE_TIME persista entre sessões.
+   */
+  private void copyCheatCodesToStorage(DataStorage ds) {
+    ds.setUsedCheatCodes(
+        new java.util.HashSet<>(gp.getCheatCodeManager().getUsedOneTimeCodes()));
+  }
+
+  /* ----- Cheat Codes (LOAD) ----- */
+
+  /**
+   * Restaura os códigos ONE_TIME já utilizados a partir do save.
+   * Saves antigos (sem este campo) resultam em set vazio — nenhum bloqueio.
+   */
+  private void applyCheatCodes(DataStorage ds) {
+    gp.getCheatCodeManager().setUsedOneTimeCodes(ds.getUsedCheatCodes());
   }
 }
