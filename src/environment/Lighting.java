@@ -2,6 +2,7 @@ package environment;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RadialGradientPaint;
 import java.awt.image.BufferedImage;
@@ -22,6 +23,9 @@ public class Lighting {
   }
 
   private DayPhase dayPhase = DayPhase.DAY;
+
+  /** Cached derived font for the debug day-phase overlay (avoids per-frame allocation). */
+  private Font debugPhaseFont;
 
   public Lighting(GamePanel gp) {
     this.gp = gp;
@@ -155,7 +159,10 @@ public class Lighting {
         default -> situation = "";
       }
       g2.setColor(Color.white);
-      g2.setFont(g2.getFont().deriveFont(50f));
+      if (debugPhaseFont == null) {
+        debugPhaseFont = g2.getFont().deriveFont(50f);
+      }
+      g2.setFont(debugPhaseFont);
       g2.drawString(situation, 800, 500);
     }
   }

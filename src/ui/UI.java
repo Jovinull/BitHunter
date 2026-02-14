@@ -315,6 +315,11 @@ public class UI {
     return fonts.getPixelBase();
   }
 
+  /** Fonte Arial 20pt carregada do classpath (usada pelo debug overlay em GamePanel). */
+  public Font getDebugFont() {
+    return fonts.arialPlain(20F);
+  }
+
   public boolean isMessageOn() {
     return messageOn;
   }

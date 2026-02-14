@@ -25,20 +25,26 @@ final class FontManager {
 
   private static final Logger LOGGER = Logger.getLogger(FontManager.class.getName());
 
-  private static final Font FALLBACK_PIXEL = new Font("SansSerif", Font.PLAIN, 16);
-  private static final Font FALLBACK_DISPLAY = new Font("SansSerif", Font.BOLD, 48);
+  private static final String FALLBACK_FAMILY = "SansSerif";
+  private static final Font FALLBACK_PIXEL = new Font(FALLBACK_FAMILY, Font.PLAIN, 16);
+  private static final Font FALLBACK_DISPLAY = new Font(FALLBACK_FAMILY, Font.BOLD, 48);
+  private static final Font FALLBACK_ARIAL = new Font(FALLBACK_FAMILY, Font.PLAIN, 20);
 
   /** Fonte pixel/retro (MaruMonica). Nunca null. */
   private final Font pixelBase;
   /** Fonte display/títulos (Purisa Bold). Nunca null. */
   private final Font displayBase;
+  /** Fonte Arial (debug overlay). Nunca null. */
+  private final Font arialBase;
 
   private final Map<Long, Font> pixelCache = new HashMap<>();
   private final Map<Long, Font> displayCache = new HashMap<>();
+  private final Map<Long, Font> arialCache = new HashMap<>();
 
   FontManager() {
     pixelBase = loadFont("/font/x12y16pxMaruMonica.ttf", FALLBACK_PIXEL);
     displayBase = loadFont("/font/Purisa Bold.ttf", FALLBACK_DISPLAY);
+    arialBase = loadFont("/font/ARIAL.ttf", FALLBACK_ARIAL);
   }
 
   // ---- API principal ----
@@ -53,6 +59,11 @@ final class FontManager {
     return cached(displayCache, displayBase, style, size);
   }
 
+  /** Fonte Arial derivada (estilo + tamanho). Resultado cacheado. */
+  Font arial(int style, float size) {
+    return cached(arialCache, arialBase, style, size);
+  }
+
   // ---- Atalhos frequentes ----
 
   Font pixelPlain(float size)    { return pixel(Font.PLAIN, size); }
@@ -60,6 +71,7 @@ final class FontManager {
   Font pixelItalic(float size)   { return pixel(Font.ITALIC, size); }
   Font displayPlain(float size)  { return display(Font.PLAIN, size); }
   Font displayBold(float size)   { return display(Font.BOLD, size); }
+  Font arialPlain(float size)    { return arial(Font.PLAIN, size); }
 
   /** Fonte-base pixel (para compatibilidade externa). Nunca null. */
   Font getPixelBase() {
