@@ -27,7 +27,8 @@
 - Corrigir warnings nos arquivos tocados
 
 ### 5. Validação
-- Garantir que o projeto compila (ver `runbook.md`)
+- **Verificar compilação**: rodar `javac` e confirmar que compila sem erros (obrigatório se `.java` foi alterado)
+- Se não compilar: corrigir ANTES de prosseguir
 - Testar manualmente o fluxo afetado (descrever como)
 - Verificar que não quebrou funcionalidades existentes
 
@@ -36,8 +37,9 @@
 - Propor commit(s) no padrão Conventional Commits (ver `commit_policy.md`)
 - Agrupar arquivos em commits que façam sentido juntos
 - Perguntar: "Posso subir o commit?"
-- Ao receber autorização: criar branch → commits separados → push → merge na main → push main
+- Ao receber autorização: verificar compilação → criar branch → commits separados → push → merge na main → push main → deletar branch
 - **NUNCA** commitar direto na main
+- **SEMPRE** deletar a branch (local + remote) após merge bem-sucedido
 
 ---
 
@@ -46,11 +48,12 @@
 ### O que SEMPRE fazer
 - Ler as regras antes de agir
 - Trabalhar em passos claros e documentados
-- Manter o build verde
+- Manter o build verde (verificar compilação antes de subir)
 - Propor commit e pedir permissão antes de push
 - Usar branch separada para toda mudança (nunca commitar direto na main)
 - Separar commits em grupos lógicos (arquivos que fazem sentido juntos)
 - Fazer merge da branch na main após push
+- Deletar a branch (local + remote) após merge bem-sucedido
 - Responder em Português (pt-BR)
 - Seguir o padrão de resposta do Copos (Diagnóstico → Plano → Execução → Testes → Resumo)
 

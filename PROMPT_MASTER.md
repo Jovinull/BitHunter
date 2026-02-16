@@ -49,29 +49,36 @@ Ao receber um prompt seguindo este template, o Cursor (Copos) deve:
 - [ ] Corrigir warnings nos arquivos tocados
 - [ ] Manter build verde
 
-### 5. Testes
+### 5. Verificação de compilação
+- [ ] Se `.java` foi alterado: rodar `javac` e confirmar build verde
+- [ ] Se não compilar: corrigir ANTES de prosseguir para commits
+- [ ] Se mudança é apenas docs/config: pular esta etapa
+
+### 6. Testes
 - [ ] Descrever como validar a mudança
 - [ ] Listar cenários de teste (o que testar manualmente)
 - [ ] Verificar que funcionalidades existentes não quebraram
 
-### 6. Resumo do que mudou
+### 7. Resumo do que mudou
 - [ ] Lista em bullets de cada alteração
 - [ ] Arquivos criados/modificados
 
-### 7. Commit proposto
+### 8. Commit proposto
 - [ ] Formato: `tipo(escopo): descrição` (Conventional Commits)
 - [ ] Bullets resumindo as mudanças
 - [ ] Seguir `.cursor/commit_policy.md`
 
-### 8. Perguntar antes de subir
+### 9. Perguntar antes de subir
 - [ ] **"Posso subir o commit?"**
 - [ ] Se "não" → deixar tudo pronto localmente
 - [ ] Se "sim" → seguir fluxo de branch obrigatório:
-  1. Criar branch nova (ex: `feat/descricao`, `fix/descricao`)
-  2. Commits separados agrupando arquivos que fazem sentido juntos
-  3. Push da branch
-  4. Merge na main (`--no-ff`)
-  5. Push da main
+  1. Verificar compilação (se `.java` alterado)
+  2. Criar branch nova (ex: `feat/descricao`, `fix/descricao`)
+  3. Commits separados agrupando arquivos que fazem sentido juntos
+  4. Push da branch
+  5. Merge na main (`--no-ff`)
+  6. Push da main
+  7. Deletar branch (local + remote)
 
 ---
 
