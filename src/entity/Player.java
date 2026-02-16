@@ -614,6 +614,12 @@ public class Player extends Entity {
       npc.speak();
     }
     npc.move(getDirection());
+
+    // Se o NPC foi empurrado com sucesso, libera o jogador para mover junto
+    // no mesmo frame, evitando jitter de câmera por movimento alternado
+    if (!npc.isCollisionOn()) {
+      setCollisionOn(false);
+    }
   }
 
   public void contactMonster(int i) {

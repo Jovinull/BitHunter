@@ -145,7 +145,7 @@ public class EventHandler {
       return;
     }
     // dungeon 1 - entrada (overworld → dungeon)
-    if (hit(0, 75, 43, "any")) {
+    if (hit(0, 80, 14, "any")) {
       teleport(2, 25, 90, GamePanel.DUNGEON);
       return;
     }
