@@ -66,9 +66,13 @@ O Cursor **sempre** vai:
 - Manter o build verde
 - Propor commit antes de subir
 - Pedir autorização para push
+- Criar branch separada (nunca commitar direto na main)
+- Separar commits em grupos lógicos
+- Fazer merge da branch na main após autorização
 
 O Cursor **nunca** vai:
 - Fazer push sem sua autorização
+- Commitar direto na main (sempre via branch + merge)
 - Refatorar código que você não pediu
 - Apagar documentação/código existente
 - Inventar funcionalidades não solicitadas

@@ -33,8 +33,11 @@
 
 ### 6. Entrega
 - Resumir em bullets o que mudou
-- Propor commit no padrão Conventional Commits (ver `commit_policy.md`)
+- Propor commit(s) no padrão Conventional Commits (ver `commit_policy.md`)
+- Agrupar arquivos em commits que façam sentido juntos
 - Perguntar: "Posso subir o commit?"
+- Ao receber autorização: criar branch → commits separados → push → merge na main → push main
+- **NUNCA** commitar direto na main
 
 ---
 
@@ -45,6 +48,9 @@
 - Trabalhar em passos claros e documentados
 - Manter o build verde
 - Propor commit e pedir permissão antes de push
+- Usar branch separada para toda mudança (nunca commitar direto na main)
+- Separar commits em grupos lógicos (arquivos que fazem sentido juntos)
+- Fazer merge da branch na main após push
 - Responder em Português (pt-BR)
 - Seguir o padrão de resposta do Copos (Diagnóstico → Plano → Execução → Testes → Resumo)
 
