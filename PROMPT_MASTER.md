@@ -66,7 +66,12 @@ Ao receber um prompt seguindo este template, o Cursor (Copos) deve:
 ### 8. Perguntar antes de subir
 - [ ] **"Posso subir o commit?"**
 - [ ] Se "não" → deixar tudo pronto localmente
-- [ ] Se "sim" → fazer push
+- [ ] Se "sim" → seguir fluxo de branch obrigatório:
+  1. Criar branch nova (ex: `feat/descricao`, `fix/descricao`)
+  2. Commits separados agrupando arquivos que fazem sentido juntos
+  3. Push da branch
+  4. Merge na main (`--no-ff`)
+  5. Push da main
 
 ---
 
