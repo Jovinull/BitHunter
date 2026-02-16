@@ -562,6 +562,43 @@ Ainda assim, alguns pontos que já ajudam a manter qualidade:
   Isso é consistente com `main.Main`, que decide `setUndecorated(true)` no boot baseado na flag carregada.
 </details>
 
+<details>
+  <summary><b>5) "The import [pacote] cannot be resolved" / "Unresolved compilation problems" (cache do JDT)</b></summary>
+  <br/>
+
+  **Sintoma:** ao rodar o jogo pelo VS Code/Cursor, o erro aparece como:
+  ```
+  Exception in thread "main" java.lang.Error: Unresolved compilation problems:
+      The import bestiary cannot be resolved
+      BestiaryService cannot be resolved to a type
+      ...
+  ```
+  O código-fonte está correto e compila normalmente via `javac` no terminal, mas o Java Language Server (RedHat JDT) não reconhece pacotes ou classes — geralmente após adicionar novos pacotes/arquivos ao projeto.
+
+  **Causa:** o workspace cache do JDT (armazenado em `%APPDATA%\Code\User\workspaceStorage\...\redhat.java\jdt_ws\`) ficou desatualizado e os `.class` gerados contêm erros embutidos.
+
+  **Solução (recomendada):**
+  1. Abra a **Command Palette** (`Ctrl+Shift+P`)
+  2. Execute **"Java: Clean Java Language Server Workspace"**
+  3. Confirme clicando em **"Restart and delete"**
+
+  Isso limpa todo o cache de compilação e força uma reindexação completa do projeto.
+
+  **Solução alternativa (manual):**
+  ```powershell
+  # Feche o Cursor/VS Code primeiro, depois execute:
+  Remove-Item -Recurse -Force "$env:APPDATA\Code\User\workspaceStorage\*\redhat.java\jdt_ws"
+  ```
+  Reabra o editor em seguida — o JDT vai recompilar tudo do zero.
+
+  **Como confirmar que o problema é cache (e não código):**
+  ```powershell
+  # Compilar direto pelo terminal (a partir da raiz do projeto):
+  & "caminho\para\javac.exe" --enable-preview --source 25 -d out -sourcepath src src\main\GamePanel.java
+  ```
+  Se compilar sem erros, o problema é exclusivamente do cache do JDT.
+</details>
+
 ---
 
 ## Automação / CI/CD
