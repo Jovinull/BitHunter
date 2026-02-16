@@ -510,7 +510,8 @@ public class GamePanel extends JPanel implements Runnable {
     y += lineHeight;
     g2.drawString("Draw Time: " + passed, x, y);
     y += lineHeight;
-    g2.drawString("God Mode: " + keyH.isGodModeOn(), x, y);
+    boolean god = keyH.isGodModeOn();
+    g2.drawString("God Mode (NoClip): " + god, x, y);
   }
 
   public void drawToScreen() {

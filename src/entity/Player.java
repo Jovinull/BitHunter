@@ -457,6 +457,13 @@ public class Player extends Entity {
     collisionChecker.checkEntity(this, gp.getiTile());
     gp.geteHandler().checkEvent();
 
+    // Noclip: god mode (via cheat "finalclass") ignora toda colisão sólida,
+    // permitindo atravessar tiles, objetos e entidades. As checagens acima
+    // ainda rodam para detectar pickups, NPCs e monstros (side-effects).
+    if (keyH.isGodModeOn()) {
+      setCollisionOn(false);
+    }
+
     if (!isCollisionOn() && !keyH.isEnterPressed()) {
       switch (getDirection()) {
         case DIR_UP -> setWorldY(getWorldY() - getSpeed());

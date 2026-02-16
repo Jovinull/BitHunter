@@ -65,8 +65,13 @@ nenhuma indicação visual aparece durante a digitação, e códigos inválidos 
 | Código | Efeito | Tipo | Referência temática |
 |---|---|---|---|
 | `gitpush` | **Força salvar** o jogo imediatamente | REPEATABLE | `git push --force` — forçar envio do estado atual |
-| `finalclass` | **Alterna Modo Deus** (god mode on/off) | REPEATABLE | `final class` — classe que não pode ser herdada/sobrescrita/derrotada |
+| `finalclass` | **Alterna Modo Deus + NoClip** (god mode on/off) | REPEATABLE | `final class` — classe que não pode ser herdada/sobrescrita/derrotada |
 | `refactor` | **Sobe 1 nível** instantaneamente (dispara level up completo) | ONE_TIME | Refatoração — melhoria contínua do código/personagem |
+
+> **Nota sobre `finalclass` (God Mode + NoClip):**
+> Quando ativo, o jogador torna-se invencível (não morre) e pode **atravessar paredes, tiles sólidos e entidades** (noclip).
+> Interações normais (pickups, NPCs, monstros, eventos) continuam funcionando.
+> God Mode é ativado **exclusivamente** via este cheat code — **não existe** atalho de teclado direto.
 
 ---
 

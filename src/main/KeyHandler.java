@@ -266,7 +266,6 @@ public class KeyHandler implements KeyListener {
       // Dev shortcuts
       case KeyEvent.VK_T -> toggleDebug();
       case KeyEvent.VK_R -> reloadCurrentMap();
-      case KeyEvent.VK_G -> godModeOn = !godModeOn;
 
       default -> {
         // noop

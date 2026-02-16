@@ -358,7 +358,6 @@ flowchart TD
 - **X**: alternar mini-mapa
 - **T**: debug/path (dev)
 - **R**: recarregar mapa (dev)
-- **G**: “god mode” (dev)
 
 ⚠️ **Risco (consistência)**: o atalho `R` recarrega um arquivo com nome diferente do arquivo existente (`interior01` vs `indoor01`).  
 💡 **Sugestão**: padronizar nomenclatura e criar uma tabela única de mapas (IDs) para reduzir drift.
@@ -656,7 +655,8 @@ Sistema de códigos secretos (cheats) digitáveis durante o gameplay, com arquit
 - **Ativação silenciosa**: pressionar `'` ou `"` ativa captura invisível; digitar código + ENTER confirma.
 - **Feedback**: mensagem no HUD + SFX ao aceitar; aviso quando ONE_TIME já foi usado; silêncio total para código inválido.
 - **Persistência**: códigos ONE_TIME são salvos em `DataStorage` e sobrevivem ao ciclo save/load.
-- **9 códigos** implementados: recursos (ouro, vida, chaves, poções), utilidade (save, god mode, level up), item exclusivo (Escudo do Compilador) e easter egg.
+- **9 códigos** implementados: recursos (ouro, vida, chaves, poções), utilidade (save, god mode + noclip, level up), item exclusivo (Escudo do Compilador) e easter egg.
+- **God Mode**: ativado **exclusivamente** via cheat code `finalclass` (toggle). Inclui invencibilidade e noclip (colisão desativada).
 
 > Documentação completa: **[`docs/CHEAT_CODES.md`](CHEAT_CODES.md)** — lista de códigos, como usar, arquitetura técnica e como adicionar novos cheats.
 
