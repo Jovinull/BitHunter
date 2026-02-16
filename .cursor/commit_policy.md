@@ -88,20 +88,28 @@ para uma classe dedicada HudUi, reduzindo o tamanho do UI.java.
 
 Ao receber autorização para subir, o Cursor **DEVE**:
 
-1. **Criar uma branch nova** a partir da `main`
+1. **Verificar compilação** (se houver arquivos `.java` alterados)
+   - Rodar `javac` para garantir que o projeto compila sem erros
+   - Se não compilar: **parar**, corrigir e só continuar quando compilar
+   - Se a mudança for apenas docs/config (sem `.java`): pular esta etapa
+2. **Criar uma branch nova** a partir da `main`
    - Padrão de nome: `tipo/descricao-curta` (ex: `feat/novo-monstro`, `fix/colisao-diagonal`, `docs/atualizar-readme`)
    - Tipos de branch: `feat/`, `fix/`, `refactor/`, `docs/`, `chore/`, `perf/`
-2. **Separar as mudanças em commits lógicos**
+3. **Separar as mudanças em commits lógicos**
    - Cada commit agrupa arquivos que fazem sentido juntos
    - Ex: não misturar mudanças de `entity/` com mudanças de `ui/` no mesmo commit, a menos que sejam interdependentes
    - Ordem dos commits: da base/infra para funcionalidade de ponta
-3. **Fazer push da branch** para o remote
-4. **Fazer merge na main** com `--no-ff` (preserva histórico da branch)
-5. **Fazer push da main** para o remote
+4. **Fazer push da branch** para o remote
+5. **Fazer merge na main** com `--no-ff` (preserva histórico da branch)
+6. **Fazer push da main** para o remote
+7. **Deletar a branch** após merge bem-sucedido (local + remote)
 
 ### Exemplo de fluxo completo
 
 ```bash
+# 0. Verificar compilação (se houver .java alterados)
+javac --release 24 -d build/classes $(find src -name "*.java")
+
 # 1. Criar branch
 git checkout -b feat/novo-item-potion-blue
 
@@ -124,7 +132,13 @@ git merge feat/novo-item-potion-blue --no-ff -m "merge: integrar ObjPotionBlue n
 
 # 5. Push da main
 git push origin main
+
+# 6. Deletar branch (local + remote)
+git branch -d feat/novo-item-potion-blue
+git push origin --delete feat/novo-item-potion-blue
 ```
 
-### Regra crítica
+### Regras críticas
 > **NUNCA** commitar direto na main. Toda mudança entra via branch + merge.
+> **SEMPRE** deletar a branch após merge bem-sucedido (local + remote).
+> **SEMPRE** verificar compilação antes de subir (se houver `.java` alterados).

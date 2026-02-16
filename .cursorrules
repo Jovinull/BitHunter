@@ -27,12 +27,15 @@
 - SEMPRE proponha um commit ao final (Conventional Commits).
 - SEMPRE pergunte "Posso subir o commit?" antes de fazer push.
 - Se o usuário disser "não", deixe tudo pronto localmente.
+- ANTES de commitar: VERIFICAR que o projeto compila sem erros (javac)
 - Ao receber autorização para subir:
-  1. CRIAR uma branch nova (nome descritivo, ex: `feat/novo-monstro`, `fix/colisao-diagonal`)
-  2. SEPARAR as mudanças em commits lógicos — cada commit agrupa arquivos que fazem sentido juntos
-  3. FAZER push da branch
-  4. FAZER merge da branch na main (--no-ff para preservar histórico)
-  5. FAZER push da main
+  1. VERIFICAR compilação (se houver arquivos .java alterados)
+  2. CRIAR uma branch nova (nome descritivo, ex: `feat/novo-monstro`, `fix/colisao-diagonal`)
+  3. SEPARAR as mudanças em commits lógicos — cada commit agrupa arquivos que fazem sentido juntos
+  4. FAZER push da branch
+  5. FAZER merge da branch na main (--no-ff para preservar histórico)
+  6. FAZER push da main
+  7. DELETAR a branch (local + remote) após merge bem-sucedido
 - Formato: `tipo(escopo): descrição curta`
   - Tipos: feat, fix, refactor, docs, style, test, chore, perf
   - Escopo: pacote ou sistema afetado (ex: entity, ui, tile, main)
