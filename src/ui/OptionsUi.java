@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.util.List;
 
+import main.GameAction;
 import main.GamePanel;
 import main.KeyHandler;
 import main.LanguageManager;
@@ -93,6 +94,8 @@ class OptionsUi {
         ui.setSubState(2);
         ui.commandNum = 0;
         ui.setControlsPage(0);
+        ui.waitingForRebind = false;
+        ui.rebindControlIndex = -1;
       }
     }
 
@@ -314,49 +317,57 @@ class OptionsUi {
     }
   }
 
+  /**
+   * Rótulos i18n para cada ação remapeável.
+   * Deve ter a MESMA ordem que {@link GameAction#getRemappable()}.
+   */
+  private static final String[] CONTROL_LABEL_KEYS = {
+      "ui.controls.moveUp",
+      "ui.controls.moveDown",
+      "ui.controls.moveLeft",
+      "ui.controls.moveRight",
+      "ui.controls.confirmAttack",
+      "ui.controls.shootCast",
+      "ui.controls.guard",
+      "ui.controls.pause",
+      "ui.controls.characterScreen",
+      "ui.controls.options",
+      "ui.controls.minimap",
+      "ui.controls.map",
+      "ui.controls.bestiary",
+  };
+
+  /**
+   * Tela de controles interativa: o jogador navega pelas ações,
+   * pressiona ENTER para remapear e a tecla é capturada em tempo real.
+   */
   private void optionsControl(int frameX, int frameY) {
     var g2 = ui.g2;
     var gp = ui.getGamePanel();
+    var bindings = gp.getInputBindings();
+    var remappable = GameAction.getRemappable();
 
-    // Título
+    // ── Título ──
     int titleY = frameY + GamePanel.TILE_SIZE;
     String title = ui.t("ui.controls.title");
     int titleX = ui.getXforCenteredText(title);
     ui.drawTextShadow(title, titleX, titleY, UI.COL_TEXT, Color.black, 2);
 
-    final String[] labelKeys = {
-        "ui.controls.move",
-        "ui.controls.confirmAttack",
-        "ui.controls.shootCast",
-        "ui.controls.characterScreen",
-        "ui.controls.pause",
-        "ui.controls.options",
-        "ui.controls.minimap",
-        "ui.controls.map"
-    };
-
-    final String[] keyLabels = {
-        "WASD",
-        "ENTER",
-        "F",
-        "C",
-        "P",
-        "ESC",
-        "X",
-        "M"
-    };
-
-    int totalControls = labelKeys.length;
+    int totalControls = remappable.size();
     int perPage = CONTROLS_PER_PAGE;
 
-    // Quantidade total de páginas
+    // ── Paginação ──
     int pageCount = (totalControls + perPage - 1) / perPage;
     if (pageCount <= 0) {
       pageCount = 1;
     }
     ui.setControlsPageCount(pageCount);
 
+    // Auto-ajusta página com base na seleção atual
     int currentPage = ui.getControlsPage();
+    if (ui.commandNum >= 0 && ui.commandNum < totalControls) {
+      currentPage = ui.commandNum / perPage;
+    }
     if (currentPage < 0) {
       currentPage = 0;
     }
@@ -368,42 +379,68 @@ class OptionsUi {
     int startIndex = currentPage * perPage;
     int endIndex = Math.min(startIndex + perPage, totalControls);
 
+    // ── Entradas da página atual ──
     int textX = frameX + GamePanel.TILE_SIZE;
+    int keysX = frameX + (int) (GamePanel.TILE_SIZE * 5.5);
     int textY = titleY + GamePanel.TILE_SIZE;
-    g2.setColor(UI.COL_TEXT);
 
     for (int i = startIndex; i < endIndex; i++) {
-      g2.drawString(ui.t(labelKeys[i]), textX, textY);
+      GameAction action = remappable.get(i);
+      boolean isSelected = (ui.commandNum == i);
+      boolean isRebinding = ui.waitingForRebind && ui.rebindControlIndex == i;
+
+      // Rótulo da ação
+      g2.setColor(isSelected ? UI.COL_ACCENT : UI.COL_TEXT);
+      g2.drawString(ui.t(CONTROL_LABEL_KEYS[i]), textX, textY);
+
+      // Tecla atribuída (ou "..." durante rebind)
+      String keyDisplay;
+      if (isRebinding) {
+        keyDisplay = "...";
+        g2.setColor(UI.COL_ACCENT);
+      } else {
+        g2.setColor(UI.COL_TEXT);
+        keyDisplay = bindings.getKeyDisplayName(action);
+      }
+      g2.drawString(keyDisplay, keysX, textY);
+
+      // Cursor de seleção
+      if (isSelected) {
+        g2.setColor(UI.COL_ACCENT);
+        g2.drawString(">", textX - 25, textY);
+      }
+
       textY += GamePanel.TILE_SIZE;
     }
 
-    int keysX = frameX + GamePanel.TILE_SIZE * 6;
-    int keysY = titleY + GamePanel.TILE_SIZE;
-
-    for (int i = startIndex; i < endIndex; i++) {
-      g2.drawString(keyLabels[i], keysX, keysY);
-      keysY += GamePanel.TILE_SIZE;
-    }
-
+    // ── Indicador de página ──
     if (pageCount > 1) {
       String pageLabel = (currentPage + 1) + "/" + pageCount;
       int pageX = frameX + GamePanel.TILE_SIZE * 6;
-      int pageY = frameY + GamePanel.TILE_SIZE * 9;
+      int pageY = frameY + (int) (GamePanel.TILE_SIZE * 8.2);
       g2.setColor(UI.COL_TEXT_DIM);
       g2.drawString(pageLabel, pageX, pageY);
     }
 
+    // ── Dica de remapeamento ──
+    if (ui.waitingForRebind) {
+      g2.setColor(UI.COL_ACCENT);
+      g2.setFont(ui.fonts.pixelPlain(24F));
+      String hint = ui.t("ui.controls.pressKey");
+      int hintX = frameX + GamePanel.TILE_SIZE;
+      int hintY = frameY + (int) (GamePanel.TILE_SIZE * 8.5);
+      g2.drawString(hint, hintX, hintY);
+      g2.setFont(ui.fonts.pixelPlain(32F)); // restaura fonte
+    }
+
+    // ── Botão "Voltar" ──
     textX = frameX + GamePanel.TILE_SIZE;
     textY = frameY + GamePanel.TILE_SIZE * 9;
     g2.setColor(UI.COL_TEXT);
     g2.drawString(ui.t(UI.KEY_COMMON_BACK), textX, textY);
-    if (ui.commandNum == 0) {
+    if (ui.commandNum == totalControls) {
+      g2.setColor(UI.COL_ACCENT);
       g2.drawString(">", textX - 25, textY);
-      if (gp.getKeyH().isEnterPressed()) {
-        ui.setControlsPage(0);
-        ui.setSubState(0);
-        ui.commandNum = 3;
-      }
     }
   }
 

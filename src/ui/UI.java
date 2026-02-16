@@ -13,8 +13,6 @@ import main.GamePanel;
 import main.KeyHandler;
 import main.LanguageManager;
 import object.ObjCoinBronze;
-import object.ObjHeart;
-import object.ObjManaCrystal;
 
 public class UI {
 
@@ -26,11 +24,6 @@ public class UI {
   final FontManager fonts;
 
   // --- HUD ---
-  BufferedImage heartFull;
-  BufferedImage heartHalf;
-  BufferedImage heartBlank;
-  BufferedImage crystalFull;
-  BufferedImage crystalBlank;
   BufferedImage coin;
 
   // --- Estado de UI (compartilhado entre telas) ---
@@ -50,6 +43,10 @@ public class UI {
   Entity npc;
   int charIndex = 0;
   String combinedText = "";
+
+  // Estado do remapeamento de teclas (tela de controles)
+  boolean waitingForRebind = false;
+  int rebindControlIndex = -1;
 
   static final Color COL_BG = new Color(0x05, 0x07, 0x14); // fundo quase preto azulado
   static final Color COL_PANEL = new Color(0x10, 0x15, 0x28); // painel um pouco mais claro
@@ -90,15 +87,6 @@ public class UI {
   public UI(GamePanel gp) {
     this.gp = gp;
     this.fonts = new FontManager();
-
-    Entity heart = new ObjHeart(gp);
-    heartFull = heart.getBaseImage();
-    heartHalf = heart.getAltImage1();
-    heartBlank = heart.getAltImage2();
-
-    Entity crystal = new ObjManaCrystal(gp);
-    crystalFull = crystal.getBaseImage();
-    crystalBlank = crystal.getAltImage1();
 
     Entity bronzeCoin = new ObjCoinBronze(gp);
     coin = bronzeCoin.getDown1();
@@ -167,34 +155,33 @@ public class UI {
       return;
     }
 
-    if (state == GamePanel.PLAY_STATE) {
-      hudUi.drawXpTopBar();
-      hudUi.drawPlayerLife();
-      hudUi.drawPetHud();
-      hudUi.drawMonsterLife();
-      hudUi.drawMessage();
-    } else if (state == GamePanel.PAUSE_STATE) {
-      hudUi.drawPlayerLife();
-      pauseUi.drawPauseScreen();
-    } else if (state == GamePanel.DIALOGUE_STATE) {
-      dialogueUi.drawDialogueScreen();
-    } else if (state == GamePanel.CHARACTER_STATE) {
-      characterUi.drawCharacterScreen();
-      inventoryUi.drawInventory(gp.getPlayer(), true);
-    } else if (state == GamePanel.OPTIONS_STATE) {
-      optionsUi.drawOptionsScreen();
-    } else if (state == GamePanel.GAME_OVER_STATE) {
-      gameOverUi.drawGameOverScreen();
-    } else if (state == GamePanel.TRANSITION_STATE) {
-      transitionUi.drawTransition();
-    } else if (state == GamePanel.TRADE_STATE) {
-      tradeUi.drawTradeScreen();
-    } else if (state == GamePanel.PET_YARD_STATE) {
-      petYardUi.drawPetYardScreen();
-    } else if (state == GamePanel.SLEEP_STATE) {
-      transitionUi.drawSleepScreen();
-    } else if (state == GamePanel.BESTIARY_STATE) {
-      bestiaryUi.drawBestiaryScreen();
+    switch (state) {
+      case GamePanel.PLAY_STATE -> {
+        hudUi.drawXpTopBar();
+        hudUi.drawPlayerLife();
+        hudUi.drawPetHud();
+        hudUi.drawMonsterLife();
+        hudUi.drawMessage();
+      }
+      case GamePanel.PAUSE_STATE -> {
+        hudUi.drawPlayerLife();
+        pauseUi.drawPauseScreen();
+      }
+      case GamePanel.DIALOGUE_STATE -> dialogueUi.drawDialogueScreen();
+      case GamePanel.CHARACTER_STATE -> {
+        characterUi.drawCharacterScreen();
+        inventoryUi.drawInventory(gp.getPlayer(), true);
+      }
+      case GamePanel.OPTIONS_STATE -> optionsUi.drawOptionsScreen();
+      case GamePanel.GAME_OVER_STATE -> gameOverUi.drawGameOverScreen();
+      case GamePanel.TRANSITION_STATE -> transitionUi.drawTransition();
+      case GamePanel.TRADE_STATE -> tradeUi.drawTradeScreen();
+      case GamePanel.PET_YARD_STATE -> petYardUi.drawPetYardScreen();
+      case GamePanel.SLEEP_STATE -> transitionUi.drawSleepScreen();
+      case GamePanel.BESTIARY_STATE -> bestiaryUi.drawBestiaryScreen();
+      default -> {
+        // noop — estados sem UI dedicada (ex: MAP_STATE, CUTSCENE_STATE)
+      }
     }
   }
 
@@ -303,6 +290,8 @@ public class UI {
     subState = 0;
     commandNum = 0;
     controlsPage = 0;
+    waitingForRebind = false;
+    rebindControlIndex = -1;
   }
 
   public BestiaryUi getBestiaryUi() {
@@ -416,5 +405,23 @@ public class UI {
 
   public void setControlsPageCount(int controlsPageCount) {
     this.controlsPageCount = controlsPageCount;
+  }
+
+  // --- Rebind de controles ---
+
+  public boolean isWaitingForRebind() {
+    return waitingForRebind;
+  }
+
+  public void setWaitingForRebind(boolean waitingForRebind) {
+    this.waitingForRebind = waitingForRebind;
+  }
+
+  public int getRebindControlIndex() {
+    return rebindControlIndex;
+  }
+
+  public void setRebindControlIndex(int rebindControlIndex) {
+    this.rebindControlIndex = rebindControlIndex;
   }
 }
