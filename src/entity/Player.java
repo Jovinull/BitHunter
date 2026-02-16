@@ -95,7 +95,7 @@ public class Player extends Entity {
     setDefaultValues();
   }
 
-  public void setDefaultValues() {
+  public final void setDefaultValues() {
     setWorldX(GamePanel.TILE_SIZE * 50);
     setWorldY(GamePanel.TILE_SIZE * 50);
 
@@ -214,7 +214,7 @@ public class Player extends Entity {
 
   @Override
   public int getDefense() {
-    int value = 0;
+    int value;
 
     // defesa base vinda do escudo (mantém a lógica antiga)
     if (getCurrentShield() != null) {
@@ -574,25 +574,29 @@ public class Player extends Entity {
     int currentMapIndex = gp.getCurrentMap();
     Entity obj = objects[currentMapIndex][i];
 
-    if (obj.getType() == TYPE_PICKUP_ONLY) {
-      obj.use(this);
-      objects[currentMapIndex][i] = null;
-    } else if (obj.getType() == TYPE_OBSTACLE) {
-      if (keyH.isEnterPressed()) {
-        attackCanceled = true;
-        obj.interact();
+    switch (obj.getType()) {
+      case TYPE_PICKUP_ONLY -> {
+        obj.use(this);
+        objects[currentMapIndex][i] = null;
       }
-    } else {
-      String text;
-      if (canObtainItem(obj)) {
-        gp.playSE(1);
-        String itemName = obj.getDisplayName(); // já vem traduzido
-        text = String.format(t("player.message.itemObtained"), itemName);
-      } else {
-        text = t("player.message.cannotCarryMore");
+      case TYPE_OBSTACLE -> {
+        if (keyH.isEnterPressed()) {
+          attackCanceled = true;
+          obj.interact();
+        }
       }
-      gp.getGameUi().addMessage(text);
-      objects[currentMapIndex][i] = null;
+      default -> {
+        String text;
+        if (canObtainItem(obj)) {
+          gp.playSE(1);
+          String itemName = obj.getDisplayName(); // já vem traduzido
+          text = String.format(t("player.message.itemObtained"), itemName);
+        } else {
+          text = t("player.message.cannotCarryMore");
+        }
+        gp.getGameUi().addMessage(text);
+        objects[currentMapIndex][i] = null;
+      }
     }
   }
 
@@ -927,14 +931,14 @@ public class Player extends Entity {
       }
     }
 
-    BufferedImage image = resolveSprite(getDirection(), isAttacking(), isGuarding(), getSpriteNum());
+    BufferedImage sprite = resolveSprite(getDirection(), isAttacking(), isGuarding(), getSpriteNum());
 
     if (isTransparent()) {
       g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
     }
 
     if (isDrawing()) {
-      g2.drawImage(image, tempScreenX, tempScreenY, null);
+      g2.drawImage(sprite, tempScreenX, tempScreenY, null);
     }
 
     g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));

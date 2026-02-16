@@ -65,35 +65,35 @@ public class GamePanel extends JPanel implements Runnable {
   int fps = 60; // Quadros por segundo
 
   // ==== COMPONENTES DO JOGO ====
-  private transient TileManager tileM = new TileManager(this); // Gerencia o carregamento e desenho dos tiles
-  private transient KeyHandler keyH = new KeyHandler(this); // Captura entrada de teclado
+  private final transient TileManager tileM = new TileManager(this); // Gerencia o carregamento e desenho dos tiles
+  private final transient KeyHandler keyH = new KeyHandler(this); // Captura entrada de teclado
   transient Sound music = new Sound(); // Gerencia a música do jogo
   transient Sound se = new Sound(); // Gerencia os efeitos sonoros do jogo
-  private transient CollisionChecker cChecker = new CollisionChecker(this); // Verifica colisões
-  private transient AssetSetter aSetter = new AssetSetter(this); // Configura os objetos do jogo
-  private transient LanguageManager languageManager = new LanguageManager(); // i18n
-  private transient UI gameUi = new UI(this); // Interface do usuário (HUD, mensagens, etc.)
-  private transient EventHandler eHandler = new EventHandler(this);
+  private final transient CollisionChecker cChecker = new CollisionChecker(this); // Verifica colisões
+  private final transient AssetSetter aSetter = new AssetSetter(this); // Configura os objetos do jogo
+  private final transient LanguageManager languageManager = new LanguageManager(); // i18n
+  private final transient UI gameUi = new UI(this); // Interface do usuário (HUD, mensagens, etc.)
+  private final transient EventHandler eHandler = new EventHandler(this);
   transient Config config = new Config(this);
-  private transient PathFinder pFinder = new PathFinder(this);
+  private final transient PathFinder pFinder = new PathFinder(this);
   transient EnvironmentManager eManager = new EnvironmentManager(this);
   transient Map map = new Map(this);
   transient SaveLoad saveLoad = new SaveLoad(this);
-  private transient EntityGenerator eGenerator = new EntityGenerator(this);
-  private transient CutsceneManager csManager = new CutsceneManager(this);
-  private transient PetIncubator petIncubator = new PetIncubator(this);
-  private transient BestiaryService bestiaryService = new BestiaryService(this);
-  private transient CheatCodeManager cheatCodeManager = new CheatCodeManager(this);
+  private final transient EntityGenerator eGenerator = new EntityGenerator(this);
+  private final transient CutsceneManager csManager = new CutsceneManager(this);
+  private final transient PetIncubator petIncubator = new PetIncubator(this);
+  private final transient BestiaryService bestiaryService = new BestiaryService(this);
+  private final transient CheatCodeManager cheatCodeManager = new CheatCodeManager(this);
   transient Thread gameThread; // Thread para rodar o loop do jogo
 
   // ENTITY AND OBJECTS
-  private transient Player player = new Player(this, keyH); // Jogador principal do jogo
-  private transient Entity[][] obj = new Entity[MAX_MAP][20]; // Objetos
-  private transient Entity[][] npc = new Entity[MAX_MAP][10]; // NPCs
-  private transient Entity[][] monster = new Entity[MAX_MAP][20];
-  private transient InteractiveTile[][] iTile = new InteractiveTile[MAX_MAP][50];
-  private transient Entity[][] projectile = new Entity[MAX_MAP][20];
-  private transient List<Entity> particleList = new ArrayList<>();
+  private final transient Player player = new Player(this, keyH); // Jogador principal do jogo
+  private final transient Entity[][] obj = new Entity[MAX_MAP][20]; // Objetos
+  private final transient Entity[][] npc = new Entity[MAX_MAP][10]; // NPCs
+  private final transient Entity[][] monster = new Entity[MAX_MAP][20];
+  private final transient InteractiveTile[][] iTile = new InteractiveTile[MAX_MAP][50];
+  private final transient Entity[][] projectile = new Entity[MAX_MAP][20];
+  private final transient List<Entity> particleList = new ArrayList<>();
   transient List<Entity> entityList = new ArrayList<>(); // Lista dinâmica para ordenação por profundidade
 
   // ==== GAME STATE ====
@@ -292,9 +292,7 @@ public class GamePanel extends JPanel implements Runnable {
   }
 
   private void updateNpcs() {
-    Entity[] currentNpcs = npc[currentMap];
-    for (int i = 0; i < currentNpcs.length; i++) {
-      Entity currentNpc = currentNpcs[i];
+    for (Entity currentNpc : npc[currentMap]) {
       if (currentNpc != null) {
         currentNpc.update();
       }
@@ -365,11 +363,9 @@ public class GamePanel extends JPanel implements Runnable {
   }
 
   private void updateInteractiveTiles() {
-    InteractiveTile[] currentTiles = iTile[currentMap];
-    for (int i = 0; i < currentTiles.length; i++) {
-      InteractiveTile interactiveTile = currentTiles[i];
-      if (interactiveTile != null) {
-        interactiveTile.update();
+    for (InteractiveTile tile : iTile[currentMap]) {
+      if (tile != null) {
+        tile.update();
       }
     }
   }
@@ -432,11 +428,9 @@ public class GamePanel extends JPanel implements Runnable {
   }
 
   private void drawInteractiveTilesGraphics() {
-    InteractiveTile[] currentTiles = iTile[currentMap];
-    for (int i = 0; i < currentTiles.length; i++) {
-      InteractiveTile interactiveTile = currentTiles[i];
-      if (interactiveTile != null) {
-        interactiveTile.draw(g2);
+    for (InteractiveTile tile : iTile[currentMap]) {
+      if (tile != null) {
+        tile.draw(g2);
       }
     }
   }
@@ -539,12 +533,11 @@ public class GamePanel extends JPanel implements Runnable {
     if (nextArea != currentArea) {
       stopMusic();
 
-      if (nextArea == OUTSIDE) {
-        playMusic(0);
-      } else if (nextArea == INDOOR) {
-        playMusic(18);
-      } else if (nextArea == DUNGEON) {
-        playMusic(19);
+      switch (nextArea) {
+        case OUTSIDE -> playMusic(0);
+        case INDOOR -> playMusic(18);
+        case DUNGEON -> playMusic(19);
+        default -> { /* área sem música específica */ }
       }
 
       aSetter.setNPC();
