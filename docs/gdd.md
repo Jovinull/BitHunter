@@ -76,6 +76,7 @@
   - [5.13 Iluminação e ciclo dia/noite](#513-iluminação-e-ciclo-dianoite)
   - [5.14 Cutscenes e boss battle](#514-cutscenes-e-boss-battle)
   - [5.15 Bestiário](#515-bestiário)
+  - [5.16 Códigos secretos (cheats)](#516-códigos-secretos-cheats)
 - [6. Mundo e geração](#6-mundo-e-geração)
 - [7. UX/HUD e fluxo de telas](#7-uxhud-e-fluxo-de-telas)
   - [7.1 HUD](#71-hud)
@@ -645,6 +646,19 @@ Cada criatura possui um **threshold de abates** por estágio, determinado pela c
 - Bônus passivos leves (ex.: +1% dano contra uma classe de criaturas)
 - Cosméticos ou títulos
 - Informações avançadas (ex.: padrões de spawn por horário do ciclo dia/noite)
+
+### 5.16) Códigos secretos (cheats)
+
+✅ **Implementado**
+
+Sistema de códigos secretos (cheats) digitáveis durante o gameplay, com arquitetura extensível baseada em regras de repetibilidade (`ONE_TIME` / `REPEATABLE`).
+
+- **Ativação silenciosa**: pressionar `'` ou `"` ativa captura invisível; digitar código + ENTER confirma.
+- **Feedback**: mensagem no HUD + SFX ao aceitar; aviso quando ONE_TIME já foi usado; silêncio total para código inválido.
+- **Persistência**: códigos ONE_TIME são salvos em `DataStorage` e sobrevivem ao ciclo save/load.
+- **9 códigos** implementados: recursos (ouro, vida, chaves, poções), utilidade (save, god mode, level up), item exclusivo (Escudo do Compilador) e easter egg.
+
+> Documentação completa: **[`docs/CHEAT_CODES.md`](CHEAT_CODES.md)** — lista de códigos, como usar, arquitetura técnica e como adicionar novos cheats.
 
 ---
 
