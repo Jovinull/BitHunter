@@ -224,6 +224,7 @@ public class KeyHandler implements KeyListener {
 
     // Interface (mutuamente exclusivas)
     if (is(key, GameAction.PAUSE)) {
+      gp.getGameUi().resetPauseAnimation();
       gp.setGameState(GamePanel.PAUSE_STATE);
     } else if (is(key, GameAction.CHARACTER)) {
       gp.setGameState(GamePanel.CHARACTER_STATE);
