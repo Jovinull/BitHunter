@@ -66,6 +66,7 @@ public class GamePanel extends JPanel implements Runnable {
 
   // ==== COMPONENTES DO JOGO ====
   private final transient TileManager tileM = new TileManager(this); // Gerencia o carregamento e desenho dos tiles
+  private final transient InputBindings inputBindings = new InputBindings(); // Mapeamento tecla → ação
   private final transient KeyHandler keyH = new KeyHandler(this); // Captura entrada de teclado
   transient Sound music = new Sound(); // Gerencia a música do jogo
   transient Sound se = new Sound(); // Gerencia os efeitos sonoros do jogo
@@ -619,6 +620,10 @@ public class GamePanel extends JPanel implements Runnable {
 
   public KeyHandler getKeyH() {
     return keyH;
+  }
+
+  public InputBindings getInputBindings() {
+    return inputBindings;
   }
 
   public CollisionChecker getcChecker() {
