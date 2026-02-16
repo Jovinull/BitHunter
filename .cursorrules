@@ -1,0 +1,65 @@
+# ══════════════════════════════════════════════════════════════
+# BitHunter — Regras do Cursor (Copos)
+# ══════════════════════════════════════════════════════════════
+# Este arquivo é lido AUTOMATICAMENTE pelo Cursor antes de
+# qualquer ação. Ele define o comportamento obrigatório do
+# assistente dentro deste repositório.
+# ══════════════════════════════════════════════════════════════
+
+## Idioma
+- SEMPRE responder em Português (pt-BR).
+
+## Antes de qualquer ação
+1. Leia ESTE arquivo (`.cursorrules`).
+2. Leia os arquivos em `.cursor/` (especialmente `workflow.md`, `code_style.md`, `architecture.md`).
+3. Leia `PROMPT_MASTER.md` caso o usuário esteja seguindo o fluxo padrão.
+4. Entenda o escopo da tarefa ANTES de alterar qualquer código.
+
+## Regras de ouro
+- **Escopo mínimo**: NÃO altere arquivos fora do escopo solicitado.
+- **Zero refactors surpresa**: nunca refatore código que não foi pedido.
+- **Build verde**: após toda alteração, garanta que o projeto compila sem erros.
+- **Warnings**: corrija warnings nos arquivos que você tocou.
+- **Sem inventar**: não crie métodos, classes ou sistemas que não foram pedidos.
+- **Sem apagar**: nunca remova código/documentação existente sem autorização explícita.
+
+## Commit e Push
+- SEMPRE proponha um commit ao final (Conventional Commits).
+- SEMPRE pergunte "Posso subir o commit?" antes de fazer push.
+- Se o usuário disser "não", deixe tudo pronto localmente.
+- Formato: `tipo(escopo): descrição curta`
+  - Tipos: feat, fix, refactor, docs, style, test, chore, perf
+  - Escopo: pacote ou sistema afetado (ex: entity, ui, tile, main)
+
+## Estrutura do projeto
+- Linguagem: Java (sem build system — compilação manual com javac)
+- Entry point: `main.Main`
+- Game loop: `main.GamePanel`
+- Pacotes: ai, bestiary, data, entity, environment, main, monster, object, pets, tile, tile_interactive, ui
+- Resources: `resource/` (maps, lang, bestiary)
+- Indentação: 2 espaços (conforme .editorconfig)
+- Encoding: UTF-8, line endings: LF
+
+## Convenções de código
+- Classes: PascalCase
+- Métodos e variáveis: camelCase
+- Constantes: UPPER_SNAKE_CASE
+- Comentários: em Português quando descritivos; JavaDoc para APIs públicas
+- Prefixos de classe: Mon (monstros), Obj (objetos), Npc (NPCs), It (tiles interativos)
+
+## Padrão de resposta (Copos)
+Toda resposta deve seguir:
+1. **Diagnóstico** — o que precisa ser feito (curto)
+2. **Plano** — passos numerados
+3. **Execução** — alterações realizadas
+4. **Testes** — como validar
+5. **Resumo + Commit** — bullets do que mudou + commit proposto + pergunta de push
+
+## Referências
+- `.cursor/workflow.md` — regras de trabalho detalhadas
+- `.cursor/commit_policy.md` — política de commits
+- `.cursor/code_style.md` — padrões de código
+- `.cursor/architecture.md` — visão geral da arquitetura
+- `.cursor/runbook.md` — como rodar, buildar, testar
+- `PROMPT_MASTER.md` — template de prompt para tarefas
+- `docs/CURSOR_GUIDE.md` — guia rápido de uso
