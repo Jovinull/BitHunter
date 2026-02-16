@@ -210,7 +210,6 @@ public class AssetSetter {
     place(monsters[mapNum][i], 82, 22);
 
     // MAP HOUSE (sem monstros - dentro de casa)
-    mapNum = MAP_HOUSE;
 
     // MAP DUNGEON
     mapNum = MAP_DUNGEON;

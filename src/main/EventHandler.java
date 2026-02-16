@@ -56,7 +56,7 @@ public class EventHandler {
     setDialogue();
   }
 
-  public void setDialogue() {
+  private void setDialogue() {
     var lm = gp.getLanguageManager();
     String[][] d = eventMaster.getDialogues();
 

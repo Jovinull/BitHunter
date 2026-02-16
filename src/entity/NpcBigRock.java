@@ -48,7 +48,7 @@ public class NpcBigRock extends Entity {
   }
 
   @Override
-  public void getImage() {
+  public final void getImage() {
     int tileSize = GamePanel.TILE_SIZE;
     up1 = setup(SPRITE_PATH, tileSize, tileSize);
     up2 = setup(SPRITE_PATH, tileSize, tileSize);
@@ -60,7 +60,7 @@ public class NpcBigRock extends Entity {
     right2 = setup(SPRITE_PATH, tileSize, tileSize);
   }
 
-  public void setDialogue() {
+  private void setDialogue() {
     String baseKey = getTranslationKey() + ".dialog.0";
     fillDialogueSet(0, baseKey, 2);
   }
@@ -94,20 +94,11 @@ public class NpcBigRock extends Entity {
 
     if (!isCollisionOn()) {
       switch (getDirection()) {
-        case DIR_UP:
-          setWorldY(getWorldY() - getSpeed());
-          break;
-        case DIR_DOWN:
-          setWorldY(getWorldY() + getSpeed());
-          break;
-        case DIR_LEFT:
-          setWorldX(getWorldX() - getSpeed());
-          break;
-        case DIR_RIGHT:
-          setWorldX(getWorldX() + getSpeed());
-          break;
-        default:
-          break;
+        case DIR_UP    -> setWorldY(getWorldY() - getSpeed());
+        case DIR_DOWN  -> setWorldY(getWorldY() + getSpeed());
+        case DIR_LEFT  -> setWorldX(getWorldX() - getSpeed());
+        case DIR_RIGHT -> setWorldX(getWorldX() + getSpeed());
+        default -> { }
       }
     }
     detectPlate();
