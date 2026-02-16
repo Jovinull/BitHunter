@@ -32,14 +32,30 @@
 - Testar manualmente o fluxo afetado (descrever como)
 - Verificar que não quebrou funcionalidades existentes
 
+### 5.1. Checklist de qualidade pré-push (OBRIGATÓRIO)
+Antes de qualquer push, verificar TODOS os itens abaixo:
+
+- [ ] **SonarLint ativo** — Confirmar que a extensão SonarLint está instalada e rodando:
+  - Abrir um `.java` → verificar se aparece "SonarLint" na barra de status inferior
+  - Se houver um SonarQube configurado: verificar se o connected mode está OK (ver `runbook.md`)
+- [ ] **Problems zerados** — Abrir o painel "Problems" (`Ctrl+Shift+M`) e verificar que não há erros/warnings nos arquivos tocados
+- [ ] **Task "Pre-push Check"** — Rodar via `Ctrl+Shift+P` → "Tasks: Run Task" → "Pre-push Check"
+  - Essa task executa: compilação com `-Xlint:all -Werror` + validação i18n
+  - Deve terminar com `[OK]` em ambas as etapas
+  - Se falhar: corrigir antes de prosseguir
+- [ ] **ErrorLens** — Confirmar que não há linhas com highlights vermelhos/amarelos nos arquivos alterados
+
 ### 6. Entrega
 - Resumir em bullets o que mudou
 - Propor commit(s) no padrão Conventional Commits (ver `commit_policy.md`)
 - Agrupar arquivos em commits que façam sentido juntos
 - Perguntar: "Posso subir o commit?"
-- Ao receber autorização: verificar compilação → criar branch → commits separados → push → merge na main → push main → deletar branch
+- Ao receber autorização:
+  1. Rodar **"Pre-push Check"** (task do VS Code) ou equivalente no terminal
+  2. Verificar compilação → criar branch → commits separados → push → merge na main → push main → deletar branch
 - **NUNCA** commitar direto na main
 - **SEMPRE** deletar a branch (local + remote) após merge bem-sucedido
+- **SEMPRE** rodar checklist de qualidade (seção 5.1) antes do push
 
 ---
 

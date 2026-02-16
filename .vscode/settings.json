@@ -34,5 +34,22 @@
   // Checkstyle
   "java.checkstyle.properties": {},
   "java.checkstyle.modules": [],
-  "java.format.settings.url": "/.vscode/eclipse-formatter.xml"
+  "java.format.settings.url": "/.vscode/eclipse-formatter.xml",
+  // Compilação — habilitar warnings do javac via Language Server
+  "java.compile.nullAnalysis.mode": "automatic",
+  "java.settings.url": "",
+  // SonarLint — modo standalone (sem servidor)
+  // Para conectar a um SonarQube/SonarCloud, veja:
+  //   https://docs.sonarsource.com/sonarlint/vs-code/team-features/connected-mode/
+  // Configurar connected mode nas settings do USUÁRIO (não do workspace):
+  //   "sonarlint.connectedMode.connections.sonarqube": [
+  //     { "serverUrl": "https://SEU-SONARQUBE", "token": "<token-pessoal>" }
+  //   ]
+  //   "sonarlint.connectedMode.project": {
+  //     "connectionId": "<id>",
+  //     "projectKey": "BitHunter"
+  //   }
+  "sonarlint.output.showAnalyzerLogs": true,
+  "sonarlint.output.showVerboseLogs": false,
+  "sonarlint.pathToNodeExecutable": ""
 }

@@ -2,9 +2,165 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Clean build",
+      "label": "Build",
+      "detail": "Compila todo o projeto com javac (warnings habilitados)",
       "type": "shell",
-      "command": "rm -rf bin && echo 'limpo.'"
+      "command": "javac",
+      "args": [
+        "--release", "24",
+        "-Xlint:all",
+        "-d", "build/classes",
+        "-sourcepath", "src",
+        "${workspaceFolder}/src/**/*.java"
+      ],
+      "windows": {
+        "command": "powershell",
+        "args": [
+          "-NoProfile",
+          "-Command",
+          "New-Item -ItemType Directory -Path build/classes -Force -ErrorAction SilentlyContinue | Out-Null; $sources = Get-ChildItem -Path src -Recurse -Filter '*.java' | ForEach-Object { $_.FullName }; javac --release 24 -Xlint:all -d build/classes $sources"
+        ]
+      },
+      "linux": {
+        "command": "bash",
+        "args": [
+          "-c",
+          "mkdir -p build/classes && javac --release 24 -Xlint:all -d build/classes $(find src -name '*.java')"
+        ]
+      },
+      "osx": {
+        "command": "bash",
+        "args": [
+          "-c",
+          "mkdir -p build/classes && javac --release 24 -Xlint:all -d build/classes $(find src -name '*.java')"
+        ]
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": "$javac",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "Clean build",
+      "detail": "Remove artefatos de build (bin/ e build/)",
+      "type": "shell",
+      "windows": {
+        "command": "powershell",
+        "args": [
+          "-NoProfile",
+          "-Command",
+          "Remove-Item -Recurse -Force bin, build -ErrorAction SilentlyContinue; Write-Host 'Limpo.'"
+        ]
+      },
+      "linux": {
+        "command": "bash",
+        "args": ["-c", "rm -rf bin build && echo 'Limpo.'"]
+      },
+      "osx": {
+        "command": "bash",
+        "args": ["-c", "rm -rf bin build && echo 'Limpo.'"]
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "Quality: Warnings Check",
+      "detail": "Compila com -Xlint:all e -Werror — falha se houver qualquer warning",
+      "type": "shell",
+      "windows": {
+        "command": "powershell",
+        "args": [
+          "-NoProfile",
+          "-Command",
+          "New-Item -ItemType Directory -Path build/classes -Force -ErrorAction SilentlyContinue | Out-Null; $sources = Get-ChildItem -Path src -Recurse -Filter '*.java' | ForEach-Object { $_.FullName }; javac --release 24 -Xlint:all -Werror -d build/classes $sources; if ($LASTEXITCODE -ne 0) { Write-Host ''; Write-Host '[FALHA] Existem warnings que precisam ser corrigidos!' -ForegroundColor Red; exit 1 } else { Write-Host ''; Write-Host '[OK] Nenhum warning encontrado.' -ForegroundColor Green }"
+        ]
+      },
+      "linux": {
+        "command": "bash",
+        "args": [
+          "-c",
+          "mkdir -p build/classes && javac --release 24 -Xlint:all -Werror -d build/classes $(find src -name '*.java') && echo '' && echo '[OK] Nenhum warning encontrado.' || (echo '' && echo '[FALHA] Existem warnings que precisam ser corrigidos!' && exit 1)"
+        ]
+      },
+      "osx": {
+        "command": "bash",
+        "args": [
+          "-c",
+          "mkdir -p build/classes && javac --release 24 -Xlint:all -Werror -d build/classes $(find src -name '*.java') && echo '' && echo '[OK] Nenhum warning encontrado.' || (echo '' && echo '[FALHA] Existem warnings que precisam ser corrigidos!' && exit 1)"
+        ]
+      },
+      "problemMatcher": "$javac",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "Quality: i18n Check",
+      "detail": "Valida traduções — falha se houver chaves faltando",
+      "type": "shell",
+      "windows": {
+        "command": "powershell",
+        "args": [
+          "-NoProfile",
+          "-Command",
+          "javac tools/I18nValidator.java -d tools 2>&1; java -cp tools I18nValidator; if ($LASTEXITCODE -ne 0) { Write-Host '[FALHA] Inconsistências de i18n detectadas!' -ForegroundColor Red; exit $LASTEXITCODE } else { Write-Host '[OK] Traduções consistentes.' -ForegroundColor Green }"
+        ]
+      },
+      "linux": {
+        "command": "bash",
+        "args": [
+          "-c",
+          "javac tools/I18nValidator.java -d tools && java -cp tools I18nValidator && echo '[OK] Traduções consistentes.' || (echo '[FALHA] Inconsistências de i18n detectadas!' && exit 1)"
+        ]
+      },
+      "osx": {
+        "command": "bash",
+        "args": [
+          "-c",
+          "javac tools/I18nValidator.java -d tools && java -cp tools I18nValidator && echo '[OK] Traduções consistentes.' || (echo '[FALHA] Inconsistências de i18n detectadas!' && exit 1)"
+        ]
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "Pre-push Check",
+      "detail": "Checklist completo antes de push: build + warnings + i18n",
+      "dependsOn": [
+        "Quality: Warnings Check",
+        "Quality: i18n Check"
+      ],
+      "dependsOrder": "sequence",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
     }
   ]
 }
