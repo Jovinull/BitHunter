@@ -8,6 +8,11 @@ import ui.UI;
 /**
  * Lida com eventos de teclado e delega o comportamento conforme o estado atual
  * do jogo. Mantém flags de input para o loop principal (GamePanel) consumir.
+ * <p>
+ * Todas as verificações de tecla usam {@link InputBindings} para traduzir
+ * keyCode → {@link GameAction}, permitindo remapeamento via configuração
+ * e pela tela de controles do jogo.
+ * </p>
  */
 public class KeyHandler implements KeyListener {
 
@@ -22,7 +27,7 @@ public class KeyHandler implements KeyListener {
   private static final int MENU_MAIN_MAX_INDEX = 2; // [Novo jogo, Carregar, Sair]
   private static final int MENU_CLASS_MAX_INDEX = 3; // [Guerreiro, Ladrão, Feiticeiro, Voltar]
 
-  /** Limites de índices de menus com navegação W/S (wrap). */
+  /** Limites de índices de menus com navegação (wrap). */
   private static final int TRADE_MENU_MAX_INDEX = 2;
   private static final int PET_YARD_MENU_MAX_INDEX = 2;
   private static final int GAME_OVER_MAX_INDEX = 1;
@@ -31,12 +36,15 @@ public class KeyHandler implements KeyListener {
   private static final int SLOT_ROW_MAX = 3;
   private static final int SLOT_COL_MAX = 4;
 
+  /** Controles exibidos por página na tela de remapeamento. */
+  private static final int CONTROLS_PER_PAGE = 6;
+
   /** Limites de escala de volume (Sound). */
   private static final int VOLUME_SCALE_MIN = 0;
   private static final int VOLUME_SCALE_MAX = 5;
 
   /**
-   * Catálogo mínimo de mapas para o atalho de dev (VK_R).
+   * Catálogo mínimo de mapas para o atalho de dev (DEBUG_RELOAD_MAP).
    *
    * Importante:
    * - O índice deve bater com {@code gp.getCurrentMap()}.
@@ -103,61 +111,34 @@ public class KeyHandler implements KeyListener {
     }
 
     switch (state) {
-      case GamePanel.TITLE_STATE -> {
-        titleState(code);
-      }
-      case GamePanel.PLAY_STATE -> {
-        playState(code);
-      }
-      case GamePanel.PAUSE_STATE -> {
-        pauseState(code);
-      }
-      case GamePanel.DIALOGUE_STATE, GamePanel.CUTSCENE_STATE -> {
-        dialogueState(code);
-      }
-      case GamePanel.CHARACTER_STATE -> {
-        characterState(code);
-      }
-      case GamePanel.OPTIONS_STATE -> {
-        optionsState(code);
-      }
-      case GamePanel.GAME_OVER_STATE -> {
-        gameOverState(code);
-      }
-      case GamePanel.TRADE_STATE -> {
-        tradeState(code);
-      }
-      case GamePanel.PET_YARD_STATE -> {
-        petYardState(code);
-      }
-      case GamePanel.MAP_STATE -> {
-        mapState(code);
-      }
-      case GamePanel.BESTIARY_STATE -> {
-        bestiaryState(code);
-      }
+      case GamePanel.TITLE_STATE -> titleState(code);
+      case GamePanel.PLAY_STATE -> playState(code);
+      case GamePanel.PAUSE_STATE -> pauseState(code);
+      case GamePanel.DIALOGUE_STATE, GamePanel.CUTSCENE_STATE -> dialogueState(code);
+      case GamePanel.CHARACTER_STATE -> characterState(code);
+      case GamePanel.OPTIONS_STATE -> optionsState(code);
+      case GamePanel.GAME_OVER_STATE -> gameOverState(code);
+      case GamePanel.TRADE_STATE -> tradeState(code);
+      case GamePanel.PET_YARD_STATE -> petYardState(code);
+      case GamePanel.MAP_STATE -> mapState(code);
+      case GamePanel.BESTIARY_STATE -> bestiaryState(code);
       default -> {
         // noop
       }
     }
   }
 
-  /** Dispara ao SOLTAR uma tecla. Zera flags de movimento correspondentes. */
+  /** Dispara ao SOLTAR uma tecla. Zera flags de input correspondentes. */
   @Override
   public void keyReleased(KeyEvent e) {
     final int key = e.getKeyCode();
-    switch (key) {
-      case KeyEvent.VK_W -> upPressed = false;
-      case KeyEvent.VK_S -> downPressed = false;
-      case KeyEvent.VK_A -> leftPressed = false;
-      case KeyEvent.VK_D -> rightPressed = false;
-      case KeyEvent.VK_F -> shotKeyPressed = false;
-      case KeyEvent.VK_ENTER -> enterPressed = false;
-      case KeyEvent.VK_SPACE -> spacePressed = false;
-      default -> {
-        // noop
-      }
-    }
+    if (is(key, GameAction.MOVE_UP)) upPressed = false;
+    if (is(key, GameAction.MOVE_DOWN)) downPressed = false;
+    if (is(key, GameAction.MOVE_LEFT)) leftPressed = false;
+    if (is(key, GameAction.MOVE_RIGHT)) rightPressed = false;
+    if (is(key, GameAction.SHOOT)) shotKeyPressed = false;
+    if (is(key, GameAction.CONFIRM)) enterPressed = false;
+    if (is(key, GameAction.GUARD)) spacePressed = false;
   }
 
   // -----------------------
@@ -180,13 +161,12 @@ public class KeyHandler implements KeyListener {
   }
 
   private void handleTitleMainMenu(int code, UI ui) {
-    switch (code) {
-      case KeyEvent.VK_W -> navigateUp(ui, MENU_MAIN_MAX_INDEX);
-      case KeyEvent.VK_S -> navigateDown(ui, MENU_MAIN_MAX_INDEX);
-      case KeyEvent.VK_ENTER -> handleTitleMainEnter(ui);
-      default -> {
-        // noop
-      }
+    if (is(code, GameAction.MOVE_UP)) {
+      navigateUp(ui, MENU_MAIN_MAX_INDEX);
+    } else if (is(code, GameAction.MOVE_DOWN)) {
+      navigateDown(ui, MENU_MAIN_MAX_INDEX);
+    } else if (is(code, GameAction.CONFIRM)) {
+      handleTitleMainEnter(ui);
     }
   }
 
@@ -209,25 +189,21 @@ public class KeyHandler implements KeyListener {
   }
 
   private void handleTitleClassSelect(int code, UI ui) {
-    switch (code) {
-      case KeyEvent.VK_W -> navigateUp(ui, MENU_CLASS_MAX_INDEX);
-      case KeyEvent.VK_S -> navigateDown(ui, MENU_CLASS_MAX_INDEX);
-      case KeyEvent.VK_ENTER -> {
-        if (ui.getCommandNum() == MENU_CLASS_MAX_INDEX) { // Voltar
-          ui.setTitleScreenState(0);
-          ui.setCommandNum(0);
-        } else {
-          gp.setGameState(GamePanel.PLAY_STATE);
-          gp.playMusic(0);
-        }
-      }
-      case KeyEvent.VK_ESCAPE -> {
+    if (is(code, GameAction.MOVE_UP)) {
+      navigateUp(ui, MENU_CLASS_MAX_INDEX);
+    } else if (is(code, GameAction.MOVE_DOWN)) {
+      navigateDown(ui, MENU_CLASS_MAX_INDEX);
+    } else if (is(code, GameAction.CONFIRM)) {
+      if (ui.getCommandNum() == MENU_CLASS_MAX_INDEX) { // Voltar
         ui.setTitleScreenState(0);
         ui.setCommandNum(0);
+      } else {
+        gp.setGameState(GamePanel.PLAY_STATE);
+        gp.playMusic(0);
       }
-      default -> {
-        // noop
-      }
+    } else if (is(code, GameAction.OPTIONS)) {
+      ui.setTitleScreenState(0);
+      ui.setCommandNum(0);
     }
   }
 
@@ -235,49 +211,44 @@ public class KeyHandler implements KeyListener {
    * Estado: Jogando (movimento, pausa, status, debug, etc).
    */
   public void playState(int key) {
-    switch (key) {
-      // Movimento (WASD)
-      case KeyEvent.VK_W -> upPressed = true;
-      case KeyEvent.VK_S -> downPressed = true;
-      case KeyEvent.VK_A -> leftPressed = true;
-      case KeyEvent.VK_D -> rightPressed = true;
+    // Movimento (flags independentes — permite diagonal)
+    if (is(key, GameAction.MOVE_UP)) upPressed = true;
+    if (is(key, GameAction.MOVE_DOWN)) downPressed = true;
+    if (is(key, GameAction.MOVE_LEFT)) leftPressed = true;
+    if (is(key, GameAction.MOVE_RIGHT)) rightPressed = true;
 
-      // Pausa / Status / Ações
-      case KeyEvent.VK_P -> gp.setGameState(GamePanel.PAUSE_STATE);
-      case KeyEvent.VK_C -> gp.setGameState(GamePanel.CHARACTER_STATE);
-      case KeyEvent.VK_ENTER -> enterPressed = true;
-      case KeyEvent.VK_F -> shotKeyPressed = true;
-      case KeyEvent.VK_SPACE -> spacePressed = true;
+    // Combate (flags independentes)
+    if (is(key, GameAction.CONFIRM)) enterPressed = true;
+    if (is(key, GameAction.SHOOT)) shotKeyPressed = true;
+    if (is(key, GameAction.GUARD)) spacePressed = true;
 
-      // Opções / Mapas
-      case KeyEvent.VK_ESCAPE -> {
-        gp.getGameUi().resetOptionsMenu();
-        gp.setGameState(GamePanel.OPTIONS_STATE);
-      }
-      case KeyEvent.VK_M -> gp.setGameState(GamePanel.MAP_STATE);
-      case KeyEvent.VK_X -> gp.map.setMiniMapOn(!gp.map.isMiniMapOn());
-
-      // Bestiário
-      case KeyEvent.VK_B -> {
-        gp.getGameUi().getBestiaryUi().resetState();
-        gp.setGameState(GamePanel.BESTIARY_STATE);
-      }
-
-      // Dev shortcuts
-      case KeyEvent.VK_T -> toggleDebug();
-      case KeyEvent.VK_R -> reloadCurrentMap();
-
-      default -> {
-        // noop
-      }
+    // Interface (mutuamente exclusivas)
+    if (is(key, GameAction.PAUSE)) {
+      gp.setGameState(GamePanel.PAUSE_STATE);
+    } else if (is(key, GameAction.CHARACTER)) {
+      gp.setGameState(GamePanel.CHARACTER_STATE);
+    } else if (is(key, GameAction.OPTIONS)) {
+      gp.getGameUi().resetOptionsMenu();
+      gp.setGameState(GamePanel.OPTIONS_STATE);
+    } else if (is(key, GameAction.MAP)) {
+      gp.setGameState(GamePanel.MAP_STATE);
+    } else if (is(key, GameAction.MINIMAP)) {
+      gp.map.setMiniMapOn(!gp.map.isMiniMapOn());
+    } else if (is(key, GameAction.BESTIARY)) {
+      gp.getGameUi().getBestiaryUi().resetState();
+      gp.setGameState(GamePanel.BESTIARY_STATE);
     }
+
+    // Dev shortcuts (respeitam debug.enabled via InputBindings)
+    if (is(key, GameAction.DEBUG_TOGGLE)) toggleDebug();
+    if (is(key, GameAction.DEBUG_RELOAD_MAP)) reloadCurrentMap();
   }
 
   /**
    * Estado: Pausado.
    */
   public void pauseState(int key) {
-    if (key == KeyEvent.VK_P) {
+    if (is(key, GameAction.PAUSE)) {
       gp.setGameState(GamePanel.PLAY_STATE);
     }
   }
@@ -286,7 +257,7 @@ public class KeyHandler implements KeyListener {
    * Estado: Diálogo/Cutscene aberto.
    */
   public void dialogueState(int key) {
-    if (key == KeyEvent.VK_ENTER) {
+    if (is(key, GameAction.CONFIRM)) {
       enterPressed = true;
     }
   }
@@ -295,56 +266,146 @@ public class KeyHandler implements KeyListener {
    * Estado: Tela de status do personagem.
    */
   public void characterState(int code) {
-    if (code == KeyEvent.VK_C) {
+    if (is(code, GameAction.CHARACTER)) {
       gp.setGameState(GamePanel.PLAY_STATE);
-    } else if (code == KeyEvent.VK_ENTER) {
+    } else if (is(code, GameAction.CONFIRM)) {
       gp.getPlayer().selectItem();
     }
-    // Navegação do inventário com W/A/S/D
+    // Navegação do inventário
     playerInventory(code);
   }
 
   /**
    * Estado: Opções.
+   * <p>
+   * Trata de forma dedicada a tela de controles (subState 2), incluindo
+   * o modo de remapeamento de teclas (rebind).
+   * </p>
    */
   public void optionsState(int code) {
     final UI ui = gp.getGameUi();
     final int subState = ui.getSubState();
 
-    if (code == KeyEvent.VK_ESCAPE) {
+    // Modo de remapeamento: captura tecla crua (antes de qualquer outro check)
+    if (subState == 2 && ui.isWaitingForRebind()) {
+      handleRebindCapture(code, ui);
+      return;
+    }
+
+    // ESC sai das opções (exceto durante rebind)
+    if (is(code, GameAction.OPTIONS)) {
       gp.setGameState(GamePanel.PLAY_STATE);
       return;
     }
-    if (code == KeyEvent.VK_ENTER) {
+
+    // Tela de controles: navegação dedicada com seleção e rebind
+    if (subState == 2) {
+      handleControlsNavigation(code, ui);
+      return;
+    }
+
+    // ENTER genérico (usado pelos outros subStates)
+    if (is(code, GameAction.CONFIRM)) {
       enterPressed = true;
       return;
     }
 
     // Navegação ESPECIAL para o submenu de idiomas (subState 4)
-    if (subState == 4 && (code == KeyEvent.VK_W || code == KeyEvent.VK_S)) {
+    if (subState == 4
+        && (is(code, GameAction.MOVE_UP) || is(code, GameAction.MOVE_DOWN))) {
       handleLanguageMenuNavigation(code, ui);
-      return;
-    }
-
-    // Navegação ESPECIAL para a tela de controles (subState 2): troca de página com
-    // A/D
-    if (subState == 2 && (code == KeyEvent.VK_A || code == KeyEvent.VK_D)) {
-      handleControlsPageNavigation(code, ui);
       return;
     }
 
     final int maxCommandNum = getOptionsMaxCommandNum(subState);
 
-    switch (code) {
-      case KeyEvent.VK_W -> moveCommandNum(ui, -1, maxCommandNum);
-      case KeyEvent.VK_S -> moveCommandNum(ui, +1, maxCommandNum);
-      case KeyEvent.VK_A -> adjustVolume(ui, subState, -1);
-      case KeyEvent.VK_D -> adjustVolume(ui, subState, +1);
-      default -> {
-        // noop
-      }
+    if (is(code, GameAction.MOVE_UP)) {
+      moveCommandNum(ui, -1, maxCommandNum);
+    } else if (is(code, GameAction.MOVE_DOWN)) {
+      moveCommandNum(ui, +1, maxCommandNum);
+    } else if (is(code, GameAction.MOVE_LEFT)) {
+      adjustVolume(ui, subState, -1);
+    } else if (is(code, GameAction.MOVE_RIGHT)) {
+      adjustVolume(ui, subState, +1);
     }
   }
+
+  // -----------------------
+  // Controls screen (rebind)
+  // -----------------------
+
+  /**
+   * Captura uma tecla crua durante o modo de remapeamento.
+   * ESC cancela; qualquer outra tecla atribui o novo binding e salva.
+   */
+  private void handleRebindCapture(int code, UI ui) {
+    // ESC sempre cancela o rebind (usando keyCode cru, não o binding)
+    if (code == KeyEvent.VK_ESCAPE) {
+      ui.setWaitingForRebind(false);
+      return;
+    }
+
+    var remappable = GameAction.getRemappable();
+    int idx = ui.getRebindControlIndex();
+    if (idx < 0 || idx >= remappable.size()) {
+      ui.setWaitingForRebind(false);
+      return;
+    }
+
+    GameAction action = remappable.get(idx);
+    gp.getInputBindings().rebind(action, code);
+    gp.getInputBindings().saveToFile();
+    ui.setWaitingForRebind(false);
+    playNavigateSfx();
+  }
+
+  /**
+   * Navegação e seleção na tela de controles (subState 2).
+   * W/S navegam pelas ações; ENTER inicia rebind ou ativa "Voltar".
+   */
+  private void handleControlsNavigation(int code, UI ui) {
+    var remappable = GameAction.getRemappable();
+    int totalEntries = remappable.size();
+    int maxCmd = totalEntries; // "Voltar" fica neste índice
+
+    if (is(code, GameAction.CONFIRM)) {
+      if (ui.getCommandNum() < totalEntries) {
+        // Inicia o modo de remapeamento para a ação selecionada
+        ui.setRebindControlIndex(ui.getCommandNum());
+        ui.setWaitingForRebind(true);
+      } else {
+        // "Voltar" → retorna ao menu de opções principal
+        ui.setControlsPage(0);
+        ui.setWaitingForRebind(false);
+        ui.setSubState(0);
+        ui.setCommandNum(3); // índice do item "Controles" no menu de opções
+      }
+      return;
+    }
+
+    if (is(code, GameAction.MOVE_UP)) {
+      moveCommandNum(ui, -1, maxCmd);
+      autoScrollControlsPage(ui, totalEntries);
+    } else if (is(code, GameAction.MOVE_DOWN)) {
+      moveCommandNum(ui, +1, maxCmd);
+      autoScrollControlsPage(ui, totalEntries);
+    }
+  }
+
+  /**
+   * Ajusta a página da tela de controles para manter a seleção visível.
+   */
+  private void autoScrollControlsPage(UI ui, int totalEntries) {
+    int cmd = ui.getCommandNum();
+    if (cmd < totalEntries) {
+      ui.setControlsPage(cmd / CONTROLS_PER_PAGE);
+    }
+    // Quando em "Voltar", mantém a página atual
+  }
+
+  // -----------------------
+  // Language & other options
+  // -----------------------
 
   /**
    * Navegação específica do submenu de idiomas:
@@ -367,59 +428,30 @@ public class KeyHandler implements KeyListener {
     int backIndex = totalLanguages;
     int commandNum = ui.getCommandNum();
 
-    switch (code) {
-      case KeyEvent.VK_W -> {
-        if (commandNum == 0 || commandNum == backIndex) {
-          // Da primeira opção ou de "Voltar" -> último idioma
-          commandNum = totalLanguages - 1;
-        } else {
-          // Dentro da lista de idiomas
-          commandNum--;
-        }
+    if (is(code, GameAction.MOVE_UP)) {
+      if (commandNum == 0 || commandNum == backIndex) {
+        // Da primeira opção ou de "Voltar" -> último idioma
+        commandNum = totalLanguages - 1;
+      } else {
+        // Dentro da lista de idiomas
+        commandNum--;
       }
-      case KeyEvent.VK_S -> {
-        if (commandNum < totalLanguages - 1) {
-          // Idioma intermediário -> próximo idioma
-          commandNum++;
-        } else if (commandNum == totalLanguages - 1) {
-          // Último idioma -> "Voltar"
-          commandNum = backIndex;
-        } else {
-          // Estava em "Voltar" -> volta para o primeiro idioma
-          commandNum = 0;
-        }
+    } else if (is(code, GameAction.MOVE_DOWN)) {
+      if (commandNum < totalLanguages - 1) {
+        // Idioma intermediário -> próximo idioma
+        commandNum++;
+      } else if (commandNum == totalLanguages - 1) {
+        // Último idioma -> "Voltar"
+        commandNum = backIndex;
+      } else {
+        // Estava em "Voltar" -> volta para o primeiro idioma
+        commandNum = 0;
       }
-      default -> {
-        return; // não trata outras teclas aqui
-      }
+    } else {
+      return; // não trata outras teclas aqui
     }
 
     ui.setCommandNum(commandNum);
-    playNavigateSfx();
-  }
-
-  /**
-   * Navegação de páginas na tela de controles (subState 2):
-   *
-   * - A -> página anterior
-   * - D -> próxima página
-   * (com wrap-around)
-   */
-  private void handleControlsPageNavigation(int code, UI ui) {
-    int pageCount = ui.getControlsPageCount();
-    if (pageCount <= 1) {
-      return;
-    }
-
-    int page = ui.getControlsPage();
-
-    if (code == KeyEvent.VK_A) {
-      page = wrapDecrement(page, pageCount - 1);
-    } else if (code == KeyEvent.VK_D) {
-      page = wrapIncrement(page, pageCount - 1);
-    }
-
-    ui.setControlsPage(page);
     playNavigateSfx();
   }
 
@@ -429,7 +461,7 @@ public class KeyHandler implements KeyListener {
    *
    * subState 0 -> menu principal de opções (0..5)
    * subState 1 -> aviso de tela cheia (apenas "Voltar", índice 0)
-   * subState 2 -> tela de controles (apenas "Voltar", índice 0)
+   * subState 2 -> tela de controles (gerenciado por handleControlsNavigation)
    * subState 3 -> confirmação de encerrar jogo ("Sim"/"Não", índices 0..1)
    * subState 4 -> seleção de idioma (0..N idiomas, + "Voltar" em N)
    */
@@ -497,28 +529,27 @@ public class KeyHandler implements KeyListener {
   public void gameOverState(int code) {
     final UI ui = gp.getGameUi();
 
-    switch (code) {
-      case KeyEvent.VK_W -> setCommandNumAndNavigateSfx(ui, wrapDecrement(ui.getCommandNum(), GAME_OVER_MAX_INDEX));
-      case KeyEvent.VK_S -> setCommandNumAndNavigateSfx(ui, wrapIncrement(ui.getCommandNum(), GAME_OVER_MAX_INDEX));
-      case KeyEvent.VK_ENTER -> {
-        int commandNum = ui.getCommandNum();
-        if (commandNum == 0) {
-          gp.logRespawnDebug("respawn.start");
-          gp.setGameState(GamePanel.PLAY_STATE);
-          gp.resetGame(false);
-          gp.playMusic(0);
-          gp.logRespawnDebug("respawn.end");
-        } else if (commandNum == 1) {
-          gp.stopMusic();
-          gp.resetGame(true);
-          ui.setTitleScreenState(0);
-          ui.setCommandNum(0);
-          ui.setSubState(0);
-          gp.setGameState(GamePanel.TITLE_STATE);
-        }
-      }
-      default -> {
-        // noop
+    if (is(code, GameAction.MOVE_UP)) {
+      setCommandNumAndNavigateSfx(ui,
+          wrapDecrement(ui.getCommandNum(), GAME_OVER_MAX_INDEX));
+    } else if (is(code, GameAction.MOVE_DOWN)) {
+      setCommandNumAndNavigateSfx(ui,
+          wrapIncrement(ui.getCommandNum(), GAME_OVER_MAX_INDEX));
+    } else if (is(code, GameAction.CONFIRM)) {
+      int commandNum = ui.getCommandNum();
+      if (commandNum == 0) {
+        gp.logRespawnDebug("respawn.start");
+        gp.setGameState(GamePanel.PLAY_STATE);
+        gp.resetGame(false);
+        gp.playMusic(0);
+        gp.logRespawnDebug("respawn.end");
+      } else if (commandNum == 1) {
+        gp.stopMusic();
+        gp.resetGame(true);
+        ui.setTitleScreenState(0);
+        ui.setCommandNum(0);
+        ui.setSubState(0);
+        gp.setGameState(GamePanel.TITLE_STATE);
       }
     }
   }
@@ -527,7 +558,7 @@ public class KeyHandler implements KeyListener {
    * Estado: Comércio (trade).
    */
   public void tradeState(int code) {
-    if (code == KeyEvent.VK_ENTER) {
+    if (is(code, GameAction.CONFIRM)) {
       enterPressed = true;
       return;
     }
@@ -537,13 +568,13 @@ public class KeyHandler implements KeyListener {
       case 0 -> handleTradeMenuNavigation(code, ui);
       case 1 -> {
         npcInventory(code);
-        if (code == KeyEvent.VK_ESCAPE) {
+        if (is(code, GameAction.OPTIONS)) {
           ui.setSubState(0);
         }
       }
       case 2 -> {
         playerInventory(code);
-        if (code == KeyEvent.VK_ESCAPE) {
+        if (is(code, GameAction.OPTIONS)) {
           ui.setSubState(0);
         }
       }
@@ -554,18 +585,18 @@ public class KeyHandler implements KeyListener {
   }
 
   private void handleTradeMenuNavigation(int code, UI ui) {
-    switch (code) {
-      case KeyEvent.VK_W -> setCommandNumAndNavigateSfx(ui, wrapDecrement(ui.getCommandNum(), TRADE_MENU_MAX_INDEX));
-      case KeyEvent.VK_S -> setCommandNumAndNavigateSfx(ui, wrapIncrement(ui.getCommandNum(), TRADE_MENU_MAX_INDEX));
-      default -> {
-        // noop
-      }
+    if (is(code, GameAction.MOVE_UP)) {
+      setCommandNumAndNavigateSfx(ui,
+          wrapDecrement(ui.getCommandNum(), TRADE_MENU_MAX_INDEX));
+    } else if (is(code, GameAction.MOVE_DOWN)) {
+      setCommandNumAndNavigateSfx(ui,
+          wrapIncrement(ui.getCommandNum(), TRADE_MENU_MAX_INDEX));
     }
   }
 
   /** Estado: Pet Yard (gerenciador de pets). */
   public void petYardState(int code) {
-    if (code == KeyEvent.VK_ENTER) {
+    if (is(code, GameAction.CONFIRM)) {
       enterPressed = true;
       return;
     }
@@ -578,7 +609,7 @@ public class KeyHandler implements KeyListener {
       case 2 -> {
         // Mantém a ordem: navega inventário, depois trata ESC.
         playerInventory(code);
-        if (code == KeyEvent.VK_ESCAPE) {
+        if (is(code, GameAction.OPTIONS)) {
           ui.setSubState(0);
         }
       }
@@ -589,13 +620,14 @@ public class KeyHandler implements KeyListener {
   }
 
   private void handlePetYardMenuNavigation(int code, UI ui) {
-    switch (code) {
-      case KeyEvent.VK_W -> setCommandNumAndNavigateSfx(ui, wrapDecrement(ui.getCommandNum(), PET_YARD_MENU_MAX_INDEX));
-      case KeyEvent.VK_S -> setCommandNumAndNavigateSfx(ui, wrapIncrement(ui.getCommandNum(), PET_YARD_MENU_MAX_INDEX));
-      case KeyEvent.VK_ESCAPE -> gp.setGameState(GamePanel.PLAY_STATE);
-      default -> {
-        // noop
-      }
+    if (is(code, GameAction.MOVE_UP)) {
+      setCommandNumAndNavigateSfx(ui,
+          wrapDecrement(ui.getCommandNum(), PET_YARD_MENU_MAX_INDEX));
+    } else if (is(code, GameAction.MOVE_DOWN)) {
+      setCommandNumAndNavigateSfx(ui,
+          wrapIncrement(ui.getCommandNum(), PET_YARD_MENU_MAX_INDEX));
+    } else if (is(code, GameAction.OPTIONS)) {
+      gp.setGameState(GamePanel.PLAY_STATE);
     }
   }
 
@@ -604,20 +636,21 @@ public class KeyHandler implements KeyListener {
     int petCount = player.getOwnedPets().size();
 
     if (petCount <= 0) {
-      if (code == KeyEvent.VK_ESCAPE) {
+      if (is(code, GameAction.OPTIONS)) {
         ui.setSubState(0);
       }
       return;
     }
 
     int maxIndex = petCount - 1;
-    switch (code) {
-      case KeyEvent.VK_W -> setCommandNumAndNavigateSfx(ui, wrapDecrement(ui.getCommandNum(), maxIndex));
-      case KeyEvent.VK_S -> setCommandNumAndNavigateSfx(ui, wrapIncrement(ui.getCommandNum(), maxIndex));
-      case KeyEvent.VK_ESCAPE -> ui.setSubState(0);
-      default -> {
-        // noop
-      }
+    if (is(code, GameAction.MOVE_UP)) {
+      setCommandNumAndNavigateSfx(ui,
+          wrapDecrement(ui.getCommandNum(), maxIndex));
+    } else if (is(code, GameAction.MOVE_DOWN)) {
+      setCommandNumAndNavigateSfx(ui,
+          wrapIncrement(ui.getCommandNum(), maxIndex));
+    } else if (is(code, GameAction.OPTIONS)) {
+      ui.setSubState(0);
     }
   }
 
@@ -634,51 +667,42 @@ public class KeyHandler implements KeyListener {
         int maxIdx = bestiaryUi.getClassCount() - 1;
         if (maxIdx < 0)
           maxIdx = 0;
-        switch (code) {
-          case KeyEvent.VK_W -> {
-            moveCommandNum(ui, -1, maxIdx);
-          }
-          case KeyEvent.VK_S -> {
-            moveCommandNum(ui, +1, maxIdx);
-          }
-          case KeyEvent.VK_ENTER -> {
-            bestiaryUi.setSelectedClassIndex(ui.getCommandNum());
-            bestiaryUi.enterSelectedClass();
-          }
-          case KeyEvent.VK_ESCAPE, KeyEvent.VK_B -> {
-            gp.setGameState(GamePanel.PLAY_STATE);
-          }
-          default -> {
-            /* noop */ }
+        if (is(code, GameAction.MOVE_UP)) {
+          moveCommandNum(ui, -1, maxIdx);
+        } else if (is(code, GameAction.MOVE_DOWN)) {
+          moveCommandNum(ui, +1, maxIdx);
+        } else if (is(code, GameAction.CONFIRM)) {
+          bestiaryUi.setSelectedClassIndex(ui.getCommandNum());
+          bestiaryUi.enterSelectedClass();
+        } else if (is(code, GameAction.OPTIONS)
+            || is(code, GameAction.BESTIARY)) {
+          gp.setGameState(GamePanel.PLAY_STATE);
         }
       }
       case 1 -> { // Lista de criaturas
-        switch (code) {
-          case KeyEvent.VK_W -> {
-            bestiaryUi.navigateUp();
-            playNavigateSfx();
-          }
-          case KeyEvent.VK_S -> {
-            bestiaryUi.navigateDown();
-            playNavigateSfx();
-          }
-          case KeyEvent.VK_ENTER -> bestiaryUi.enterSelectedCreature();
-          case KeyEvent.VK_ESCAPE -> bestiaryUi.goBack();
-          default -> {
-            /* noop */ }
+        if (is(code, GameAction.MOVE_UP)) {
+          bestiaryUi.navigateUp();
+          playNavigateSfx();
+        } else if (is(code, GameAction.MOVE_DOWN)) {
+          bestiaryUi.navigateDown();
+          playNavigateSfx();
+        } else if (is(code, GameAction.CONFIRM)) {
+          bestiaryUi.enterSelectedCreature();
+        } else if (is(code, GameAction.OPTIONS)) {
+          bestiaryUi.goBack();
         }
       }
       case 2 -> { // Detalhes da criatura
-        switch (code) {
-          case KeyEvent.VK_W -> bestiaryUi.navigateUp();
-          case KeyEvent.VK_S -> bestiaryUi.navigateDown();
-          case KeyEvent.VK_ESCAPE -> bestiaryUi.goBack();
-          default -> {
-            /* noop */ }
+        if (is(code, GameAction.MOVE_UP)) {
+          bestiaryUi.navigateUp();
+        } else if (is(code, GameAction.MOVE_DOWN)) {
+          bestiaryUi.navigateDown();
+        } else if (is(code, GameAction.OPTIONS)) {
+          bestiaryUi.goBack();
         }
       }
       default -> {
-        if (code == KeyEvent.VK_ESCAPE) {
+        if (is(code, GameAction.OPTIONS)) {
           gp.setGameState(GamePanel.PLAY_STATE);
         }
       }
@@ -686,19 +710,17 @@ public class KeyHandler implements KeyListener {
   }
 
   public void mapState(int code) {
-    switch (code) {
-      case KeyEvent.VK_M -> gp.setGameState(GamePanel.PLAY_STATE);
-
-      // Toggles de camadas de marcadores no mapa grande
-      case KeyEvent.VK_1 -> gp.map.toggleLayer(tile.MapMarkerType.NPC);
-      case KeyEvent.VK_2 -> {
-        gp.map.toggleLayer(tile.MapMarkerType.MONSTER);
-        gp.map.toggleLayer(tile.MapMarkerType.BOSS);
-      }
-      case KeyEvent.VK_3 -> gp.map.toggleLayer(tile.MapMarkerType.INTERACTIVE);
-      case KeyEvent.VK_4 -> gp.map.toggleLayer(tile.MapMarkerType.DROP);
-
-      default -> { /* noop */ }
+    if (is(code, GameAction.MAP)) {
+      gp.setGameState(GamePanel.PLAY_STATE);
+    } else if (is(code, GameAction.MAP_LAYER_NPC)) {
+      gp.map.toggleLayer(tile.MapMarkerType.NPC);
+    } else if (is(code, GameAction.MAP_LAYER_MONSTER)) {
+      gp.map.toggleLayer(tile.MapMarkerType.MONSTER);
+      gp.map.toggleLayer(tile.MapMarkerType.BOSS);
+    } else if (is(code, GameAction.MAP_LAYER_INTERACTIVE)) {
+      gp.map.toggleLayer(tile.MapMarkerType.INTERACTIVE);
+    } else if (is(code, GameAction.MAP_LAYER_DROP)) {
+      gp.map.toggleLayer(tile.MapMarkerType.DROP);
     }
   }
 
@@ -711,16 +733,16 @@ public class KeyHandler implements KeyListener {
     int row = ui.getPlayerSlotRow();
     int col = ui.getPlayerSlotCol();
 
-    if (code == KeyEvent.VK_W && row != 0) {
+    if (is(code, GameAction.MOVE_UP) && row != 0) {
       ui.setPlayerSlotRow(row - 1);
       playNavigateSfx();
-    } else if (code == KeyEvent.VK_A && col != 0) {
+    } else if (is(code, GameAction.MOVE_LEFT) && col != 0) {
       ui.setPlayerSlotCol(col - 1);
       playNavigateSfx();
-    } else if (code == KeyEvent.VK_S && row != SLOT_ROW_MAX) {
+    } else if (is(code, GameAction.MOVE_DOWN) && row != SLOT_ROW_MAX) {
       ui.setPlayerSlotRow(row + 1);
       playNavigateSfx();
-    } else if (code == KeyEvent.VK_D && col != SLOT_COL_MAX) {
+    } else if (is(code, GameAction.MOVE_RIGHT) && col != SLOT_COL_MAX) {
       ui.setPlayerSlotCol(col + 1);
       playNavigateSfx();
     }
@@ -731,16 +753,16 @@ public class KeyHandler implements KeyListener {
     int row = ui.getNpcSlotRow();
     int col = ui.getNpcSlotCol();
 
-    if (code == KeyEvent.VK_W && row != 0) {
+    if (is(code, GameAction.MOVE_UP) && row != 0) {
       ui.setNpcSlotRow(row - 1);
       playNavigateSfx();
-    } else if (code == KeyEvent.VK_A && col != 0) {
+    } else if (is(code, GameAction.MOVE_LEFT) && col != 0) {
       ui.setNpcSlotCol(col - 1);
       playNavigateSfx();
-    } else if (code == KeyEvent.VK_S && row != SLOT_ROW_MAX) {
+    } else if (is(code, GameAction.MOVE_DOWN) && row != SLOT_ROW_MAX) {
       ui.setNpcSlotRow(row + 1);
       playNavigateSfx();
-    } else if (code == KeyEvent.VK_D && col != SLOT_COL_MAX) {
+    } else if (is(code, GameAction.MOVE_RIGHT) && col != SLOT_COL_MAX) {
       ui.setNpcSlotCol(col + 1);
       playNavigateSfx();
     }
@@ -749,6 +771,11 @@ public class KeyHandler implements KeyListener {
   // -----------------------
   // Private helpers (no behavior change)
   // -----------------------
+
+  /** Consulta o binding para verificar se keyCode corresponde à ação. */
+  private boolean is(int code, GameAction action) {
+    return gp.getInputBindings().isAction(code, action);
+  }
 
   private void playNavigateSfx() {
     gp.playSE(NAVIGATE_SFX_ID);
