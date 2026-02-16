@@ -27,9 +27,16 @@
 - SEMPRE proponha um commit ao final (Conventional Commits).
 - SEMPRE pergunte "Posso subir o commit?" antes de fazer push.
 - Se o usuário disser "não", deixe tudo pronto localmente.
+- Ao receber autorização para subir:
+  1. CRIAR uma branch nova (nome descritivo, ex: `feat/novo-monstro`, `fix/colisao-diagonal`)
+  2. SEPARAR as mudanças em commits lógicos — cada commit agrupa arquivos que fazem sentido juntos
+  3. FAZER push da branch
+  4. FAZER merge da branch na main (--no-ff para preservar histórico)
+  5. FAZER push da main
 - Formato: `tipo(escopo): descrição curta`
   - Tipos: feat, fix, refactor, docs, style, test, chore, perf
   - Escopo: pacote ou sistema afetado (ex: entity, ui, tile, main)
+- NUNCA commitar direto na main — sempre via branch + merge
 
 ## Estrutura do projeto
 - Linguagem: Java (sem build system — compilação manual com javac)

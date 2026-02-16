@@ -77,8 +77,54 @@ para uma classe dedicada HudUi, reduzindo o tamanho do UI.java.
 
 ## Fluxo de push
 
-1. O Cursor propõe o commit com mensagem formatada
+1. O Cursor propõe o(s) commit(s) com mensagens formatadas
 2. O Cursor lista em bullets o que mudou
 3. O Cursor pergunta: **"Posso subir o commit?"**
 4. Só faz push se o usuário autorizar explicitamente
 5. Se "não" → tudo fica pronto localmente (staged + committed, sem push)
+6. Se "sim" → seguir o fluxo de branch obrigatório (abaixo)
+
+## Fluxo de branch (OBRIGATÓRIO)
+
+Ao receber autorização para subir, o Cursor **DEVE**:
+
+1. **Criar uma branch nova** a partir da `main`
+   - Padrão de nome: `tipo/descricao-curta` (ex: `feat/novo-monstro`, `fix/colisao-diagonal`, `docs/atualizar-readme`)
+   - Tipos de branch: `feat/`, `fix/`, `refactor/`, `docs/`, `chore/`, `perf/`
+2. **Separar as mudanças em commits lógicos**
+   - Cada commit agrupa arquivos que fazem sentido juntos
+   - Ex: não misturar mudanças de `entity/` com mudanças de `ui/` no mesmo commit, a menos que sejam interdependentes
+   - Ordem dos commits: da base/infra para funcionalidade de ponta
+3. **Fazer push da branch** para o remote
+4. **Fazer merge na main** com `--no-ff` (preserva histórico da branch)
+5. **Fazer push da main** para o remote
+
+### Exemplo de fluxo completo
+
+```bash
+# 1. Criar branch
+git checkout -b feat/novo-item-potion-blue
+
+# 2. Commits separados e lógicos
+git add src/object/ObjPotionBlue.java
+git commit -m "feat(object): adicionar ObjPotionBlue com restauração de mana"
+
+git add src/main/EntityGenerator.java
+git commit -m "feat(main): registrar ObjPotionBlue no EntityGenerator"
+
+git add resource/lang/messages_*.properties
+git commit -m "feat(i18n): adicionar chaves de tradução para ObjPotionBlue"
+
+# 3. Push da branch
+git push -u origin feat/novo-item-potion-blue
+
+# 4. Merge na main
+git checkout main
+git merge feat/novo-item-potion-blue --no-ff -m "merge: integrar ObjPotionBlue na main"
+
+# 5. Push da main
+git push origin main
+```
+
+### Regra crítica
+> **NUNCA** commitar direto na main. Toda mudança entra via branch + merge.
