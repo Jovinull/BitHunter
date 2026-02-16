@@ -63,12 +63,14 @@ O Cursor **sempre** vai:
 - Ler as regras antes de agir
 - Trabalhar em passos claros
 - Evitar mudanças fora do escopo
+- Verificar compilação antes de subir (se `.java` foi alterado)
 - Manter o build verde
 - Propor commit antes de subir
 - Pedir autorização para push
 - Criar branch separada (nunca commitar direto na main)
 - Separar commits em grupos lógicos
 - Fazer merge da branch na main após autorização
+- Deletar a branch (local + remote) após merge bem-sucedido
 
 O Cursor **nunca** vai:
 - Fazer push sem sua autorização
