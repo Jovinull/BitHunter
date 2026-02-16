@@ -163,10 +163,7 @@ public class UI {
         hudUi.drawMonsterLife();
         hudUi.drawMessage();
       }
-      case GamePanel.PAUSE_STATE -> {
-        hudUi.drawPlayerLife();
-        pauseUi.drawPauseScreen();
-      }
+      case GamePanel.PAUSE_STATE -> pauseUi.drawPauseScreen();
       case GamePanel.DIALOGUE_STATE -> dialogueUi.drawDialogueScreen();
       case GamePanel.CHARACTER_STATE -> {
         characterUi.drawCharacterScreen();
@@ -188,7 +185,6 @@ public class UI {
   private void configureTextRendering() {
     int state = gp.getGameState();
     boolean smoothUi = state == GamePanel.TITLE_STATE
-        || state == GamePanel.PAUSE_STATE
         || state == GamePanel.GAME_OVER_STATE;
 
     if (smoothUi) {
@@ -292,6 +288,11 @@ public class UI {
     controlsPage = 0;
     waitingForRebind = false;
     rebindControlIndex = -1;
+  }
+
+  /** Reseta a animação do pause (chamado ao entrar em PAUSE_STATE). */
+  public void resetPauseAnimation() {
+    pauseUi.reset();
   }
 
   public BestiaryUi getBestiaryUi() {
