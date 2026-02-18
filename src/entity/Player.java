@@ -36,6 +36,11 @@ public class Player extends Entity {
   private boolean lightUpdated = false;
   private boolean debugCollision = false;
 
+  /** Nome do jogador definido na criação do save. */
+  private String playerName = "";
+  /** Índice da classe (0=Guerreiro, 1=Ladrão, 2=Feiticeiro). */
+  private int characterClass = 0;
+
   private PetEntity pet;
 
   private final List<String> ownedPets = new ArrayList<>();
@@ -1448,5 +1453,23 @@ public class Player extends Entity {
     } else {
       gp.getGameUi().addMessage(t("player.message.cannotCarryMore"));
     }
+  }
+
+  // ===== Identidade do jogador (slots de save) =====
+
+  public String getPlayerName() {
+    return playerName;
+  }
+
+  public void setPlayerName(String playerName) {
+    this.playerName = playerName != null ? playerName : "";
+  }
+
+  public int getCharacterClass() {
+    return characterClass;
+  }
+
+  public void setCharacterClass(int characterClass) {
+    this.characterClass = characterClass;
   }
 }

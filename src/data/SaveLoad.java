@@ -18,7 +18,6 @@ import pets.PetIncubator;
 public class SaveLoad {
 
   private static final Logger LOG = Logger.getLogger(SaveLoad.class.getName());
-  private static final String SAVE_FILE = "save.dat";
 
   private final GamePanel gp;
 
@@ -26,8 +25,19 @@ public class SaveLoad {
     this.gp = gp;
   }
 
+  /**
+   * Salva no slot atual via {@link SaveManager}.
+   * Callers legados (EventHandler, CheatCodeManager) continuam funcionando.
+   */
   public void save() {
-    File file = new File(SAVE_FILE);
+    gp.getSaveManager().save();
+  }
+
+  /**
+   * Serializa o estado do jogo no arquivo especificado.
+   * Usado internamente pelo {@link SaveManager}.
+   */
+  void saveToFile(File file) {
     try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
       DataStorage ds = buildDataStorage();
       oos.writeObject(ds);
@@ -37,23 +47,30 @@ public class SaveLoad {
     }
   }
 
-  public void load() {
-    File file = new File(SAVE_FILE);
+  /**
+   * Carrega e aplica o estado do jogo a partir do arquivo especificado.
+   * Usado internamente pelo {@link SaveManager}.
+   *
+   * @return {@code true} se o carregamento foi bem-sucedido
+   */
+  boolean loadFromFile(File file) {
     if (!file.exists()) {
       LOG.info(() -> "No save file found at " + file.getAbsolutePath());
-      return;
+      return false;
     }
 
     try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
       DataStorage ds = readDataStorage(ois);
       if (ds == null) {
-        return;
+        return false;
       }
 
       applyFromDataStorage(ds);
       LOG.fine(() -> "Game loaded: " + file.getAbsolutePath());
+      return true;
     } catch (IOException | ClassNotFoundException ex) {
       LOG.log(Level.SEVERE, "Failed to load game", ex);
+      return false;
     }
   }
 
@@ -112,6 +129,8 @@ public class SaveLoad {
 
   private void copyPlayerStatsToStorage(DataStorage ds) {
     var player = gp.getPlayer();
+    ds.setPlayerName(player.getPlayerName());
+    ds.setCharacterClass(player.getCharacterClass());
     ds.setLevel(player.getLevel());
     ds.setMaxLife(player.getMaxLife());
     ds.setLife(player.getLife());
@@ -175,6 +194,8 @@ public class SaveLoad {
 
   private void applyPlayerStats(DataStorage ds) {
     var player = gp.getPlayer();
+    player.setPlayerName(ds.getPlayerName() != null ? ds.getPlayerName() : "");
+    player.setCharacterClass(ds.getCharacterClass());
     player.setLevel(ds.getLevel());
     player.setMaxLife(ds.getMaxLife());
     player.setLife(ds.getLife());
@@ -292,8 +313,8 @@ public class SaveLoad {
 
       player.addOwnedPet(petId);
 
-      int lvl = (i < levels.size()) ? levels.get(i) : 1;
-      int xp = (i < exps.size()) ? exps.get(i) : 0;
+      int lvl = safeUnbox(i < levels.size() ? levels.get(i) : null, 1);
+      int xp = safeUnbox(i < exps.size() ? exps.get(i) : null, 0);
 
       player.restorePetProgress(petId, lvl, xp);
     }
@@ -386,5 +407,10 @@ public class SaveLoad {
    */
   private void applyCheatCodes(DataStorage ds) {
     gp.getCheatCodeManager().setUsedOneTimeCodes(ds.getUsedCheatCodes());
+  }
+
+  /** Unboxing seguro: retorna {@code fallback} se {@code value} for null. */
+  private static int safeUnbox(Integer value, int fallback) {
+    return value != null ? value : fallback;
   }
 }
