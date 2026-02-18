@@ -86,7 +86,7 @@ public class AssetSetter {
 
     // Porta da entrada da dungeon
     objects[mapNum][i] = new ObjDoor(gp);
-    place(objects[mapNum][i++], 75, 42);
+    place(objects[mapNum][i++], 80, 17);
 
     // Baú perto do lago com chave
     objects[mapNum][i] = new ObjChest(gp);
@@ -310,15 +310,12 @@ public class AssetSetter {
 
     // Árvores secas bloqueando caminho alternativo para a dungeon
     interactiveTiles[mapNum][i++] = new ItDryTree(gp, 73, 40);
-    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 74, 40);
-    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 76, 40);
     interactiveTiles[mapNum][i++] = new ItDryTree(gp, 77, 40);
     // Árvores secas decorativas perto do lago
     interactiveTiles[mapNum][i++] = new ItDryTree(gp, 28, 15);
     interactiveTiles[mapNum][i++] = new ItDryTree(gp, 12, 30);
     // Árvores secas na floresta
     interactiveTiles[mapNum][i++] = new ItDryTree(gp, 70, 28);
-    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 72, 30);
     // Árvores secas no caminho sul
     interactiveTiles[mapNum][i++] = new ItDryTree(gp, 48, 70);
     interactiveTiles[mapNum][i++] = new ItDryTree(gp, 52, 70);
