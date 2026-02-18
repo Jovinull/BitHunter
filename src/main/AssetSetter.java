@@ -199,6 +199,21 @@ public class AssetSetter {
     // Orc patrulhando caminho oeste
     monsters[mapNum][i] = new MonOrc(gp);
     place(monsters[mapNum][i++], 25, 60);
+    // Orcs na região sul/sudoeste
+    monsters[mapNum][i] = new MonOrc(gp);
+    place(monsters[mapNum][i++], 17, 92);
+
+    monsters[mapNum][i] = new MonOrc(gp);
+    place(monsters[mapNum][i++], 9, 88);
+
+    monsters[mapNum][i] = new MonOrc(gp);
+    place(monsters[mapNum][i++], 10, 80);
+
+    monsters[mapNum][i] = new MonOrc(gp);
+    place(monsters[mapNum][i++], 9, 73);
+
+    monsters[mapNum][i] = new MonOrc(gp);
+    place(monsters[mapNum][i++], 7, 65);
 
     // Red Slimes na clareira da floresta NE
     monsters[mapNum][i] = new MonRedSlime(gp);
