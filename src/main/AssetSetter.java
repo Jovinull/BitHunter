@@ -262,7 +262,14 @@ public class AssetSetter {
     // Árvores secas no caminho sul
     interactiveTiles[mapNum][i++] = new ItDryTree(gp, 48, 70);
     interactiveTiles[mapNum][i++] = new ItDryTree(gp, 52, 70);
-    interactiveTiles[mapNum][i] = new ItDryTree(gp, 50, 9);
+    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 50, 9);
+    // Árvores secas na região sudoeste
+    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 11, 65);
+    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 10, 70);
+    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 16, 64);
+    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 14, 74);
+    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 18, 81);
+    interactiveTiles[mapNum][i] = new ItDryTree(gp, 19, 88);
 
     // MAP DUNGEON
     mapNum = MAP_DUNGEON;
