@@ -130,17 +130,17 @@ public class EventHandler {
       return;
     }
     // casa - entrada (overworld → indoor)
-    if (hit(0, 25, 70, "any")) {
+    if (hit(0, 22, 28, "any")) {
       teleport(1, 12, 13, GamePanel.INDOOR);
       return;
     }
     // casa - saída (indoor → overworld)
-    if (hit(1, 12, 13, "any")) {
-      teleport(0, 25, 72, GamePanel.OUTSIDE);
+    if (hit(1, 12, 14, "any")) {
+      teleport(0, 22, 28, GamePanel.OUTSIDE);
       return;
     }
     // falar com NPC merchant
-    if (hit(1, 12, 9, Entity.DIR_UP)) {
+    if (hit(1, 12, 6, Entity.DIR_UP)) {
       speak(gp.getNpc()[1][0]);
       return;
     }

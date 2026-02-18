@@ -83,10 +83,6 @@ public class AssetSetter {
     objects[mapNum][i] = new ObjManaCrystal(gp);
     place(objects[mapNum][i++], 30, 42);
 
-    // Porta da casa
-    objects[mapNum][i] = new ObjDoor(gp);
-    place(objects[mapNum][i++], 25, 69);
-
     // Porta da entrada da dungeon
     objects[mapNum][i] = new ObjDoor(gp);
     place(objects[mapNum][i++], 75, 42);
@@ -156,7 +152,7 @@ public class AssetSetter {
     i = 0;
 
     npcs[mapNum][i] = new NpcMerchant(gp);
-    place(npcs[mapNum][i], 12, 9);
+    place(npcs[mapNum][i], 12, 6);
 
     // MAP DUNGEON - Pedras-obstáculo nas salas
     mapNum = MAP_DUNGEON;

@@ -26,7 +26,7 @@ public class NpcMerchant extends Entity {
     setTranslationKey(NPC_ID);
 
     setDirection(DIR_DOWN);
-    setSpeed(1);
+    setSpeed(0);
 
     // solidArea é final -> configurar via getter
     Rectangle sa = getSolidArea();
