@@ -91,7 +91,7 @@ public class GamePanel extends JPanel implements Runnable {
   private final transient Player player = new Player(this, keyH); // Jogador principal do jogo
   private final transient Entity[][] obj = new Entity[MAX_MAP][20]; // Objetos
   private final transient Entity[][] npc = new Entity[MAX_MAP][10]; // NPCs
-  private final transient Entity[][] monster = new Entity[MAX_MAP][20];
+  private final transient Entity[][] monster = new Entity[MAX_MAP][50];
   private final transient InteractiveTile[][] iTile = new InteractiveTile[MAX_MAP][50];
   private final transient Entity[][] projectile = new Entity[MAX_MAP][20];
   private final transient List<Entity> particleList = new ArrayList<>();
