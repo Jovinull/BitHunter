@@ -8,6 +8,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import data.SaveManager.SlotInfo;
 import entity.Entity;
 import main.GamePanel;
 import main.KeyHandler;
@@ -48,6 +49,11 @@ public class UI {
   boolean waitingForRebind = false;
   int rebindControlIndex = -1;
 
+  // Estado da tela de slots de save
+  int saveSlotMode = SaveSlotUi.MODE_NEW_GAME;
+  int selectedSaveSlot = -1;
+  private final StringBuilder playerNameInput = new StringBuilder();
+
   static final Color COL_BG = new Color(0x05, 0x07, 0x14); // fundo quase preto azulado
   static final Color COL_PANEL = new Color(0x10, 0x15, 0x28); // painel um pouco mais claro
   static final Color COL_PANEL_BORDER = new Color(0x28, 0x36, 0x56); // borda azul-acinzentada
@@ -73,6 +79,7 @@ public class UI {
   // --- Sub-UIs ---
   private final HudUi hudUi;
   private final TitleUi titleUi;
+  private final SaveSlotUi saveSlotUi;
   private final PauseUi pauseUi;
   private final DialogueUi dialogueUi;
   private final InventoryUi inventoryUi;
@@ -93,6 +100,7 @@ public class UI {
 
     // instancia sub-UIs
     hudUi = new HudUi(this);
+    saveSlotUi = new SaveSlotUi(this);
     titleUi = new TitleUi(this);
     pauseUi = new PauseUi(this);
     dialogueUi = new DialogueUi(this);
@@ -424,5 +432,66 @@ public class UI {
 
   public void setRebindControlIndex(int rebindControlIndex) {
     this.rebindControlIndex = rebindControlIndex;
+  }
+
+  // --- Slots de save ---
+
+  SaveSlotUi getSaveSlotUi() {
+    return saveSlotUi;
+  }
+
+  /** Atualiza o cache de metadados dos slots de save. */
+  public void refreshSaveSlotInfos() {
+    saveSlotUi.refreshSlotInfos();
+  }
+
+  /** Retorna os metadados em cache dos 3 slots (índice 0 = Slot 1). */
+  public SlotInfo[] getSaveSlotInfos() {
+    return saveSlotUi.getSlotInfos();
+  }
+
+  /** Comprimento máximo do nome do jogador. */
+  public int getMaxPlayerNameLength() {
+    return saveSlotUi.getMaxNameLength();
+  }
+
+  public int getSaveSlotMode() {
+    return saveSlotMode;
+  }
+
+  public void setSaveSlotMode(int saveSlotMode) {
+    this.saveSlotMode = saveSlotMode;
+  }
+
+  public int getSelectedSaveSlot() {
+    return selectedSaveSlot;
+  }
+
+  public void setSelectedSaveSlot(int selectedSaveSlot) {
+    this.selectedSaveSlot = selectedSaveSlot;
+  }
+
+  // --- Input do nome do jogador ---
+
+  public String getPlayerNameText() {
+    return playerNameInput.toString();
+  }
+
+  public void clearPlayerName() {
+    playerNameInput.setLength(0);
+  }
+
+  public void appendPlayerNameChar(char c) {
+    playerNameInput.append(c);
+  }
+
+  public void deleteLastPlayerNameChar() {
+    if (!playerNameInput.isEmpty()) {
+      playerNameInput.deleteCharAt(playerNameInput.length() - 1);
+    }
+  }
+
+  public int getPlayerNameLength() {
+    return playerNameInput.length();
   }
 }
