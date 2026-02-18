@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import ai.PathFinder;
 import bestiary.BestiaryService;
 import data.SaveLoad;
+import data.SaveManager;
 import entity.Entity;
 import entity.Player;
 import environment.EnvironmentManager;
@@ -80,6 +81,7 @@ public class GamePanel extends JPanel implements Runnable {
   transient EnvironmentManager eManager = new EnvironmentManager(this);
   transient Map map = new Map(this);
   transient SaveLoad saveLoad = new SaveLoad(this);
+  private final transient SaveManager saveManager = new SaveManager(this);
   private final transient EntityGenerator eGenerator = new EntityGenerator(this);
   private final transient CutsceneManager csManager = new CutsceneManager(this);
   private final transient PetIncubator petIncubator = new PetIncubator(this);
@@ -736,6 +738,10 @@ public class GamePanel extends JPanel implements Runnable {
 
   public SaveLoad getSaveLoad() {
     return saveLoad;
+  }
+
+  public SaveManager getSaveManager() {
+    return saveManager;
   }
 
   public PetIncubator getPetIncubator() {

@@ -3,6 +3,8 @@ package main;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import data.SaveManager;
+import data.SaveManager.SlotInfo;
 import ui.UI;
 
 /**
@@ -26,6 +28,11 @@ public class KeyHandler implements KeyListener {
   /** Limites de índices dos menus de título. */
   private static final int MENU_MAIN_MAX_INDEX = 2; // [Novo jogo, Carregar, Sair]
   private static final int MENU_CLASS_MAX_INDEX = 3; // [Guerreiro, Ladrão, Feiticeiro, Voltar]
+  private static final int MENU_SLOT_MAX_INDEX = SaveManager.MAX_SLOTS; // 0..2 = slots, 3 = Voltar
+
+  /** Modos da tela de seleção de slots (espelho de SaveSlotUi). */
+  private static final int SLOT_MODE_NEW_GAME = 0;
+  private static final int SLOT_MODE_CONTINUE = 1;
 
   /** Limites de índices de menus com navegação (wrap). */
   private static final int TRADE_MENU_MAX_INDEX = 2;
@@ -93,8 +100,23 @@ public class KeyHandler implements KeyListener {
    */
   @Override
   public void keyTyped(KeyEvent e) {
-    if (gp.getGameState() == GamePanel.PLAY_STATE) {
+    int state = gp.getGameState();
+    if (state == GamePanel.PLAY_STATE) {
       gp.getCheatCodeManager().onCharTyped(e.getKeyChar());
+    } else if (state == GamePanel.TITLE_STATE) {
+      handleTitleCharTyped(e.getKeyChar());
+    }
+  }
+
+  private void handleTitleCharTyped(char c) {
+    UI ui = gp.getGameUi();
+    if (ui.getTitleScreenState() != 5) {
+      return;
+    }
+    if (Character.isLetterOrDigit(c) || c == ' ' || c == '-' || c == '_') {
+      if (ui.getPlayerNameLength() < ui.getMaxPlayerNameLength()) {
+        ui.appendPlayerNameChar(c);
+      }
     }
   }
 
@@ -154,9 +176,11 @@ public class KeyHandler implements KeyListener {
     switch (ui.getTitleScreenState()) {
       case 0 -> handleTitleMainMenu(code, ui);
       case 1 -> handleTitleClassSelect(code, ui);
-      default -> {
-        // noop
-      }
+      case 2 -> handleTitleSlotSelect(code, ui);
+      case 3 -> handleTitleOverwriteConfirm(code, ui);
+      case 4 -> handleTitleDeleteConfirm(code, ui);
+      case 5 -> handleTitleNameInput(code, ui);
+      default -> { /* noop */ }
     }
   }
 
@@ -172,19 +196,20 @@ public class KeyHandler implements KeyListener {
 
   private void handleTitleMainEnter(UI ui) {
     switch (ui.getCommandNum()) {
-      case 0 -> { // Novo jogo -> vai para seleção de classe
-        ui.setTitleScreenState(1);
+      case 0 -> { // Novo jogo -> seleção de slot
+        ui.setSaveSlotMode(SLOT_MODE_NEW_GAME);
+        ui.setTitleScreenState(2);
         ui.setCommandNum(0);
+        ui.refreshSaveSlotInfos();
       }
-      case 1 -> { // Carregar jogo
-        gp.saveLoad.load();
-        gp.setGameState(GamePanel.PLAY_STATE);
-        gp.playMusic(0);
+      case 1 -> { // Carregar jogo -> seleção de slot
+        ui.setSaveSlotMode(SLOT_MODE_CONTINUE);
+        ui.setTitleScreenState(2);
+        ui.refreshSaveSlotInfos();
+        ui.setCommandNum(firstSelectableSlot(ui));
       }
       case 2 -> System.exit(0); // Sair
-      default -> {
-        // noop
-      }
+      default -> { /* noop */ }
     }
   }
 
@@ -195,16 +220,207 @@ public class KeyHandler implements KeyListener {
       navigateDown(ui, MENU_CLASS_MAX_INDEX);
     } else if (is(code, GameAction.CONFIRM)) {
       if (ui.getCommandNum() == MENU_CLASS_MAX_INDEX) { // Voltar
-        ui.setTitleScreenState(0);
-        ui.setCommandNum(0);
+        ui.setTitleScreenState(5);
       } else {
-        gp.setGameState(GamePanel.PLAY_STATE);
-        gp.playMusic(0);
+        startNewGameOnSlot(ui, ui.getCommandNum());
       }
+    } else if (is(code, GameAction.OPTIONS)) {
+      ui.setTitleScreenState(5);
+    }
+  }
+
+  /**
+   * Cria um novo jogo no slot selecionado com o nome e classe informados.
+   */
+  private void startNewGameOnSlot(UI ui, int classIndex) {
+    int slot = ui.getSelectedSaveSlot();
+    String playerName = ui.getPlayerNameText().trim();
+
+    gp.resetGame(true);
+    gp.getPlayer().setPlayerName(playerName);
+    gp.getPlayer().setCharacterClass(classIndex);
+    gp.getSaveManager().save(slot);
+
+    gp.setGameState(GamePanel.PLAY_STATE);
+    gp.playMusic(0);
+  }
+
+  // -----------------------
+  // Save slot handlers
+  // -----------------------
+
+  /**
+   * Navegação e ações na tela de seleção de slots.
+   * commandNum 0..2 = slots, 3 = Voltar.
+   */
+  private void handleTitleSlotSelect(int code, UI ui) {
+    if (is(code, GameAction.MOVE_UP)) {
+      navigateSlot(ui, -1);
+    } else if (is(code, GameAction.MOVE_DOWN)) {
+      navigateSlot(ui, +1);
+    } else if (is(code, GameAction.CONFIRM)) {
+      handleSlotSelectEnter(ui);
+    } else if (code == KeyEvent.VK_BACK_SPACE || code == KeyEvent.VK_DELETE) {
+      handleSlotDelete(ui);
     } else if (is(code, GameAction.OPTIONS)) {
       ui.setTitleScreenState(0);
       ui.setCommandNum(0);
     }
+  }
+
+  private void handleSlotSelectEnter(UI ui) {
+    int cmd = ui.getCommandNum();
+
+    if (cmd == SaveManager.MAX_SLOTS) {
+      ui.setTitleScreenState(0);
+      ui.setCommandNum(0);
+      return;
+    }
+
+    int slot = cmd + 1;
+    ui.setSelectedSaveSlot(slot);
+    SlotInfo info = ui.getSaveSlotInfos()[cmd];
+
+    if (ui.getSaveSlotMode() == SLOT_MODE_NEW_GAME) {
+      if (info.occupied() && !info.corrupt()) {
+        ui.setTitleScreenState(3);
+        ui.setCommandNum(0);
+      } else {
+        ui.clearPlayerName();
+        ui.setTitleScreenState(5);
+      }
+    } else {
+      if (info.occupied() && !info.corrupt()) {
+        gp.getSaveManager().load(slot);
+        gp.setGameState(GamePanel.PLAY_STATE);
+        gp.playMusic(0);
+      }
+    }
+  }
+
+  private void handleSlotDelete(UI ui) {
+    int cmd = ui.getCommandNum();
+    if (cmd >= SaveManager.MAX_SLOTS) {
+      return;
+    }
+    SlotInfo info = ui.getSaveSlotInfos()[cmd];
+    if (info.occupied()) {
+      ui.setSelectedSaveSlot(cmd + 1);
+      ui.setTitleScreenState(4);
+      ui.setCommandNum(0);
+    }
+  }
+
+  /**
+   * Confirmação de sobrescrita de slot.
+   * commandNum 0 = Cancelar, 1 = Sobrescrever.
+   */
+  private void handleTitleOverwriteConfirm(int code, UI ui) {
+    if (is(code, GameAction.MOVE_UP)) {
+      navigateUp(ui, 1);
+    } else if (is(code, GameAction.MOVE_DOWN)) {
+      navigateDown(ui, 1);
+    } else if (is(code, GameAction.CONFIRM)) {
+      if (ui.getCommandNum() == 0) {
+        returnToSlotSelect(ui);
+      } else {
+        ui.clearPlayerName();
+        ui.setTitleScreenState(5);
+      }
+    } else if (is(code, GameAction.OPTIONS)) {
+      returnToSlotSelect(ui);
+    }
+  }
+
+  /**
+   * Confirmação de exclusão de slot.
+   * commandNum 0 = Cancelar, 1 = Apagar.
+   */
+  private void handleTitleDeleteConfirm(int code, UI ui) {
+    if (is(code, GameAction.MOVE_UP)) {
+      navigateUp(ui, 1);
+    } else if (is(code, GameAction.MOVE_DOWN)) {
+      navigateDown(ui, 1);
+    } else if (is(code, GameAction.CONFIRM)) {
+      if (ui.getCommandNum() == 0) {
+        returnToSlotSelect(ui);
+      } else {
+        gp.getSaveManager().delete(ui.getSelectedSaveSlot());
+        ui.refreshSaveSlotInfos();
+        returnToSlotSelect(ui);
+      }
+    } else if (is(code, GameAction.OPTIONS)) {
+      returnToSlotSelect(ui);
+    }
+  }
+
+  /**
+   * Input de nome do jogador.
+   * ENTER confirma (se nome não vazio), ESC cancela.
+   * Caracteres são capturados em keyTyped.
+   */
+  private void handleTitleNameInput(int code, UI ui) {
+    if (is(code, GameAction.CONFIRM)) {
+      String name = ui.getPlayerNameText().trim();
+      if (!name.isEmpty()) {
+        ui.setTitleScreenState(1);
+        ui.setCommandNum(0);
+      }
+    } else if (is(code, GameAction.OPTIONS)
+        || code == KeyEvent.VK_ESCAPE) {
+      returnToSlotSelect(ui);
+    } else if (code == KeyEvent.VK_BACK_SPACE) {
+      ui.deleteLastPlayerNameChar();
+    }
+  }
+
+  /**
+   * Navega entre slots pulando os desabilitados no modo Continuar.
+   * No modo Novo Jogo todos os slots são selecionáveis.
+   */
+  private void navigateSlot(UI ui, int direction) {
+    int max = MENU_SLOT_MAX_INDEX;
+    int current = ui.getCommandNum();
+    int next = current;
+
+    for (int attempt = 0; attempt <= max; attempt++) {
+      next += direction;
+      if (next < 0) next = max;
+      if (next > max) next = 0;
+
+      if (isSlotSelectable(ui, next)) {
+        break;
+      }
+    }
+
+    ui.setCommandNum(next);
+  }
+
+  /** Retorna o primeiro índice selecionável (ou "Voltar" se todos vazios). */
+  private int firstSelectableSlot(UI ui) {
+    for (int i = 0; i < SaveManager.MAX_SLOTS; i++) {
+      if (isSlotSelectable(ui, i)) {
+        return i;
+      }
+    }
+    return SaveManager.MAX_SLOTS;
+  }
+
+  private boolean isSlotSelectable(UI ui, int index) {
+    if (index == SaveManager.MAX_SLOTS) {
+      return true;
+    }
+    if (ui.getSaveSlotMode() != SLOT_MODE_CONTINUE) {
+      return true;
+    }
+    SlotInfo info = ui.getSaveSlotInfos()[index];
+    return info.occupied() && !info.corrupt();
+  }
+
+  private void returnToSlotSelect(UI ui) {
+    ui.setTitleScreenState(2);
+    int slotIdx = ui.getSelectedSaveSlot() - 1;
+    ui.setCommandNum(Math.max(0, slotIdx));
   }
 
   /**

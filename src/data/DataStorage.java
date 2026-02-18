@@ -53,6 +53,10 @@ public class DataStorage implements Serializable {
   private Map<String, Set<String>> bestiaryRevealedVeryRare = new HashMap<>();
   private int bestiaryPoints;
 
+  // ===== IDENTIDADE DO JOGADOR =====
+  private String playerName;
+  private int characterClass;
+
   // ===== CHEAT CODES (ONE_TIME) =====
   // Armazena os códigos ONE_TIME já utilizados para impedir reuso entre sessões.
   // Pode ser null em saves antigos (antes desta feature); o getter trata isso.
@@ -320,5 +324,28 @@ public class DataStorage implements Serializable {
 
   public void setUsedCheatCodes(Set<String> usedCheatCodes) {
     this.usedCheatCodes = usedCheatCodes != null ? usedCheatCodes : new HashSet<>();
+  }
+
+  // ===== IDENTIDADE DO JOGADOR getters/setters =====
+
+  /**
+   * Nome do jogador definido na criação do save.
+   * Pode ser null em saves antigos (antes do sistema de slots).
+   */
+  public String getPlayerName() {
+    return playerName;
+  }
+
+  public void setPlayerName(String playerName) {
+    this.playerName = playerName;
+  }
+
+  /** Índice da classe (0=Guerreiro, 1=Ladrão, 2=Feiticeiro). */
+  public int getCharacterClass() {
+    return characterClass;
+  }
+
+  public void setCharacterClass(int characterClass) {
+    this.characterClass = characterClass;
   }
 }
