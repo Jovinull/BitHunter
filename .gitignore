@@ -56,3 +56,7 @@ replay_pid*
 *.dat
 
 /out/
+
+# Build artifacts (BitHunter)
+/build/
+/classes/
