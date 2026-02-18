@@ -268,7 +268,25 @@ public class AssetSetter {
     place(monsters[mapNum][i++], 80, 20);
 
     monsters[mapNum][i] = new MonRedSlime(gp);
-    place(monsters[mapNum][i], 82, 22);
+    place(monsters[mapNum][i++], 82, 22);
+    // Red Slimes adicionais no mapa 1
+    monsters[mapNum][i] = new MonRedSlime(gp);
+    place(monsters[mapNum][i++], 82, 38);
+
+    monsters[mapNum][i] = new MonRedSlime(gp);
+    place(monsters[mapNum][i++], 85, 33);
+
+    monsters[mapNum][i] = new MonRedSlime(gp);
+    place(monsters[mapNum][i++], 90, 40);
+
+    monsters[mapNum][i] = new MonRedSlime(gp);
+    place(monsters[mapNum][i++], 91, 30);
+
+    monsters[mapNum][i] = new MonRedSlime(gp);
+    place(monsters[mapNum][i++], 90, 18);
+
+    monsters[mapNum][i] = new MonRedSlime(gp);
+    place(monsters[mapNum][i], 82, 26);
 
     // MAP HOUSE (sem monstros - dentro de casa)
 
