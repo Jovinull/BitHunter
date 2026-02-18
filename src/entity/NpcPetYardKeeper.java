@@ -14,7 +14,6 @@ public class NpcPetYardKeeper extends Entity {
 
   public NpcPetYardKeeper(GamePanel gp) {
     super(gp);
-    setType(TYPE_NPC);
     setInternalId(NPC_ID);
     setTranslationKey(NPC_ID);
 
