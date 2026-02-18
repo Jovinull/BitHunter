@@ -35,14 +35,15 @@ public class SaveManager {
       boolean occupied,
       boolean corrupt,
       String playerName,
-      int characterClass
+      int characterClass,
+      long totalPlayTimeSeconds
   ) {
     public static SlotInfo empty() {
-      return new SlotInfo(false, false, null, -1);
+      return new SlotInfo(false, false, null, -1, 0);
     }
 
     public static SlotInfo ofCorrupt() {
-      return new SlotInfo(true, true, null, -1);
+      return new SlotInfo(true, true, null, -1, -1);
     }
   }
 
@@ -95,7 +96,8 @@ public class SaveManager {
         String name = ds.getPlayerName();
         return new SlotInfo(true, false,
             name != null ? name : "",
-            ds.getCharacterClass());
+            ds.getCharacterClass(),
+            ds.getTotalPlayTimeSeconds());
       }
       return SlotInfo.ofCorrupt();
     } catch (Exception e) {

@@ -239,6 +239,7 @@ public class KeyHandler implements KeyListener {
     gp.resetGame(true);
     gp.getPlayer().setPlayerName(playerName);
     gp.getPlayer().setCharacterClass(classIndex);
+    gp.getPlayTimeTracker().start(0);
     gp.getSaveManager().save(slot);
 
     gp.setGameState(GamePanel.PLAY_STATE);
@@ -292,6 +293,8 @@ public class KeyHandler implements KeyListener {
     } else {
       if (info.occupied() && !info.corrupt()) {
         gp.getSaveManager().load(slot);
+        gp.getPlayTimeTracker().start(
+            gp.getPlayTimeTracker().getTotalSeconds());
         gp.setGameState(GamePanel.PLAY_STATE);
         gp.playMusic(0);
       }
@@ -761,6 +764,8 @@ public class KeyHandler implements KeyListener {
         gp.playMusic(0);
         gp.logRespawnDebug("respawn.end");
       } else if (commandNum == 1) {
+        gp.getPlayTimeTracker().stop();
+        gp.getSaveManager().save();
         gp.stopMusic();
         gp.resetGame(true);
         ui.setTitleScreenState(0);

@@ -467,6 +467,8 @@ class OptionsUi {
     if (ui.commandNum == 0) {
       g2.drawString(">", textX - 25, textY);
       if (keyH.isEnterPressed()) {
+        gp.getPlayTimeTracker().stop();
+        gp.getSaveManager().save();
         ui.setSubState(0);
         ui.commandNum = 0;
         ui.setTitleScreenState(0);
