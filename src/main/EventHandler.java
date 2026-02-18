@@ -161,7 +161,7 @@ public class EventHandler {
     }
     // dungeon 1 - saída (dungeon → overworld)
     if (hit(2, 25, 91, "any")) {
-      teleport(0, 75, 45, GamePanel.OUTSIDE);
+      teleport(0, 79, 14, GamePanel.OUTSIDE);
       return;
     }
     // dungeon 2 / boss room - entrada
