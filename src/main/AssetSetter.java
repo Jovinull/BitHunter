@@ -35,6 +35,7 @@ public class AssetSetter {
   private static final int MAP_HOUSE = 1;
   private static final int MAP_DUNGEON = 2;
   private static final int MAP_BOSS_ROOM = 3;
+  private static final int MAP_INDOOR2 = 4;
 
   private final GamePanel gp;
 
@@ -144,15 +145,19 @@ public class AssetSetter {
     npcs[mapNum][i] = new NpcOldMan(gp);
     place(npcs[mapNum][i++], 48, 48);
 
-    npcs[mapNum][i] = new NpcPetYardKeeper(gp);
-    place(npcs[mapNum][i], 52, 52);
-
     // MAP HOUSE
     mapNum = MAP_HOUSE;
     i = 0;
 
     npcs[mapNum][i] = new NpcMerchant(gp);
     place(npcs[mapNum][i], 12, 6);
+
+    // MAP INDOOR2 - Pet Yard
+    mapNum = MAP_INDOOR2;
+    i = 0;
+
+    npcs[mapNum][i] = new NpcPetYardKeeper(gp);
+    place(npcs[mapNum][i], 53, 53);
 
     // MAP DUNGEON - Pedras-obstáculo nas salas
     mapNum = MAP_DUNGEON;
@@ -256,7 +261,8 @@ public class AssetSetter {
     interactiveTiles[mapNum][i++] = new ItDryTree(gp, 72, 30);
     // Árvores secas no caminho sul
     interactiveTiles[mapNum][i++] = new ItDryTree(gp, 48, 70);
-    interactiveTiles[mapNum][i] = new ItDryTree(gp, 52, 70);
+    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 52, 70);
+    interactiveTiles[mapNum][i] = new ItDryTree(gp, 50, 9);
 
     // MAP DUNGEON
     mapNum = MAP_DUNGEON;

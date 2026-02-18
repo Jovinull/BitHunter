@@ -144,6 +144,16 @@ public class EventHandler {
       speak(gp.getNpc()[1][0]);
       return;
     }
+    // pet yard - entrada (overworld → indoor2)
+    if (hit(0, 50, 6, "any")) {
+      teleport(4, 58, 61, GamePanel.INDOOR);
+      return;
+    }
+    // pet yard - saída (indoor2 → overworld)
+    if (hit(4, 58, 61, "any")) {
+      teleport(0, 50, 7, GamePanel.OUTSIDE);
+      return;
+    }
     // dungeon 1 - entrada (overworld → dungeon)
     if (hit(0, 80, 14, "any")) {
       teleport(2, 25, 90, GamePanel.DUNGEON);

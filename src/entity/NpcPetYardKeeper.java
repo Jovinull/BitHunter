@@ -19,7 +19,7 @@ public class NpcPetYardKeeper extends Entity {
     setTranslationKey(NPC_ID);
 
     setDirection(DIR_DOWN);
-    setSpeed(1);
+    setSpeed(0);
 
     Rectangle sa = getSolidArea();
     sa.x = 8;
