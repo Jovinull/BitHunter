@@ -240,6 +240,24 @@ public class AssetSetter {
 
     monsters[mapNum][i] = new MonGreenSlime(gp);
     place(monsters[mapNum][i++], 59, 25);
+    // Green Slimes adicionais (nova faixa)
+    monsters[mapNum][i] = new MonGreenSlime(gp);
+    place(monsters[mapNum][i++], 20, 40);
+
+    monsters[mapNum][i] = new MonGreenSlime(gp);
+    place(monsters[mapNum][i++], 18, 36);
+
+    monsters[mapNum][i] = new MonGreenSlime(gp);
+    place(monsters[mapNum][i++], 12, 34);
+
+    monsters[mapNum][i] = new MonGreenSlime(gp);
+    place(monsters[mapNum][i++], 9, 27);
+
+    monsters[mapNum][i] = new MonGreenSlime(gp);
+    place(monsters[mapNum][i++], 10, 20);
+
+    monsters[mapNum][i] = new MonGreenSlime(gp);
+    place(monsters[mapNum][i++], 11, 12);
 
     // Orc patrulhando caminho oeste
     monsters[mapNum][i] = new MonOrc(gp);
@@ -286,7 +304,34 @@ public class AssetSetter {
     place(monsters[mapNum][i++], 90, 18);
 
     monsters[mapNum][i] = new MonRedSlime(gp);
-    place(monsters[mapNum][i], 82, 26);
+    place(monsters[mapNum][i++], 82, 26);
+    // Red Slimes adicionais (nova faixa)
+    monsters[mapNum][i] = new MonRedSlime(gp);
+    place(monsters[mapNum][i++], 17, 18);
+
+    monsters[mapNum][i] = new MonRedSlime(gp);
+    place(monsters[mapNum][i++], 20, 5);
+
+    monsters[mapNum][i] = new MonRedSlime(gp);
+    place(monsters[mapNum][i++], 22, 11);
+
+    monsters[mapNum][i] = new MonRedSlime(gp);
+    place(monsters[mapNum][i++], 16, 10);
+
+    monsters[mapNum][i] = new MonRedSlime(gp);
+    place(monsters[mapNum][i++], 14, 14);
+
+    monsters[mapNum][i] = new MonRedSlime(gp);
+    place(monsters[mapNum][i++], 25, 14);
+
+    monsters[mapNum][i] = new MonRedSlime(gp);
+    place(monsters[mapNum][i++], 38, 71);
+
+    monsters[mapNum][i] = new MonRedSlime(gp);
+    place(monsters[mapNum][i++], 46, 77);
+
+    monsters[mapNum][i] = new MonRedSlime(gp);
+    place(monsters[mapNum][i], 41, 83);
 
     // MAP HOUSE (sem monstros - dentro de casa)
 
