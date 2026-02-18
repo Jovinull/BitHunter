@@ -87,9 +87,10 @@ public class TileManager {
   }
 
   /**
-   * Carrega as imagens e a flag de colisão de cada tile
+   * Carrega as imagens e a flag de colisão de cada tile.
+   * Visibilidade private: evita chamada de método sobrescrevível no construtor.
    */
-  public void getTileImage() {
+  private void getTileImage() {
     for (int i = 0; i < fileNames.size(); i++) {
       String fileName = fileNames.get(i);
       boolean collision = "true".equals(collisionStatus.get(i));
@@ -114,9 +115,10 @@ public class TileManager {
   }
 
   /**
-   * Lê o layout do mapa de um arquivo de texto e preenche a matriz mapTileNum
+   * Lê o layout do mapa de um arquivo de texto e preenche a matriz mapTileNum.
+   * Marcado como final: evita chamada de método sobrescrevível no construtor.
    */
-  public void loadMap(String filePath, int map) {
+  public final void loadMap(String filePath, int map) {
     try (InputStream is = getClass().getResourceAsStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
 

@@ -28,12 +28,21 @@ public class NpcPetYardKeeper extends Entity {
     sa.width = 30;
     sa.height = 30;
 
-    getImage();
+    loadImage();
     setDialogues();
   }
 
   @Override
   public void getImage() {
+    loadImage();
+  }
+
+  /**
+   * Carrega sprites do NPC — private para evitar chamada de método
+   * sobrescrevível no construtor (override pode executar antes de campos
+   * da subclasse estarem inicializados).
+   */
+  private void loadImage() {
     int size = GamePanel.TILE_SIZE;
 
     var yard = setup("/npc/yard", size, size);
