@@ -57,6 +57,11 @@ public class DataStorage implements Serializable {
   private String playerName;
   private int characterClass;
 
+  // ===== TEMPO DE JOGO =====
+  // Total de segundos jogados neste save (acumulado entre sessões).
+  // Saves antigos não possuem este campo; o getter retorna 0 nesse caso.
+  private long totalPlayTimeSeconds;
+
   // ===== CHEAT CODES (ONE_TIME) =====
   // Armazena os códigos ONE_TIME já utilizados para impedir reuso entre sessões.
   // Pode ser null em saves antigos (antes desta feature); o getter trata isso.
@@ -306,6 +311,20 @@ public class DataStorage implements Serializable {
 
   public void setBestiaryPoints(int bestiaryPoints) {
     this.bestiaryPoints = bestiaryPoints;
+  }
+
+  // ===== TEMPO DE JOGO getters/setters =====
+
+  /**
+   * Total de segundos jogados neste save.
+   * Retorna 0 para saves antigos (campo primitivo long — default seguro).
+   */
+  public long getTotalPlayTimeSeconds() {
+    return totalPlayTimeSeconds;
+  }
+
+  public void setTotalPlayTimeSeconds(long totalPlayTimeSeconds) {
+    this.totalPlayTimeSeconds = totalPlayTimeSeconds;
   }
 
   // ===== CHEAT CODES getters/setters =====

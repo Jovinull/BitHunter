@@ -3,6 +3,7 @@ package ui;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
+import data.PlayTimeTracker;
 import data.SaveManager;
 import data.SaveManager.SlotInfo;
 import main.GamePanel;
@@ -123,9 +124,19 @@ class SaveSlotUi {
     int infoX = textX + 170;
     g2.setFont(ui.fonts.displayPlain(22F));
 
+    String timeLabel = ui.t("ui.save.playTime") + " ";
+    int rightPad = x + w - 16;
+
     if (info.corrupt()) {
       g2.setColor(COL_CORRUPTED);
       g2.drawString(ui.t("ui.save.corrupted"), infoX, firstLineY);
+
+      String timeText = timeLabel + ui.t("ui.save.playTimeUnavailable");
+      g2.setFont(ui.fonts.displayPlain(18F));
+      g2.setColor(COL_CORRUPTED);
+      int tw = (int) g2.getFontMetrics().getStringBounds(timeText, g2).getWidth();
+      g2.drawString(timeText, rightPad - tw, firstLineY);
+      g2.setFont(ui.fonts.displayPlain(22F));
     } else if (info.occupied()) {
       String pName = info.playerName();
       if (pName == null || pName.isBlank()) {
@@ -137,9 +148,24 @@ class SaveSlotUi {
       String className = getClassDisplayName(info.characterClass());
       g2.setColor(UI.COL_TEXT_DIM);
       g2.drawString(className, infoX, firstLineY + lineH);
+
+      String timeText = timeLabel
+          + PlayTimeTracker.formatPlayTime(info.totalPlayTimeSeconds());
+      g2.setFont(ui.fonts.displayPlain(18F));
+      g2.setColor(UI.COL_TEXT_DIM);
+      int tw = (int) g2.getFontMetrics().getStringBounds(timeText, g2).getWidth();
+      g2.drawString(timeText, rightPad - tw, firstLineY + lineH);
+      g2.setFont(ui.fonts.displayPlain(22F));
     } else {
       g2.setColor(UI.COL_TEXT_DIM);
       g2.drawString(ui.t("ui.save.empty"), infoX, firstLineY);
+
+      String timeText = timeLabel + "--";
+      g2.setFont(ui.fonts.displayPlain(18F));
+      g2.setColor(UI.COL_TEXT_DIM);
+      int tw = (int) g2.getFontMetrics().getStringBounds(timeText, g2).getWidth();
+      g2.drawString(timeText, rightPad - tw, firstLineY);
+      g2.setFont(ui.fonts.displayPlain(22F));
     }
 
     if (selected && !disabled) {

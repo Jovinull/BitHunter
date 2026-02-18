@@ -104,6 +104,7 @@ public class SaveLoad {
     copyMapObjectsToStorage(ds);
     copyBestiaryToStorage(ds);
     copyCheatCodesToStorage(ds);
+    copyPlayTimeToStorage(ds);
     return ds;
   }
 
@@ -116,6 +117,7 @@ public class SaveLoad {
     applyIncubator(ds);
     applyBestiary(ds);
     applyCheatCodes(ds);
+    applyPlayTime(ds);
 
     // Recalcular atributos derivados
     var player = gp.getPlayer();
@@ -407,6 +409,19 @@ public class SaveLoad {
    */
   private void applyCheatCodes(DataStorage ds) {
     gp.getCheatCodeManager().setUsedOneTimeCodes(ds.getUsedCheatCodes());
+  }
+
+  /* ----- Play Time (SAVE) ----- */
+
+  private void copyPlayTimeToStorage(DataStorage ds) {
+    ds.setTotalPlayTimeSeconds(gp.getPlayTimeTracker().getTotalSeconds());
+  }
+
+  /* ----- Play Time (LOAD) ----- */
+
+  private void applyPlayTime(DataStorage ds) {
+    gp.getPlayTimeTracker().start(ds.getTotalPlayTimeSeconds());
+    gp.getPlayTimeTracker().pause();
   }
 
   /** Unboxing seguro: retorna {@code fallback} se {@code value} for null. */

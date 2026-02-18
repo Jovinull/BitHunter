@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 
 import ai.PathFinder;
 import bestiary.BestiaryService;
+import data.PlayTimeTracker;
 import data.SaveLoad;
 import data.SaveManager;
 import entity.Entity;
@@ -87,6 +88,7 @@ public class GamePanel extends JPanel implements Runnable {
   private final transient PetIncubator petIncubator = new PetIncubator(this);
   private final transient BestiaryService bestiaryService = new BestiaryService(this);
   private final transient CheatCodeManager cheatCodeManager = new CheatCodeManager(this);
+  private final transient PlayTimeTracker playTimeTracker = new PlayTimeTracker();
   transient Thread gameThread; // Thread para rodar o loop do jogo
 
   // ENTITY AND OBJECTS
@@ -688,8 +690,17 @@ public class GamePanel extends JPanel implements Runnable {
     return gameState;
   }
 
-  public void setGameState(int gameState) {
-    this.gameState = gameState;
+  public void setGameState(int newState) {
+    int oldState = this.gameState;
+    this.gameState = newState;
+
+    if (oldState == PLAY_STATE && newState != PLAY_STATE) {
+      playTimeTracker.pause();
+    } else if (oldState != PLAY_STATE && newState == PLAY_STATE) {
+      if (playTimeTracker.isRunning()) {
+        playTimeTracker.resume();
+      }
+    }
   }
 
   public boolean isBossBattleOn() {
@@ -754,5 +765,9 @@ public class GamePanel extends JPanel implements Runnable {
 
   public CheatCodeManager getCheatCodeManager() {
     return cheatCodeManager;
+  }
+
+  public PlayTimeTracker getPlayTimeTracker() {
+    return playTimeTracker;
   }
 }
