@@ -1,134 +1,189 @@
-Project License — Code & Assets
-Version: 1.0 (2025-11-01)
+BitHunter — Proprietary License / Licença Proprietária
+Version: 2.0 (2026-02-18)
 
-Author/Copyright: © 2025 Felipe Jovino
-Repository: This file governs all materials in this project unless a file or folder explicitly states a different license.
+Copyright (c) 2025–2026 Felipe Jovino
+All Rights Reserved / Todos os direitos reservados.
 
-──────────────────────────────────────────────────────────────────────────────
-0) PLAIN-LANGUAGE SUMMARY (Non-legal, for convenience only)
-──────────────────────────────────────────────────────────────────────────────
-• CODE: Licensed under the MIT License. You may use, copy, modify, merge, publish,
-  distribute, sublicense, and sell copies of the code, provided you include the
-  copyright notice and the license text. No warranty.
+Repository: https://github.com/Jovinull/BitHunter
 
-• ASSETS (art/audio/fonts/video/etc.): Licensed under Creative Commons
-  Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0).
-  You may share the assets for non-commercial purposes with proper attribution.
-  You may not distribute derivatives (e.g., recolors, edits, remixes), and you
-  may not use the assets commercially without separate permission.
+This is NOT an open-source license. This project is "source-available":
+the source code is publicly visible for transparency, study, and
+contribution, but it is NOT freely licensed for reuse.
 
-This summary does not replace the legal terms below.
+Este projeto NÃO é open-source. Ele é "source-available": o código-fonte
+é publicamente visível para transparência, estudo e contribuição, mas NÃO
+é livremente licenciado para reutilização.
 
-──────────────────────────────────────────────────────────────────────────────
-1) SCOPE & DEFINITIONS
-──────────────────────────────────────────────────────────────────────────────
-“Code” means source code and build/automation scripts located in folders such as
-`src/`, `app/`, or other programming files (e.g., `.java`, `.kt`, `.xml` for build),
-plus technical documentation specifically about the code.
+══════════════════════════════════════════════════════════════════════════
+1) DEFINITIONS / DEFINIÇÕES
+══════════════════════════════════════════════════════════════════════════
 
-“Assets” means non-code creative works including (without limitation) images,
-sprites, tiles, concept art, UI elements, icons, logos, illustrations, 2D/3D art,
-audio (music, SFX), fonts bundled with the project, and video. Typically located
-under folders like `assets/`, `art/`, `audio/`, `music/`, `fonts/`, `gfx/`, `ui/`,
-`sfx/`, `video/`, and subfolders. Assets generated automatically by the toolchain
-(e.g., compiled binaries) are not “Assets” unless they embed or replicate original
-creative content.
+"Project" means all files in this repository, including (without
+limitation) source code, build scripts, configuration files,
+documentation, and Assets.
 
-“Third-party components” are files that include their own license header or a
-nearby LICENSE/NOTICE file. For those, the third-party license prevails for that
-component.
+"Assets" means all non-code creative works including (without limitation)
+images, sprites, tiles, icons, logos, illustrations, UI elements, audio
+(music, sound effects), fonts, maps, level data, translations,
+game-design documents, and any other media files. Typically located under
+folders such as resource/, assets/, art/, audio/, fonts/, maps/, sounds/.
 
-For absolute clarity: the Code is under MIT; the Assets are under CC BY-NC-ND 4.0.
-If a path or file is unclear, the author’s intent is: code → MIT; creative media → CC.
+"Repository" means this specific Git repository and its official hosting
+location (e.g., on GitHub).
 
-──────────────────────────────────────────────────────────────────────────────
-2) CODE LICENSE (MIT)
-──────────────────────────────────────────────────────────────────────────────
-MIT License
+"Contribution" means any code, documentation, asset, or other material
+submitted to this Repository via pull request, patch, or similar
+mechanism.
 
-Copyright (c) 2025 Felipe Jovino
+══════════════════════════════════════════════════════════════════════════
+2) LIMITED PERMISSION GRANT / PERMISSÃO LIMITADA
+══════════════════════════════════════════════════════════════════════════
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
+Subject to the restrictions below, you are permitted to:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+(a) VIEW the source code and Assets in this Repository for personal
+    study, evaluation, and educational purposes.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+(b) CLONE or DOWNLOAD this Repository to a local machine for the sole
+    purpose of personal study, evaluation, local execution, or preparing
+    Contributions to this Repository.
 
-──────────────────────────────────────────────────────────────────────────────
-3) ASSETS LICENSE (CREATIVE COMMONS BY-NC-ND 4.0)
-──────────────────────────────────────────────────────────────────────────────
-License: Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International
-Canonical Legal Code: https://creativecommons.org/licenses/by-nc-nd/4.0/
+(c) RUN the Project locally for personal, non-commercial evaluation and
+    testing.
 
-By exercising the licensed rights in the Assets, you accept the CC BY-NC-ND 4.0
-terms. In short (this summary does not replace the legal code at the URL above):
+(d) CONTRIBUTE to this Repository by submitting pull requests or issues,
+    subject to the Contribution terms in Section 4.
 
-• Attribution (BY): When sharing the Assets, you must give appropriate credit to
-  “Felipe Jovino”, provide a link to this license, and indicate if changes were made.
-  (Note: You are not permitted to distribute Adapted Material—see “ND” below.)
+No other rights are granted, whether expressly or by implication,
+estoppel, or otherwise.
 
-• NonCommercial (NC): You may not use the Assets for commercial purposes or for
-  monetary compensation/advantage without separate written permission from the author.
+══════════════════════════════════════════════════════════════════════════
+3) RESTRICTIONS / RESTRIÇÕES
+══════════════════════════════════════════════════════════════════════════
 
-• NoDerivatives (ND): You may not share modified, remixed, recolored, edited, or
-  otherwise adapted versions of the Assets. Distribution of such derivatives is not
-  permitted under this license.
+You may NOT, without prior written authorization from the copyright
+holder:
 
-• Technical transformations: Purely technical modifications necessary for use
-  (e.g., compression, format conversion) do not, by themselves, create “Adapted
-  Material” under the CC license, provided they do not produce a new creative work.
+(a) REUSE, COPY, EXTRACT, or INCORPORATE any part of this Project
+    (including code, Assets, or documentation) into another project,
+    product, library, package, or repository — whether open-source,
+    proprietary, commercial, or non-commercial.
 
-• No endorsement: You must not imply endorsement by the author.
+(b) REDISTRIBUTE this Project or any part of it, in source or compiled
+    form, outside of this Repository. This includes (without limitation)
+    publishing on package registries (npm, Maven Central, etc.),
+    distributing builds/binaries, uploading to other hosting platforms,
+    or sharing modified copies.
 
-• Other rights: Moral rights, publicity/privacy rights, patent and trademark rights
-  are not licensed. “AS IS”/no warranty; liability is disclaimed to the maximum extent.
+(c) PUBLISH FORKS as independent or derivative projects. You may fork
+    this Repository solely for the purpose of preparing Contributions
+    (pull requests) back to this Repository. Publishing a fork as your
+    own project, under any name or license, is expressly prohibited.
 
-For the complete and authoritative terms, consult the legal code at the canonical URL.
+(d) CREATE DERIVATIVE WORKS outside the Contribution workflow described
+    in Section 4. This includes (without limitation) adaptations,
+    translations (of Assets, not code contributions), remixes, mods
+    distributed separately, or any work based on this Project.
 
-──────────────────────────────────────────────────────────────────────────────
-4) PRACTICAL GUIDANCE (NON-BINDING, FOR CLARITY)
-──────────────────────────────────────────────────────────────────────────────
-Allowed with Assets:
-• Non-commercial sharing of the original, unmodified Assets with attribution to
-  “Felipe Jovino” and a link to the CC BY-NC-ND 4.0 license.
-• Technical changes needed for runtime (e.g., compression) that are not distributed
-  as standalone “new” assets.
+(e) USE ASSETS (sprites, sounds, music, fonts, maps, images, texts,
+    illustrations, UI elements, level data, etc.) in any context outside
+    this Repository — even for non-commercial or educational purposes.
+    The Assets are All Rights Reserved and are inseparable from the
+    Project for licensing purposes.
 
-Not allowed with Assets:
-• Commercial use by third parties (e.g., using the art/audio in a paid game).
-• Distribution of modified Assets (e.g., recolors, edits, remixes, extractions as a pack).
-• Publishing the Assets separately as a stock/asset pack, whether free or paid.
+(f) SUBLICENSE, SELL, LEASE, or otherwise transfer any rights granted
+    under this license.
 
-If you want a commercial or derivative-friendly license for the Assets, contact
-the author to negotiate a separate license.
+(g) REMOVE or ALTER any copyright notice, license text, or attribution
+    contained in this Repository.
 
-──────────────────────────────────────────────────────────────────────────────
-5) THIRD-PARTY COMPONENTS
-──────────────────────────────────────────────────────────────────────────────
-Any third-party file that contains its own license header or is accompanied by a
-license/notice file remains governed by that third-party license. Where required,
-include the third-party notices when redistributing.
+══════════════════════════════════════════════════════════════════════════
+4) CONTRIBUTIONS / CONTRIBUIÇÕES
+══════════════════════════════════════════════════════════════════════════
 
-──────────────────────────────────────────────────────────────────────────────
-6) SHORT NOTICE FOR README (OPTIONAL COPY/PASTE)
-──────────────────────────────────────────────────────────────────────────────
-Code: MIT © 2025 Felipe Jovino — see LICENSE.txt
-Assets (art/audio/fonts/etc.): CC BY-NC-ND 4.0 — attribution required, no commercial
-use, no derivatives. Legal code: https://creativecommons.org/licenses/by-nc-nd/4.0/
+Contributions to this Repository (via pull request, patch, or similar)
+are welcome, subject to the following terms:
 
-──────────────────────────────────────────────────────────────────────────────
-7) CONTACT
-──────────────────────────────────────────────────────────────────────────────
-For special permissions (e.g., commercial or derivative use of Assets), please
-contact the author.
+(a) By submitting a Contribution, you represent and warrant that:
+    - You are the original author of the Contribution, or you have
+      sufficient rights to submit it under these terms.
+    - The Contribution does not infringe any third-party intellectual
+      property rights.
+
+(b) By submitting a Contribution, you irrevocably agree that:
+    - The Contribution may be incorporated into the Project under this
+      same license (All Rights Reserved, copyright held by Felipe
+      Jovino).
+    - You grant Felipe Jovino a perpetual, worldwide, non-exclusive,
+      royalty-free, irrevocable license to use, modify, distribute, and
+      sublicense the Contribution as part of this Project, under this
+      license or any future license chosen by the copyright holder.
+    - You waive any claim to additional compensation or attribution
+      beyond what is customarily provided (e.g., Git commit history).
+
+(c) The copyright holder reserves the right to accept, reject, or
+    modify any Contribution at their sole discretion.
+
+See CONTRIBUTING.md for practical guidelines on how to contribute.
+
+══════════════════════════════════════════════════════════════════════════
+5) THIRD-PARTY COMPONENTS / COMPONENTES DE TERCEIROS
+══════════════════════════════════════════════════════════════════════════
+
+If any file or component in this Repository includes its own license
+header or is accompanied by a separate LICENSE/NOTICE file, that
+third-party license governs that specific component. The restrictions in
+this license apply to all other files.
+
+══════════════════════════════════════════════════════════════════════════
+6) DISCLAIMER OF WARRANTY / ISENÇÃO DE GARANTIA
+══════════════════════════════════════════════════════════════════════════
+
+THIS PROJECT IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+
+IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES,
+OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR
+OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THIS PROJECT OR
+THE USE OR OTHER DEALINGS IN THIS PROJECT.
+
+USE AT YOUR OWN RISK.
+
+══════════════════════════════════════════════════════════════════════════
+7) TERMINATION / RESCISÃO
+══════════════════════════════════════════════════════════════════════════
+
+Any rights granted under this license terminate automatically if you
+violate any of its terms. Upon termination, you must destroy all copies
+of the Project in your possession.
+
+══════════════════════════════════════════════════════════════════════════
+8) GOVERNING INTENT / INTENÇÃO
+══════════════════════════════════════════════════════════════════════════
+
+The intent of this license is clear:
+
+- This Repository is PUBLIC so that people can see how the Project
+  works, learn from it, and contribute improvements back.
+- Nobody may take code, assets, or any other material from this
+  Repository and use it elsewhere — not in other projects, not in forks
+  published as separate projects, not in packages, not in commercial
+  products, not in non-commercial products.
+- Contributions are welcome, but only directed at THIS Repository.
+
+If any provision of this license is found to be unenforceable, the
+remaining provisions shall continue in full force and effect.
+
+══════════════════════════════════════════════════════════════════════════
+9) CONTACT / CONTATO
+══════════════════════════════════════════════════════════════════════════
+
+For permissions beyond those granted here (commercial licensing, asset
+licensing, redistribution rights, etc.), contact the copyright holder:
+
+Felipe Jovino
+
+══════════════════════════════════════════════════════════════════════════
+END OF LICENSE
+══════════════════════════════════════════════════════════════════════════

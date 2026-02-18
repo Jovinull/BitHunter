@@ -1,5 +1,14 @@
 # <div align="center">BitHunter</div>
 # <div align="center"><sub>Um RPG 2D top-down em Java (AWT/Swing) — engine “na unha”, com foco em sistemas, legibilidade e iteração rápida.</sub></div>
+
+<div align="center">
+
+> **Source-available / Proprietary** — Este repositório é público, mas **não é open-source**.<br/>
+> O código e os assets são protegidos (All Rights Reserved). Contribuições via PR são bem-vindas.<br/>
+> Reutilização fora deste repositório é **proibida**. Veja [`LICENSE`](LICENSE) e [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+</div>
+
 <br/>
 
 <div align="center">
@@ -640,21 +649,25 @@ Sem inventar escopo, estas são melhorias naturalmente sugeridas pelo estado atu
 
 ## Contribuição
 
-O repositório não contém `CONTRIBUTING.md` nem templates de PR/Issue. Ainda assim, um fluxo que combina com a estrutura atual:
+Contribuições (issues e pull requests) são bem-vindas! Consulte [`CONTRIBUTING.md`](CONTRIBUTING.md) para as regras completas.
 
-- **Discussão técnica**: abra uma Issue descrevendo “o quê” e “por quê” (principalmente para mudanças em assets e gameplay).
-- **PRs pequenas**: alterações focadas por subsistema (`ui/`, `entity/`, `tile/`, `data/`…).
-- **Compatibilidade com saves**: mudanças em `internalId` e em `data.DataStorage` afetam `save.dat`. Evite renomear IDs estáveis sem estratégia de migração.
-- **i18n**: sempre que adicionar textos, inclua chaves em `messages_pt_BR.properties` e (quando possível) nos demais idiomas.
+**Resumo rápido:**
+
+- Abra uma Issue antes de grandes mudanças.
+- PRs focados por subsistema (`ui/`, `entity/`, `tile/`, `data/`…).
+- Ao submeter um PR, você declara ter direito sobre o que enviou e concorda em licenciar a contribuição sob os mesmos termos do [`LICENSE`](LICENSE).
+- Contribuições devem ser originais ou compatíveis com a política do projeto.
 
 ---
 
 ## Licença
 
-O arquivo `LICENSE` define um modelo “duplo”:
+> **Source-available / Proprietary — All Rights Reserved**
 
-- **Código**: **MIT License**.
-- **Assets** (arte/áudio/fontes/vídeo etc.): **CC BY-NC-ND 4.0** (atribuição obrigatória, não comercial, sem derivativos).
+Este projeto é **público** e aceita contribuições, mas **não é open-source**.
 
-> Consulte `LICENSE` para os termos completos e para o racional (inclusive orientações práticas).
+- **Código, assets, sons, imagens, sprites, fontes, mapas e textos** estão todos protegidos sob a mesma licença proprietária (All Rights Reserved © 2025–2026 Felipe Jovino).
+- **Permitido**: visualizar, clonar, rodar localmente para estudo/avaliação e contribuir via PR para **este** repositório.
+- **Proibido**: reutilizar código ou assets em outros projetos, publicar forks como projetos próprios, redistribuir builds/binários, empacotar bibliotecas, ou criar derivados fora do fluxo de contribuição deste repositório.
 
+Consulte [`LICENSE`](LICENSE) para os termos completos e [`CONTRIBUTING.md`](CONTRIBUTING.md) para as regras de contribuição.
