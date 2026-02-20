@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import entity.Entity;
+import environment.WeatherType;
 import main.GamePanel;
 import pets.PetFactory;
 
@@ -314,6 +315,26 @@ class HudUi {
 
     String bossName = monster.getDisplayName();
     g2.drawString(bossName, x + 4, y - 10);
+  }
+
+  /** Indicador discreto do clima atual no canto superior direito. */
+  void drawWeatherIndicator() {
+    var gp = ui.getGamePanel();
+    var wm = gp.getEnvironmentManager().getWeatherManager();
+    if (wm == null) return;
+
+    WeatherType type = wm.getCurrentType();
+    if (type == WeatherType.CLEAR) return;
+
+    Graphics2D g2 = ui.g2;
+    String label = type.name();
+
+    g2.setFont(ui.fonts.pixelBold(12F));
+    g2.setColor(new Color(255, 255, 255, 140));
+    var fm = g2.getFontMetrics();
+    int x = GamePanel.SCREEN_WIDTH - fm.stringWidth(label) - 12;
+    int y = 22;
+    g2.drawString(label, x, y);
   }
 
   void drawMessage() {

@@ -169,6 +169,7 @@ public class UI {
         hudUi.drawPlayerLife();
         hudUi.drawPetHud();
         hudUi.drawMonsterLife();
+        hudUi.drawWeatherIndicator();
         hudUi.drawMessage();
       }
       case GamePanel.PAUSE_STATE -> pauseUi.drawPauseScreen();
