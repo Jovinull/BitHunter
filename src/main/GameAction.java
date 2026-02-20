@@ -43,6 +43,7 @@ public enum GameAction {
   // ── Debug ──
   DEBUG_TOGGLE(KeyEvent.VK_T, Category.DEBUG),
   DEBUG_RELOAD_MAP(KeyEvent.VK_R, Category.DEBUG),
+  DEBUG_WEATHER_CYCLE(KeyEvent.VK_F6, Category.DEBUG),
 
   // ── Camadas do mapa (tela de mapa) ──
   MAP_LAYER_NPC(KeyEvent.VK_1, Category.MAP_LAYERS),

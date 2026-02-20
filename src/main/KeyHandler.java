@@ -462,6 +462,7 @@ public class KeyHandler implements KeyListener {
     // Dev shortcuts (respeitam debug.enabled via InputBindings)
     if (is(key, GameAction.DEBUG_TOGGLE)) toggleDebug();
     if (is(key, GameAction.DEBUG_RELOAD_MAP)) reloadCurrentMap();
+    if (is(key, GameAction.DEBUG_WEATHER_CYCLE)) cycleWeather();
   }
 
   /**
@@ -1037,6 +1038,13 @@ public class KeyHandler implements KeyListener {
   private void toggleDebug() {
     showDebugText = !showDebugText;
     gp.getTileM().setDrawPath(showDebugText);
+  }
+
+  private void cycleWeather() {
+    var wm = gp.getEnvironmentManager().getWeatherManager();
+    if (wm != null) {
+      wm.cycleWeather();
+    }
   }
 
   private void reloadCurrentMap() {
