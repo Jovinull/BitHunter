@@ -32,6 +32,7 @@ class TransitionUi {
 
       player.setWorldX(GamePanel.TILE_SIZE * eventHandler.getTempCol());
       player.setWorldY(GamePanel.TILE_SIZE * eventHandler.getTempRow());
+      player.snapPetToSelf();
 
       eventHandler.setPreviousEventX(player.getWorldX());
       eventHandler.setPreviousEventY(player.getWorldY());

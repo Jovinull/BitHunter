@@ -150,10 +150,16 @@ public class Player extends Entity {
     setWorldX(GamePanel.TILE_SIZE * 50);
     setWorldY(GamePanel.TILE_SIZE * 50);
     setDirection(DIR_DOWN);
+    snapPetToSelf();
+  }
 
+  /**
+   * Reposiciona o pet junto do player (se houver pet ativo).
+   * Deve ser chamado após qualquer teleporte instantâneo do player.
+   */
+  public void snapPetToSelf() {
     if (pet != null) {
-      pet.setWorldX(getWorldX() - GamePanel.TILE_SIZE);
-      pet.setWorldY(getWorldY());
+      pet.snapToOwner();
     }
   }
 
@@ -1201,8 +1207,7 @@ public class Player extends Entity {
     this.activePetId = petId;
     this.pet = newPet;
 
-    pet.setWorldX(getWorldX() - GamePanel.TILE_SIZE);
-    pet.setWorldY(getWorldY());
+    pet.snapToOwner();
     return true;
   }
 

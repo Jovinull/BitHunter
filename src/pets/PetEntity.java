@@ -146,6 +146,17 @@ public abstract class PetEntity extends Entity {
    */
   protected abstract void applyPassiveEffect();
 
+  /**
+   * Reposiciona o pet instantaneamente ao lado do owner.
+   * Usado durante teleportes para evitar que o pet "ande" pelo mapa inteiro.
+   */
+  public void snapToOwner() {
+    setWorldX(owner.getWorldX() - GamePanel.TILE_SIZE);
+    setWorldY(owner.getWorldY());
+    setDirection(owner.getDirection());
+    setSpriteCounter(0);
+  }
+
   public Player getOwner() {
     return owner;
   }

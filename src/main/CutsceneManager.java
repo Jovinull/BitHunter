@@ -154,6 +154,7 @@ public class CutsceneManager {
         // Restaurar posição do player
         player.setWorldX(npcs[currentMap][i].getWorldX());
         player.setWorldY(npcs[currentMap][i].getWorldY());
+        player.snapPetToSelf();
         // Remover o dummy
         npcs[currentMap][i] = null;
         break;
