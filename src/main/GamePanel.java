@@ -189,6 +189,11 @@ public class GamePanel extends JPanel implements Runnable {
       if (lighting != null) {
         lighting.resetDay();
       }
+
+      var weatherManager = eManager.getWeatherManager();
+      if (weatherManager != null) {
+        weatherManager.reset();
+      }
     }
   }
 
@@ -511,6 +516,14 @@ public class GamePanel extends JPanel implements Runnable {
     y += lineHeight;
     boolean god = keyH.isGodModeOn();
     g2.drawString("God Mode (NoClip): " + god, x, y);
+
+    var wm = eManager.getWeatherManager();
+    if (wm != null) {
+      y += lineHeight;
+      g2.drawString("Weather: " + wm.getCurrentType().name(), x, y);
+      y += lineHeight;
+      g2.drawString("W.Duration: " + wm.getDurationRemaining() / 60 + "s", x, y);
+    }
   }
 
   public void drawToScreen() {
