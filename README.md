@@ -226,6 +226,72 @@ java -jar build/app.jar
 
 ---
 
+## Gerar executável (.exe) com runtime embutido
+
+> **Requisito:** JDK 14+ com o comando `jpackage` disponível no PATH.
+
+O `jpackage` empacota o `.jar` junto com um runtime Java, gerando um `.exe` standalone que não exige Java instalado na máquina do usuário.
+
+### 1) Gere o JAR (se ainda não gerou)
+
+Siga os passos da seção [Build (com resources)](#build-com-resources) para produzir o `build/app.jar`.
+
+### 2) Prepare a pasta de input
+
+O `jpackage` exige que o `--main-jar` seja **apenas o nome do arquivo** (sem caminho), e que esse `.jar` esteja **dentro da pasta** informada em `--input`.
+
+Crie a estrutura de packaging e copie o JAR para dentro dela:
+
+```powershell
+cd D:\Workspace\BitHunter\build
+
+mkdir .\package\input -Force | Out-Null
+mkdir .\package\out   -Force | Out-Null
+
+Copy-Item .\app.jar .\package\input\ -Force
+```
+
+> Se o seu JAR tiver outro nome (ex.: `BitHunter-v1.0.0.jar`), ajuste o nome nos comandos abaixo.
+
+### 3) Gere o executável
+
+```powershell
+jpackage `
+  --type app-image `
+  --dest .\package\out `
+  --name BitHunter `
+  --input .\package\input `
+  --main-jar app.jar
+```
+
+| Parâmetro      | O que faz                                                            |
+| -------------- | -------------------------------------------------------------------- |
+| `--type`       | `app-image` gera uma pasta com o `.exe` (sem instalador)             |
+| `--dest`       | Pasta de destino onde o pacote será criado                           |
+| `--name`       | Nome do executável gerado                                            |
+| `--input`      | Pasta que contém o `.jar` e quaisquer arquivos extras                |
+| `--main-jar`   | **Apenas o nome** do JAR (sem caminho) — deve estar dentro de `--input` |
+
+### 4) Resultado
+
+Após a execução, o executável estará em:
+
+```
+build\package\out\BitHunter\BitHunter.exe
+```
+
+A pasta `BitHunter\` conterá o runtime Java embutido (subpasta `runtime\`) e tudo que estava em `--input`. Basta distribuir essa pasta inteira — o usuário final **não precisa ter Java instalado**.
+
+### Incluindo arquivos extras no pacote
+
+Se o jogo precisar de arquivos externos ao JAR em tempo de execução (como `config.txt` ou pastas de assets), basta copiá-los para a pasta `--input` antes de rodar o `jpackage`. Tudo que estiver dentro de `--input` será incluído no pacote final junto ao `.exe`.
+
+```powershell
+Copy-Item ..\config.txt .\package\input\ -Force
+```
+
+---
+
 ## Como rodar localmente
 
 ### Via VS Code (config já no repo)
