@@ -23,12 +23,6 @@
         - UI modular (HUD, trade, opções, pet yard…)<br/>
         - i18n com <code>.properties</code><br/>
       </td>
-      <td align="left">
-        <b>⚠️ Observação importante sobre assets</b><br/>
-        O código referencia <i>sprites</i>, <i>tiles</i>, fontes e sons via classpath (<code>/objects</code>, <code>/player</code>, <code>/tiles</code>, <code>/sounds</code>, <code>/font</code>…), mas este repositório (no estado atual) <b>não contém</b> arquivos <code>.png</code>/<code>.wav</code>/<code>.ttf</code> versionados.<br/>
-        <br/>
-        Isso significa que o projeto pode <b>não rodar “do zero”</b> sem adicionar esses recursos na pasta <code>resource/</code> (ver <a href="#recursos-assets-e-classpath">Recursos (assets) e classpath</a>).
-      </td>
     </tr>
   </table>
 </div>
