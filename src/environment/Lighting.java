@@ -24,7 +24,10 @@ public class Lighting {
 
   private DayPhase dayPhase = DayPhase.DAY;
 
-  /** Cached derived font for the debug day-phase overlay (avoids per-frame allocation). */
+  /**
+   * Cached derived font for the debug day-phase overlay (avoids per-frame
+   * allocation).
+   */
   private Font debugPhaseFont;
 
   public Lighting(GamePanel gp) {
@@ -195,5 +198,27 @@ public class Lighting {
 
   public String getDayPhaseName() {
     return dayPhase.name();
+  }
+
+  public String getFormattedTime() {
+    int totalFrames = 0;
+    switch (dayPhase) {
+      case DAY -> totalFrames = dayCounter;
+      case DUSK -> totalFrames = 18000 + (int) (filterAlpha * 1800f);
+      case NIGHT -> totalFrames = 19800 + dayCounter;
+      case DAWN -> totalFrames = 30600 + dayCounter;
+    }
+
+    // 32400 frames = 24 hours = 1440 minutes
+    // 1 frame = 1440 / 32400 minutes = 1 / 22.5 minutes
+    int totalMinutes = (int) (totalFrames / 22.5f);
+
+    // Assume DAY starts at 06:00
+    totalMinutes += 360;
+
+    int hour = (totalMinutes / 60) % 24;
+    int minute = totalMinutes % 60;
+
+    return String.format("%02d:%02d", hour, minute);
   }
 }
