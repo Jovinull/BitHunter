@@ -2,6 +2,7 @@ package ui;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 
 import data.PlayTimeTracker;
 import data.SaveManager;
@@ -86,7 +87,7 @@ class SaveSlotUi {
 
       boolean disabled = (mode == MODE_CONTINUE)
           && (!infos[i].occupied() || infos[i].corrupt());
-      drawSlotCard(cardX, y, cardW, cardH, i + 1, infos[i],
+      drawSlotCard(new Rectangle(cardX, y, cardW, cardH), i + 1, infos[i],
           selected, disabled);
     }
 
@@ -103,8 +104,13 @@ class SaveSlotUi {
         UI.COL_TEXT_DIM, Color.black, 2);
   }
 
-  private void drawSlotCard(int x, int y, int w, int h,
+  private void drawSlotCard(Rectangle bounds,
       int slotNum, SlotInfo info, boolean selected, boolean disabled) {
+    int x = bounds.x;
+    int y = bounds.y;
+    int w = bounds.width;
+    int h = bounds.height;
+
     Graphics2D g2 = ui.g2;
 
     Color bgColor = disabled ? COL_DISABLED_BG : UI.COL_PANEL;
@@ -131,10 +137,24 @@ class SaveSlotUi {
         textX, firstLineY);
 
     int infoX = textX + 170;
-    g2.setFont(ui.fonts.displayPlain(22F));
-
-    String timeLabel = ui.t("ui.save.playTime") + " ";
     int rightPad = x + w - 16;
+
+    drawSlotInfo(g2, info, infoX, firstLineY, lineH, rightPad, disabled);
+
+    if (selected && !disabled) {
+      int triX = x - 20;
+      int triY = y + h / 2 - 10;
+      int[] xs = { triX, triX + 14, triX };
+      int[] ys = { triY, triY + 10, triY + 20 };
+      g2.setColor(UI.COL_ACCENT);
+      g2.fillPolygon(xs, ys, 3);
+    }
+  }
+
+  private void drawSlotInfo(Graphics2D g2, SlotInfo info, int infoX, int firstLineY, int lineH, int rightPad,
+      boolean disabled) {
+    g2.setFont(ui.fonts.displayPlain(22F));
+    String timeLabel = ui.t("ui.save.playTime") + " ";
 
     if (info.corrupt()) {
       g2.setColor(COL_CORRUPTED);
@@ -175,15 +195,6 @@ class SaveSlotUi {
       int tw = (int) g2.getFontMetrics().getStringBounds(timeText, g2).getWidth();
       g2.drawString(timeText, rightPad - tw, firstLineY);
       g2.setFont(ui.fonts.displayPlain(22F));
-    }
-
-    if (selected && !disabled) {
-      int triX = x - 20;
-      int triY = y + h / 2 - 10;
-      int[] xs = { triX, triX + 14, triX };
-      int[] ys = { triY, triY + 10, triY + 20 };
-      g2.setColor(UI.COL_ACCENT);
-      g2.fillPolygon(xs, ys, 3);
     }
   }
 
