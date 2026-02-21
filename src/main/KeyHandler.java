@@ -459,10 +459,12 @@ public class KeyHandler implements KeyListener {
       gp.setGameState(GamePanel.BESTIARY_STATE);
     }
 
-    // Dev shortcuts (respeitam debug.enabled via InputBindings)
-    if (is(key, GameAction.DEBUG_TOGGLE)) toggleDebug();
-    if (is(key, GameAction.DEBUG_RELOAD_MAP)) reloadCurrentMap();
-    if (is(key, GameAction.DEBUG_WEATHER_CYCLE)) cycleWeather();
+    // Dev shortcuts (respeitam debug.enabled via InputBindings + god mode)
+    if (is(key, GameAction.DEBUG_TOGGLE)
+        || is(key, GameAction.DEBUG_RELOAD_MAP)
+        || is(key, GameAction.DEBUG_WEATHER_CYCLE)) {
+      handleDevShortcut(key);
+    }
   }
 
   /**
@@ -1045,6 +1047,23 @@ public class KeyHandler implements KeyListener {
     if (wm != null) {
       wm.cycleWeather();
     }
+  }
+
+  /**
+   * Despacha atalhos de dev somente se o GOD MODE estiver ativo.
+   * <p>Centraliza a checagem para evitar ifs espalhados.
+   * Se god mode estiver desativado, exibe feedback discreto no HUD.</p>
+   */
+  private void handleDevShortcut(int key) {
+    if (!godModeOn) {
+      gp.getGameUi().addMessage(
+          gp.getLanguageManager().text("debug.devShortcutLocked"));
+      return;
+    }
+
+    if (is(key, GameAction.DEBUG_TOGGLE)) toggleDebug();
+    if (is(key, GameAction.DEBUG_RELOAD_MAP)) reloadCurrentMap();
+    if (is(key, GameAction.DEBUG_WEATHER_CYCLE)) cycleWeather();
   }
 
   private void reloadCurrentMap() {
