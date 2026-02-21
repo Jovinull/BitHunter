@@ -74,7 +74,16 @@ class SaveSlotUi {
     g2.setFont(ui.fonts.displayPlain(28F));
     for (int i = 0; i < SaveManager.MAX_SLOTS; i++) {
       int y = startY + i * (cardH + gap);
-      boolean selected = (ui.getCommandNum() == i);
+      boolean isDialogActive = (ui.getTitleScreenState() == 3 || ui.getTitleScreenState() == 4);
+      boolean selected;
+      if (isDialogActive) {
+        // If a dialog is open on top, keep the selection fixed on the slot that
+        // triggered it
+        selected = ((ui.getSelectedSaveSlot() - 1) == i);
+      } else {
+        selected = (ui.getCommandNum() == i);
+      }
+
       boolean disabled = (mode == MODE_CONTINUE)
           && (!infos[i].occupied() || infos[i].corrupt());
       drawSlotCard(cardX, y, cardW, cardH, i + 1, infos[i],
@@ -171,8 +180,8 @@ class SaveSlotUi {
     if (selected && !disabled) {
       int triX = x - 20;
       int triY = y + h / 2 - 10;
-      int[] xs = {triX, triX + 14, triX};
-      int[] ys = {triY, triY + 10, triY + 20};
+      int[] xs = { triX, triX + 14, triX };
+      int[] ys = { triY, triY + 10, triY + 20 };
       g2.setColor(UI.COL_ACCENT);
       g2.fillPolygon(xs, ys, 3);
     }
@@ -197,7 +206,7 @@ class SaveSlotUi {
     g2.setColor(COL_OVERLAY);
     g2.fillRect(0, 0, GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT);
 
-    int w = (int) (GamePanel.SCREEN_WIDTH * 0.6);
+    int w = (int) (GamePanel.SCREEN_WIDTH * 0.85);
     int h = GamePanel.TILE_SIZE * 5;
     int x = (GamePanel.SCREEN_WIDTH - w) / 2;
     int y = (GamePanel.SCREEN_HEIGHT - h) / 2;
@@ -205,6 +214,9 @@ class SaveSlotUi {
 
     g2.setFont(ui.fonts.displayPlain(24F));
     int textY = y + GamePanel.TILE_SIZE + 10;
+
+    // Instead of hardcoding two lines, dynamically measure and potentially wrap or
+    // fit the text across the wider box
     ui.drawTextShadowCentered(ui.t("ui.save.overwrite.line1"),
         textY, UI.COL_TEXT, Color.black, 2);
     ui.drawTextShadowCentered(ui.t("ui.save.overwrite.line2"),
@@ -228,7 +240,7 @@ class SaveSlotUi {
     g2.setColor(COL_OVERLAY);
     g2.fillRect(0, 0, GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT);
 
-    int w = (int) (GamePanel.SCREEN_WIDTH * 0.6);
+    int w = (int) (GamePanel.SCREEN_WIDTH * 0.85);
     int h = GamePanel.TILE_SIZE * 5;
     int x = (GamePanel.SCREEN_WIDTH - w) / 2;
     int y = (GamePanel.SCREEN_HEIGHT - h) / 2;
@@ -236,6 +248,7 @@ class SaveSlotUi {
 
     g2.setFont(ui.fonts.displayPlain(24F));
     int textY = y + GamePanel.TILE_SIZE + 10;
+
     ui.drawTextShadowCentered(ui.t("ui.save.delete.line1"),
         textY, UI.COL_TEXT, Color.black, 2);
     ui.drawTextShadowCentered(ui.t("ui.save.delete.line2"),

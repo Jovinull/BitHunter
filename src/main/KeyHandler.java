@@ -329,9 +329,9 @@ public class KeyHandler implements KeyListener {
    */
   private void handleTitleOverwriteConfirm(int code, UI ui) {
     if (is(code, GameAction.MOVE_UP)) {
-      navigateUp(ui, 1);
+      setCommandNumAndNavigateSfx(ui, wrapDecrement(ui.getCommandNum(), 1));
     } else if (is(code, GameAction.MOVE_DOWN)) {
-      navigateDown(ui, 1);
+      setCommandNumAndNavigateSfx(ui, wrapIncrement(ui.getCommandNum(), 1));
     } else if (is(code, GameAction.CONFIRM)) {
       if (ui.getCommandNum() == 0) {
         returnToSlotSelect(ui);
@@ -350,9 +350,9 @@ public class KeyHandler implements KeyListener {
    */
   private void handleTitleDeleteConfirm(int code, UI ui) {
     if (is(code, GameAction.MOVE_UP)) {
-      navigateUp(ui, 1);
+      setCommandNumAndNavigateSfx(ui, wrapDecrement(ui.getCommandNum(), 1));
     } else if (is(code, GameAction.MOVE_DOWN)) {
-      navigateDown(ui, 1);
+      setCommandNumAndNavigateSfx(ui, wrapIncrement(ui.getCommandNum(), 1));
     } else if (is(code, GameAction.CONFIRM)) {
       if (ui.getCommandNum() == 0) {
         returnToSlotSelect(ui);
