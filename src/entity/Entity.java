@@ -557,12 +557,21 @@ public class Entity {
   }
 
   public BufferedImage setup(String imagePath, int width, int height) {
+    String cacheKey = imagePath + "_" + width + "x" + height;
+    BufferedImage cachedImage = main.ImageCache.get(cacheKey);
+
+    if (cachedImage != null) {
+      return cachedImage;
+    }
+
     UtilityTool uTool = new UtilityTool();
     BufferedImage img = null;
 
     try {
       img = ImageIO.read(getClass().getResourceAsStream(imagePath + ".png"));
       img = uTool.scaleImage(img, width, height);
+
+      main.ImageCache.put(cacheKey, img);
     } catch (IOException e) {
       e.printStackTrace();
     }
