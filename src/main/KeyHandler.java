@@ -113,10 +113,9 @@ public class KeyHandler implements KeyListener {
     if (ui.getTitleScreenState() != 5) {
       return;
     }
-    if (Character.isLetterOrDigit(c) || c == ' ' || c == '-' || c == '_') {
-      if (ui.getPlayerNameLength() < ui.getMaxPlayerNameLength()) {
-        ui.appendPlayerNameChar(c);
-      }
+    if ((Character.isLetterOrDigit(c) || c == ' ' || c == '-' || c == '_')
+        && ui.getPlayerNameLength() < ui.getMaxPlayerNameLength()) {
+      ui.appendPlayerNameChar(c);
     }
   }
 
