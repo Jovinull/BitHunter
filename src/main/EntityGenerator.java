@@ -1,168 +1,55 @@
 package main;
 
 import entity.Entity;
-import object.ObjAxe;
-import object.ObjBoots;
-import object.ObjChest;
-import object.ObjChestSecret;
-import object.ObjCoinBronze;
-import object.ObjDoor;
-import object.ObjDoorIron;
-import object.ObjFireball;
-import object.ObjHeart;
-import object.ObjKey;
-import object.ObjLantern;
-import object.ObjClock;
-import object.ObjManaCrystal;
-import object.ObjPickaxe;
-import object.ObjPotionRed;
-import object.ObjRock;
-import object.ObjShieldBlue;
-import object.ObjShieldJava;
-import object.ObjShieldWood;
-import object.ObjSwordNormal;
-import object.ObjTent;
+import object.*;
 import pets.GreenSnailEgg;
 import pets.YellowSnailEgg;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 public class EntityGenerator {
 
   private final GamePanel gp;
+  private final Map<String, Function<GamePanel, Entity>> factories = new HashMap<>();
 
   public EntityGenerator(GamePanel gp) {
     this.gp = gp;
+    initFactories();
+  }
+
+  private void initFactories() {
+    factories.put(ObjAxe.OBJ_ID, ObjAxe::new);
+    factories.put(ObjBoots.OBJ_ID, ObjBoots::new);
+    factories.put(ObjChest.OBJ_ID, ObjChest::new);
+    factories.put(ObjChestSecret.OBJ_ID, ObjChestSecret::new);
+    factories.put(ObjCoinBronze.OBJ_ID, ObjCoinBronze::new);
+    factories.put(ObjDoor.OBJ_ID, ObjDoor::new);
+    factories.put(ObjDoorIron.OBJ_ID, ObjDoorIron::new);
+    factories.put(ObjFireball.OBJ_ID, ObjFireball::new);
+    factories.put(ObjHeart.OBJ_ID, ObjHeart::new);
+    factories.put(ObjKey.OBJ_ID, ObjKey::new);
+    factories.put(ObjLantern.OBJ_ID, ObjLantern::new);
+    factories.put(ObjClock.OBJ_ID, ObjClock::new);
+    factories.put(ObjManaCrystal.OBJ_ID, ObjManaCrystal::new);
+    factories.put(ObjPickaxe.OBJ_ID, ObjPickaxe::new);
+    factories.put(ObjPotionRed.OBJ_ID, ObjPotionRed::new);
+    factories.put(ObjRock.OBJ_ID, ObjRock::new);
+    factories.put(ObjShieldBlue.OBJ_ID, ObjShieldBlue::new);
+    factories.put(ObjShieldWood.OBJ_ID, ObjShieldWood::new);
+    factories.put(ObjShieldJava.OBJ_ID, ObjShieldJava::new);
+    factories.put(ObjSwordNormal.OBJ_ID, ObjSwordNormal::new);
+    factories.put(ObjTent.OBJ_ID, ObjTent::new);
+    factories.put(YellowSnailEgg.OBJ_ID, YellowSnailEgg::new);
+    factories.put(GreenSnailEgg.OBJ_ID, GreenSnailEgg::new);
   }
 
   public Entity getObject(String idOrName) {
-
     if (idOrName == null || idOrName.isEmpty()) {
       return null;
     }
-
-    Entity obj = null;
-
-    switch (idOrName) {
-
-      // Machado
-      case ObjAxe.OBJ_ID:
-        obj = new ObjAxe(gp);
-        break;
-
-      // Botas
-      case ObjBoots.OBJ_ID:
-        obj = new ObjBoots(gp);
-        break;
-
-      // Baú
-      case ObjChest.OBJ_ID:
-        obj = new ObjChest(gp);
-        break;
-
-      // Moeda de bronze
-      case ObjCoinBronze.OBJ_ID:
-        obj = new ObjCoinBronze(gp);
-        break;
-
-      // Porta de ferro
-      case ObjDoorIron.OBJ_ID:
-        obj = new ObjDoorIron(gp);
-        break;
-
-      // Porta comum
-      case ObjDoor.OBJ_ID:
-        obj = new ObjDoor(gp);
-        break;
-
-      // Bola de fogo
-      case ObjFireball.OBJ_ID:
-        obj = new ObjFireball(gp);
-        break;
-
-      // Coração
-      case ObjHeart.OBJ_ID:
-        obj = new ObjHeart(gp);
-        break;
-
-      // Chave
-      case ObjKey.OBJ_ID:
-        obj = new ObjKey(gp);
-        break;
-
-      // Lanterna
-      case ObjLantern.OBJ_ID:
-        obj = new ObjLantern(gp);
-        break;
-
-      // Relógio
-      case ObjClock.OBJ_ID:
-        obj = new ObjClock(gp);
-        break;
-
-      // Cristal de Mana
-      case ObjManaCrystal.OBJ_ID:
-        obj = new ObjManaCrystal(gp);
-        break;
-
-      // Picareta
-      case ObjPickaxe.OBJ_ID:
-        obj = new ObjPickaxe(gp);
-        break;
-
-      // Poção Vermelha
-      case ObjPotionRed.OBJ_ID:
-        obj = new ObjPotionRed(gp);
-        break;
-
-      // Pedra
-      case ObjRock.OBJ_ID:
-        obj = new ObjRock(gp);
-        break;
-
-      // Escudo Azul
-      case ObjShieldBlue.OBJ_ID:
-        obj = new ObjShieldBlue(gp);
-        break;
-
-      // Escudo de Madeira
-      case ObjShieldWood.OBJ_ID:
-        obj = new ObjShieldWood(gp);
-        break;
-
-      // Escudo do Compilador (Java) — lendário
-      case ObjShieldJava.OBJ_ID:
-        obj = new ObjShieldJava(gp);
-        break;
-
-      // Baú Secreto
-      case ObjChestSecret.OBJ_ID:
-        obj = new ObjChestSecret(gp);
-        break;
-
-      // Espada Comum
-      case ObjSwordNormal.OBJ_ID:
-        obj = new ObjSwordNormal(gp);
-        break;
-
-      // Tenda
-      case ObjTent.OBJ_ID:
-        obj = new ObjTent(gp);
-        break;
-
-      // Ovo do Caracol Amarelo
-      case YellowSnailEgg.OBJ_ID:
-        obj = new YellowSnailEgg(gp);
-        break;
-
-      // Ovo do Caracol Verde
-      case GreenSnailEgg.OBJ_ID:
-        obj = new GreenSnailEgg(gp);
-        break;
-
-      default:
-        // id desconhecido; obj permanece null
-        break;
-    }
-
-    return obj;
+    Function<GamePanel, Entity> factory = factories.get(idOrName);
+    return factory != null ? factory.apply(gp) : null;
   }
 }
