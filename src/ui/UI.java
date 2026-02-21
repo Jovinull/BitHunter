@@ -44,6 +44,7 @@ public class UI {
   Entity npc;
   int charIndex = 0;
   String combinedText = "";
+  private boolean clockWindowOpen = false;
 
   // Estado do remapeamento de teclas (tela de controles)
   boolean waitingForRebind = false;
@@ -171,6 +172,9 @@ public class UI {
         hudUi.drawMonsterLife();
         hudUi.drawWeatherIndicator();
         hudUi.drawMessage();
+        if (clockWindowOpen) {
+          hudUi.drawClockWindow();
+        }
       }
       case GamePanel.PAUSE_STATE -> pauseUi.drawPauseScreen();
       case GamePanel.DIALOGUE_STATE -> dialogueUi.drawDialogueScreen();
@@ -314,7 +318,10 @@ public class UI {
     return fonts.getPixelBase();
   }
 
-  /** Fonte Arial 20pt carregada do classpath (usada pelo debug overlay em GamePanel). */
+  /**
+   * Fonte Arial 20pt carregada do classpath (usada pelo debug overlay em
+   * GamePanel).
+   */
   public Font getDebugFont() {
     return fonts.arialPlain(20F);
   }
@@ -494,5 +501,13 @@ public class UI {
 
   public int getPlayerNameLength() {
     return playerNameInput.length();
+  }
+
+  public boolean isClockWindowOpen() {
+    return clockWindowOpen;
+  }
+
+  public void setClockWindowOpen(boolean clockWindowOpen) {
+    this.clockWindowOpen = clockWindowOpen;
   }
 }

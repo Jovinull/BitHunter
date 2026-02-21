@@ -11,6 +11,7 @@ import object.ObjPotionRed;
 import object.ObjShieldBlue;
 import object.ObjShieldWood;
 import object.ObjSwordNormal;
+import object.ObjClock;
 
 public class NpcMerchant extends Entity {
 
@@ -76,6 +77,7 @@ public class NpcMerchant extends Entity {
     inv.add(new ObjShieldWood(gp));
     inv.add(new ObjShieldBlue(gp));
     inv.add(new ObjLantern(gp));
+    inv.add(new ObjClock(gp));
     inv.add(new ObjBoots(gp));
   }
 
