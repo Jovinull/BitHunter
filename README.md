@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="resource/arts/banner.png" alt="BitHunter Banner" />
+</div>
+
 # <div align="center">BitHunter</div>
 # <div align="center"><sub>Um RPG 2D top-down em Java (AWT/Swing) — engine “na unha”, com foco em sistemas, legibilidade e iteração rápida.</sub></div>
 
@@ -264,13 +268,13 @@ jpackage `
   --main-jar app.jar
 ```
 
-| Parâmetro      | O que faz                                                            |
-| -------------- | -------------------------------------------------------------------- |
-| `--type`       | `app-image` gera uma pasta com o `.exe` (sem instalador)             |
-| `--dest`       | Pasta de destino onde o pacote será criado                           |
-| `--name`       | Nome do executável gerado                                            |
-| `--input`      | Pasta que contém o `.jar` e quaisquer arquivos extras                |
-| `--main-jar`   | **Apenas o nome** do JAR (sem caminho) — deve estar dentro de `--input` |
+| Parâmetro    | O que faz                                                               |
+| ------------ | ----------------------------------------------------------------------- |
+| `--type`     | `app-image` gera uma pasta com o `.exe` (sem instalador)                |
+| `--dest`     | Pasta de destino onde o pacote será criado                              |
+| `--name`     | Nome do executável gerado                                               |
+| `--input`    | Pasta que contém o `.jar` e quaisquer arquivos extras                   |
+| `--main-jar` | **Apenas o nome** do JAR (sem caminho) — deve estar dentro de `--input` |
 
 ### 4) Resultado
 
