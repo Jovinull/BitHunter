@@ -5,6 +5,7 @@ import java.awt.event.KeyListener;
 
 import data.SaveManager;
 import data.SaveManager.SlotInfo;
+import ui.BestiaryUi;
 import ui.UI;
 
 /**
@@ -884,52 +885,59 @@ public class KeyHandler implements KeyListener {
   public void bestiaryState(int code) {
     final UI ui = gp.getGameUi();
     var bestiaryUi = ui.getBestiaryUi();
-    int subState = ui.getSubState();
 
-    switch (subState) {
-      case 0 -> { // Lista de classes
-        int maxIdx = bestiaryUi.getClassCount() - 1;
-        if (maxIdx < 0)
-          maxIdx = 0;
-        if (is(code, GameAction.MOVE_UP)) {
-          moveCommandNum(ui, -1, maxIdx);
-        } else if (is(code, GameAction.MOVE_DOWN)) {
-          moveCommandNum(ui, +1, maxIdx);
-        } else if (is(code, GameAction.CONFIRM)) {
-          bestiaryUi.setSelectedClassIndex(ui.getCommandNum());
-          bestiaryUi.enterSelectedClass();
-        } else if (is(code, GameAction.OPTIONS)
-            || is(code, GameAction.BESTIARY)) {
-          gp.setGameState(GamePanel.PLAY_STATE);
-        }
-      }
-      case 1 -> { // Lista de criaturas
-        if (is(code, GameAction.MOVE_UP)) {
-          bestiaryUi.navigateUp();
-          playNavigateSfx();
-        } else if (is(code, GameAction.MOVE_DOWN)) {
-          bestiaryUi.navigateDown();
-          playNavigateSfx();
-        } else if (is(code, GameAction.CONFIRM)) {
-          bestiaryUi.enterSelectedCreature();
-        } else if (is(code, GameAction.OPTIONS)) {
-          bestiaryUi.goBack();
-        }
-      }
-      case 2 -> { // Detalhes da criatura
-        if (is(code, GameAction.MOVE_UP)) {
-          bestiaryUi.navigateUp();
-        } else if (is(code, GameAction.MOVE_DOWN)) {
-          bestiaryUi.navigateDown();
-        } else if (is(code, GameAction.OPTIONS)) {
-          bestiaryUi.goBack();
-        }
-      }
+    switch (ui.getSubState()) {
+      case 0 -> handleBestiaryClassList(code, ui, bestiaryUi);
+      case 1 -> handleBestiaryCreatureList(code, bestiaryUi);
+      case 2 -> handleBestiaryCreatureDetail(code, bestiaryUi);
       default -> {
         if (is(code, GameAction.OPTIONS)) {
           gp.setGameState(GamePanel.PLAY_STATE);
         }
       }
+    }
+  }
+
+  /** Bestiário — lista de classes (subState 0). */
+  private void handleBestiaryClassList(int code, UI ui, BestiaryUi bestiaryUi) {
+    int maxIdx = Math.max(bestiaryUi.getClassCount() - 1, 0);
+
+    if (is(code, GameAction.MOVE_UP)) {
+      moveCommandNum(ui, -1, maxIdx);
+    } else if (is(code, GameAction.MOVE_DOWN)) {
+      moveCommandNum(ui, +1, maxIdx);
+    } else if (is(code, GameAction.CONFIRM)) {
+      bestiaryUi.setSelectedClassIndex(ui.getCommandNum());
+      bestiaryUi.enterSelectedClass();
+    } else if (is(code, GameAction.OPTIONS)
+        || is(code, GameAction.BESTIARY)) {
+      gp.setGameState(GamePanel.PLAY_STATE);
+    }
+  }
+
+  /** Bestiário — lista de criaturas (subState 1). */
+  private void handleBestiaryCreatureList(int code, BestiaryUi bestiaryUi) {
+    if (is(code, GameAction.MOVE_UP)) {
+      bestiaryUi.navigateUp();
+      playNavigateSfx();
+    } else if (is(code, GameAction.MOVE_DOWN)) {
+      bestiaryUi.navigateDown();
+      playNavigateSfx();
+    } else if (is(code, GameAction.CONFIRM)) {
+      bestiaryUi.enterSelectedCreature();
+    } else if (is(code, GameAction.OPTIONS)) {
+      bestiaryUi.goBack();
+    }
+  }
+
+  /** Bestiário — detalhes da criatura (subState 2). */
+  private void handleBestiaryCreatureDetail(int code, BestiaryUi bestiaryUi) {
+    if (is(code, GameAction.MOVE_UP)) {
+      bestiaryUi.navigateUp();
+    } else if (is(code, GameAction.MOVE_DOWN)) {
+      bestiaryUi.navigateDown();
+    } else if (is(code, GameAction.OPTIONS)) {
+      bestiaryUi.goBack();
     }
   }
 
