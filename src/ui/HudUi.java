@@ -23,6 +23,7 @@ class HudUi {
   private static final Color COL_MONSTER_BAR_FILL = new Color(255, 0, 30);
 
   private final UI ui;
+  private BufferedImage clockImage;
 
   HudUi(UI ui) {
     this.ui = ui;
@@ -127,7 +128,7 @@ class HudUi {
       if (activePetId != null) {
         icon = PetFactory.getPetIcon(activePetId, gp, player);
       }
-    } catch (Exception ignored) {
+    } catch (Exception _) {
       // ignore: se falhar ao carregar o ícone, só não desenha nada
     }
     if (icon != null) {
@@ -321,10 +322,12 @@ class HudUi {
   void drawWeatherIndicator() {
     var gp = ui.getGamePanel();
     var wm = gp.getEnvironmentManager().getWeatherManager();
-    if (wm == null) return;
+    if (wm == null)
+      return;
 
     WeatherType type = wm.getCurrentType();
-    if (type == WeatherType.CLEAR) return;
+    if (type == WeatherType.CLEAR)
+      return;
 
     Graphics2D g2 = ui.g2;
     String label = type.name();
@@ -368,5 +371,73 @@ class HudUi {
         i++;
       }
     }
+  }
+
+  void drawClockWindow() {
+    Graphics2D g2 = ui.g2;
+    var gp = ui.getGamePanel();
+
+    // Lazy load the clock image
+    if (clockImage == null) {
+      try {
+        clockImage = new object.ObjClock(gp).getDown1();
+      } catch (Exception _) {
+        // Fallback or ignore
+      }
+    }
+
+    int frameX = GamePanel.TILE_SIZE;
+    int frameY = GamePanel.TILE_SIZE * 5;
+    int frameWidth = GamePanel.TILE_SIZE * 5;
+    int frameHeight = GamePanel.TILE_SIZE * 2;
+
+    int currentArea = gp.getCurrentArea();
+    if (currentArea == GamePanel.OUTSIDE || currentArea == GamePanel.DUNGEON) {
+      // Just visually separate
+    }
+
+    // Fundo do painel zeldiano
+    g2.setColor(UI.COL_PANEL);
+    g2.fillRoundRect(frameX, frameY, frameWidth, frameHeight, 14, 14);
+
+    var oldStroke = g2.getStroke();
+    g2.setStroke(new BasicStroke(3f));
+    g2.setColor(UI.COL_PANEL_BORDER);
+    g2.drawRoundRect(frameX, frameY, frameWidth, frameHeight, 14, 14);
+    g2.setStroke(oldStroke);
+
+    // Ícone do relógio
+    if (clockImage != null) {
+      g2.drawImage(clockImage, frameX + 10, frameY + 24, null);
+    }
+
+    g2.setFont(ui.fonts.pixelBold(24F));
+    g2.setColor(UI.COL_TEXT);
+
+    // Hora do jogo
+    var lighting = gp.getEnvironmentManager().getLighting();
+    String timeStr = "--:--";
+    if (lighting != null) {
+      timeStr = lighting.getFormattedTime();
+    }
+
+    // Clima
+    var weatherManager = gp.getEnvironmentManager().getWeatherManager();
+    String weatherStr = "";
+    if (weatherManager != null) {
+      String weatherKey = "weather.type." + weatherManager.getCurrentType().name().toLowerCase();
+      weatherStr = ui.t(weatherKey);
+      // Fallback
+      if (weatherStr.startsWith("weather.type.")) {
+        weatherStr = weatherManager.getCurrentType().name();
+      }
+    }
+
+    int textX = frameX + GamePanel.TILE_SIZE + 10;
+    int textY = frameY + 36;
+    g2.drawString(timeStr, textX, textY);
+
+    g2.setFont(ui.fonts.pixelPlain(18F));
+    g2.drawString(weatherStr, textX, textY + 24);
   }
 }

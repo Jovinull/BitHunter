@@ -154,13 +154,20 @@ public class KeyHandler implements KeyListener {
   @Override
   public void keyReleased(KeyEvent e) {
     final int key = e.getKeyCode();
-    if (is(key, GameAction.MOVE_UP)) upPressed = false;
-    if (is(key, GameAction.MOVE_DOWN)) downPressed = false;
-    if (is(key, GameAction.MOVE_LEFT)) leftPressed = false;
-    if (is(key, GameAction.MOVE_RIGHT)) rightPressed = false;
-    if (is(key, GameAction.SHOOT)) shotKeyPressed = false;
-    if (is(key, GameAction.CONFIRM)) enterPressed = false;
-    if (is(key, GameAction.GUARD)) spacePressed = false;
+    if (is(key, GameAction.MOVE_UP))
+      upPressed = false;
+    if (is(key, GameAction.MOVE_DOWN))
+      downPressed = false;
+    if (is(key, GameAction.MOVE_LEFT))
+      leftPressed = false;
+    if (is(key, GameAction.MOVE_RIGHT))
+      rightPressed = false;
+    if (is(key, GameAction.SHOOT))
+      shotKeyPressed = false;
+    if (is(key, GameAction.CONFIRM))
+      enterPressed = false;
+    if (is(key, GameAction.GUARD))
+      spacePressed = false;
   }
 
   // -----------------------
@@ -180,7 +187,8 @@ public class KeyHandler implements KeyListener {
       case 3 -> handleTitleOverwriteConfirm(code, ui);
       case 4 -> handleTitleDeleteConfirm(code, ui);
       case 5 -> handleTitleNameInput(code, ui);
-      default -> { /* noop */ }
+      default -> {
+        /* noop */ }
     }
   }
 
@@ -209,7 +217,8 @@ public class KeyHandler implements KeyListener {
         ui.setCommandNum(firstSelectableSlot(ui));
       }
       case 2 -> System.exit(0); // Sair
-      default -> { /* noop */ }
+      default -> {
+        /* noop */ }
     }
   }
 
@@ -388,8 +397,10 @@ public class KeyHandler implements KeyListener {
 
     for (int attempt = 0; attempt <= max; attempt++) {
       next += direction;
-      if (next < 0) next = max;
-      if (next > max) next = 0;
+      if (next < 0)
+        next = max;
+      if (next > max)
+        next = 0;
 
       if (isSlotSelectable(ui, next)) {
         break;
@@ -430,16 +441,31 @@ public class KeyHandler implements KeyListener {
    * Estado: Jogando (movimento, pausa, status, debug, etc).
    */
   public void playState(int key) {
+    // Se a janela do relógio estiver aberta, feche com ESC (OPTIONS) ou ENTER
+    // (CONFIRM)
+    if (gp.getGameUi().isClockWindowOpen()
+        && (is(key, GameAction.OPTIONS) || is(key, GameAction.CONFIRM) || is(key, GameAction.CHARACTER))) {
+      gp.getGameUi().setClockWindowOpen(false);
+      return; // não processa mais nada
+    }
+
     // Movimento (flags independentes — permite diagonal)
-    if (is(key, GameAction.MOVE_UP)) upPressed = true;
-    if (is(key, GameAction.MOVE_DOWN)) downPressed = true;
-    if (is(key, GameAction.MOVE_LEFT)) leftPressed = true;
-    if (is(key, GameAction.MOVE_RIGHT)) rightPressed = true;
+    if (is(key, GameAction.MOVE_UP))
+      upPressed = true;
+    if (is(key, GameAction.MOVE_DOWN))
+      downPressed = true;
+    if (is(key, GameAction.MOVE_LEFT))
+      leftPressed = true;
+    if (is(key, GameAction.MOVE_RIGHT))
+      rightPressed = true;
 
     // Combate (flags independentes)
-    if (is(key, GameAction.CONFIRM)) enterPressed = true;
-    if (is(key, GameAction.SHOOT)) shotKeyPressed = true;
-    if (is(key, GameAction.GUARD)) spacePressed = true;
+    if (is(key, GameAction.CONFIRM))
+      enterPressed = true;
+    if (is(key, GameAction.SHOOT))
+      shotKeyPressed = true;
+    if (is(key, GameAction.GUARD))
+      spacePressed = true;
 
     // Interface (mutuamente exclusivas)
     if (is(key, GameAction.PAUSE)) {
@@ -1058,8 +1084,10 @@ public class KeyHandler implements KeyListener {
 
   /**
    * Despacha atalhos de dev somente se o GOD MODE estiver ativo.
-   * <p>Centraliza a checagem para evitar ifs espalhados.
-   * Se god mode estiver desativado, exibe feedback discreto no HUD.</p>
+   * <p>
+   * Centraliza a checagem para evitar ifs espalhados.
+   * Se god mode estiver desativado, exibe feedback discreto no HUD.
+   * </p>
    */
   private void handleDevShortcut(int key) {
     if (!godModeOn) {
@@ -1068,9 +1096,12 @@ public class KeyHandler implements KeyListener {
       return;
     }
 
-    if (is(key, GameAction.DEBUG_TOGGLE)) toggleDebug();
-    if (is(key, GameAction.DEBUG_RELOAD_MAP)) reloadCurrentMap();
-    if (is(key, GameAction.DEBUG_WEATHER_CYCLE)) cycleWeather();
+    if (is(key, GameAction.DEBUG_TOGGLE))
+      toggleDebug();
+    if (is(key, GameAction.DEBUG_RELOAD_MAP))
+      reloadCurrentMap();
+    if (is(key, GameAction.DEBUG_WEATHER_CYCLE))
+      cycleWeather();
   }
 
   private void reloadCurrentMap() {
@@ -1128,7 +1159,9 @@ public class KeyHandler implements KeyListener {
 
   /**
    * Alterna o Modo Deus (god mode) programaticamente.
-   * <p>Chamado pelo {@link CheatCodeManager} (código secreto "finalclass").</p>
+   * <p>
+   * Chamado pelo {@link CheatCodeManager} (código secreto "finalclass").
+   * </p>
    */
   public void toggleGodMode() {
     godModeOn = !godModeOn;
