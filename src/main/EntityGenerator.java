@@ -12,6 +12,7 @@ import object.ObjFireball;
 import object.ObjHeart;
 import object.ObjKey;
 import object.ObjLantern;
+import object.ObjClock;
 import object.ObjManaCrystal;
 import object.ObjPickaxe;
 import object.ObjPotionRed;
@@ -90,6 +91,11 @@ public class EntityGenerator {
       // Lanterna
       case ObjLantern.OBJ_ID:
         obj = new ObjLantern(gp);
+        break;
+
+      // Relógio
+      case ObjClock.OBJ_ID:
+        obj = new ObjClock(gp);
         break;
 
       // Cristal de Mana
