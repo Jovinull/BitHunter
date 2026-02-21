@@ -449,7 +449,19 @@ public class KeyHandler implements KeyListener {
       return; // não processa mais nada
     }
 
-    // Movimento (flags independentes — permite diagonal)
+    handleMovementKeys(key);
+    handleCombatKeys(key);
+    handleInterfaceKeys(key);
+
+    // Dev shortcuts (respeitam debug.enabled via InputBindings + god mode)
+    if (is(key, GameAction.DEBUG_TOGGLE)
+        || is(key, GameAction.DEBUG_RELOAD_MAP)
+        || is(key, GameAction.DEBUG_WEATHER_CYCLE)) {
+      handleDevShortcut(key);
+    }
+  }
+
+  private void handleMovementKeys(int key) {
     if (is(key, GameAction.MOVE_UP))
       upPressed = true;
     if (is(key, GameAction.MOVE_DOWN))
@@ -458,16 +470,18 @@ public class KeyHandler implements KeyListener {
       leftPressed = true;
     if (is(key, GameAction.MOVE_RIGHT))
       rightPressed = true;
+  }
 
-    // Combate (flags independentes)
+  private void handleCombatKeys(int key) {
     if (is(key, GameAction.CONFIRM))
       enterPressed = true;
     if (is(key, GameAction.SHOOT))
       shotKeyPressed = true;
     if (is(key, GameAction.GUARD))
       spacePressed = true;
+  }
 
-    // Interface (mutuamente exclusivas)
+  private void handleInterfaceKeys(int key) {
     if (is(key, GameAction.PAUSE)) {
       gp.getGameUi().resetPauseAnimation();
       gp.setGameState(GamePanel.PAUSE_STATE);
@@ -483,13 +497,6 @@ public class KeyHandler implements KeyListener {
     } else if (is(key, GameAction.BESTIARY)) {
       gp.getGameUi().getBestiaryUi().resetState();
       gp.setGameState(GamePanel.BESTIARY_STATE);
-    }
-
-    // Dev shortcuts (respeitam debug.enabled via InputBindings + god mode)
-    if (is(key, GameAction.DEBUG_TOGGLE)
-        || is(key, GameAction.DEBUG_RELOAD_MAP)
-        || is(key, GameAction.DEBUG_WEATHER_CYCLE)) {
-      handleDevShortcut(key);
     }
   }
 
