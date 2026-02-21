@@ -12,6 +12,12 @@ public class PathfindingComponent {
   }
 
   public void searchPath(int goalCol, int goalRow) {
+    // Stuck detection: cancela o path se o NPC estiver travado
+    entity.getStuckDetector().tick();
+    if (!entity.isOnPath()) {
+      return;
+    }
+
     int startCol = entity.getCol();
     int startRow = entity.getRow();
 

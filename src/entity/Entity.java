@@ -20,6 +20,7 @@ import entity.components.ItemAttributesComponent;
 import entity.components.MovementComponent;
 import entity.components.PathfindingComponent;
 import entity.components.RespawnComponent;
+import entity.components.StuckDetectorComponent;
 import entity.services.ParticleService;
 import main.GamePanel;
 import main.UtilityTool;
@@ -68,6 +69,7 @@ public class Entity {
   private final MovementComponent movement;
   private final CombatComponent combat;
   private final PathfindingComponent pathfinding;
+  private final StuckDetectorComponent stuckDetector;
   private final EntityRenderer renderer;
   private final InventoryComponent inventoryComponent;
   private final EquipmentComponent equipment;
@@ -190,6 +192,7 @@ public class Entity {
     this.movement = new MovementComponent(this);
     this.combat = new CombatComponent(this);
     this.pathfinding = new PathfindingComponent(this);
+    this.stuckDetector = new StuckDetectorComponent(this);
     this.renderer = new EntityRenderer();
     this.inventoryComponent = new InventoryComponent();
     this.equipment = new EquipmentComponent();
@@ -583,6 +586,10 @@ public class Entity {
   // =========================
   public void searchPath(int goalCol, int goalRow) {
     pathfinding.searchPath(goalCol, goalRow);
+  }
+
+  public StuckDetectorComponent getStuckDetector() {
+    return stuckDetector;
   }
 
   public int getDetected(Entity user, Entity[][] target, String targetInternalId) {
