@@ -162,7 +162,8 @@ public class TileManager {
     int maxWorldCol = gp.getMaxWorldCol();
     int maxWorldRow = gp.getMaxWorldRow();
 
-    var player = gp.getPlayer();
+    int camX = gp.getCameraX();
+    int camY = gp.getCameraY();
     int currentMapIndex = gp.getCurrentMap();
 
     while (worldCol < maxWorldCol && worldRow < maxWorldRow) {
@@ -172,13 +173,13 @@ public class TileManager {
       int worldX = worldCol * GamePanel.TILE_SIZE;
       int worldY = worldRow * GamePanel.TILE_SIZE;
 
-      int screenX = worldX - player.getWorldX() + player.screenX;
-      int screenY = worldY - player.getWorldY() + player.screenY;
+      int screenX = worldX - camX;
+      int screenY = worldY - camY;
 
-      if (worldX + GamePanel.TILE_SIZE > player.getWorldX() - player.screenX &&
-          worldX - GamePanel.TILE_SIZE < player.getWorldX() + player.screenX &&
-          worldY + GamePanel.TILE_SIZE > player.getWorldY() - player.screenY &&
-          worldY - GamePanel.TILE_SIZE < player.getWorldY() + player.screenY) {
+      if (worldX + GamePanel.TILE_SIZE > camX &&
+          worldX - GamePanel.TILE_SIZE < camX + GamePanel.SCREEN_WIDTH &&
+          worldY + GamePanel.TILE_SIZE > camY &&
+          worldY - GamePanel.TILE_SIZE < camY + GamePanel.SCREEN_HEIGHT) {
 
         g2.drawImage(tile[tileNum].getImage(), screenX, screenY, null);
       }
@@ -198,8 +199,8 @@ public class TileManager {
       for (var node : pathList) {
         int pathWorldX = node.getCol() * GamePanel.TILE_SIZE;
         int pathWorldY = node.getRow() * GamePanel.TILE_SIZE;
-        int pathScreenX = pathWorldX - player.getWorldX() + player.screenX;
-        int pathScreenY = pathWorldY - player.getWorldY() + player.screenY;
+        int pathScreenX = pathWorldX - camX;
+        int pathScreenY = pathWorldY - camY;
         g2.fillRect(pathScreenX, pathScreenY, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
       }
     }

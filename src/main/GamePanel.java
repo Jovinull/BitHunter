@@ -597,6 +597,27 @@ public class GamePanel extends JPanel implements Runnable {
     }
   }
 
+  // ==== CÂMERA (clamping nas bordas do mapa) ====
+
+  /**
+   * Posição X da câmera no mundo, clampada para não ultrapassar os limites do mapa.
+   * Estilo SNES: a câmera para na borda e o jogador se desloca dentro da tela.
+   */
+  public int getCameraX() {
+    int camX = player.getWorldX() - player.screenX;
+    int maxCamX = Math.max(0, maxWorldCol * TILE_SIZE - SCREEN_WIDTH);
+    return Math.clamp(camX, 0, maxCamX);
+  }
+
+  /**
+   * Posição Y da câmera no mundo, clampada para não ultrapassar os limites do mapa.
+   */
+  public int getCameraY() {
+    int camY = player.getWorldY() - player.screenY;
+    int maxCamY = Math.max(0, maxWorldRow * TILE_SIZE - SCREEN_HEIGHT);
+    return Math.clamp(camY, 0, maxCamY);
+  }
+
   // ==== GETTERS / SETTERS PARA CAMPOS ENCAPSULADOS ====
 
   public int getCurrentMap() {

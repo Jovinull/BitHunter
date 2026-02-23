@@ -30,27 +30,36 @@ public class Lighting {
    */
   private Font debugPhaseFont;
 
+  private int lastLightCenterX = -1;
+  private int lastLightCenterY = -1;
+
   public Lighting(GamePanel gp) {
     this.gp = gp;
     setLightSource();
   }
 
   public void setLightSource() {
-    darknessFilter = new BufferedImage(
-        GamePanel.SCREEN_WIDTH,
-        GamePanel.SCREEN_HEIGHT,
-        BufferedImage.TYPE_INT_ARGB);
+    if (darknessFilter == null) {
+      darknessFilter = new BufferedImage(
+          GamePanel.SCREEN_WIDTH,
+          GamePanel.SCREEN_HEIGHT,
+          BufferedImage.TYPE_INT_ARGB);
+    }
 
     Graphics2D g2 = (Graphics2D) darknessFilter.getGraphics();
 
+    g2.setComposite(AlphaComposite.Clear);
+    g2.fillRect(0, 0, GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT);
+    g2.setComposite(AlphaComposite.SrcOver);
+
     var player = gp.getPlayer();
+
+    int centerX = player.getWorldX() - gp.getCameraX() + GamePanel.TILE_SIZE / 2;
+    int centerY = player.getWorldY() - gp.getCameraY() + GamePanel.TILE_SIZE / 2;
 
     if (player.getCurrentLight() == null) {
       g2.setColor(new Color(0, 0, 0.1f, 0.97f));
     } else {
-      int centerX = player.screenX + (GamePanel.TILE_SIZE) / 2;
-      int centerY = player.screenY + (GamePanel.TILE_SIZE) / 2;
-
       Color[] color = new Color[12];
       float[] fraction = new float[12];
 
@@ -87,6 +96,9 @@ public class Lighting {
 
     g2.fillRect(0, 0, GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT);
     g2.dispose();
+
+    lastLightCenterX = centerX;
+    lastLightCenterY = centerY;
   }
 
   public void resetDay() {
@@ -98,8 +110,11 @@ public class Lighting {
   public void update() {
     var player = gp.getPlayer();
 
-    // Atualiza quando a iluminação do player muda (usar accessors)
-    if (player.isLightUpdated()) {
+    int effectiveCenterX = player.getWorldX() - gp.getCameraX() + GamePanel.TILE_SIZE / 2;
+    int effectiveCenterY = player.getWorldY() - gp.getCameraY() + GamePanel.TILE_SIZE / 2;
+    boolean centerMoved = effectiveCenterX != lastLightCenterX || effectiveCenterY != lastLightCenterY;
+
+    if (player.isLightUpdated() || centerMoved) {
       setLightSource();
       player.setLightUpdated(false);
     }

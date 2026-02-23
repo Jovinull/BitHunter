@@ -931,8 +931,8 @@ public class Player extends Entity {
 
   @Override
   public void draw(Graphics2D g2) {
-    int tempScreenX = screenX;
-    int tempScreenY = screenY;
+    int drawX = getWorldX() - gp.getCameraX();
+    int drawY = getWorldY() - gp.getCameraY();
 
     if (pet != null) {
       pet.draw(g2);
@@ -941,10 +941,10 @@ public class Player extends Entity {
     // Ajuste de posição para ataques UP/LEFT
     if (isAttacking()) {
       if (DIR_UP.equals(getDirection())) {
-        tempScreenY = screenY - GamePanel.TILE_SIZE;
+        drawY -= GamePanel.TILE_SIZE;
       }
       if (DIR_LEFT.equals(getDirection())) {
-        tempScreenX = screenX - GamePanel.TILE_SIZE;
+        drawX -= GamePanel.TILE_SIZE;
       }
     }
 
@@ -955,15 +955,17 @@ public class Player extends Entity {
     }
 
     if (isDrawing()) {
-      g2.drawImage(sprite, tempScreenX, tempScreenY, null);
+      g2.drawImage(sprite, drawX, drawY, null);
     }
 
     g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 
     if (isDebugCollision()) {
       Rectangle sa = getSolidArea();
+      int baseX = getWorldX() - gp.getCameraX();
+      int baseY = getWorldY() - gp.getCameraY();
       g2.setColor(Color.red);
-      g2.drawRect(screenX + sa.x, screenY + sa.y, sa.width, sa.height);
+      g2.drawRect(baseX + sa.x, baseY + sa.y, sa.width, sa.height);
     }
   }
 
