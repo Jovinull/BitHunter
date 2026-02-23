@@ -590,12 +590,7 @@ public class Player extends Entity {
         obj.use(this);
         objects[currentMapIndex][i] = null;
       }
-      case TYPE_OBSTACLE -> {
-        if (keyH.isEnterPressed()) {
-          attackCanceled = true;
-          obj.interact();
-        }
-      }
+      case TYPE_OBSTACLE -> interactObstacle(obj);
       default -> {
         String text;
         if (canObtainItem(obj)) {
@@ -630,6 +625,13 @@ public class Player extends Entity {
     // no mesmo frame, evitando jitter de câmera por movimento alternado
     if (!npc.isCollisionOn()) {
       setCollisionOn(false);
+    }
+  }
+
+  private void interactObstacle(Entity obj) {
+    if (keyH.isEnterPressed()) {
+      attackCanceled = true;
+      obj.interact();
     }
   }
 
