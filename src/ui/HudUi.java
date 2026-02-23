@@ -128,7 +128,7 @@ class HudUi {
       if (activePetId != null) {
         icon = PetFactory.getPetIcon(activePetId, gp, player);
       }
-    } catch (Exception _) {
+    } catch (Exception ignored) {
       // ignore: se falhar ao carregar o ícone, só não desenha nada
     }
     if (icon != null) {
@@ -381,7 +381,7 @@ class HudUi {
     if (clockImage == null) {
       try {
         clockImage = new object.ObjClock(gp).getDown1();
-      } catch (Exception _) {
+      } catch (Exception ignored) {
         // Fallback or ignore
       }
     }
