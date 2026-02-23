@@ -203,13 +203,11 @@ public class Entity {
   // =========================
 
   public int getScreenX() {
-    var player = gp.getPlayer();
-    return worldX - player.getWorldX() + player.screenX;
+    return worldX - gp.getCameraX();
   }
 
   public int getScreenY() {
-    var player = gp.getPlayer();
-    return worldY - player.getWorldY() + player.screenY;
+    return worldY - gp.getCameraY();
   }
 
   public GamePanel getGp() {
@@ -524,13 +522,14 @@ public class Entity {
   }
 
   public boolean inCamera() {
-    var player = gp.getPlayer();
     int tileSize = GamePanel.TILE_SIZE;
+    int camX = gp.getCameraX();
+    int camY = gp.getCameraY();
 
-    return (worldX + tileSize * 5 > player.getWorldX() - player.screenX &&
-        worldX - tileSize < player.getWorldX() + player.screenX &&
-        worldY + tileSize * 5 > player.getWorldY() - player.screenY &&
-        worldY - tileSize < player.getWorldY() + player.screenY);
+    return (worldX + tileSize * 5 > camX &&
+        worldX - tileSize < camX + GamePanel.SCREEN_WIDTH &&
+        worldY + tileSize * 5 > camY &&
+        worldY - tileSize < camY + GamePanel.SCREEN_HEIGHT);
   }
 
   public void draw(Graphics2D g2) {
