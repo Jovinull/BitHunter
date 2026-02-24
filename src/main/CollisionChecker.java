@@ -95,8 +95,8 @@ public class CollisionChecker {
         break;
 
       default:
-        // sem direção definida -> nada a fazer
-        break;
+        // sem direção definida -> não processa colisão de tile
+        return;
     }
   }
 
