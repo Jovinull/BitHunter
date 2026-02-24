@@ -1,7 +1,9 @@
 package ai;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.PriorityQueue;
 
 import main.GamePanel;
 import tile.Tile;
@@ -14,7 +16,8 @@ public class PathFinder {
   private final GamePanel gp;
   private Node[][] node;
 
-  private final List<Node> openList = new ArrayList<>();
+  private final PriorityQueue<Node> openList = new PriorityQueue<>(
+      Comparator.comparingInt(Node::getFCost).thenComparingInt(Node::getGCost));
   private final List<Node> pathList = new ArrayList<>();
 
   private Node startNode;
@@ -140,25 +143,18 @@ public class PathFinder {
   }
 
   public boolean search() {
-    while (!goalReached && step < MAX_STEPS) {
-
-      currentNode.setChecked(true);
-      openList.remove(currentNode);
-
-      expandNeighbors(currentNode.getCol(), currentNode.getRow());
-
-      if (openList.isEmpty()) {
-        break;
-      }
-
+    while (!goalReached && step < MAX_STEPS && !openList.isEmpty()) {
       currentNode = selectBestOpenNode();
+      currentNode.setOpen(false);
+      currentNode.setChecked(true);
 
       if (currentNode == goalNode) {
         goalReached = true;
         trackThePath();
+      } else {
+        expandNeighbors(currentNode.getCol(), currentNode.getRow());
+        step++;
       }
-
-      step++;
     }
     return goalReached;
   }
@@ -184,21 +180,7 @@ public class PathFinder {
   }
 
   private Node selectBestOpenNode() {
-    int bestIdx = 0;
-    int bestF = Integer.MAX_VALUE;
-
-    for (int i = 0; i < openList.size(); i++) {
-      Node n = openList.get(i);
-      int f = n.getFCost();
-      int g = n.getGCost();
-      int bestG = openList.get(bestIdx).getGCost();
-
-      if (f < bestF || (f == bestF && g < bestG)) {
-        bestIdx = i;
-        bestF = f;
-      }
-    }
-    return openList.get(bestIdx);
+    return openList.poll();
   }
 
   private void openNode(Node n) {
