@@ -81,6 +81,10 @@ public class Player extends Entity {
   /** Timer restante do escudo temporário, em frames. */
   private int javaShieldTempShieldTimer = 0;
 
+  private int currentWeaponSlotCache = 0;
+  private int currentShieldSlotCache = 0;
+  private int currentBootsSlotCache = -1;
+
   public Player(GamePanel gp, KeyHandler keyH) {
     super(gp);
     this.keyH = keyH;
@@ -254,37 +258,36 @@ public class Player extends Entity {
   }
 
   public int getCurrentWeaponSlot() {
-    int currentWeaponSlot = 0;
-    var inv = getInventory();
-    for (int i = 0; i < inv.size(); i++) {
-      if (inv.get(i) == getCurrentWeapon()) {
-        currentWeaponSlot = i;
-      }
-    }
-    return currentWeaponSlot;
+    currentWeaponSlotCache = resolveEquipmentSlot(getCurrentWeapon(), currentWeaponSlotCache, 0);
+    return currentWeaponSlotCache;
   }
 
   public int getCurrentShieldSlot() {
-    int currentShieldSlot = 0;
-    var inv = getInventory();
-    for (int i = 0; i < inv.size(); i++) {
-      if (inv.get(i) == getCurrentShield()) {
-        currentShieldSlot = i;
-      }
-    }
-    return currentShieldSlot;
+    currentShieldSlotCache = resolveEquipmentSlot(getCurrentShield(), currentShieldSlotCache, 0);
+    return currentShieldSlotCache;
   }
 
   public int getCurrentBootsSlot() {
-    int currentBootsSlot = -1;
+    currentBootsSlotCache = resolveEquipmentSlot(getCurrentBoots(), currentBootsSlotCache, -1);
+    return currentBootsSlotCache;
+  }
+
+  private int resolveEquipmentSlot(Entity equippedItem, int cachedSlot, int fallbackSlot) {
+    if (equippedItem == null) {
+      return fallbackSlot;
+    }
+
     var inv = getInventory();
+    if (cachedSlot >= 0 && cachedSlot < inv.size() && inv.get(cachedSlot) == equippedItem) {
+      return cachedSlot;
+    }
+
     for (int i = 0; i < inv.size(); i++) {
-      if (inv.get(i) == getCurrentBoots()) {
-        currentBootsSlot = i;
-        break;
+      if (inv.get(i) == equippedItem) {
+        return i;
       }
     }
-    return currentBootsSlot;
+    return fallbackSlot;
   }
 
   @Override
