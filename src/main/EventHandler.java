@@ -5,6 +5,24 @@ import entity.Entity;
 
 public class EventHandler {
 
+  private static final int MAP_WORLD = 0;
+  private static final int MAP_HOUSE = 1;
+  private static final int MAP_DUNGEON = 2;
+  private static final int MAP_BOSS_ROOM = 3;
+  private static final int MAP_INDOOR2 = 4;
+
+  private static final int EVENT_RECT_OFFSET = 23;
+  private static final int EVENT_RECT_SIZE = 2;
+  private static final String DIR_ANY = "any";
+  private static final int EVENT_RESET_DISTANCE_TILES = GamePanel.TILE_SIZE;
+
+  private static final int SFX_STAIRS = 13;
+  private static final int SFX_DAMAGE = 6;
+  private static final int SFX_HEAL = 2;
+  private static final int PIT_DAMAGE_AMOUNT = 1;
+
+  private static final int NPC_MERCHANT_SLOT = 0;
+
   private final GamePanel gp;
   private final EventRect[][][] eventRect;
   private final Entity eventMaster;
@@ -35,10 +53,10 @@ public class EventHandler {
 
     while (map < maxMap && col < maxCol && row < maxRow) {
       eventRect[map][col][row] = new EventRect();
-      eventRect[map][col][row].x = 23;
-      eventRect[map][col][row].y = 23;
-      eventRect[map][col][row].width = 2;
-      eventRect[map][col][row].height = 2;
+      eventRect[map][col][row].x = EVENT_RECT_OFFSET;
+      eventRect[map][col][row].y = EVENT_RECT_OFFSET;
+      eventRect[map][col][row].width = EVENT_RECT_SIZE;
+      eventRect[map][col][row].height = EVENT_RECT_SIZE;
       eventRect[map][col][row].eventRectDefaultX = eventRect[map][col][row].x;
       eventRect[map][col][row].eventRectDefaultY = eventRect[map][col][row].y;
 
@@ -111,7 +129,7 @@ public class EventHandler {
     int xDistance = Math.abs(player.getWorldX() - previousEventX);
     int yDistance = Math.abs(player.getWorldY() - previousEventY);
     int distance = Math.max(xDistance, yDistance);
-    if (distance > GamePanel.TILE_SIZE) {
+    if (distance > EVENT_RESET_DISTANCE_TILES) {
       canTouchEvent = true;
     }
 
@@ -120,62 +138,62 @@ public class EventHandler {
     }
 
     // dano no buraco (leste do centro)
-    if (hit(0, 55, 55, Entity.DIR_RIGHT)) {
+    if (hit(MAP_WORLD, 55, 55, Entity.DIR_RIGHT)) {
       damagePit(GamePanel.DIALOGUE_STATE);
       return;
     }
     // fonte de cura (norte da vila)
-    if (hit(0, 50, 42, Entity.DIR_UP)) {
+    if (hit(MAP_WORLD, 50, 42, Entity.DIR_UP)) {
       healingPool(GamePanel.DIALOGUE_STATE);
       return;
     }
     // casa - entrada (overworld → indoor)
-    if (hit(0, 22, 28, "any")) {
-      teleport(1, 12, 13, GamePanel.INDOOR);
+    if (hit(MAP_WORLD, 22, 28, DIR_ANY)) {
+      teleport(MAP_HOUSE, 12, 13, GamePanel.INDOOR);
       return;
     }
     // casa - saída (indoor → overworld)
-    if (hit(1, 12, 14, "any")) {
-      teleport(0, 22, 28, GamePanel.OUTSIDE);
+    if (hit(MAP_HOUSE, 12, 14, DIR_ANY)) {
+      teleport(MAP_WORLD, 22, 28, GamePanel.OUTSIDE);
       return;
     }
     // falar com NPC merchant
-    if (hit(1, 12, 6, Entity.DIR_UP)) {
-      speak(gp.getNpc()[1][0]);
+    if (hit(MAP_HOUSE, 12, 6, Entity.DIR_UP)) {
+      speak(gp.getNpc()[MAP_HOUSE][NPC_MERCHANT_SLOT]);
       return;
     }
     // pet yard - entrada (overworld → indoor2)
-    if (hit(0, 50, 6, "any")) {
-      teleport(4, 58, 61, GamePanel.INDOOR);
+    if (hit(MAP_WORLD, 50, 6, DIR_ANY)) {
+      teleport(MAP_INDOOR2, 58, 61, GamePanel.INDOOR);
       return;
     }
     // pet yard - saída (indoor2 → overworld)
-    if (hit(4, 58, 61, "any")) {
-      teleport(0, 50, 7, GamePanel.OUTSIDE);
+    if (hit(MAP_INDOOR2, 58, 61, DIR_ANY)) {
+      teleport(MAP_WORLD, 50, 7, GamePanel.OUTSIDE);
       return;
     }
     // dungeon 1 - entrada (overworld → dungeon)
-    if (hit(0, 80, 14, "any")) {
-      teleport(2, 25, 90, GamePanel.DUNGEON);
+    if (hit(MAP_WORLD, 80, 14, DIR_ANY)) {
+      teleport(MAP_DUNGEON, 25, 90, GamePanel.DUNGEON);
       return;
     }
     // dungeon 1 - saída (dungeon → overworld)
-    if (hit(2, 25, 91, "any")) {
-      teleport(0, 79, 14, GamePanel.OUTSIDE);
+    if (hit(MAP_DUNGEON, 25, 91, DIR_ANY)) {
+      teleport(MAP_WORLD, 79, 14, GamePanel.OUTSIDE);
       return;
     }
     // dungeon 2 / boss room - entrada
-    if (hit(2, 25, 9, "any")) {
-      teleport(3, 50, 90, GamePanel.DUNGEON);
+    if (hit(MAP_DUNGEON, 25, 9, DIR_ANY)) {
+      teleport(MAP_BOSS_ROOM, 50, 90, GamePanel.DUNGEON);
       return;
     }
     // boss room - saída (volta para dungeon)
-    if (hit(3, 50, 91, "any")) {
-      teleport(2, 25, 10, GamePanel.DUNGEON);
+    if (hit(MAP_BOSS_ROOM, 50, 91, DIR_ANY)) {
+      teleport(MAP_DUNGEON, 25, 10, GamePanel.DUNGEON);
       return;
     }
     // trigger do Skeleton Lord (arena)
-    if (hit(3, 50, 55, "any")) {
+    if (hit(MAP_BOSS_ROOM, 50, 55, DIR_ANY)) {
       skeletonLord();
     }
   }
@@ -187,16 +205,16 @@ public class EventHandler {
     tempCol = col;
     tempRow = row;
     canTouchEvent = false;
-    gp.playSE(13);
+    gp.playSE(SFX_STAIRS);
   }
 
   public void damagePit(int gameState) {
     gp.setGameState(gameState);
-    gp.playSE(6);
+    gp.playSE(SFX_DAMAGE);
     eventMaster.startDialogue(eventMaster, 0);
 
     var player = gp.getPlayer();
-    player.setLife(player.getLife() - 1);
+    player.setLife(player.getLife() - PIT_DAMAGE_AMOUNT);
 
     canTouchEvent = false;
   }
@@ -211,7 +229,7 @@ public class EventHandler {
       gp.setGameState(gameState);
       player.setAttackCanceled(true);
 
-      gp.playSE(2);
+      gp.playSE(SFX_HEAL);
 
       eventMaster.startDialogue(eventMaster, 1);
 

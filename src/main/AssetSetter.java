@@ -25,8 +25,10 @@ import object.ObjPotionRed;
 import object.ObjShieldBlue;
 import object.ObjShieldJava;
 import object.ObjTent;
+import java.util.function.Supplier;
 import tile_interactive.ItDestructibleWall;
 import tile_interactive.ItDryTree;
+import tile_interactive.InteractiveTile;
 import tile_interactive.ItMetalPlate;
 
 public class AssetSetter {
@@ -36,6 +38,34 @@ public class AssetSetter {
   private static final int MAP_DUNGEON = 2;
   private static final int MAP_BOSS_ROOM = 3;
   private static final int MAP_INDOOR2 = 4;
+  private static final int[][] WORLD_GREEN_SLIME_POSITIONS = {
+      {45, 78}, {50, 82}, {55, 79}, {48, 85}, {52, 76},
+      {42, 30}, {39, 27}, {42, 24}, {45, 26}, {44, 20}, {38, 17}, {31, 11},
+      {35, 9}, {40, 10}, {45, 12}, {55, 16}, {56, 20}, {54, 22}, {60, 20}, {59, 25},
+      {20, 40}, {18, 36}, {12, 34}, {9, 27}, {10, 20}, {11, 12}
+  };
+  private static final int[][] WORLD_ORC_POSITIONS = {
+      {25, 60}, {17, 92}, {9, 88}, {10, 80}, {9, 73}, {7, 65}
+  };
+  private static final int[][] WORLD_RED_SLIME_POSITIONS = {
+      {78, 22}, {80, 20}, {82, 22}, {82, 38}, {85, 33}, {90, 40}, {91, 30}, {90, 18},
+      {82, 26}, {17, 18}, {20, 5}, {22, 11}, {16, 10}, {14, 14}, {25, 14}, {38, 71},
+      {46, 77}, {41, 83}
+  };
+  private static final int[][] DUNGEON_BAT_POSITIONS = {
+      {38, 46}, {58, 58}, {16, 52}, {38, 20}, {58, 28}
+  };
+  private static final int[][] WORLD_DRY_TREE_POSITIONS = {
+      {73, 40}, {77, 40}, {28, 15}, {12, 30}, {70, 28}, {48, 70}, {52, 70},
+      {50, 9}, {11, 65}, {10, 70}, {16, 64}, {14, 74}, {18, 81}, {19, 88}
+  };
+  private static final int[][] DUNGEON_DESTRUCTIBLE_WALL_POSITIONS = {
+      {34, 48}, {34, 49}, {34, 50}, {18, 38}, {18, 39}, {60, 38}, {60, 39}, {22, 72},
+      {22, 73}, {42, 22}, {42, 23}, {42, 24}, {30, 62}, {48, 46}, {48, 47}, {48, 48}
+  };
+  private static final int[][] DUNGEON_METAL_PLATE_POSITIONS = {
+      {20, 24}, {14, 55}, {56, 54}
+  };
 
   private final GamePanel gp;
 
@@ -143,7 +173,7 @@ public class AssetSetter {
 
     // MAP WORLD - NPCs na vila central
     npcs[mapNum][i] = new NpcOldMan(gp);
-    place(npcs[mapNum][i++], 48, 48);
+    place(npcs[mapNum][i], 48, 48);
 
     // MAP HOUSE
     mapNum = MAP_HOUSE;
@@ -180,158 +210,9 @@ public class AssetSetter {
     int mapNum = MAP_WORLD;
     int i = 0;
 
-    // Green Slimes na área sul (campo de combate)
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 45, 78);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 50, 82);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 55, 79);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 48, 85);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 52, 76);
-    // Green Slimes adicionais no mapa 1
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 42, 30);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 39, 27);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 42, 24);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 45, 26);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 44, 20);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 38, 17);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 31, 11);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 35, 9);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 40, 10);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 45, 12);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 55, 16);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 56, 20);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 54, 22);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 60, 20);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 59, 25);
-    // Green Slimes adicionais (nova faixa)
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 20, 40);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 18, 36);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 12, 34);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 9, 27);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 10, 20);
-
-    monsters[mapNum][i] = new MonGreenSlime(gp);
-    place(monsters[mapNum][i++], 11, 12);
-
-    // Orc patrulhando caminho oeste
-    monsters[mapNum][i] = new MonOrc(gp);
-    place(monsters[mapNum][i++], 25, 60);
-    // Orcs na região sul/sudoeste
-    monsters[mapNum][i] = new MonOrc(gp);
-    place(monsters[mapNum][i++], 17, 92);
-
-    monsters[mapNum][i] = new MonOrc(gp);
-    place(monsters[mapNum][i++], 9, 88);
-
-    monsters[mapNum][i] = new MonOrc(gp);
-    place(monsters[mapNum][i++], 10, 80);
-
-    monsters[mapNum][i] = new MonOrc(gp);
-    place(monsters[mapNum][i++], 9, 73);
-
-    monsters[mapNum][i] = new MonOrc(gp);
-    place(monsters[mapNum][i++], 7, 65);
-
-    // Red Slimes na clareira da floresta NE
-    monsters[mapNum][i] = new MonRedSlime(gp);
-    place(monsters[mapNum][i++], 78, 22);
-
-    monsters[mapNum][i] = new MonRedSlime(gp);
-    place(monsters[mapNum][i++], 80, 20);
-
-    monsters[mapNum][i] = new MonRedSlime(gp);
-    place(monsters[mapNum][i++], 82, 22);
-    // Red Slimes adicionais no mapa 1
-    monsters[mapNum][i] = new MonRedSlime(gp);
-    place(monsters[mapNum][i++], 82, 38);
-
-    monsters[mapNum][i] = new MonRedSlime(gp);
-    place(monsters[mapNum][i++], 85, 33);
-
-    monsters[mapNum][i] = new MonRedSlime(gp);
-    place(monsters[mapNum][i++], 90, 40);
-
-    monsters[mapNum][i] = new MonRedSlime(gp);
-    place(monsters[mapNum][i++], 91, 30);
-
-    monsters[mapNum][i] = new MonRedSlime(gp);
-    place(monsters[mapNum][i++], 90, 18);
-
-    monsters[mapNum][i] = new MonRedSlime(gp);
-    place(monsters[mapNum][i++], 82, 26);
-    // Red Slimes adicionais (nova faixa)
-    monsters[mapNum][i] = new MonRedSlime(gp);
-    place(monsters[mapNum][i++], 17, 18);
-
-    monsters[mapNum][i] = new MonRedSlime(gp);
-    place(monsters[mapNum][i++], 20, 5);
-
-    monsters[mapNum][i] = new MonRedSlime(gp);
-    place(monsters[mapNum][i++], 22, 11);
-
-    monsters[mapNum][i] = new MonRedSlime(gp);
-    place(monsters[mapNum][i++], 16, 10);
-
-    monsters[mapNum][i] = new MonRedSlime(gp);
-    place(monsters[mapNum][i++], 14, 14);
-
-    monsters[mapNum][i] = new MonRedSlime(gp);
-    place(monsters[mapNum][i++], 25, 14);
-
-    monsters[mapNum][i] = new MonRedSlime(gp);
-    place(monsters[mapNum][i++], 38, 71);
-
-    monsters[mapNum][i] = new MonRedSlime(gp);
-    place(monsters[mapNum][i++], 46, 77);
-
-    monsters[mapNum][i] = new MonRedSlime(gp);
-    place(monsters[mapNum][i], 41, 83);
+    i = placeMonsterBatch(monsters[mapNum], i, WORLD_GREEN_SLIME_POSITIONS, () -> new MonGreenSlime(gp));
+    i = placeMonsterBatch(monsters[mapNum], i, WORLD_ORC_POSITIONS, () -> new MonOrc(gp));
+    placeMonsterBatch(monsters[mapNum], i, WORLD_RED_SLIME_POSITIONS, () -> new MonRedSlime(gp));
 
     // MAP HOUSE (sem monstros - dentro de casa)
 
@@ -339,21 +220,7 @@ public class AssetSetter {
     mapNum = MAP_DUNGEON;
     i = 0;
 
-    // Morcegos distribuídos pelas salas
-    monsters[mapNum][i] = new MonBat(gp);
-    place(monsters[mapNum][i++], 38, 46);
-
-    monsters[mapNum][i] = new MonBat(gp);
-    place(monsters[mapNum][i++], 58, 58);
-
-    monsters[mapNum][i] = new MonBat(gp);
-    place(monsters[mapNum][i++], 16, 52);
-
-    monsters[mapNum][i] = new MonBat(gp);
-    place(monsters[mapNum][i++], 38, 20);
-
-    monsters[mapNum][i] = new MonBat(gp);
-    place(monsters[mapNum][i], 58, 28);
+    placeMonsterBatch(monsters[mapNum], i, DUNGEON_BAT_POSITIONS, () -> new MonBat(gp));
 
     // MAP BOSS ROOM
     mapNum = MAP_BOSS_ROOM;
@@ -371,58 +238,17 @@ public class AssetSetter {
     int mapNum = MAP_WORLD;
     int i = 0;
 
-    // Árvores secas bloqueando caminho alternativo para a dungeon
-    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 73, 40);
-    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 77, 40);
-    // Árvores secas decorativas perto do lago
-    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 28, 15);
-    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 12, 30);
-    // Árvores secas na floresta
-    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 70, 28);
-    // Árvores secas no caminho sul
-    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 48, 70);
-    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 52, 70);
-    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 50, 9);
-    // Árvores secas na região sudoeste
-    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 11, 65);
-    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 10, 70);
-    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 16, 64);
-    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 14, 74);
-    interactiveTiles[mapNum][i++] = new ItDryTree(gp, 18, 81);
-    interactiveTiles[mapNum][i] = new ItDryTree(gp, 19, 88);
+    placeInteractiveTileBatch(interactiveTiles[mapNum], i, WORLD_DRY_TREE_POSITIONS,
+        (col, row) -> new ItDryTree(gp, col, row));
 
     // MAP DUNGEON
     mapNum = MAP_DUNGEON;
     i = 0;
 
-    // Paredes destrutíveis - atalho entre salas
-    // Parede entre corridor e central hall
-    interactiveTiles[mapNum][i++] = new ItDestructibleWall(gp, 34, 48);
-    interactiveTiles[mapNum][i++] = new ItDestructibleWall(gp, 34, 49);
-    interactiveTiles[mapNum][i++] = new ItDestructibleWall(gp, 34, 50);
-    // Parede entre west chamber e NW room
-    interactiveTiles[mapNum][i++] = new ItDestructibleWall(gp, 18, 38);
-    interactiveTiles[mapNum][i++] = new ItDestructibleWall(gp, 18, 39);
-    // Parede entre east chamber e NE room
-    interactiveTiles[mapNum][i++] = new ItDestructibleWall(gp, 60, 38);
-    interactiveTiles[mapNum][i++] = new ItDestructibleWall(gp, 60, 39);
-    // Parede secreta no hub sul
-    interactiveTiles[mapNum][i++] = new ItDestructibleWall(gp, 22, 72);
-    interactiveTiles[mapNum][i++] = new ItDestructibleWall(gp, 22, 73);
-    // Paredes na câmara norte
-    interactiveTiles[mapNum][i++] = new ItDestructibleWall(gp, 42, 22);
-    interactiveTiles[mapNum][i++] = new ItDestructibleWall(gp, 42, 23);
-    interactiveTiles[mapNum][i++] = new ItDestructibleWall(gp, 42, 24);
-    // Mais paredes destrutíveis para exploração
-    interactiveTiles[mapNum][i++] = new ItDestructibleWall(gp, 30, 62);
-    interactiveTiles[mapNum][i++] = new ItDestructibleWall(gp, 48, 46);
-    interactiveTiles[mapNum][i++] = new ItDestructibleWall(gp, 48, 47);
-    interactiveTiles[mapNum][i++] = new ItDestructibleWall(gp, 48, 48);
-
-    // Placas de metal (puzzles)
-    interactiveTiles[mapNum][i++] = new ItMetalPlate(gp, 20, 24);
-    interactiveTiles[mapNum][i++] = new ItMetalPlate(gp, 14, 55);
-    interactiveTiles[mapNum][i] = new ItMetalPlate(gp, 56, 54);
+    i = placeInteractiveTileBatch(interactiveTiles[mapNum], i, DUNGEON_DESTRUCTIBLE_WALL_POSITIONS,
+        (col, row) -> new ItDestructibleWall(gp, col, row));
+    placeInteractiveTileBatch(interactiveTiles[mapNum], i, DUNGEON_METAL_PLATE_POSITIONS,
+        (col, row) -> new ItMetalPlate(gp, col, row));
   }
 
   /** Posiciona uma entidade em (col,row) -> (worldX, worldY) e registra spawn. */
@@ -435,5 +261,33 @@ public class AssetSetter {
 
     // Ponto padrão de respawn = ponto onde a entidade nasce
     entity.setSpawnPoint(worldX, worldY);
+  }
+
+  private int placeMonsterBatch(Entity[] mapMonsters, int startIndex, int[][] positions,
+      Supplier<Entity> factory) {
+    int i = startIndex;
+    for (int[] pos : positions) {
+      mapMonsters[i] = factory.get();
+      place(mapMonsters[i], pos[0], pos[1]);
+      i++;
+    }
+    return i;
+  }
+
+  private int placeInteractiveTileBatch(
+      InteractiveTile[] mapTiles,
+      int startIndex,
+      int[][] positions,
+      InteractiveTileFactory factory) {
+    int i = startIndex;
+    for (int[] pos : positions) {
+      mapTiles[i++] = factory.create(pos[0], pos[1]);
+    }
+    return i;
+  }
+
+  @FunctionalInterface
+  private interface InteractiveTileFactory {
+    InteractiveTile create(int col, int row);
   }
 }
