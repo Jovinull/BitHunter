@@ -136,7 +136,7 @@ public class Player extends Entity {
     setCurrentChest(null);
     setCurrentLegs(null);
 
-    setAttack(getAttack());
+    recalculateAttackStats();
     setDefense(getDefense());
 
     updateMaxGuardStaminaFromShield(true);
@@ -213,8 +213,7 @@ public class Player extends Entity {
     setSpeed(finalSpeed);
   }
 
-  @Override
-  public int getAttack() {
+  public void recalculateAttackStats() {
     Rectangle a = getAttackArea();
     a.width = getCurrentWeapon().getAttackArea().width;
     a.height = getCurrentWeapon().getAttackArea().height;
@@ -224,7 +223,6 @@ public class Player extends Entity {
 
     int value = getStrength() * getCurrentWeapon().getAttackValue();
     setAttack(value);
-    return value;
   }
 
   @Override
@@ -784,7 +782,7 @@ public class Player extends Entity {
         setDexterity(getDexterity() + 1);
       }
 
-      setAttack(getAttack());
+      recalculateAttackStats();
       setDefense(getDefense());
       setLife(getMaxLife());
     }
@@ -833,7 +831,7 @@ public class Player extends Entity {
   private void handleWeaponSelection(Entity selectedItem) {
     // Não estou permitindo "desarmar" ainda – várias coisas assumem arma válida
     setCurrentWeapon(selectedItem);
-    setAttack(getAttack());
+    recalculateAttackStats();
     getAttackImage();
   }
 

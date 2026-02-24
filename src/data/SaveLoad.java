@@ -121,7 +121,7 @@ public class SaveLoad {
 
     // Recalcular atributos derivados
     var player = gp.getPlayer();
-    player.getAttack();
+    player.recalculateAttackStats();
     player.getDefense();
     player.getAttackImage();
     player.recalculateSpeedFromEquipment();
