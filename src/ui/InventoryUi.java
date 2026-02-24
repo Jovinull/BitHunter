@@ -11,6 +11,19 @@ class InventoryUi {
 
   private static final int INVENTORY_COLS = 5;
   private static final Color COL_AMOUNT_SHADOW = new Color(60, 60, 60);
+  private static final int PLAYER_FRAME_X_TILES = 12;
+  private static final int NPC_FRAME_X_TILES = 2;
+  private static final int INVENTORY_FRAME_Y_TILES = 1;
+  private static final int INVENTORY_FRAME_WIDTH_TILES = 6;
+  private static final int INVENTORY_FRAME_HEIGHT_TILES = 5;
+  private static final int INVENTORY_FRAME_HEIGHT_EXTRA = 20;
+  private static final int TITLE_X_OFFSET = 20;
+  private static final int TITLE_Y_OFFSET = 32;
+  private static final int SLOT_START_Y_OFFSET = 16;
+  private static final int SLOT_WIDTH_EXTRA = 3;
+  private static final int AMOUNT_RIGHT_ALIGN_OFFSET = 44;
+  private static final int DESCRIPTION_LINE_HEIGHT = 22;
+  private static final int DESCRIPTION_FIRST_LINE_HEIGHT = 24;
 
   private final UI ui;
 
@@ -29,17 +42,17 @@ class InventoryUi {
     int slotRow;
 
     if (entity == ui.getGamePanel().getPlayer()) {
-      frameX = GamePanel.TILE_SIZE * 12;
-      frameY = GamePanel.TILE_SIZE;
-      frameWidth = GamePanel.TILE_SIZE * 6;
-      frameHeight = GamePanel.TILE_SIZE * 5 + 20;
+      frameX = GamePanel.TILE_SIZE * PLAYER_FRAME_X_TILES;
+      frameY = GamePanel.TILE_SIZE * INVENTORY_FRAME_Y_TILES;
+      frameWidth = GamePanel.TILE_SIZE * INVENTORY_FRAME_WIDTH_TILES;
+      frameHeight = GamePanel.TILE_SIZE * INVENTORY_FRAME_HEIGHT_TILES + INVENTORY_FRAME_HEIGHT_EXTRA;
       slotCol = ui.getPlayerSlotCol();
       slotRow = ui.getPlayerSlotRow();
     } else {
-      frameX = GamePanel.TILE_SIZE * 2;
-      frameY = GamePanel.TILE_SIZE;
-      frameWidth = GamePanel.TILE_SIZE * 6;
-      frameHeight = GamePanel.TILE_SIZE * 5 + 20;
+      frameX = GamePanel.TILE_SIZE * NPC_FRAME_X_TILES;
+      frameY = GamePanel.TILE_SIZE * INVENTORY_FRAME_Y_TILES;
+      frameWidth = GamePanel.TILE_SIZE * INVENTORY_FRAME_WIDTH_TILES;
+      frameHeight = GamePanel.TILE_SIZE * INVENTORY_FRAME_HEIGHT_TILES + INVENTORY_FRAME_HEIGHT_EXTRA;
       slotCol = ui.getNpcSlotCol();
       slotRow = ui.getNpcSlotRow();
     }
@@ -49,14 +62,14 @@ class InventoryUi {
     String title = (entity == ui.getGamePanel().getPlayer())
         ? ui.t("ui.inventory.playerTitle")
         : ui.t("ui.inventory.npcTitle");
-    int titleY = frameY + 32;
+    int titleY = frameY + TITLE_Y_OFFSET;
 
     g2.setFont(ui.fonts.pixelBold(22F));
-    ui.drawTextShadow(title, frameX + 20, titleY, UI.COL_TEXT, Color.black, 2);
+    ui.drawTextShadow(title, frameX + TITLE_X_OFFSET, titleY, UI.COL_TEXT, Color.black, 2);
 
-    final int slotXstart = frameX + 20;
-    final int slotYstart = titleY + 16;
-    final int slotWidth = GamePanel.TILE_SIZE + 3;
+    final int slotXstart = frameX + TITLE_X_OFFSET;
+    final int slotYstart = titleY + SLOT_START_Y_OFFSET;
+    final int slotWidth = GamePanel.TILE_SIZE + SLOT_WIDTH_EXTRA;
     final int slotHeight = GamePanel.TILE_SIZE;
 
     drawInventoryItems(entity, slotXstart, slotYstart, slotWidth, slotHeight);
@@ -96,7 +109,7 @@ class InventoryUi {
 
         g2.setFont(ui.fonts.pixelBold(32F));
         String s = String.valueOf(item.getAmount());
-        int amountX = ui.getXforAlignToRightText(s, slotX + 44);
+        int amountX = ui.getXforAlignToRightText(s, slotX + AMOUNT_RIGHT_ALIGN_OFFSET);
         int amountY = slotY + GamePanel.TILE_SIZE;
 
         g2.setColor(COL_AMOUNT_SHADOW);
@@ -189,7 +202,7 @@ class InventoryUi {
       String displayName = item.getDisplayName();
       g2.setFont(ui.fonts.pixelBold(20F));
       g2.drawString("[" + displayName + "]", textX, textY);
-      textY += 24;
+      textY += DESCRIPTION_FIRST_LINE_HEIGHT;
 
       String desc = item.getDisplayDescription();
       g2.setFont(ui.fonts.pixelPlain(20F));
@@ -198,7 +211,7 @@ class InventoryUi {
         String[] lines = desc.split("\n");
         for (String line : lines) {
           g2.drawString(line, textX, textY);
-          textY += 22;
+          textY += DESCRIPTION_LINE_HEIGHT;
         }
       }
     }

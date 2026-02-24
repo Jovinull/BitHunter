@@ -12,6 +12,29 @@ import main.LanguageManager;
 class OptionsUi {
 
   private static final int CONTROLS_PER_PAGE = 6;
+  private static final int OPTIONS_FRAME_X_TILES = 6;
+  private static final int OPTIONS_FRAME_Y_TILES = 1;
+  private static final int OPTIONS_FRAME_WIDTH_TILES = 8;
+  private static final int OPTIONS_FRAME_HEIGHT_TILES = 10;
+  private static final int CURSOR_X_OFFSET = 25;
+  private static final int FULLSCREEN_CHECKBOX_X_TILES = 4;
+  private static final double FULLSCREEN_CHECKBOX_X_HALF_TILE = 0.5;
+  private static final int FULLSCREEN_CHECKBOX_Y_OFFSET = 22;
+  private static final int CHECKBOX_SIZE = 24;
+  private static final int CHECKBOX_INNER_OFFSET = 2;
+  private static final int CHECKBOX_INNER_SIZE = 20;
+  private static final int VOLUME_BAR_WIDTH = 120;
+  private static final int VOLUME_BAR_HEIGHT = 24;
+  private static final int VOLUME_FILL_INSET = 1;
+  private static final int VOLUME_FILL_REDUCTION = 2;
+  private static final int VOLUME_FILL_HEIGHT = 22;
+  private static final int VOLUME_SCALE_MULTIPLIER = 24;
+  private static final int DIALOG_LINE_HEIGHT = 32;
+  private static final double CONTROLS_KEYS_X_TILES = 5.5;
+  private static final double CONTROLS_PAGE_LABEL_Y_TILES = 8.2;
+  private static final double CONTROLS_HINT_Y_TILES = 8.5;
+  private static final int LANGUAGE_ARROW_X_TILES = 7;
+  private static final int LANGUAGE_UP_ARROW_Y_TILES = 4;
 
   private final UI ui;
 
@@ -24,10 +47,10 @@ class OptionsUi {
     g2.setColor(UI.COL_TEXT);
     g2.setFont(ui.fonts.pixelPlain(32F));
 
-    int frameX = GamePanel.TILE_SIZE * 6;
-    int frameY = GamePanel.TILE_SIZE;
-    int frameWidth = GamePanel.TILE_SIZE * 8;
-    int frameHeight = GamePanel.TILE_SIZE * 10;
+    int frameX = GamePanel.TILE_SIZE * OPTIONS_FRAME_X_TILES;
+    int frameY = GamePanel.TILE_SIZE * OPTIONS_FRAME_Y_TILES;
+    int frameWidth = GamePanel.TILE_SIZE * OPTIONS_FRAME_WIDTH_TILES;
+    int frameHeight = GamePanel.TILE_SIZE * OPTIONS_FRAME_HEIGHT_TILES;
     ui.drawSubWindow(frameX, frameY, frameWidth, frameHeight);
 
     switch (ui.getSubState()) {
@@ -64,7 +87,7 @@ class OptionsUi {
     g2.setColor(UI.COL_TEXT);
     g2.drawString(ui.t("ui.options.fullscreen"), textX, textY);
     if (ui.commandNum == 0) {
-      g2.drawString(">", textX - 25, textY);
+      g2.drawString(">", textX - CURSOR_X_OFFSET, textY);
       if (keyH.isEnterPressed()) {
         gp.setFullScreenOn(!gp.isFullScreenOn());
         ui.setSubState(1);
@@ -75,21 +98,21 @@ class OptionsUi {
     textY += GamePanel.TILE_SIZE;
     g2.drawString(ui.t("ui.options.music"), textX, textY);
     if (ui.commandNum == 1) {
-      g2.drawString(">", textX - 25, textY);
+      g2.drawString(">", textX - CURSOR_X_OFFSET, textY);
     }
 
     // EFEITOS SONOROS
     textY += GamePanel.TILE_SIZE;
     g2.drawString(ui.t("ui.options.effects"), textX, textY);
     if (ui.commandNum == 2) {
-      g2.drawString(">", textX - 25, textY);
+      g2.drawString(">", textX - CURSOR_X_OFFSET, textY);
     }
 
     // CONTROLES
     textY += GamePanel.TILE_SIZE;
     g2.drawString(ui.t("ui.options.controls"), textX, textY);
     if (ui.commandNum == 3) {
-      g2.drawString(">", textX - 25, textY);
+      g2.drawString(">", textX - CURSOR_X_OFFSET, textY);
       if (keyH.isEnterPressed()) {
         ui.setSubState(2);
         ui.commandNum = 0;
@@ -105,7 +128,7 @@ class OptionsUi {
     String languageLine = ui.t("ui.options.language") + ": " + currentLangName;
     g2.drawString(languageLine, textX, textY);
     if (ui.commandNum == 4) {
-      g2.drawString(">", textX - 25, textY);
+      g2.drawString(">", textX - CURSOR_X_OFFSET, textY);
       if (keyH.isEnterPressed()) {
         ui.setSubState(4);
         ui.commandNum = 0;
@@ -117,7 +140,7 @@ class OptionsUi {
     textY += GamePanel.TILE_SIZE;
     g2.drawString(ui.t("ui.options.endGame"), textX, textY);
     if (ui.commandNum == 5) {
-      g2.drawString(">", textX - 25, textY);
+      g2.drawString(">", textX - CURSOR_X_OFFSET, textY);
       if (keyH.isEnterPressed()) {
         ui.setSubState(3);
         ui.commandNum = 0;
@@ -130,31 +153,34 @@ class OptionsUi {
     g2.drawString(ui.t(UI.KEY_TRADE_HINT_BACK), textX, textY);
 
     // CHECKBOX TELA CHEIA
-    textX = frameX + (int) (GamePanel.TILE_SIZE * 4.5);
-    textY = frameY + GamePanel.TILE_SIZE * 2 - 22;
+    textX = frameX + GamePanel.TILE_SIZE * FULLSCREEN_CHECKBOX_X_TILES
+        + (int) (GamePanel.TILE_SIZE * FULLSCREEN_CHECKBOX_X_HALF_TILE);
+    textY = frameY + GamePanel.TILE_SIZE * 2 - FULLSCREEN_CHECKBOX_Y_OFFSET;
     g2.setStroke(new BasicStroke(3));
     g2.setColor(UI.COL_PANEL_BORDER);
-    g2.drawRect(textX, textY, 24, 24);
+    g2.drawRect(textX, textY, CHECKBOX_SIZE, CHECKBOX_SIZE);
     if (gp.isFullScreenOn()) {
       g2.setColor(UI.COL_ACCENT);
-      g2.fillRect(textX + 2, textY + 2, 20, 20);
+      g2.fillRect(textX + CHECKBOX_INNER_OFFSET, textY + CHECKBOX_INNER_OFFSET, CHECKBOX_INNER_SIZE, CHECKBOX_INNER_SIZE);
     }
 
     // VOLUME MÚSICA
     textY += GamePanel.TILE_SIZE;
     g2.setColor(UI.COL_PANEL_BORDER);
-    g2.drawRect(textX, textY, 120, 24);
+    g2.drawRect(textX, textY, VOLUME_BAR_WIDTH, VOLUME_BAR_HEIGHT);
     g2.setColor(UI.COL_ACCENT);
-    int volumeWidth = 24 * gp.getMusic().getVolumeScale();
-    g2.fillRect(textX + 1, textY + 1, Math.max(0, volumeWidth - 2), 22);
+    int volumeWidth = VOLUME_SCALE_MULTIPLIER * gp.getMusic().getVolumeScale();
+    g2.fillRect(textX + VOLUME_FILL_INSET, textY + VOLUME_FILL_INSET,
+        Math.max(0, volumeWidth - VOLUME_FILL_REDUCTION), VOLUME_FILL_HEIGHT);
 
     // VOLUME EFEITOS
     textY += GamePanel.TILE_SIZE;
     g2.setColor(UI.COL_PANEL_BORDER);
-    g2.drawRect(textX, textY, 120, 24);
+    g2.drawRect(textX, textY, VOLUME_BAR_WIDTH, VOLUME_BAR_HEIGHT);
     g2.setColor(UI.COL_ACCENT);
-    volumeWidth = 24 * gp.getSe().getVolumeScale();
-    g2.fillRect(textX + 1, textY + 1, Math.max(0, volumeWidth - 2), 22);
+    volumeWidth = VOLUME_SCALE_MULTIPLIER * gp.getSe().getVolumeScale();
+    g2.fillRect(textX + VOLUME_FILL_INSET, textY + VOLUME_FILL_INSET,
+        Math.max(0, volumeWidth - VOLUME_FILL_REDUCTION), VOLUME_FILL_HEIGHT);
 
     gp.getConfig().saveConfig();
   }
@@ -244,7 +270,7 @@ class OptionsUi {
 
       g2.drawString(name, textX, textY);
       if (ui.commandNum == i) {
-        g2.drawString(">", textX - 25, textY);
+        g2.drawString(">", textX - CURSOR_X_OFFSET, textY);
         if (keyH.isEnterPressed()) {
           langManager.setCurrentLanguage(opt.code());
           gp.getConfig().saveConfig();
@@ -262,11 +288,11 @@ class OptionsUi {
 
     int visibleCount = Math.min(UI.MAX_VISIBLE_LANG_OPTIONS, totalLanguages);
     int maxOffset = Math.max(0, totalLanguages - visibleCount);
-    int arrowX = frameX + GamePanel.TILE_SIZE * 7;
+    int arrowX = frameX + GamePanel.TILE_SIZE * LANGUAGE_ARROW_X_TILES;
 
     if (ui.languageScrollOffset > 0) {
       g2.setColor(UI.COL_TEXT_DIM);
-      g2.drawString("↑", arrowX, frameY + GamePanel.TILE_SIZE * 4);
+      g2.drawString("↑", arrowX, frameY + GamePanel.TILE_SIZE * LANGUAGE_UP_ARROW_Y_TILES);
     }
     if (ui.languageScrollOffset < maxOffset) {
       g2.setColor(UI.COL_TEXT_DIM);
@@ -283,7 +309,7 @@ class OptionsUi {
 
     g2.drawString(backLabel, textX, textY);
     if (ui.commandNum == backIndex) {
-      g2.drawString(">", textX - 25, textY);
+      g2.drawString(">", textX - CURSOR_X_OFFSET, textY);
       if (keyH.isEnterPressed()) {
         ui.setSubState(0);
         ui.commandNum = 4;
@@ -304,13 +330,13 @@ class OptionsUi {
     g2.setColor(UI.COL_TEXT);
     for (String line : ui.currentDialogue.split("\n")) {
       g2.drawString(line, textX, textY);
-      textY += 32;
+      textY += DIALOG_LINE_HEIGHT;
     }
 
     textY = frameY + GamePanel.TILE_SIZE * 9;
     g2.drawString(ui.t(UI.KEY_COMMON_BACK), textX, textY);
     if (ui.commandNum == 0) {
-      g2.drawString(">", textX - 25, textY);
+      g2.drawString(">", textX - CURSOR_X_OFFSET, textY);
       if (gp.getKeyH().isEnterPressed()) {
         ui.setSubState(0);
       }
@@ -357,23 +383,11 @@ class OptionsUi {
     int perPage = CONTROLS_PER_PAGE;
 
     // ── Paginação ──
-    int pageCount = (totalControls + perPage - 1) / perPage;
-    if (pageCount <= 0) {
-      pageCount = 1;
-    }
+    int pageCount = calculatePageCount(totalControls, perPage);
     ui.setControlsPageCount(pageCount);
 
     // Auto-ajusta página com base na seleção atual
-    int currentPage = ui.getControlsPage();
-    if (ui.commandNum >= 0 && ui.commandNum < totalControls) {
-      currentPage = ui.commandNum / perPage;
-    }
-    if (currentPage < 0) {
-      currentPage = 0;
-    }
-    if (currentPage > pageCount - 1) {
-      currentPage = pageCount - 1;
-    }
+    int currentPage = resolveCurrentControlsPage(totalControls, perPage, pageCount);
     ui.setControlsPage(currentPage);
 
     int startIndex = currentPage * perPage;
@@ -381,7 +395,7 @@ class OptionsUi {
 
     // ── Entradas da página atual ──
     int textX = frameX + GamePanel.TILE_SIZE;
-    int keysX = frameX + (int) (GamePanel.TILE_SIZE * 5.5);
+    int keysX = frameX + (int) (GamePanel.TILE_SIZE * CONTROLS_KEYS_X_TILES);
     int textY = titleY + GamePanel.TILE_SIZE;
 
     for (int i = startIndex; i < endIndex; i++) {
@@ -407,7 +421,7 @@ class OptionsUi {
       // Cursor de seleção
       if (isSelected) {
         g2.setColor(UI.COL_ACCENT);
-        g2.drawString(">", textX - 25, textY);
+        g2.drawString(">", textX - CURSOR_X_OFFSET, textY);
       }
 
       textY += GamePanel.TILE_SIZE;
@@ -417,7 +431,7 @@ class OptionsUi {
     if (pageCount > 1) {
       String pageLabel = (currentPage + 1) + "/" + pageCount;
       int pageX = frameX + GamePanel.TILE_SIZE * 6;
-      int pageY = frameY + (int) (GamePanel.TILE_SIZE * 8.2);
+      int pageY = frameY + (int) (GamePanel.TILE_SIZE * CONTROLS_PAGE_LABEL_Y_TILES);
       g2.setColor(UI.COL_TEXT_DIM);
       g2.drawString(pageLabel, pageX, pageY);
     }
@@ -428,7 +442,7 @@ class OptionsUi {
       g2.setFont(ui.fonts.pixelPlain(24F));
       String hint = ui.t("ui.controls.pressKey");
       int hintX = frameX + GamePanel.TILE_SIZE;
-      int hintY = frameY + (int) (GamePanel.TILE_SIZE * 8.5);
+      int hintY = frameY + (int) (GamePanel.TILE_SIZE * CONTROLS_HINT_Y_TILES);
       g2.drawString(hint, hintX, hintY);
       g2.setFont(ui.fonts.pixelPlain(32F)); // restaura fonte
     }
@@ -440,8 +454,27 @@ class OptionsUi {
     g2.drawString(ui.t(UI.KEY_COMMON_BACK), textX, textY);
     if (ui.commandNum == totalControls) {
       g2.setColor(UI.COL_ACCENT);
-      g2.drawString(">", textX - 25, textY);
+      g2.drawString(">", textX - CURSOR_X_OFFSET, textY);
     }
+  }
+
+  private int calculatePageCount(int totalControls, int perPage) {
+    int pageCount = (totalControls + perPage - 1) / perPage;
+    return Math.max(1, pageCount);
+  }
+
+  private int resolveCurrentControlsPage(int totalControls, int perPage, int pageCount) {
+    int currentPage = ui.getControlsPage();
+    if (ui.commandNum >= 0 && ui.commandNum < totalControls) {
+      currentPage = ui.commandNum / perPage;
+    }
+    if (currentPage < 0) {
+      return 0;
+    }
+    if (currentPage > pageCount - 1) {
+      return pageCount - 1;
+    }
+    return currentPage;
   }
 
   private void optionsEndGameConfirmation(int frameX, int frameY) {
@@ -456,7 +489,7 @@ class OptionsUi {
     g2.setColor(UI.COL_TEXT);
     for (String line : ui.currentDialogue.split("\n")) {
       g2.drawString(line, textX, textY);
-      textY += 32;
+      textY += DIALOG_LINE_HEIGHT;
     }
 
     String text = ui.t("ui.common.yes");
@@ -465,7 +498,7 @@ class OptionsUi {
     g2.drawString(text, textX, textY);
     var keyH = gp.getKeyH();
     if (ui.commandNum == 0) {
-      g2.drawString(">", textX - 25, textY);
+      g2.drawString(">", textX - CURSOR_X_OFFSET, textY);
       if (keyH.isEnterPressed()) {
         gp.getPlayTimeTracker().stop();
         gp.getSaveManager().save();
@@ -484,7 +517,7 @@ class OptionsUi {
     textY += GamePanel.TILE_SIZE;
     g2.drawString(text, textX, textY);
     if (ui.commandNum == 1) {
-      g2.drawString(">", textX - 25, textY);
+      g2.drawString(">", textX - CURSOR_X_OFFSET, textY);
       if (keyH.isEnterPressed()) {
         ui.setSubState(0);
         ui.commandNum = 4;
