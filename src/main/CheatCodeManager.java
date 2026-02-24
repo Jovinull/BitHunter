@@ -13,55 +13,105 @@ import entity.Entity;
  * Gerencia códigos secretos digitáveis durante o jogo (sistema CRC).
  *
  * <h3>Arquitetura de repetibilidade</h3>
- * <p>Cada cheat é registrado com uma {@link Repeatability}:</p>
+ * <p>
+ * Cada cheat é registrado com uma {@link Repeatability}:
+ * </p>
  * <ul>
- *   <li>{@code ONE_TIME} — pode ser usado apenas uma vez por save.
- *       O estado é persistido via {@link data.DataStorage} para impedir
- *       reuso mesmo após fechar e reabrir o jogo.</li>
- *   <li>{@code REPEATABLE} — pode ser usado livremente, sem restrição.</li>
+ * <li>{@code ONE_TIME} — pode ser usado apenas uma vez por save.
+ * O estado é persistido via {@link data.DataStorage} para impedir
+ * reuso mesmo após fechar e reabrir o jogo.</li>
+ * <li>{@code REPEATABLE} — pode ser usado livremente, sem restrição.</li>
  * </ul>
  *
  * <h3>Modo de uso (para o jogador)</h3>
  * <ol>
- *   <li>No estado PLAY, pressione aspas ({@code '} ou {@code "}) para ativar
- *       o modo captura silencioso.</li>
- *   <li>Digite o código secreto (letras, dígitos ou ponto; case-insensitive).</li>
- *   <li>Pressione ENTER para confirmar, ou ESC para cancelar.
- *       Se expirar o timeout ({@value #CAPTURE_TIMEOUT_MS}ms), o código
- *       é validado automaticamente.</li>
+ * <li>No estado PLAY, pressione aspas ({@code '} ou {@code "}) para ativar
+ * o modo captura silencioso.</li>
+ * <li>Digite o código secreto (letras, dígitos ou ponto;
+ * case-insensitive).</li>
+ * <li>Pressione ENTER para confirmar, ou ESC para cancelar.
+ * Se expirar o timeout ({@value #CAPTURE_TIMEOUT_MS}ms), o código
+ * é validado automaticamente.</li>
  * </ol>
  *
- * <p>Nenhuma indicação visual aparece durante a digitação.
+ * <p>
+ * Nenhuma indicação visual aparece durante a digitação.
  * Se o código estiver correto e elegível para uso, o efeito é aplicado
  * e um feedback aparece no HUD. Códigos ONE_TIME já usados exibem aviso.
- * Código inválido → silencioso.</p>
+ * Código inválido → silencioso.
+ * </p>
  *
  * <h3>Códigos registrados</h3>
  * <table>
- *   <tr><th>Código</th><th>Efeito</th><th>Tipo</th></tr>
- *   <tr><td>{@code trycatch}</td><td>Escudo do Compilador (Java)</td><td>ONE_TIME</td></tr>
- *   <tr><td>{@code nullpointer}</td><td>Easter egg: mensagem divertida</td><td>REPEATABLE</td></tr>
- *   <tr><td>{@code overflow}</td><td>+1000 moedas (Stack Overflow)</td><td>REPEATABLE</td></tr>
- *   <tr><td>{@code hotfix}</td><td>Restaura vida e mana ao máximo</td><td>REPEATABLE</td></tr>
- *   <tr><td>{@code sudo}</td><td>+5 chaves (acesso root)</td><td>REPEATABLE</td></tr>
- *   <tr><td>{@code printf}</td><td>+5 poções vermelhas</td><td>REPEATABLE</td></tr>
- *   <tr><td>{@code gitpush}</td><td>Força salvar o jogo</td><td>REPEATABLE</td></tr>
- *   <tr><td>{@code finalclass}</td><td>Alterna Modo Deus</td><td>REPEATABLE</td></tr>
- *   <tr><td>{@code refactor}</td><td>Sobe 1 nível</td><td>ONE_TIME</td></tr>
+ * <tr>
+ * <th>Código</th>
+ * <th>Efeito</th>
+ * <th>Tipo</th>
+ * </tr>
+ * <tr>
+ * <td>{@code trycatch}</td>
+ * <td>Escudo do Compilador (Java)</td>
+ * <td>ONE_TIME</td>
+ * </tr>
+ * <tr>
+ * <td>{@code nullpointer}</td>
+ * <td>Easter egg: mensagem divertida</td>
+ * <td>REPEATABLE</td>
+ * </tr>
+ * <tr>
+ * <td>{@code overflow}</td>
+ * <td>+1000 moedas (Stack Overflow)</td>
+ * <td>REPEATABLE</td>
+ * </tr>
+ * <tr>
+ * <td>{@code hotfix}</td>
+ * <td>Restaura vida e mana ao máximo</td>
+ * <td>REPEATABLE</td>
+ * </tr>
+ * <tr>
+ * <td>{@code sudo}</td>
+ * <td>+5 chaves (acesso root)</td>
+ * <td>REPEATABLE</td>
+ * </tr>
+ * <tr>
+ * <td>{@code printf}</td>
+ * <td>+5 poções vermelhas</td>
+ * <td>REPEATABLE</td>
+ * </tr>
+ * <tr>
+ * <td>{@code gitpush}</td>
+ * <td>Força salvar o jogo</td>
+ * <td>REPEATABLE</td>
+ * </tr>
+ * <tr>
+ * <td>{@code finalclass}</td>
+ * <td>Alterna Modo Deus</td>
+ * <td>REPEATABLE</td>
+ * </tr>
+ * <tr>
+ * <td>{@code refactor}</td>
+ * <td>Sobe 1 nível</td>
+ * <td>ONE_TIME</td>
+ * </tr>
  * </table>
  *
  * <h3>Persistência</h3>
- * <p>Os códigos ONE_TIME já utilizados são salvos em
+ * <p>
+ * Os códigos ONE_TIME já utilizados são salvos em
  * {@link data.DataStorage#getUsedCheatCodes()} e restaurados ao carregar
- * o jogo via {@link data.SaveLoad}.</p>
+ * o jogo via {@link data.SaveLoad}.
+ * </p>
  *
  * <h3>Compatibilidade de teclado (ABNT2 / US)</h3>
- * <p>A ativação é feita via {@link #onCharTyped(char)}, que recebe o caractere
+ * <p>
+ * A ativação é feita via {@link #onCharTyped(char)}, que recebe o caractere
  * real digitado (independente do layout físico). Isso garante que tanto
  * {@code '} (aspas simples) quanto {@code "} (aspas duplas) funcionem
- * em qualquer layout — ABNT2, US-International, etc.</p>
+ * em qualquer layout — ABNT2, US-International, etc.
+ * </p>
  *
  * <h3>Passos de reprodução para teste manual</h3>
+ *
  * <pre>
  * 1. Inicie o jogo e entre em PLAY_STATE (novo jogo ou carregar).
  * 2. Pressione ' ou " para ativar a captura silenciosa.
@@ -91,7 +141,8 @@ public class CheatCodeManager {
   /**
    * Registro interno de um cheat: regra de uso e ação a executar.
    */
-  private record CheatEntry(Repeatability repeatability, Runnable action) {}
+  private record CheatEntry(Repeatability repeatability, Runnable action) {
+  }
 
   // ====================================================================
   // Constantes
@@ -122,13 +173,17 @@ public class CheatCodeManager {
 
   private final GamePanel gp;
 
-  /** Códigos registrados: chave (lowercase) → entrada com ação e repetibilidade. */
+  /**
+   * Códigos registrados: chave (lowercase) → entrada com ação e repetibilidade.
+   */
   private final Map<String, CheatEntry> registeredCodes = new LinkedHashMap<>();
 
   /**
    * Códigos ONE_TIME já utilizados neste save.
-   * <p>Persistido via {@link data.DataStorage} para sobreviver ao ciclo
-   * save/load. Códigos REPEATABLE nunca entram aqui.</p>
+   * <p>
+   * Persistido via {@link data.DataStorage} para sobreviver ao ciclo
+   * save/load. Códigos REPEATABLE nunca entram aqui.
+   * </p>
    */
   private final Set<String> usedOneTimeCodes = new HashSet<>();
 
@@ -176,7 +231,8 @@ public class CheatCodeManager {
     registeredCodes.put("overflow",
         new CheatEntry(Repeatability.REPEATABLE, this::grantGold));
 
-    // "hotfix" → Restaura vida e mana ao máximo (deploy de hotfix = correção rápida).
+    // "hotfix" → Restaura vida e mana ao máximo (deploy de hotfix = correção
+    // rápida).
     // REPEATABLE: efeito instantâneo e não acumulável, útil em emergências.
     registeredCodes.put("hotfix",
         new CheatEntry(Repeatability.REPEATABLE, this::restoreVitals));
@@ -198,7 +254,8 @@ public class CheatCodeManager {
     registeredCodes.put("gitpush",
         new CheatEntry(Repeatability.REPEATABLE, this::forceSave));
 
-    // "finalclass" → Alterna Modo Deus (final class = não pode ser herdado/derrotado).
+    // "finalclass" → Alterna Modo Deus (final class = não pode ser
+    // herdado/derrotado).
     // REPEATABLE: é um toggle on/off, precisa repetir para desligar.
     registeredCodes.put("finalclass",
         new CheatEntry(Repeatability.REPEATABLE, this::toggleGodMode));
@@ -207,6 +264,17 @@ public class CheatCodeManager {
     // ONE_TIME: level up permanente é impactante demais para repetir via cheat.
     registeredCodes.put("refactor",
         new CheatEntry(Repeatability.ONE_TIME, this::grantLevelUp));
+
+    // --- Dynamic Cheats: Summon Monsters ---
+    for (String id : gp.geteGenerator().getRegisteredIds()) {
+      if (id.startsWith("monster.")) {
+        // e.g. "monster.bat" -> "summonbat"
+        String monsterName = id.substring("monster.".length()).toLowerCase();
+        String cheatCode = "summon" + monsterName;
+        registeredCodes.put(cheatCode,
+            new CheatEntry(Repeatability.REPEATABLE, () -> summonMonster(id, monsterName)));
+      }
+    }
   }
 
   // ====================================================================
@@ -216,13 +284,17 @@ public class CheatCodeManager {
   /**
    * Processa um caractere digitado ({@code keyTyped}).
    *
-   * <p>Retorna {@code true} se o evento foi consumido e não deve
-   * ser propagado para outros handlers.</p>
+   * <p>
+   * Retorna {@code true} se o evento foi consumido e não deve
+   * ser propagado para outros handlers.
+   * </p>
    *
-   * <p><b>Compatibilidade ABNT2/US:</b> aceita tanto {@code '} quanto {@code "}
+   * <p>
+   * <b>Compatibilidade ABNT2/US:</b> aceita tanto {@code '} quanto {@code "}
    * como caractere de ativação, pois o mapeamento de VK_QUOTE varia entre
    * layouts. O {@code keyTyped} fornece o caractere real independentemente
-   * do layout físico do teclado.</p>
+   * do layout físico do teclado.
+   * </p>
    */
   public boolean onCharTyped(char c) {
     if (!capturing) {
@@ -245,9 +317,11 @@ public class CheatCodeManager {
   /**
    * Processa uma tecla pressionada ({@code keyPressed}) durante captura.
    *
-   * <p>Retorna {@code true} se o evento foi consumido. Durante o modo
+   * <p>
+   * Retorna {@code true} se o evento foi consumido. Durante o modo
    * captura, <b>todas</b> as teclas são consumidas para impedir que
-   * ações do jogo (WASD, T, R, G etc.) sejam disparadas.</p>
+   * ações do jogo (WASD, T, R, G etc.) sejam disparadas.
+   * </p>
    */
   public boolean onKeyPressed(int keyCode) {
     if (!capturing) {
@@ -271,8 +345,10 @@ public class CheatCodeManager {
   /**
    * Verifica se o manager está em modo de captura.
    *
-   * <p>Usado pelo {@link KeyHandler} para saber se deve bloquear
-   * {@code keyReleased} de flags de movimento durante a digitação.</p>
+   * <p>
+   * Usado pelo {@link KeyHandler} para saber se deve bloquear
+   * {@code keyReleased} de flags de movimento durante a digitação.
+   * </p>
    */
   public boolean isCapturing() {
     return capturing;
@@ -298,7 +374,9 @@ public class CheatCodeManager {
 
   /**
    * Retorna cópia imutável dos códigos ONE_TIME já usados.
-   * <p>Utilizado por {@link data.SaveLoad} ao salvar o jogo.</p>
+   * <p>
+   * Utilizado por {@link data.SaveLoad} ao salvar o jogo.
+   * </p>
    */
   public Set<String> getUsedOneTimeCodes() {
     return Collections.unmodifiableSet(usedOneTimeCodes);
@@ -306,9 +384,12 @@ public class CheatCodeManager {
 
   /**
    * Restaura os códigos ONE_TIME já usados a partir do save.
-   * <p>Utilizado por {@link data.SaveLoad} ao carregar o jogo.</p>
+   * <p>
+   * Utilizado por {@link data.SaveLoad} ao carregar o jogo.
+   * </p>
    *
-   * @param codes conjunto de códigos já usados (null-safe)
+   * @param codes
+   *          conjunto de códigos já usados (null-safe)
    */
   public void setUsedOneTimeCodes(Set<String> codes) {
     usedOneTimeCodes.clear();
@@ -335,12 +416,14 @@ public class CheatCodeManager {
   /**
    * Valida o código digitado e executa a ação correspondente.
    *
-   * <p>Fluxo de decisão:</p>
+   * <p>
+   * Fluxo de decisão:
+   * </p>
    * <ol>
-   *   <li>Código vazio → ignora.</li>
-   *   <li>Código não registrado → silencioso (sem feedback).</li>
-   *   <li>ONE_TIME já usado → mensagem de aviso e bloqueio.</li>
-   *   <li>Código válido → marca ONE_TIME como usado, executa ação.</li>
+   * <li>Código vazio → ignora.</li>
+   * <li>Código não registrado → silencioso (sem feedback).</li>
+   * <li>ONE_TIME já usado → mensagem de aviso e bloqueio.</li>
+   * <li>Código válido → marca ONE_TIME como usado, executa ação.</li>
    * </ol>
    */
   private void confirm() {
@@ -381,8 +464,10 @@ public class CheatCodeManager {
   /**
    * {@code "trycatch"} — Concede o Escudo do Compilador (Java).
    *
-   * <p>ONE_TIME: referencia a mecânica try/catch do escudo;
-   * é um item poderoso e exclusivo que não deve ser duplicado.</p>
+   * <p>
+   * ONE_TIME: referencia a mecânica try/catch do escudo;
+   * é um item poderoso e exclusivo que não deve ser duplicado.
+   * </p>
    */
   private void grantCompilerShield() {
     var lang = gp.getLanguageManager();
@@ -394,8 +479,10 @@ public class CheatCodeManager {
   /**
    * {@code "nullpointer"} — Easter egg temático de NullPointerException.
    *
-   * <p>REPEATABLE: não concede vantagem mecânica, apenas exibe
-   * mensagem divertida para diversão do jogador.</p>
+   * <p>
+   * REPEATABLE: não concede vantagem mecânica, apenas exibe
+   * mensagem divertida para diversão do jogador.
+   * </p>
    */
   private void easterEggNullPointer() {
     var lang = gp.getLanguageManager();
@@ -407,8 +494,10 @@ public class CheatCodeManager {
   /**
    * {@code "overflow"} — Adiciona {@value #OVERFLOW_COINS} moedas.
    *
-   * <p>REPEATABLE: referência a Stack Overflow = overflow de riqueza.
-   * Moedas são consumíveis (compras, baús), então repetir é equilibrado.</p>
+   * <p>
+   * REPEATABLE: referência a Stack Overflow = overflow de riqueza.
+   * Moedas são consumíveis (compras, baús), então repetir é equilibrado.
+   * </p>
    */
   private void grantGold() {
     var lang = gp.getLanguageManager();
@@ -421,8 +510,10 @@ public class CheatCodeManager {
   /**
    * {@code "hotfix"} — Restaura vida e mana ao máximo.
    *
-   * <p>REPEATABLE: efeito instantâneo e não acumulável.
-   * "Hotfix" = correção emergencial implantada em produção.</p>
+   * <p>
+   * REPEATABLE: efeito instantâneo e não acumulável.
+   * "Hotfix" = correção emergencial implantada em produção.
+   * </p>
    */
   private void restoreVitals() {
     var lang = gp.getLanguageManager();
@@ -436,8 +527,10 @@ public class CheatCodeManager {
   /**
    * {@code "sudo"} — Adiciona {@value #SUDO_KEYS} chaves ao inventário.
    *
-   * <p>REPEATABLE: chaves são consumidas ao abrir portas/baús.
-   * "sudo" = super user do → acesso irrestrito a tudo.</p>
+   * <p>
+   * REPEATABLE: chaves são consumidas ao abrir portas/baús.
+   * "sudo" = super user do → acesso irrestrito a tudo.
+   * </p>
    */
   private void grantKeys() {
     var lang = gp.getLanguageManager();
@@ -452,8 +545,10 @@ public class CheatCodeManager {
   /**
    * {@code "printf"} — Adiciona {@value #PRINTF_POTIONS} poções vermelhas.
    *
-   * <p>REPEATABLE: poções são consumíveis e se esgotam naturalmente.
-   * "printf" = output de dados → output de cura.</p>
+   * <p>
+   * REPEATABLE: poções são consumíveis e se esgotam naturalmente.
+   * "printf" = output de dados → output de cura.
+   * </p>
    */
   private void grantPotions() {
     var lang = gp.getLanguageManager();
@@ -468,8 +563,10 @@ public class CheatCodeManager {
   /**
    * {@code "gitpush"} — Força salvar o jogo imediatamente.
    *
-   * <p>REPEATABLE: salvar o jogo é sempre seguro e desejável.
-   * "git push --force" = forçar envio do estado atual.</p>
+   * <p>
+   * REPEATABLE: salvar o jogo é sempre seguro e desejável.
+   * "git push --force" = forçar envio do estado atual.
+   * </p>
    */
   private void forceSave() {
     var lang = gp.getLanguageManager();
@@ -481,8 +578,10 @@ public class CheatCodeManager {
   /**
    * {@code "finalclass"} — Alterna o Modo Deus (god mode).
    *
-   * <p>REPEATABLE: é um toggle on/off, precisa repetir para desligar.
-   * "final class" = classe que não pode ser herdada/sobrescrita/derrotada.</p>
+   * <p>
+   * REPEATABLE: é um toggle on/off, precisa repetir para desligar.
+   * "final class" = classe que não pode ser herdada/sobrescrita/derrotada.
+   * </p>
    */
   private void toggleGodMode() {
     var lang = gp.getLanguageManager();
@@ -497,11 +596,15 @@ public class CheatCodeManager {
   /**
    * {@code "refactor"} — Concede XP suficiente para subir 1 nível.
    *
-   * <p>ONE_TIME: level up permanente é cumulativo e impactante demais
-   * para repetir livremente via cheat.</p>
+   * <p>
+   * ONE_TIME: level up permanente é cumulativo e impactante demais
+   * para repetir livremente via cheat.
+   * </p>
    *
-   * <p>Reutiliza {@link entity.Player#checkLevelUp()} para disparar
-   * toda a lógica padrão de level up (stats, diálogo, SFX).</p>
+   * <p>
+   * Reutiliza {@link entity.Player#checkLevelUp()} para disparar
+   * toda a lógica padrão de level up (stats, diálogo, SFX).
+   * </p>
    */
   private void grantLevelUp() {
     var lang = gp.getLanguageManager();
@@ -513,6 +616,54 @@ public class CheatCodeManager {
     gp.getGameUi().addMessage(lang.text("cheat.refactor"));
   }
 
+  /**
+   * Invoca um monstro dinamicamente próximo ao jogador.
+   *
+   * <p>
+   * REPEATABLE: ajuda nos testes e na diversão. Os monstros invocados
+   * não dão respawn (não voltam à vida após morrer).
+   * </p>
+   */
+  private void summonMonster(String monsterId, String monsterName) {
+    var player = gp.getPlayer();
+
+    // Create the entity
+    Entity monster = gp.geteGenerator().getObject(monsterId);
+    if (monster == null)
+      return;
+
+    // Disable respawn specifically for summoned monsters
+    monster.disableRespawn();
+
+    // Place near player (e.g., exactly at player position or adjacent)
+    // Here we use player's worldX and worldY with an offset
+    int spawnX = player.getWorldX() + GamePanel.TILE_SIZE;
+    int spawnY = player.getWorldY();
+
+    monster.setWorldX(spawnX);
+    monster.setWorldY(spawnY);
+    monster.setSpawnPoint(spawnX, spawnY);
+
+    // Add to game's monster list
+    Entity[][] mapMonsters = gp.getMonster();
+    int currentMap = gp.getCurrentMap();
+    boolean spawned = false;
+    for (int i = 0; i < mapMonsters[currentMap].length; i++) {
+      if (mapMonsters[currentMap][i] == null) {
+        mapMonsters[currentMap][i] = monster;
+        spawned = true;
+        break;
+      }
+    }
+
+    if (spawned) {
+      gp.getGameUi().addMessage("Cheat: Summoned " + monsterName + " (No Respawn)");
+      gp.playSE(SUCCESS_SFX_ID);
+    } else {
+      gp.getGameUi().addMessage("Cheat failed: Monster limit reached in this map.");
+    }
+  }
+
   // ====================================================================
   // Utilitário interno
   // ====================================================================
@@ -520,11 +671,15 @@ public class CheatCodeManager {
   /**
    * Adiciona uma quantidade de itens empilháveis ao inventário do jogador.
    *
-   * <p>Se já existir um stack do item, incrementa a quantidade.
-   * Caso contrário, cria um novo slot (se houver espaço).</p>
+   * <p>
+   * Se já existir um stack do item, incrementa a quantidade.
+   * Caso contrário, cria um novo slot (se houver espaço).
+   * </p>
    *
-   * @param internalId id interno do item (ex: {@code "item.key"})
-   * @param count      quantidade a adicionar
+   * @param internalId
+   *          id interno do item (ex: {@code "item.key"})
+   * @param count
+   *          quantidade a adicionar
    * @return {@code true} se os itens foram adicionados com sucesso
    */
   private boolean addStackableItems(String internalId, int count) {

@@ -30,8 +30,8 @@
 
 <br/>
 
-> ✅ **Implementado** não significa “final”: significa “há evidência de funcionamento no código”.  
-> 🧭 **Planejado** é intenção (pode mudar).  
+> ✅ **Implementado** não significa “final”: significa “há evidência de funcionamento no código”.
+> 🧭 **Planejado** é intenção (pode mudar).
 > 💡 **Sugestão** é uma proposta de design/pipeline para reduzir risco e acelerar iteração.
 
 ---
@@ -191,7 +191,7 @@ O projeto prioriza **clareza mecânica**, **leitura visual limpa** e **desempenh
 
 - **Não** será um RPG focado em “história linear obrigatória” (anti-pilar: cutscenes longas e intrusivas).
 - **Não** será um jogo com “buildcrafting” hiper opaco (anti-pilar: 40 stats escondidos sem explicação).
-- **Não** será “hardcore punitivo por padrão” (anti-pilar: perda total de progressão por morte).  
+- **Não** será “hardcore punitivo por padrão” (anti-pilar: perda total de progressão por morte).
   🧭 A punição de morte deve existir, mas ser **justa** e **aprendível**.
 - **Não** dependerá de grind infinito sem decisões (anti-pilar: farm sem escolhas).
 
@@ -335,7 +335,7 @@ flowchart TD
 
 ### 4.2) Ascensão
 
-- 🧭 **Planejado**: resetar parte da progressão do personagem em troca de bônus permanentes (QoL + pequenos percentuais).  
+- 🧭 **Planejado**: resetar parte da progressão do personagem em troca de bônus permanentes (QoL + pequenos percentuais).
 - 💡 **Sugestão**: formalizar uma **tabela de bônus** com limites (caps) e custos crescentes para evitar “ascension power creep” irreversível.
 
 ---
@@ -359,7 +359,7 @@ flowchart TD
 - **T**: debug/path (dev)
 - **R**: recarregar mapa (dev)
 
-⚠️ **Risco (consistência)**: o atalho `R` recarrega um arquivo com nome diferente do arquivo existente (`interior01` vs `indoor01`).  
+⚠️ **Risco (consistência)**: o atalho `R` recarrega um arquivo com nome diferente do arquivo existente (`interior01` vs `indoor01`).
 💡 **Sugestão**: padronizar nomenclatura e criar uma tabela única de mapas (IDs) para reduzir drift.
 
 ### 5.2) Combate
@@ -481,7 +481,7 @@ flowchart TD
 - salva `DataStorage` em `save.dat`
 - restaura stats, inventário (por `internalId`), equipamentos (por slots), objetos no mapa (id/pos/loot/opened), pets e incubadora
 
-⚠️ **Risco (compatibilidade)**: mudanças em `internalId`, slots ou `DataStorage` podem quebrar saves antigos.  
+⚠️ **Risco (compatibilidade)**: mudanças em `internalId`, slots ou `DataStorage` podem quebrar saves antigos.
 💡 **Sugestão**: criar estratégia de versão do save (ex.: `saveVersion`) e migração leve (tolerância a campos faltantes).
 
 ### 5.11) i18n (traduções) e IDs estáveis
@@ -842,7 +842,7 @@ stateDiagram-v2
 
 ⚠️ **Inconsistência detectada (GDD vs código)**:
 
-- No texto base, a progressão de XP menciona “dobrar” `nextLevelExp`, mas a tabela/fórmula final e o código usam outra lógica.  
+- No texto base, a progressão de XP menciona “dobrar” `nextLevelExp`, mas a tabela/fórmula final e o código usam outra lógica.
 - Este GDD final mantém a tabela/fórmula e recomenda alinhar o texto (ver método abaixo).
 
 ### 9.4) Método de balanceamento (como ajustar sem quebrar)
@@ -966,16 +966,16 @@ stateDiagram-v2
 
 ### P0 (fundação jogável e confiável)
 
-- **Assets no repositório / pipeline de assets** (para rodar do zero)  
+- **Assets no repositório / pipeline de assets** (para rodar do zero)
   Critério: jogo roda sem missing resources.
-- **Alinhar inconsistências GDD↔código** (mapa/XP/teclas/fórmulas)  
+- **Alinhar inconsistências GDD↔código** (mapa/XP/teclas/fórmulas)
   Critério: GDD espelha o comportamento atual + separa claramente o planejado.
-- **Drops e economia mínima estável**  
+- **Drops e economia mínima estável**
   Critério: comprar/vender + drops básicos não geram loops infinitos triviais.
 
 ### P1 (profundidade e variedade)
 
-- **Variedade de inimigos** com papéis claros (trash/skirmisher/elite)  
+- **Variedade de inimigos** com papéis claros (trash/skirmisher/elite)
 - **Mais eventos e “salas” com risco/recompensa**
 - **Sistema de materiais** (craft/imbuir) com sinks reais
 

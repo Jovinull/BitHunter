@@ -663,7 +663,15 @@ public class Entity {
    * Ex.: 60 * 10 = 10 segundos se o jogo roda a 60 FPS.
    */
   public void enableRespawn(int delayFrames) {
-    respawn.enableRespawn(delayFrames);
+    if (respawn != null) {
+      respawn.enableRespawn(delayFrames);
+    }
+  }
+
+  public void disableRespawn() {
+    if (respawn != null) {
+      respawn.disableRespawn();
+    }
   }
 
   public boolean isRespawnEnabled() {

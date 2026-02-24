@@ -67,6 +67,7 @@ nenhuma indicação visual aparece durante a digitação, e códigos inválidos 
 | `gitpush` | **Força salvar** o jogo imediatamente | REPEATABLE | `git push --force` — forçar envio do estado atual |
 | `finalclass` | **Alterna Modo Deus + NoClip** (god mode on/off) | REPEATABLE | `final class` — classe que não pode ser herdada/sobrescrita/derrotada |
 | `refactor` | **Sobe 1 nível** instantaneamente (dispara level up completo) | ONE_TIME | Refatoração — melhoria contínua do código/personagem |
+| `summon[monstro]` | **Invocar Monstro** dinamicamente próximo ao jogador (não dá respawn). Ex.: `summonbat`, `summonslime`. | REPEATABLE | Ferramenta de testes para escalar monstros e verificar IA sem procurá-los pelo mapa |
 
 > **Nota sobre `finalclass` (God Mode + NoClip):**
 > Quando ativo, o jogador torna-se invencível (não morre) e pode **atravessar paredes, tiles sólidos e entidades** (noclip).

@@ -1,13 +1,33 @@
 package main;
 
-import entity.Entity;
-import object.*;
-import pets.GreenSnailEgg;
-import pets.YellowSnailEgg;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+
+import entity.Entity;
+import object.ObjAxe;
+import object.ObjBoots;
+import object.ObjChest;
+import object.ObjChestSecret;
+import object.ObjClock;
+import object.ObjCoinBronze;
+import object.ObjDoor;
+import object.ObjDoorIron;
+import object.ObjFireball;
+import object.ObjHeart;
+import object.ObjKey;
+import object.ObjLantern;
+import object.ObjManaCrystal;
+import object.ObjPickaxe;
+import object.ObjPotionRed;
+import object.ObjRock;
+import object.ObjShieldBlue;
+import object.ObjShieldJava;
+import object.ObjShieldWood;
+import object.ObjSwordNormal;
+import object.ObjTent;
+import pets.GreenSnailEgg;
+import pets.YellowSnailEgg;
 
 public class EntityGenerator {
 
@@ -43,6 +63,13 @@ public class EntityGenerator {
     factories.put(ObjTent.OBJ_ID, ObjTent::new);
     factories.put(YellowSnailEgg.OBJ_ID, YellowSnailEgg::new);
     factories.put(GreenSnailEgg.OBJ_ID, GreenSnailEgg::new);
+
+    // Monsters
+    factories.put(monster.MonBat.MON_ID, monster.MonBat::new);
+    factories.put(monster.MonGreenSlime.MON_ID, monster.MonGreenSlime::new);
+    factories.put(monster.MonOrc.MON_ID, monster.MonOrc::new);
+    factories.put(monster.MonRedSlime.MON_ID, monster.MonRedSlime::new);
+    factories.put(monster.MonSkeletonLord.MON_ID, monster.MonSkeletonLord::new);
   }
 
   public Entity getObject(String idOrName) {
@@ -51,5 +78,9 @@ public class EntityGenerator {
     }
     Function<GamePanel, Entity> factory = factories.get(idOrName);
     return factory != null ? factory.apply(gp) : null;
+  }
+
+  public java.util.Set<String> getRegisteredIds() {
+    return factories.keySet();
   }
 }

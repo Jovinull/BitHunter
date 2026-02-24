@@ -35,6 +35,11 @@ public class RespawnComponent {
     this.respawnCounter = 0;
   }
 
+  public void disableRespawn() {
+    this.respawnEnabled = false;
+    this.respawnCounter = 0;
+  }
+
   public boolean isRespawnEnabled() {
     return respawnEnabled;
   }
@@ -77,7 +82,8 @@ public class RespawnComponent {
         entity.setLife(entity.getMaxLife());
         entity.setDying(false);
         entity.setAlive(true);
-        // Drop deve ser liberado novamente para a próxima morte (é "1x por morte", não "1x pra sempre")
+        // Drop deve ser liberado novamente para a próxima morte (é "1x por morte", não
+        // "1x pra sempre")
         dropHandled = false;
         entity.setInvincible(false);
         entity.setTransparent(false);
