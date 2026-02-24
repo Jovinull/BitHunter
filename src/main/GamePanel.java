@@ -8,8 +8,6 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,8 +34,6 @@ public class GamePanel extends JPanel implements Runnable {
 
   private static final Logger LOGGER = Logger.getLogger(GamePanel.class.getName());
   private static final boolean DEBUG_RESPAWN = false;
-  private static final Comparator<Entity> ENTITY_Y_COMPARATOR =
-      Comparator.comparingInt(Entity::getWorldY);
 
   // ==== CONFIGURAÇÕES DE TELA (visível) ====
   private static final int ORIGINAL_TILE_SIZE = 16; // Tamanho base de um tile (16x16 pixels)
@@ -473,11 +469,25 @@ public class GamePanel extends JPanel implements Runnable {
   }
 
   private void sortAndDrawEntities() {
-    Collections.sort(entityList, ENTITY_Y_COMPARATOR);
+    insertionSortEntitiesByWorldY(entityList);
     for (Entity entity : entityList) {
       entity.draw(g2);
     }
     entityList.clear();
+  }
+
+  private static void insertionSortEntitiesByWorldY(List<Entity> entities) {
+    for (int i = 1; i < entities.size(); i++) {
+      Entity current = entities.get(i);
+      int currentY = current.getWorldY();
+      int j = i - 1;
+
+      while (j >= 0 && entities.get(j).getWorldY() > currentY) {
+        entities.set(j + 1, entities.get(j));
+        j--;
+      }
+      entities.set(j + 1, current);
+    }
   }
 
   private void drawEnvironment() {
