@@ -90,7 +90,6 @@ public class MonGreenSlime extends Entity {
 
   @Override
   public void checkDrop() {
-    // (S2119) Reusar Random -> ThreadLocalRandom
     int i = ThreadLocalRandom.current().nextInt(1, 101);
 
     if (i < DROP_COIN_THRESHOLD) {

@@ -8,7 +8,6 @@ import java.awt.image.BufferedImage;
  */
 public class Tile {
 
-  // Campos agora encapsulados (Sonar S1104)
   private BufferedImage image;
   private boolean collision = false;
 

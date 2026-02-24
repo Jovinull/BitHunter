@@ -10,11 +10,9 @@ public class CutsceneManager {
 
   private final GamePanel gp;
 
-  // estado interno da cena (campos não públicos conforme S1104)
   private int sceneNum;
   private int scenePhase;
 
-  // constantes (estáticas e em CAIXA_ALTA conforme S1170 e S115)
   private static final int NA = 0;
   private static final int SKELETON_LORD = 1;
 
@@ -33,9 +31,7 @@ public class CutsceneManager {
     }
   }
 
-  // renomeado para lowerCamelCase sem underscore (S100)
   private void sceneSkeletonLord() {
-    // reduzir complexidade cognitiva (S3776) delegando por fase
     if (scenePhase == 0) {
       phase0Setup();
       return;

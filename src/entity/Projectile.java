@@ -36,8 +36,6 @@ public class Projectile extends Entity {
     updateAnimation();
   }
 
-  // ===== Helpers para reduzir complexidade (S3776) =====
-
   /** Projétil do player acerta monstros. */
   private void handleHitMonster() {
     var collisionChecker = gp.getcChecker();

@@ -49,7 +49,7 @@ public class MonBat extends Entity {
   }
 
   /** Carrega sprites do morcego (padrão antigo: manter nome getImage()). */
-  @Override // (S1161)
+  @Override
   public void getImage() {
     up1 = setup(BAT_DOWN_1, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
     up2 = setup(BAT_DOWN_2, GamePanel.TILE_SIZE, GamePanel.TILE_SIZE);
@@ -74,7 +74,6 @@ public class MonBat extends Entity {
 
   @Override
   public void checkDrop() {
-    // (S2119) Reusar Random -> ThreadLocalRandom
     int i = ThreadLocalRandom.current().nextInt(1, 101);
 
     if (i < DROP_COIN_THRESHOLD) {

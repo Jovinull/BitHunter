@@ -392,7 +392,6 @@ public class Player extends Entity {
         || keyH.isRightPressed() || keyH.isEnterPressed();
   }
 
-  // renomeado (S2177)
   private void processKnockBack() {
     setCollisionOn(false);
 

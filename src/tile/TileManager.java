@@ -24,10 +24,8 @@ public class TileManager {
   private static final Logger LOGGER = Logger.getLogger(TileManager.class.getName());
   private static final Color PATH_COLOR = new Color(255, 0, 0, 70);
 
-  // Referência ao painel do jogo (agora protegida, não pública – S1104)
   protected final GamePanel gp;
 
-  // Encapsulados (S1104)
   private Tile[] tile; // Vetor de tipos de tiles disponíveis
   private int[][][] mapTileNum; // Matriz do mapa (IDs de tiles)
   private boolean drawPath = false; // Flag para desenhar pathfinding
@@ -66,7 +64,7 @@ public class TileManager {
       if (firstLine == null || firstLine.isEmpty()) {
         LOGGER.severe("Arquivo de mapa vazio: /maps/world01.txt");
       } else {
-        String[] maxTile = firstLine.split(" "); // S1197 ok
+        String[] maxTile = firstLine.split(" ");
         int worldSize = maxTile.length;
 
         gp.setMaxWorldCol(worldSize);
@@ -134,7 +132,7 @@ public class TileManager {
           break;
         }
 
-        String[] numbers = line.split(" "); // S1197 ok
+        String[] numbers = line.split(" ");
 
         while (col < maxWorldCol) {
           int num = (col < numbers.length) ? Integer.parseInt(numbers[col]) : 0;
