@@ -10,6 +10,40 @@ class CharacterUi {
 
   private static final Color COL_PORTRAIT_BG = new Color(10, 10, 15, 190);
   private static final Color COL_EQUIP_SLOT_BG = new Color(20, 24, 32, 220);
+  private static final int FRAME_X_TILES = 2;
+  private static final int FRAME_Y_TILES = 1;
+  private static final int FRAME_WIDTH_TILES = 9;
+  private static final int FRAME_HEIGHT_TILES = 10;
+  private static final int BASE_PADDING = 24;
+  private static final int TITLE_Y_OFFSET = 8;
+  private static final int TITLE_BOTTOM_SPACING = 44;
+  private static final int PORTRAIT_SIZE_TILES = 3;
+  private static final int PORTRAIT_ROUND_RADIUS = 12;
+  private static final int INFO_X_OFFSET = 24;
+  private static final int INFO_Y_OFFSET = 8;
+  private static final int INFO_LINE_HEIGHT = 30;
+  private static final int STAT_BAR_WIDTH_TILES = 4;
+  private static final int STAT_BAR_HEIGHT = 16;
+  private static final int STATS_BLOCK_Y_OFFSET = 40;
+  private static final int STATS_LINE_HEIGHT = 24;
+  private static final int STATS_TAIL_X_OFFSET = 30;
+  private static final int EQUIP_AREA_PADDING = 16;
+  private static final int EQUIP_TITLE_Y_OFFSET = 32;
+  private static final int EQUIP_TITLE_COLLISION_PADDING = 8;
+  private static final int EQUIP_GRID_COLS = 3;
+  private static final int EQUIP_GRID_ROWS = 2;
+  private static final int EQUIP_MIN_H_GAP = 12;
+  private static final int EQUIP_V_GAP = 32;
+  private static final int EQUIP_GRID_START_Y_OFFSET = 28;
+  private static final int EQUIP_LABEL_Y_OFFSET = 6;
+  private static final int EQUIP_SLOT_ROUND_RADIUS = 10;
+  private static final int EQUIP_SLOT_INNER_INSET = 1;
+  private static final int EQUIP_SLOT_INNER_REDUCTION = 2;
+  private static final int EQUIP_ICON_MARGIN = 4;
+  private static final int STAT_BAR_ROUND_RADIUS = 8;
+  private static final int STAT_TEXT_X_OFFSET = 8;
+  private static final int STAT_TEXT_Y_BOTTOM_OFFSET = 4;
+  private static final int SHADOW_OFFSET = 1;
 
   private final UI ui;
 
@@ -22,34 +56,34 @@ class CharacterUi {
     var gp = ui.getGamePanel();
     var player = gp.getPlayer();
 
-    final int frameX = GamePanel.TILE_SIZE * 2;
-    final int frameY = GamePanel.TILE_SIZE;
-    final int frameWidth = GamePanel.TILE_SIZE * 9;
-    final int frameHeight = GamePanel.TILE_SIZE * 10;
+    final int frameX = GamePanel.TILE_SIZE * FRAME_X_TILES;
+    final int frameY = GamePanel.TILE_SIZE * FRAME_Y_TILES;
+    final int frameWidth = GamePanel.TILE_SIZE * FRAME_WIDTH_TILES;
+    final int frameHeight = GamePanel.TILE_SIZE * FRAME_HEIGHT_TILES;
     ui.drawSubWindow(frameX, frameY, frameWidth, frameHeight);
 
     g2.setColor(UI.COL_TEXT);
     g2.setFont(ui.fonts.pixelBold(30F));
 
-    final int padding = 24;
+    final int padding = BASE_PADDING;
     int textX = frameX + padding;
     int textY = frameY + padding;
 
-    int titleOffsetY = 8;
+    int titleOffsetY = TITLE_Y_OFFSET;
     ui.drawTextShadow(ui.t("ui.character.title"),
         textX,
         textY + titleOffsetY,
         UI.COL_TEXT,
         Color.black,
         2);
-    textY += 44;
+    textY += TITLE_BOTTOM_SPACING;
 
-    int portraitSize = GamePanel.TILE_SIZE * 3;
+    int portraitSize = GamePanel.TILE_SIZE * PORTRAIT_SIZE_TILES;
     int portraitX = textX;
     int portraitY = textY;
 
     g2.setColor(COL_PORTRAIT_BG);
-    g2.fillRoundRect(portraitX, portraitY, portraitSize, portraitSize, 12, 12);
+    g2.fillRoundRect(portraitX, portraitY, portraitSize, portraitSize, PORTRAIT_ROUND_RADIUS, PORTRAIT_ROUND_RADIUS);
 
     g2.drawImage(
         player.getDown1(),
@@ -59,16 +93,16 @@ class CharacterUi {
         GamePanel.TILE_SIZE * 2,
         null);
 
-    int infoX = portraitX + portraitSize + 24;
-    int infoY = portraitY + 8;
+    int infoX = portraitX + portraitSize + INFO_X_OFFSET;
+    int infoY = portraitY + INFO_Y_OFFSET;
 
     g2.setFont(ui.fonts.pixelPlain(22F));
     String nivelLabel = ui.t("ui.character.levelPrefix") + " " + player.getLevel();
     ui.drawTextShadow(nivelLabel, infoX, infoY, UI.COL_TEXT, Color.black, 2);
-    infoY += 30;
+    infoY += INFO_LINE_HEIGHT;
 
-    int barWidth = GamePanel.TILE_SIZE * 4;
-    int barHeight = 16;
+    int barWidth = GamePanel.TILE_SIZE * STAT_BAR_WIDTH_TILES;
+    int barHeight = STAT_BAR_HEIGHT;
 
     drawStatBar(
         infoX,
@@ -78,7 +112,7 @@ class CharacterUi {
         player.getLife(),
         player.getMaxLife(),
         ui.t("ui.stats.hp"));
-    infoY += 30;
+    infoY += INFO_LINE_HEIGHT;
 
     drawStatBar(
         infoX,
@@ -89,7 +123,7 @@ class CharacterUi {
         player.getMaxMana(),
         ui.t("ui.stats.mp"));
 
-    infoY += 30;
+    infoY += INFO_LINE_HEIGHT;
     drawStatBar(
         infoX,
         infoY,
@@ -100,10 +134,10 @@ class CharacterUi {
         ui.t("ui.stats.exp"));
 
     int statsBlockX = frameX + padding;
-    int statsBlockY = portraitY + portraitSize + 40;
+    int statsBlockY = portraitY + portraitSize + STATS_BLOCK_Y_OFFSET;
 
     g2.setFont(ui.fonts.pixelPlain(20F));
-    int lineHeight = 24;
+    int lineHeight = STATS_LINE_HEIGHT;
 
     String[] labels = {
         ui.t("ui.character.stat.strength"),
@@ -113,7 +147,7 @@ class CharacterUi {
         ui.t("ui.character.stat.coins")
     };
 
-    int tailX = frameX + frameWidth / 2 - 30;
+    int tailX = frameX + frameWidth / 2 - STATS_TAIL_X_OFFSET;
 
     for (int i = 0; i < labels.length; i++) {
       g2.setColor(UI.COL_TEXT_DIM);
@@ -168,15 +202,15 @@ class CharacterUi {
       statsBlockY += lineHeight;
     }
 
-    int equipAreaPadding = 16;
+    int equipAreaPadding = EQUIP_AREA_PADDING;
     int equipAreaX = frameX + frameWidth / 2 + equipAreaPadding;
     int equipAreaRight = frameX + frameWidth - equipAreaPadding;
     int equipAreaWidth = equipAreaRight - equipAreaX;
 
     g2.setFont(ui.fonts.pixelBold(22F));
-    int equipTitleY = portraitY + portraitSize + 32;
-    if (equipTitleY > statsBlockY - 8) {
-      equipTitleY = statsBlockY - 8;
+    int equipTitleY = portraitY + portraitSize + EQUIP_TITLE_Y_OFFSET;
+    if (equipTitleY > statsBlockY - EQUIP_TITLE_COLLISION_PADDING) {
+      equipTitleY = statsBlockY - EQUIP_TITLE_COLLISION_PADDING;
     }
     ui.drawTextShadow(ui.t("ui.character.equipmentsTitle"),
         equipAreaX,
@@ -185,14 +219,14 @@ class CharacterUi {
         Color.black,
         2);
 
-    int cols = 3;
-    int rows = 2;
+    int cols = EQUIP_GRID_COLS;
+    int rows = EQUIP_GRID_ROWS;
 
     int slotSize = GamePanel.TILE_SIZE;
-    int hGap = Math.max(12, (equipAreaWidth - cols * slotSize) / (cols - 1));
-    int vGap = 32;
+    int hGap = Math.max(EQUIP_MIN_H_GAP, (equipAreaWidth - cols * slotSize) / (cols - 1));
+    int vGap = EQUIP_V_GAP;
 
-    int gridStartY = equipTitleY + 28;
+    int gridStartY = equipTitleY + EQUIP_GRID_START_Y_OFFSET;
 
     String[] equipLabels = {
         ui.t("ui.character.equipment.helmet"),
@@ -253,23 +287,23 @@ class CharacterUi {
         int slotY = layout.startY() + row * (layout.slotSize() + layout.vGap());
 
         g2.setColor(UI.COL_TEXT_DIM);
-        g2.drawString(labels[index], slotX, slotY - 6);
+        g2.drawString(labels[index], slotX, slotY - EQUIP_LABEL_Y_OFFSET);
 
         int boxY = slotY;
         g2.setColor(UI.COL_PANEL_BORDER);
-        g2.drawRoundRect(slotX, boxY, layout.slotSize(), layout.slotSize(), 10, 10);
+        g2.drawRoundRect(slotX, boxY, layout.slotSize(), layout.slotSize(), EQUIP_SLOT_ROUND_RADIUS, EQUIP_SLOT_ROUND_RADIUS);
         g2.setColor(COL_EQUIP_SLOT_BG);
         g2.fillRoundRect(
-            slotX + 1,
-            boxY + 1,
-            layout.slotSize() - 2,
-            layout.slotSize() - 2,
-            10,
-            10);
+            slotX + EQUIP_SLOT_INNER_INSET,
+            boxY + EQUIP_SLOT_INNER_INSET,
+            layout.slotSize() - EQUIP_SLOT_INNER_REDUCTION,
+            layout.slotSize() - EQUIP_SLOT_INNER_REDUCTION,
+            EQUIP_SLOT_ROUND_RADIUS,
+            EQUIP_SLOT_ROUND_RADIUS);
 
         Entity item = items[index];
         if (item != null && item.getDown1() != null) {
-          int iconMargin = 4;
+          int iconMargin = EQUIP_ICON_MARGIN;
           int iconSize = layout.slotSize() - iconMargin * 2;
           int iconX = slotX + iconMargin;
           int iconY = boxY + iconMargin;
@@ -285,21 +319,21 @@ class CharacterUi {
     Graphics2D g2 = ui.g2;
 
     g2.setColor(UI.COL_PANEL_BORDER);
-    g2.fillRoundRect(x, y, width, height, 8, 8);
+    g2.fillRoundRect(x, y, width, height, STAT_BAR_ROUND_RADIUS, STAT_BAR_ROUND_RADIUS);
 
     if (max > 0 && current > 0) {
       int filledWidth = (int) (width * (Math.min(current, max) / (double) max));
       g2.setColor(UI.COL_ACCENT);
-      g2.fillRoundRect(x, y, filledWidth, height, 8, 8);
+      g2.fillRoundRect(x, y, filledWidth, height, STAT_BAR_ROUND_RADIUS, STAT_BAR_ROUND_RADIUS);
     }
 
     g2.setFont(ui.fonts.pixelPlain(18F));
     String text = label + " " + current + "/" + max;
-    int textX = x + 8;
-    int textY = y + height - 4;
+    int textX = x + STAT_TEXT_X_OFFSET;
+    int textY = y + height - STAT_TEXT_Y_BOTTOM_OFFSET;
 
     g2.setColor(Color.black);
-    g2.drawString(text, textX + 1, textY + 1);
+    g2.drawString(text, textX + SHADOW_OFFSET, textY + SHADOW_OFFSET);
     g2.setColor(UI.COL_TEXT);
     g2.drawString(text, textX, textY);
   }

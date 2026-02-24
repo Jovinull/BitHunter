@@ -24,6 +24,73 @@ class PetYardUi {
 
   private static final String PET_NAME_TRANSLATION_SUFFIX = ".name";
   private static final Color COL_BAR_BG = new Color(0, 0, 0, 160);
+  private static final int CURSOR_X_OFFSET = 24;
+  private static final int MAIN_MENU_X_TILES = 15;
+  private static final int MAIN_MENU_Y_TILES = 4;
+  private static final int MAIN_MENU_WIDTH_TILES = 4;
+  private static final int MAIN_MENU_HEIGHT_TILES = 4;
+  private static final int INCUBATOR_PANEL_X_TILES = 3;
+  private static final int INCUBATOR_PANEL_Y_TILES = 7;
+  private static final int INCUBATOR_PANEL_WIDTH_TILES = 6;
+  private static final int INCUBATOR_PANEL_HEIGHT_TILES = 3;
+  private static final int PET_LIST_FRAME_X_TILES = 2;
+  private static final int PET_LIST_FRAME_Y_TILES = 1;
+  private static final int PET_LIST_FRAME_WIDTH_TILES = 16;
+  private static final int PET_LIST_FRAME_HEIGHT_TILES = 8;
+  private static final int TITLE_Y_OFFSET = 32;
+  private static final int LIST_AREA_X_OFFSET = 16;
+  private static final int LIST_AREA_WIDTH_OFFSET = 24;
+  private static final int ROW_LINE_EXTRA_SPACING = 8;
+  private static final int ROW_TOP_OFFSET = 4;
+  private static final int ICON_X_OFFSET = 4;
+  private static final int TEXT_X_GAP_AFTER_ICON = 8;
+  private static final int TAG_Y_OFFSET = 16;
+  private static final int NAME_Y_OFFSET = 32;
+  private static final int LEVEL_RIGHT_OFFSET = 10;
+  private static final int HINT_Y_OFFSET = 16;
+  private static final int DETAILS_PADDING = 24;
+  private static final int DETAILS_TITLE_Y_OFFSET = 8;
+  private static final int DETAILS_TITLE_BOTTOM_SPACING = 28;
+  private static final int ACTIVE_PET_LINE_HEIGHT = 22;
+  private static final int XP_BAR_HEIGHT = 12;
+  private static final int XP_BAR_Y_OFFSET = 2;
+  private static final int XP_BAR_ROUND = 6;
+  private static final int XP_BAR_INNER_INSET = 2;
+  private static final int XP_BAR_INNER_REDUCTION = 4;
+  private static final int XP_TEXT_Y_OFFSET = 14;
+  private static final int ACTIVE_STATS_START_Y_OFFSET = 30;
+  private static final int INACTIVE_HINT_LINE_HEIGHT = 18;
+  private static final int INACTIVE_HINT_BOTTOM_SPACING = 8;
+  private static final int DESCRIPTION_LINE_HEIGHT = 22;
+  private static final int EGG_INFO_X_TILES = 2;
+  private static final int EGG_INFO_Y_TILES = 6;
+  private static final int EGG_INFO_Y_EXTRA = 20;
+  private static final int EGG_INFO_WIDTH_TILES = 10;
+  private static final int EGG_INFO_HEIGHT_TILES = 3;
+  private static final int EGG_TEXT_X_OFFSET = 24;
+  private static final int EGG_HINT_Y_OFFSET = 32;
+  private static final int EGG_INVALID_Y_OFFSET = 64;
+  private static final int EGG_NAME_Y_OFFSET = 64;
+  private static final int EGG_DETAILS_Y_OFFSET = 88;
+  private static final int EGG_TIME_X_OFFSET = 260;
+  private static final int EGG_ALREADY_OWNED_Y_OFFSET = 20;
+  private static final int INCUBATOR_PANEL_Y_GAP = 16;
+  private static final int INCUBATOR_STATUS_HEIGHT_TILES = 2;
+  private static final int FRAMES_PER_SECOND = 60;
+  private static final int SECONDS_PER_MINUTE = 60;
+  private static final int INCUBATOR_PADDING = 24;
+  private static final int INCUBATOR_TITLE_BOTTOM_SPACING = 24;
+  private static final int INCUBATOR_EMPTY_TEXT_Y_OFFSET = 8;
+  private static final int INCUBATOR_TIME_Y_OFFSET = 26;
+  private static final int INCUBATOR_BAR_PADDING_X = 24;
+  private static final int INCUBATOR_BAR_PADDING_Y = 16;
+  private static final int INCUBATOR_BAR_HEIGHT = 18;
+  private static final int INCUBATOR_BAR_ROUND = 10;
+  private static final int INCUBATOR_BAR_INNER_INSET = 2;
+  private static final int INCUBATOR_BAR_INNER_REDUCTION = 4;
+  private static final int INCUBATOR_BAR_INNER_ROUND = 8;
+  private static final int INCUBATOR_PERCENT_Y_OFFSET = 4;
+  private static final int INCUBATOR_ICON_MARGIN = 16;
 
   private final UI ui;
   private final InventoryUi inventoryUi;
@@ -61,10 +128,10 @@ class PetYardUi {
     npc.setDialogueSet(0);
     ui.getDialogueUi().drawDialogueScreen();
 
-    int x = GamePanel.TILE_SIZE * 15;
-    int y = GamePanel.TILE_SIZE * 4;
-    int width = GamePanel.TILE_SIZE * 4;
-    int height = GamePanel.TILE_SIZE * 4;
+    int x = GamePanel.TILE_SIZE * MAIN_MENU_X_TILES;
+    int y = GamePanel.TILE_SIZE * MAIN_MENU_Y_TILES;
+    int width = GamePanel.TILE_SIZE * MAIN_MENU_WIDTH_TILES;
+    int height = GamePanel.TILE_SIZE * MAIN_MENU_HEIGHT_TILES;
     ui.drawSubWindow(x, y, width, height);
 
     x += GamePanel.TILE_SIZE;
@@ -75,7 +142,7 @@ class PetYardUi {
     // 0 - Gerenciar pets
     g2.drawString(ui.t("ui.petYard.manage"), x, y);
     if (ui.getCommandNum() == 0) {
-      g2.drawString(">", x - 24, y);
+      g2.drawString(">", x - CURSOR_X_OFFSET, y);
       if (keyH.isEnterPressed()) {
         ui.setSubState(1);
         ui.setCommandNum(0);
@@ -86,7 +153,7 @@ class PetYardUi {
     // 1 - Chocar ovo
     g2.drawString(ui.t("ui.petYard.hatch"), x, y);
     if (ui.getCommandNum() == 1) {
-      g2.drawString(">", x - 24, y);
+      g2.drawString(">", x - CURSOR_X_OFFSET, y);
       if (keyH.isEnterPressed()) {
         ui.setSubState(2);
       }
@@ -96,7 +163,7 @@ class PetYardUi {
     // 2 - Sair
     g2.drawString(ui.t("ui.petYard.leave"), x, y);
     if (ui.getCommandNum() == 2) {
-      g2.drawString(">", x - 24, y);
+      g2.drawString(">", x - CURSOR_X_OFFSET, y);
       if (keyH.isEnterPressed()) {
         ui.setCommandNum(0);
         gp.setGameState(GamePanel.PLAY_STATE);
@@ -104,10 +171,10 @@ class PetYardUi {
     }
 
     // --- Painel da incubadora no canto inferior esquerdo do Pet Yard ---
-    int panelWidth = GamePanel.TILE_SIZE * 6;
-    int panelHeight = GamePanel.TILE_SIZE * 3;
-    int panelX = GamePanel.TILE_SIZE * 3;
-    int panelY = GamePanel.TILE_SIZE * 7;
+    int panelWidth = GamePanel.TILE_SIZE * INCUBATOR_PANEL_WIDTH_TILES;
+    int panelHeight = GamePanel.TILE_SIZE * INCUBATOR_PANEL_HEIGHT_TILES;
+    int panelX = GamePanel.TILE_SIZE * INCUBATOR_PANEL_X_TILES;
+    int panelY = GamePanel.TILE_SIZE * INCUBATOR_PANEL_Y_TILES;
 
     drawIncubatorStatusPanel(panelX, panelY, panelWidth, panelHeight);
   }
@@ -122,15 +189,15 @@ class PetYardUi {
     List<String> pets = player.getOwnedPets();
     PetEntity activePet = player.getPet();
 
-    int frameX = GamePanel.TILE_SIZE * 2;
-    int frameY = GamePanel.TILE_SIZE;
-    int frameWidth = GamePanel.TILE_SIZE * 16;
-    int frameHeight = GamePanel.TILE_SIZE * 8;
+    int frameX = GamePanel.TILE_SIZE * PET_LIST_FRAME_X_TILES;
+    int frameY = GamePanel.TILE_SIZE * PET_LIST_FRAME_Y_TILES;
+    int frameWidth = GamePanel.TILE_SIZE * PET_LIST_FRAME_WIDTH_TILES;
+    int frameHeight = GamePanel.TILE_SIZE * PET_LIST_FRAME_HEIGHT_TILES;
 
     ui.drawSubWindow(frameX, frameY, frameWidth, frameHeight);
 
     // Título
-    int titleY = frameY + 32;
+    int titleY = frameY + TITLE_Y_OFFSET;
     g2.setFont(ui.fonts.pixelPlain(24F));
     ui.drawTextShadow(
         ui.t("ui.petYard.manageTitle"),
@@ -141,10 +208,10 @@ class PetYardUi {
         2);
 
     // Área da lista (lado esquerdo)
-    int listAreaX = frameX + 16;
+    int listAreaX = frameX + LIST_AREA_X_OFFSET;
     int listAreaY = titleY + GamePanel.TILE_SIZE;
-    int listAreaWidth = frameWidth / 2 - 24;
-    int lineHeight = GamePanel.TILE_SIZE + 8;
+    int listAreaWidth = frameWidth / 2 - LIST_AREA_WIDTH_OFFSET;
+    int lineHeight = GamePanel.TILE_SIZE + ROW_LINE_EXTRA_SPACING;
 
     g2.setFont(ui.fonts.pixelPlain(20F));
 
@@ -218,7 +285,7 @@ class PetYardUi {
     PetEntity activePet = player.getPet();
 
     int rowCenterY = layout.listAreaY + rowIndex * layout.lineHeight;
-    int rowTop = rowCenterY - GamePanel.TILE_SIZE + 4;
+    int rowTop = rowCenterY - GamePanel.TILE_SIZE + ROW_TOP_OFFSET;
 
     boolean selected = (rowIndex == ui.getCommandNum());
 
@@ -237,7 +304,7 @@ class PetYardUi {
     // Ícone
     BufferedImage icon = PetFactory.getPetIcon(petId, gp, player);
     int iconSize = GamePanel.TILE_SIZE;
-    int iconX = rowX + 4;
+    int iconX = rowX + ICON_X_OFFSET;
     int iconY = rowTop;
     if (icon != null) {
       g2.drawImage(icon, iconX, iconY, iconSize, iconSize, null);
@@ -245,9 +312,9 @@ class PetYardUi {
 
     String name = ui.t(petId + PET_NAME_TRANSLATION_SUFFIX);
 
-    int textX = iconX + iconSize + 8;
-    int tagY = rowTop + 16; // linha de cima
-    int nameY = rowTop + 32; // linha de baixo
+    int textX = iconX + iconSize + TEXT_X_GAP_AFTER_ICON;
+    int tagY = rowTop + TAG_Y_OFFSET; // linha de cima
+    int nameY = rowTop + NAME_Y_OFFSET; // linha de baixo
 
     boolean isActive = activePet != null && petId.equals(activePet.getInternalId());
 
@@ -266,7 +333,7 @@ class PetYardUi {
       g2.setColor(selected ? UI.COL_ACCENT : UI.COL_TEXT);
       var fmLevel = g2.getFontMetrics();
       int levelWidth = fmLevel.stringWidth(levelLabel);
-      int levelX = rowX + rowW - levelWidth - 10;
+      int levelX = rowX + rowW - levelWidth - LEVEL_RIGHT_OFFSET;
       g2.drawString(levelLabel, levelX, tagY);
     }
 
@@ -278,7 +345,7 @@ class PetYardUi {
 
   private void drawPetListHint(
       Graphics2D g2, int frameX, int frameY, int frameHeight) {
-    int hintY = frameY + frameHeight - 16;
+    int hintY = frameY + frameHeight - HINT_Y_OFFSET;
     g2.setFont(ui.fonts.pixelPlain(16F));
     g2.setColor(UI.COL_TEXT_DIM);
     g2.drawString(ui.t("ui.petYard.hintEquip"), frameX + 24, hintY);
@@ -363,16 +430,16 @@ class PetYardUi {
     String name = ui.t(petId + PET_NAME_TRANSLATION_SUFFIX);
     String desc = ui.t(petId + ".desc");
 
-    int padding = 24;
+    int padding = DETAILS_PADDING;
     int textX = frameX + padding;
-    int textY = frameY + padding + 8;
+    int textY = frameY + padding + DETAILS_TITLE_Y_OFFSET;
 
     // Nome do pet
     g2.setFont(ui.fonts.pixelBold(22F));
     g2.setColor(UI.COL_TEXT);
     g2.drawString(name, textX, textY);
 
-    textY += 28;
+    textY += DETAILS_TITLE_BOTTOM_SPACING;
 
     boolean isActive = activePet != null && petId.equals(activePet.getInternalId());
 
@@ -397,33 +464,39 @@ class PetYardUi {
     g2.setFont(ui.fonts.pixelPlain(18F));
     g2.setColor(UI.COL_ACCENT);
     g2.drawString("Lv. " + level, textX, textY);
-    textY += 22;
+    textY += ACTIVE_PET_LINE_HEIGHT;
 
     // Barra de XP
     int barWidth = frameWidth - padding * 2;
-    int barHeight = 12;
+    int barHeight = XP_BAR_HEIGHT;
     int barX = textX;
-    int barY = textY + 2;
+    int barY = textY + XP_BAR_Y_OFFSET;
 
     double ratio = (next > 0) ? Math.min(1.0, exp / (double) next) : 0.0;
     int filled = (int) (barWidth * ratio);
 
     g2.setColor(COL_BAR_BG);
-    g2.fillRoundRect(barX, barY, barWidth, barHeight, 6, 6);
+    g2.fillRoundRect(barX, barY, barWidth, barHeight, XP_BAR_ROUND, XP_BAR_ROUND);
     g2.setColor(UI.COL_PANEL_BORDER);
-    g2.drawRoundRect(barX, barY, barWidth, barHeight, 6, 6);
+    g2.drawRoundRect(barX, barY, barWidth, barHeight, XP_BAR_ROUND, XP_BAR_ROUND);
 
     if (filled > 0) {
       g2.setColor(UI.COL_ACCENT);
-      g2.fillRoundRect(barX + 2, barY + 2, filled - 4, barHeight - 4, 4, 4);
+      g2.fillRoundRect(
+          barX + XP_BAR_INNER_INSET,
+          barY + XP_BAR_INNER_INSET,
+          filled - XP_BAR_INNER_REDUCTION,
+          barHeight - XP_BAR_INNER_REDUCTION,
+          4,
+          4);
     }
 
     String xpText = "XP " + exp + " / " + next;
     g2.setFont(ui.fonts.pixelPlain(14F));
     g2.setColor(UI.COL_TEXT_DIM);
-    g2.drawString(xpText, barX, barY + barHeight + 14);
+    g2.drawString(xpText, barX, barY + barHeight + XP_TEXT_Y_OFFSET);
 
-    int currentTextY = barY + barHeight + 30;
+    int currentTextY = barY + barHeight + ACTIVE_STATS_START_Y_OFFSET;
 
     // ---- Stats numéricos específicos do pet ativo (delegados ao próprio Pet) ----
     String statsLine = activePet.buildPetStatsLineForUi();
@@ -431,7 +504,7 @@ class PetYardUi {
       g2.setFont(ui.fonts.pixelPlain(18F));
       g2.setColor(UI.COL_TEXT);
       g2.drawString(statsLine, textX, currentTextY);
-      currentTextY += 22;
+      currentTextY += ACTIVE_PET_LINE_HEIGHT;
     }
 
     return currentTextY;
@@ -448,10 +521,10 @@ class PetYardUi {
     String hint = ui.t("ui.petYard.inactivePetHint");
     for (String line : hint.split("\n")) {
       g2.drawString(line, textX, textY);
-      textY += 18; // espaçamento entre linhas
+      textY += INACTIVE_HINT_LINE_HEIGHT; // espaçamento entre linhas
     }
 
-    return textY + 8; // respiro antes da descrição
+    return textY + INACTIVE_HINT_BOTTOM_SPACING; // respiro antes da descrição
   }
 
   private void drawPetDescription(String desc, int textX, int textY) {
@@ -464,7 +537,7 @@ class PetYardUi {
 
     for (String line : desc.split("\n")) {
       g2.drawString(line, textX, textY);
-      textY += 22;
+      textY += DESCRIPTION_LINE_HEIGHT;
     }
   }
 
@@ -476,17 +549,17 @@ class PetYardUi {
     // inventário do player com cursor (desenha mochila + descrição)
     inventoryUi.drawInventory(player, true);
 
-    int infoX = GamePanel.TILE_SIZE * 2;
-    int infoY = GamePanel.TILE_SIZE * 6 + 20;
-    int infoWidth = GamePanel.TILE_SIZE * 10;
-    int infoHeight = GamePanel.TILE_SIZE * 3;
+    int infoX = GamePanel.TILE_SIZE * EGG_INFO_X_TILES;
+    int infoY = GamePanel.TILE_SIZE * EGG_INFO_Y_TILES + EGG_INFO_Y_EXTRA;
+    int infoWidth = GamePanel.TILE_SIZE * EGG_INFO_WIDTH_TILES;
+    int infoHeight = GamePanel.TILE_SIZE * EGG_INFO_HEIGHT_TILES;
 
     ui.drawSubWindow(infoX, infoY, infoWidth, infoHeight);
 
     // hint
     g2.setFont(ui.fonts.pixelPlain(20F));
     g2.setColor(UI.COL_TEXT);
-    g2.drawString(ui.t("ui.petYard.eggHint"), infoX + 24, infoY + 32);
+    g2.drawString(ui.t("ui.petYard.eggHint"), infoX + EGG_TEXT_X_OFFSET, infoY + EGG_HINT_Y_OFFSET);
 
     int itemIndex = ui.getItemIndexOnSlot(ui.getPlayerSlotCol(), ui.getPlayerSlotRow());
     if (itemIndex >= player.getInventory().size()) {
@@ -498,7 +571,7 @@ class PetYardUi {
     if (item == null || item.getType() != Entity.TYPE_EGG) {
       g2.setColor(UI.COL_TEXT_DIM);
       g2.setFont(ui.fonts.pixelPlain(20F));
-      g2.drawString(ui.t("ui.petYard.eggInvalid"), infoX + 24, infoY + 64);
+      g2.drawString(ui.t("ui.petYard.eggInvalid"), infoX + EGG_TEXT_X_OFFSET, infoY + EGG_INVALID_Y_OFFSET);
       return;
     }
 
@@ -507,7 +580,7 @@ class PetYardUi {
     // detalhes do ovo válido selecionado
     String eggName = egg.getDisplayName();
     int cost = egg.getHatchCost();
-    int seconds = egg.getHatchTimeTicks() / 60;
+    int seconds = egg.getHatchTimeTicks() / FRAMES_PER_SECOND;
 
     String lineCost = String.format(ui.t("ui.petYard.eggCost"), cost);
     String lineTime = String.format(ui.t("ui.petYard.eggTime"), seconds);
@@ -516,20 +589,20 @@ class PetYardUi {
 
     // nome do ovo como "título"
     g2.setFont(ui.fonts.pixelBold(20F));
-    g2.drawString(eggName, infoX + 24, infoY + 64);
+    g2.drawString(eggName, infoX + EGG_TEXT_X_OFFSET, infoY + EGG_NAME_Y_OFFSET);
 
     // custo + tempo como "descrição"
     g2.setFont(ui.fonts.pixelPlain(20F));
-    g2.drawString(lineCost, infoX + 24, infoY + 88);
-    g2.drawString(lineTime, infoX + 260, infoY + 88);
+    g2.drawString(lineCost, infoX + EGG_TEXT_X_OFFSET, infoY + EGG_DETAILS_Y_OFFSET);
+    g2.drawString(lineTime, infoX + EGG_TIME_X_OFFSET, infoY + EGG_DETAILS_Y_OFFSET);
 
     // já possuo esse pet?
     boolean alreadyOwned = player.getOwnedPets().contains(egg.getPetId());
     if (alreadyOwned) {
       g2.setFont(ui.fonts.pixelPlain(20F));
       g2.setColor(UI.COL_ACCENT);
-      int warnY = infoY + infoHeight - 20;
-      g2.drawString(ui.t("ui.petYard.petAlreadyOwned"), infoX + 24, warnY);
+      int warnY = infoY + infoHeight - EGG_ALREADY_OWNED_Y_OFFSET;
+      g2.drawString(ui.t("ui.petYard.petAlreadyOwned"), infoX + EGG_TEXT_X_OFFSET, warnY);
       return;
     }
 
@@ -540,9 +613,9 @@ class PetYardUi {
 
     // --- Painel da incubadora logo abaixo das informações do ovo ---
     int panelX = infoX;
-    int panelY = infoY + infoHeight + 16;
+    int panelY = infoY + infoHeight + INCUBATOR_PANEL_Y_GAP;
     int panelWidth = infoWidth;
-    int panelHeight = GamePanel.TILE_SIZE * 2;
+    int panelHeight = GamePanel.TILE_SIZE * INCUBATOR_STATUS_HEIGHT_TILES;
 
     drawIncubatorStatusPanel(panelX, panelY, panelWidth, panelHeight);
   }
@@ -604,7 +677,7 @@ class PetYardUi {
     // Janela base
     ui.drawSubWindow(frameX, frameY, frameWidth, frameHeight);
 
-    int padding = 24;
+    int padding = INCUBATOR_PADDING;
     int textX = frameX + padding;
     int textY = frameY + padding;
 
@@ -618,7 +691,7 @@ class PetYardUi {
         Color.black,
         2);
 
-    textY += 24;
+    textY += INCUBATOR_TITLE_BOTTOM_SPACING;
 
     if (!incubator.hasActiveEgg()) {
       drawIncubatorEmptyMessage(textX, textY);
@@ -641,7 +714,7 @@ class PetYardUi {
 
     g2.setFont(ui.fonts.pixelPlain(16F));
     g2.setColor(UI.COL_TEXT_DIM);
-    g2.drawString(ui.t("ui.petYard.noEggIncubating"), textX, textY + 8);
+    g2.drawString(ui.t("ui.petYard.noEggIncubating"), textX, textY + INCUBATOR_EMPTY_TEXT_Y_OFFSET);
   }
 
   private void drawIncubatorEggNameAndTime(
@@ -663,9 +736,9 @@ class PetYardUi {
     }
 
     int remainingTicks = incubator.getRemainingTicks();
-    int remainingSeconds = Math.max(0, remainingTicks / 60);
-    int remMinutes = remainingSeconds / 60;
-    int remSeconds = remainingSeconds % 60;
+    int remainingSeconds = Math.max(0, remainingTicks / FRAMES_PER_SECOND);
+    int remMinutes = remainingSeconds / SECONDS_PER_MINUTE;
+    int remSeconds = remainingSeconds % SECONDS_PER_MINUTE;
     String timeLabel = ui.t("ui.petYard.timeRemainingLabel"); // ex.: "Tempo restante"
     String timeText = String.format("%s %02d:%02d", timeLabel, remMinutes, remSeconds);
 
@@ -676,7 +749,7 @@ class PetYardUi {
 
     // Tempo restante logo abaixo
     g2.setColor(UI.COL_TEXT_DIM);
-    g2.drawString(timeText, textX, textY + 26);
+    g2.drawString(timeText, textX, textY + INCUBATOR_TIME_Y_OFFSET);
   }
 
   private void drawIncubatorProgressBar(
@@ -689,26 +762,32 @@ class PetYardUi {
 
     Graphics2D g2 = ui.g2;
 
-    int barPaddingX = 24;
-    int barPaddingY = 16;
+    int barPaddingX = INCUBATOR_BAR_PADDING_X;
+    int barPaddingY = INCUBATOR_BAR_PADDING_Y;
     int barWidth = frameWidth - barPaddingX * 2;
-    int barHeight = 18;
+    int barHeight = INCUBATOR_BAR_HEIGHT;
     int barX = frameX + barPaddingX;
     int barY = frameY + frameHeight - barHeight - barPaddingY;
 
     // Fundo da barra
     g2.setColor(COL_BAR_BG);
-    g2.fillRoundRect(barX, barY, barWidth, barHeight, 10, 10);
+    g2.fillRoundRect(barX, barY, barWidth, barHeight, INCUBATOR_BAR_ROUND, INCUBATOR_BAR_ROUND);
 
     // Borda da barra
     g2.setColor(UI.COL_PANEL_BORDER);
-    g2.drawRoundRect(barX, barY, barWidth, barHeight, 10, 10);
+    g2.drawRoundRect(barX, barY, barWidth, barHeight, INCUBATOR_BAR_ROUND, INCUBATOR_BAR_ROUND);
 
     // Parte preenchida
     if (hasTicks && progress > 0) {
-      int filledWidth = (barWidth - 4) * progress / 100;
+      int filledWidth = (barWidth - INCUBATOR_BAR_INNER_REDUCTION) * progress / 100;
       g2.setColor(UI.COL_ACCENT);
-      g2.fillRoundRect(barX + 2, barY + 2, filledWidth, barHeight - 4, 8, 8);
+      g2.fillRoundRect(
+          barX + INCUBATOR_BAR_INNER_INSET,
+          barY + INCUBATOR_BAR_INNER_INSET,
+          filledWidth,
+          barHeight - INCUBATOR_BAR_INNER_REDUCTION,
+          INCUBATOR_BAR_INNER_ROUND,
+          INCUBATOR_BAR_INNER_ROUND);
     }
 
     // Texto da % no centro da barra
@@ -717,7 +796,7 @@ class PetYardUi {
     g2.setColor(Color.white);
     int textWidth = g2.getFontMetrics().stringWidth(percentText);
     int percentX = barX + (barWidth - textWidth) / 2;
-    int percentY = barY + barHeight - 4;
+    int percentY = barY + barHeight - INCUBATOR_PERCENT_Y_OFFSET;
     g2.drawString(percentText, percentX, percentY);
   }
 
@@ -737,8 +816,8 @@ class PetYardUi {
       BufferedImage icon = PetFactory.getPetIcon(petId, gp, gp.getPlayer());
       if (icon != null) {
         int iconSize = GamePanel.TILE_SIZE;
-        int iconX = frameX + frameWidth - iconSize - 16;
-        int iconY = frameY + 16;
+        int iconX = frameX + frameWidth - iconSize - INCUBATOR_ICON_MARGIN;
+        int iconY = frameY + INCUBATOR_ICON_MARGIN;
         ui.g2.drawImage(icon, iconX, iconY, null);
       }
     } catch (Exception ignored) {
