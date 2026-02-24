@@ -7,6 +7,13 @@ import main.GamePanel;
 
 class DialogueUi {
 
+  private static final int DIALOG_SFX_TYPING = 17;
+  private static final int DIALOG_WINDOW_X_TILES = 3;
+  private static final int DIALOG_WINDOW_Y_DIVISOR = 2;
+  private static final int DIALOG_WINDOW_HORIZONTAL_MARGIN_TILES = 6;
+  private static final int DIALOG_WINDOW_HEIGHT_TILES = 4;
+  private static final int DIALOG_TEXT_LINE_HEIGHT = 40;
+
   private final UI ui;
 
   DialogueUi(UI ui) {
@@ -20,10 +27,10 @@ class DialogueUi {
       return;
     }
 
-    int x = GamePanel.TILE_SIZE * 3;
-    int y = GamePanel.TILE_SIZE / 2;
-    int width = GamePanel.SCREEN_WIDTH - (GamePanel.TILE_SIZE * 6);
-    int height = GamePanel.TILE_SIZE * 4;
+    int x = GamePanel.TILE_SIZE * DIALOG_WINDOW_X_TILES;
+    int y = GamePanel.TILE_SIZE / DIALOG_WINDOW_Y_DIVISOR;
+    int width = GamePanel.SCREEN_WIDTH - (GamePanel.TILE_SIZE * DIALOG_WINDOW_HORIZONTAL_MARGIN_TILES);
+    int height = GamePanel.TILE_SIZE * DIALOG_WINDOW_HEIGHT_TILES;
     ui.drawSubWindow(x, y, width, height);
 
     g2.setFont(ui.fonts.pixelPlain(32F));
@@ -50,7 +57,7 @@ class DialogueUi {
     char[] characters = dialogueLine.toCharArray();
 
     if (ui.charIndex < characters.length) {
-      gp.playSE(17);
+      gp.playSE(DIALOG_SFX_TYPING);
       ui.combinedText.append(characters[ui.charIndex]);
       ui.currentDialogue = ui.combinedText.toString();
       ui.charIndex++;
@@ -94,7 +101,7 @@ class DialogueUi {
 
     for (String line : current.split("\n")) {
       g2.drawString(line, x, y);
-      y += 40;
+      y += DIALOG_TEXT_LINE_HEIGHT;
     }
   }
 }
