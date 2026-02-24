@@ -125,6 +125,7 @@ public class GamePanel extends JPanel implements Runnable {
   private long debugUpdateNanos = 0L;
   private long debugRenderNanos = 0L;
   private int debugFrameCount = 0;
+  private long collisionFrameCounter = 0L;
   private long respawnStartMs = -1L;
   private boolean respawnUpdateLogPending = false;
 
@@ -281,6 +282,7 @@ public class GamePanel extends JPanel implements Runnable {
   }
 
   private void updatePlayState() {
+    collisionFrameCounter++;
     if (respawnUpdateLogPending) {
       logRespawnDebug("update.resume");
       respawnUpdateLogPending = false;
@@ -730,10 +732,8 @@ public class GamePanel extends JPanel implements Runnable {
 
     if (oldState == PLAY_STATE && newState != PLAY_STATE) {
       playTimeTracker.pause();
-    } else if (oldState != PLAY_STATE && newState == PLAY_STATE) {
-      if (playTimeTracker.isRunning()) {
-        playTimeTracker.resume();
-      }
+    } else if (oldState != PLAY_STATE && newState == PLAY_STATE && playTimeTracker.isRunning()) {
+      playTimeTracker.resume();
     }
   }
 
@@ -803,5 +803,9 @@ public class GamePanel extends JPanel implements Runnable {
 
   public PlayTimeTracker getPlayTimeTracker() {
     return playTimeTracker;
+  }
+
+  public long getCollisionFrameCounter() {
+    return collisionFrameCounter;
   }
 }
