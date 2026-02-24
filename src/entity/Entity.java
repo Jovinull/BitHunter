@@ -415,7 +415,7 @@ public class Entity {
     collisionChecker.checkEntity(this, gp.getNpc());
     collisionChecker.checkEntity(this, gp.getMonster());
     collisionChecker.checkEntity(this, gp.getiTile());
-    boolean contactPlayer = collisionChecker.checKPlayer(this);
+    boolean contactPlayer = collisionChecker.checkPlayer(this);
 
     if (this.type == TYPE_MONSTER && contactPlayer) {
       damagePlayer(attack);

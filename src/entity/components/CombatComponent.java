@@ -84,7 +84,7 @@ public class CombatComponent {
     var player = entity.getGp().getPlayer();
 
     if (entity.getType() == Entity.TYPE_MONSTER) {
-      if (collisionChecker.checKPlayer(entity)) {
+      if (collisionChecker.checkPlayer(entity)) {
         damagePlayer(entity.getAttack());
       }
     } else {

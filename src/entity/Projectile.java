@@ -69,7 +69,7 @@ public class Projectile extends Entity {
     var collisionChecker = gp.getcChecker();
     var player = gp.getPlayer();
 
-    boolean contactPlayer = collisionChecker.checKPlayer(this);
+    boolean contactPlayer = collisionChecker.checkPlayer(this);
     if (player.isInvincible() || !contactPlayer) {
       return;
     }

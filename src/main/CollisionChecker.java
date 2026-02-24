@@ -135,7 +135,7 @@ public class CollisionChecker {
   }
 
   // Verifica se a entidade colidiu com o jogador
-  public boolean checKPlayer(Entity entity) {
+  public boolean checkPlayer(Entity entity) {
 
     boolean contactPlayer = false;
 
