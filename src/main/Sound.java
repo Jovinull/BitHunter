@@ -51,17 +51,20 @@ public class Sound {
   // Prepara o áudio correspondente ao índice informado
   public void setFile(int i) {
     try {
-      if (i == currentIndex && clip != null) {
+      if (i == currentIndex && clip != null && clip.isOpen()) {
         // Reutiliza o clip já carregado para evitar I/O bloqueante no respawn.
         return;
       }
 
-      AudioInputStream ais = AudioSystem.getAudioInputStream(soundURL[i]); // Lê o áudio
+      closeCurrentClip();
+
+      try (AudioInputStream ais = AudioSystem.getAudioInputStream(soundURL[i])) { // Lê o áudio
       clip = AudioSystem.getClip(); // Cria um reprodutor de som
       clip.open(ais); // Carrega o áudio no reprodutor
       fc = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN); // Controla o volume
       checkVolume(); // Ajusta o volume conforme volumeScale
       currentIndex = i;
+      }
     } catch (Exception e) {
       e.printStackTrace(); // Mostra o erro se o som não puder ser carregado
     }
@@ -89,6 +92,19 @@ public class Sound {
     if (clip != null && clip.isRunning()) {
       clip.stop();
     }
+  }
+
+  private void closeCurrentClip() {
+    if (clip == null) {
+      return;
+    }
+    if (clip.isRunning()) {
+      clip.stop();
+    }
+    clip.close();
+    clip = null;
+    fc = null;
+    currentIndex = -1;
   }
 
   public void checkVolume() {
