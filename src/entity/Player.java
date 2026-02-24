@@ -578,7 +578,7 @@ public class Player extends Entity {
   }
 
   public void pickUpObject(int i) {
-    if (i == 999) {
+    if (i < 0) {
       return;
     }
 
@@ -608,7 +608,7 @@ public class Player extends Entity {
   }
 
   public void interactNPC(int i) {
-    if (i == 999) {
+    if (i < 0) {
       return;
     }
 
@@ -637,7 +637,7 @@ public class Player extends Entity {
   }
 
   public void contactMonster(int i) {
-    if (i == 999) {
+    if (i < 0) {
       return;
     }
 
@@ -666,7 +666,7 @@ public class Player extends Entity {
   }
 
   public void damageMonster(int i, Entity attacker, int attack, int knockBackPower) {
-    if (i == 999) {
+    if (i < 0) {
       return;
     }
 
@@ -721,7 +721,7 @@ public class Player extends Entity {
   }
 
   public void damageInteractiveTile(int i) {
-    if (i == 999) {
+    if (i < 0) {
       return;
     }
 
@@ -749,7 +749,7 @@ public class Player extends Entity {
   }
 
   public void damageProjectile(int i) {
-    if (i == 999) {
+    if (i < 0) {
       return;
     }
 

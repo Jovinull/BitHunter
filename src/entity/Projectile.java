@@ -45,7 +45,7 @@ public class Projectile extends Entity {
     int currentMapIndex = gp.getCurrentMap();
 
     int monsterIndex = collisionChecker.checkEntity(this, monsters);
-    if (monsterIndex == 999) {
+    if (monsterIndex < 0) {
       return;
     }
 

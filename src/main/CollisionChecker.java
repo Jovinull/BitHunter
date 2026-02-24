@@ -11,7 +11,7 @@ import entity.Entity;
 // Classe responsável por verificar colisões entre entidades e tiles
 public class CollisionChecker {
 
-  private static final int NO_COLLISION_INDEX = 999;
+  private static final int NO_COLLISION_INDEX = -1;
   private static final int SPATIAL_CELL_SIZE = GamePanel.TILE_SIZE * 2;
   private static final int QUERY_PADDING_PIXELS = GamePanel.TILE_SIZE * 2;
 
@@ -117,7 +117,7 @@ public class CollisionChecker {
   }
 
   // Verifica colisão entre uma entidade e um array de entidades-alvo
-  // Retorna o índice da entidade-alvo com a qual houve colisão (ou 999 se
+  // Retorna o índice da entidade-alvo com a qual houve colisão (ou -1 se
   // nenhuma)
   public int checkEntity(Entity entity, Entity[][] target) {
 
