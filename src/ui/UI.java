@@ -43,7 +43,7 @@ public class UI {
   int counter = 0;
   Entity npc;
   int charIndex = 0;
-  String combinedText = "";
+  final StringBuilder combinedText = new StringBuilder();
   private boolean clockWindowOpen = false;
 
   // Estado do remapeamento de teclas (tela de controles)

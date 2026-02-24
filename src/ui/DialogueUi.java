@@ -51,9 +51,8 @@ class DialogueUi {
 
     if (ui.charIndex < characters.length) {
       gp.playSE(17);
-      String s = String.valueOf(characters[ui.charIndex]);
-      ui.combinedText = ui.combinedText + s;
-      ui.currentDialogue = ui.combinedText;
+      ui.combinedText.append(characters[ui.charIndex]);
+      ui.currentDialogue = ui.combinedText.toString();
       ui.charIndex++;
     }
 
@@ -62,7 +61,8 @@ class DialogueUi {
 
     if (keyHandler.isEnterPressed()) {
       ui.charIndex = 0;
-      ui.combinedText = "";
+      ui.combinedText.setLength(0);
+      ui.currentDialogue = "";
 
       if (state == GamePanel.DIALOGUE_STATE || state == GamePanel.CUTSCENE_STATE) {
         npc.setDialogueIndex(idx + 1);
