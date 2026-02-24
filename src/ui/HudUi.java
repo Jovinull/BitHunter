@@ -347,29 +347,39 @@ class HudUi {
 
     g2.setFont(ui.fonts.pixelBold(32F));
 
-    int i = 0;
-    while (i < ui.message.size()) {
-      String m = ui.message.get(i);
-      boolean removed = false;
-      if (m != null) {
+    int size = ui.message.size();
+    int write = 0;
+
+    for (int read = 0; read < size; read++) {
+      String message = ui.message.get(read);
+      int counter = ui.messageCounter.get(read);
+      boolean keep = true;
+
+      if (message != null) {
         g2.setColor(Color.black);
-        g2.drawString(m, messageX + 2, messageY + 2);
+        g2.drawString(message, messageX + 2, messageY + 2);
         g2.setColor(UI.COL_TEXT);
-        g2.drawString(m, messageX, messageY);
+        g2.drawString(message, messageX, messageY);
 
-        int msgCounter = ui.messageCounter.get(i) + 1;
-        ui.messageCounter.set(i, msgCounter);
+        counter++;
         messageY += 40;
+        keep = counter <= 180;
+      }
 
-        if (ui.messageCounter.get(i) > 180) {
-          ui.message.remove(i);
-          ui.messageCounter.remove(i);
-          removed = true;
+      if (keep) {
+        if (write != read) {
+          ui.message.set(write, message);
+          ui.messageCounter.set(write, counter);
+        } else if (message != null) {
+          ui.messageCounter.set(write, counter);
         }
+        write++;
       }
-      if (!removed) {
-        i++;
-      }
+    }
+
+    if (write < size) {
+      ui.message.subList(write, size).clear();
+      ui.messageCounter.subList(write, size).clear();
     }
   }
 
