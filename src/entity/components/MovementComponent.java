@@ -3,6 +3,12 @@ package entity.components;
 import entity.Entity;
 public class MovementComponent {
 
+  private static final int KNOCKBACK_DURATION_FRAMES = 10;
+  private static final int SPRITE_ANIMATION_THRESHOLD = 24;
+  private static final int INVINCIBILITY_DURATION_FRAMES = 20;
+  private static final int SHOT_COOLDOWN_FRAMES = 30;
+  private static final int OFF_BALANCE_DURATION_FRAMES = 60;
+
   private final Entity entity;
 
   public MovementComponent(Entity entity) {
@@ -36,7 +42,7 @@ public class MovementComponent {
     }
 
     entity.setKnockBackCounter(entity.getKnockBackCounter() + 1);
-    if (entity.getKnockBackCounter() == 10) {
+    if (entity.getKnockBackCounter() == KNOCKBACK_DURATION_FRAMES) {
       entity.setKnockBackCounter(0);
       entity.setKnockBack(false);
       entity.setSpeed(entity.getDefaultSpeed());
@@ -67,7 +73,7 @@ public class MovementComponent {
     }
 
     entity.setSpriteCounter(entity.getSpriteCounter() + 1);
-    if (entity.getSpriteCounter() > 24) {
+    if (entity.getSpriteCounter() > SPRITE_ANIMATION_THRESHOLD) {
       entity.setSpriteNum(entity.getSpriteNum() == 1 ? 2 : 1);
       entity.setSpriteCounter(0);
     }
@@ -76,7 +82,7 @@ public class MovementComponent {
   public void handleInvincibility() {
     if (entity.isInvincible()) {
       entity.setInvincibleCounter(entity.getInvincibleCounter() + 1);
-      if (entity.getInvincibleCounter() > 20) {
+      if (entity.getInvincibleCounter() > INVINCIBILITY_DURATION_FRAMES) {
         entity.setInvincible(false);
         entity.setInvincibleCounter(0);
       }
@@ -84,7 +90,7 @@ public class MovementComponent {
   }
 
   public void handleShotCooldown() {
-    if (entity.getShotAvailableCounter() < 30) {
+    if (entity.getShotAvailableCounter() < SHOT_COOLDOWN_FRAMES) {
       entity.setShotAvailableCounter(entity.getShotAvailableCounter() + 1);
     }
   }
@@ -92,7 +98,7 @@ public class MovementComponent {
   public void handleOffBalance() {
     if (entity.isOffBalance()) {
       entity.setOffBalanceCounter(entity.getOffBalanceCounter() + 1);
-      if (entity.getOffBalanceCounter() > 60) {
+      if (entity.getOffBalanceCounter() > OFF_BALANCE_DURATION_FRAMES) {
         entity.setOffBalance(false);
         entity.setOffBalanceCounter(0);
       }

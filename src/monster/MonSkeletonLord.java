@@ -13,6 +13,22 @@ import object.ObjManaCrystal;
 public class MonSkeletonLord extends Entity {
 
   public static final String MON_ID = "monster.skeletonLord";
+  private static final int BOSS_SCALE = 5;
+  private static final int SOLID_AREA_BASE_OFFSET = 48;
+  private static final int ATTACK_AREA_SIZE = 170;
+  private static final int MOTION_1_DURATION = 25;
+  private static final int MOTION_2_DURATION = 50;
+  private static final int RAGE_TRIGGER_DIVISOR = 2;
+  private static final int RAGE_SPEED_BONUS = 1;
+  private static final int RAGE_ATTACK_VALUE = 15;
+  private static final int CHASE_DISTANCE = 10;
+  private static final int MOVE_TOWARD_PLAYER_INTERVAL = 60;
+  private static final int RANDOM_DIRECTION_INTERVAL = 120;
+  private static final int ATTACK_RATE = 60;
+  private static final int ATTACK_STRAIGHT_RANGE_TILES = 7;
+  private static final int ATTACK_HORIZONTAL_RANGE_TILES = 5;
+  private static final int DROP_COIN_THRESHOLD = 50;
+  private static final int DROP_HEART_THRESHOLD = 75;
 
   public MonSkeletonLord(GamePanel gp) {
     super(gp);
@@ -33,23 +49,23 @@ public class MonSkeletonLord extends Entity {
     setKnockBackPower(5);
     setSleep(true);
 
-    int size = GamePanel.TILE_SIZE * 5;
+    int size = GamePanel.TILE_SIZE * BOSS_SCALE;
 
     // Área sólida
-    getSolidArea().x = 48;
-    getSolidArea().y = 48;
-    getSolidArea().width = size - 48 * 2;
-    getSolidArea().height = size - 48;
+    getSolidArea().x = SOLID_AREA_BASE_OFFSET;
+    getSolidArea().y = SOLID_AREA_BASE_OFFSET;
+    getSolidArea().width = size - SOLID_AREA_BASE_OFFSET * 2;
+    getSolidArea().height = size - SOLID_AREA_BASE_OFFSET;
     setSolidAreaDefaultX(getSolidArea().x);
     setSolidAreaDefaultY(getSolidArea().y);
 
     // Área de ataque
-    getAttackArea().width = 170;
-    getAttackArea().height = 170;
+    getAttackArea().width = ATTACK_AREA_SIZE;
+    getAttackArea().height = ATTACK_AREA_SIZE;
 
     // Durações das animações de ataque
-    setMotion1Duration(25);
-    setMotion2Duration(50);
+    setMotion1Duration(MOTION_1_DURATION);
+    setMotion2Duration(MOTION_2_DURATION);
 
     getImage();
     getAttackImage();
@@ -58,7 +74,7 @@ public class MonSkeletonLord extends Entity {
 
   @Override
   public void getImage() {
-    int i = 5;
+    int i = BOSS_SCALE;
 
     if (!isInRage()) {
       up1 = setup("/monster/skeletonlord_up_1", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i);
@@ -82,7 +98,7 @@ public class MonSkeletonLord extends Entity {
   }
 
   public void getAttackImage() {
-    int i = 5;
+    int i = BOSS_SCALE;
 
     if (!isInRage()) {
       attackUp1 = setup("/monster/skeletonlord_attack_up_1", GamePanel.TILE_SIZE * i, GamePanel.TILE_SIZE * i * 2);
@@ -129,23 +145,26 @@ public class MonSkeletonLord extends Entity {
     var player = gp.getPlayer();
 
     // Entra em fúria quando a vida cai abaixo de 50%
-    if (!isInRage() && getLife() < getMaxLife() / 2) {
+    if (!isInRage() && getLife() < getMaxLife() / RAGE_TRIGGER_DIVISOR) {
       setInRage(true);
       getImage();
       getAttackImage();
-      setDefaultSpeed(getDefaultSpeed() + 1);
+      setDefaultSpeed(getDefaultSpeed() + RAGE_SPEED_BONUS);
       setSpeed(getDefaultSpeed());
-      setAttack(15);
+      setAttack(RAGE_ATTACK_VALUE);
     }
 
-    if (getTileDistance(player) < 10) {
-      moveTowardPlayer(60);
+    if (getTileDistance(player) < CHASE_DISTANCE) {
+      moveTowardPlayer(MOVE_TOWARD_PLAYER_INTERVAL);
     } else {
-      getRandomDirection(120);
+      getRandomDirection(RANDOM_DIRECTION_INTERVAL);
     }
 
     if (!isAttacking()) {
-      checkAttackOrNot(60, GamePanel.TILE_SIZE * 7, GamePanel.TILE_SIZE * 5);
+      checkAttackOrNot(
+          ATTACK_RATE,
+          GamePanel.TILE_SIZE * ATTACK_STRAIGHT_RANGE_TILES,
+          GamePanel.TILE_SIZE * ATTACK_HORIZONTAL_RANGE_TILES);
     }
   }
 
@@ -174,9 +193,9 @@ public class MonSkeletonLord extends Entity {
 
     int roll = ThreadLocalRandom.current().nextInt(1, 101);
 
-    if (roll < 50) {
+    if (roll < DROP_COIN_THRESHOLD) {
       dropItem(new ObjCoinBronze(gp));
-    } else if (roll < 75) {
+    } else if (roll < DROP_HEART_THRESHOLD) {
       dropItem(new ObjHeart(gp));
     } else {
       dropItem(new ObjManaCrystal(gp));

@@ -11,6 +11,18 @@ import object.ObjManaCrystal;
 public class MonOrc extends Entity {
 
   public static final String MON_ID = "monster.orc";
+  private static final int FRAMES_PER_SECOND = 60;
+  private static final int RESPAWN_DELAY_SECONDS = 40;
+  private static final int CHASE_STOP_DISTANCE = 15;
+  private static final int CHASE_STOP_RATE = 100;
+  private static final int CHASE_START_DISTANCE = 5;
+  private static final int CHASE_START_RATE = 100;
+  private static final int RANDOM_DIRECTION_INTERVAL = 120;
+  private static final int ATTACK_RATE = 30;
+  private static final int ATTACK_STRAIGHT_RANGE_TILES = 4;
+  private static final int ATTACK_HORIZONTAL_RANGE_TILES = 1;
+  private static final int DROP_COIN_THRESHOLD = 50;
+  private static final int DROP_HEART_THRESHOLD = 75;
 
   public MonOrc(GamePanel gp) {
     super(gp);
@@ -27,7 +39,7 @@ public class MonOrc extends Entity {
     setAttack(9);
     setDefense(3);
     setExp(20);
-    enableRespawn(60 * 40);
+    enableRespawn(FRAMES_PER_SECOND * RESPAWN_DELAY_SECONDS);
     setKnockBackPower(5);
 
     // Colisão / Ataque
@@ -76,15 +88,18 @@ public class MonOrc extends Entity {
     var player = gp.getPlayer();
 
     if (isOnPath()) {
-      checkStopChasingOrNot(player, 15, 100);
+      checkStopChasingOrNot(player, CHASE_STOP_DISTANCE, CHASE_STOP_RATE);
       searchPath(getGoalCol(player), getGoalRow(player));
     } else {
-      checkStartChasingOrNot(player, 5, 100);
-      getRandomDirection(120);
+      checkStartChasingOrNot(player, CHASE_START_DISTANCE, CHASE_START_RATE);
+      getRandomDirection(RANDOM_DIRECTION_INTERVAL);
     }
 
     if (!isAttacking()) {
-      checkAttackOrNot(30, GamePanel.TILE_SIZE * 4, GamePanel.TILE_SIZE);
+      checkAttackOrNot(
+          ATTACK_RATE,
+          GamePanel.TILE_SIZE * ATTACK_STRAIGHT_RANGE_TILES,
+          GamePanel.TILE_SIZE * ATTACK_HORIZONTAL_RANGE_TILES);
     }
   }
 
@@ -98,9 +113,9 @@ public class MonOrc extends Entity {
   public void checkDrop() {
     int i = ThreadLocalRandom.current().nextInt(1, 101);
 
-    if (i < 50) {
+    if (i < DROP_COIN_THRESHOLD) {
       dropItem(new ObjCoinBronze(gp));
-    } else if (i < 75) {
+    } else if (i < DROP_HEART_THRESHOLD) {
       dropItem(new ObjHeart(gp));
     } else {
       dropItem(new ObjManaCrystal(gp));

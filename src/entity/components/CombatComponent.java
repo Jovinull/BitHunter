@@ -5,6 +5,10 @@ import entity.Player;
 
 public class CombatComponent {
 
+  private static final int PERFECT_GUARD_WINDOW_FRAMES = 10;
+  private static final int GUARD_STUN_PENALTY_FRAMES = 60;
+  private static final int BLOCKED_DAMAGE_DIVISOR = 3;
+
   private final Entity entity;
 
   public CombatComponent(Entity entity) {
@@ -128,14 +132,14 @@ public class CombatComponent {
 
       player.onGuardHit(attack);
 
-      if (player.getGuardCounter() < 10) {
+      if (player.getGuardCounter() < PERFECT_GUARD_WINDOW_FRAMES) {
         damage = 0;
         entity.getGp().playSE(16);
         setKnockBack(entity, player, entity.getKnockBackPower());
         entity.setOffBalance(true);
-        entity.setSpriteCounter(entity.getSpriteCounter() - 60);
+        entity.setSpriteCounter(entity.getSpriteCounter() - GUARD_STUN_PENALTY_FRAMES);
       } else {
-        damage = damage / 3;
+        damage = damage / BLOCKED_DAMAGE_DIVISOR;
         entity.getGp().playSE(15);
       }
     } else {

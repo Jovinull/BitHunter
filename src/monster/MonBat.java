@@ -14,6 +14,11 @@ public class MonBat extends Entity {
 
   private static final String BAT_DOWN_1 = "/monster/bat_down_1";
   private static final String BAT_DOWN_2 = "/monster/bat_down_2";
+  private static final int FRAMES_PER_SECOND = 60;
+  private static final int RESPAWN_DELAY_SECONDS = 10;
+  private static final int RANDOM_DIRECTION_INTERVAL = 10;
+  private static final int DROP_COIN_THRESHOLD = 50;
+  private static final int DROP_HEART_THRESHOLD = 75;
 
   public MonBat(GamePanel gp) {
     super(gp);
@@ -29,7 +34,7 @@ public class MonBat extends Entity {
     setAttack(4);
     setDefense(0);
     setExp(5);
-    enableRespawn(60 * 10);
+    enableRespawn(FRAMES_PER_SECOND * RESPAWN_DELAY_SECONDS);
 
     // solidArea (usa o objeto exposto por getSolidArea())
     getSolidArea().x = 3;
@@ -58,7 +63,7 @@ public class MonBat extends Entity {
 
   @Override
   public void setAction() {
-    getRandomDirection(10);
+    getRandomDirection(RANDOM_DIRECTION_INTERVAL);
   }
 
   @Override
@@ -72,9 +77,9 @@ public class MonBat extends Entity {
     // (S2119) Reusar Random -> ThreadLocalRandom
     int i = ThreadLocalRandom.current().nextInt(1, 101);
 
-    if (i < 50) {
+    if (i < DROP_COIN_THRESHOLD) {
       dropItem(new ObjCoinBronze(gp));
-    } else if (i < 75) {
+    } else if (i < DROP_HEART_THRESHOLD) {
       dropItem(new ObjHeart(gp));
     } else {
       dropItem(new ObjManaCrystal(gp));

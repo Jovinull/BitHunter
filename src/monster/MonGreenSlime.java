@@ -15,6 +15,17 @@ public class MonGreenSlime extends Entity {
 
   private static final String SLIME_DOWN_1 = "/monster/greenslime_down_1";
   private static final String SLIME_DOWN_2 = "/monster/greenslime_down_2";
+  private static final int FRAMES_PER_SECOND = 60;
+  private static final int RESPAWN_DELAY_SECONDS = 20;
+  private static final int CHASE_STOP_DISTANCE = 15;
+  private static final int CHASE_STOP_RATE = 100;
+  private static final int SHOOT_RATE = 200;
+  private static final int SHOT_INTERVAL = 30;
+  private static final int CHASE_START_DISTANCE = 5;
+  private static final int CHASE_START_RATE = 100;
+  private static final int RANDOM_DIRECTION_INTERVAL = 120;
+  private static final int DROP_COIN_THRESHOLD = 50;
+  private static final int DROP_HEART_THRESHOLD = 75;
 
   public MonGreenSlime(GamePanel gp) {
     super(gp);
@@ -30,7 +41,7 @@ public class MonGreenSlime extends Entity {
     setAttack(3);
     setDefense(0);
     setExp(3);
-    enableRespawn(60 * 20);
+    enableRespawn(FRAMES_PER_SECOND * RESPAWN_DELAY_SECONDS);
     setProjectile(new ObjRock(gp));
 
     // solidArea (usar o objeto via getter, Rectangle tem campos públicos)
@@ -62,12 +73,12 @@ public class MonGreenSlime extends Entity {
     var player = gp.getPlayer();
 
     if (isOnPath()) {
-      checkStopChasingOrNot(player, 15, 100);
+      checkStopChasingOrNot(player, CHASE_STOP_DISTANCE, CHASE_STOP_RATE);
       searchPath(getGoalCol(player), getGoalRow(player));
-      checkShootOrNot(200, 30);
+      checkShootOrNot(SHOOT_RATE, SHOT_INTERVAL);
     } else {
-      checkStartChasingOrNot(player, 5, 100);
-      getRandomDirection(120);
+      checkStartChasingOrNot(player, CHASE_START_DISTANCE, CHASE_START_RATE);
+      getRandomDirection(RANDOM_DIRECTION_INTERVAL);
     }
   }
 
@@ -82,9 +93,9 @@ public class MonGreenSlime extends Entity {
     // (S2119) Reusar Random -> ThreadLocalRandom
     int i = ThreadLocalRandom.current().nextInt(1, 101);
 
-    if (i < 50) {
+    if (i < DROP_COIN_THRESHOLD) {
       dropItem(new ObjCoinBronze(gp));
-    } else if (i < 75) {
+    } else if (i < DROP_HEART_THRESHOLD) {
       dropItem(new ObjHeart(gp));
     } else {
       dropItem(new ObjManaCrystal(gp));
