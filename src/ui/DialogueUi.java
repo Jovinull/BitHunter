@@ -8,11 +8,10 @@ import main.GamePanel;
 class DialogueUi {
 
   private static final int DIALOG_SFX_TYPING = 17;
-  private static final int DIALOG_WINDOW_X_TILES = 3;
-  private static final int DIALOG_WINDOW_Y_DIVISOR = 2;
-  private static final int DIALOG_WINDOW_HORIZONTAL_MARGIN_TILES = 6;
+  private static final int DIALOG_WINDOW_X_TILES = 2;
+  private static final int DIALOG_WINDOW_Y_DIVISOR = 3;
+  private static final int DIALOG_WINDOW_HORIZONTAL_MARGIN_TILES = 4;
   private static final int DIALOG_WINDOW_HEIGHT_TILES = 4;
-  private static final int DIALOG_TEXT_LINE_HEIGHT = 40;
 
   private final UI ui;
 
@@ -33,9 +32,10 @@ class DialogueUi {
     int height = GamePanel.TILE_SIZE * DIALOG_WINDOW_HEIGHT_TILES;
     ui.drawSubWindow(x, y, width, height);
 
-    g2.setFont(ui.fonts.pixelPlain(32F));
-    x += GamePanel.TILE_SIZE;
-    y += GamePanel.TILE_SIZE;
+    int panelPadding = ui.getPanelPadding();
+    g2.setFont(ui.fonts.pixelPlain(28F));
+    x += panelPadding + 8;
+    y += panelPadding + 24;
 
     String[][] ds = npc.getDialogues();
     int set = npc.getDialogueSet();
@@ -101,7 +101,7 @@ class DialogueUi {
 
     for (String line : current.split("\n")) {
       g2.drawString(line, x, y);
-      y += DIALOG_TEXT_LINE_HEIGHT;
+      y += ui.getDialogueLineHeight();
     }
   }
 }

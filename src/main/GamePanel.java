@@ -401,7 +401,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     if (keyH.isShowDebugText()) {
-      drawDebugInfo(drawStart);
+      gameUi.drawDebugOverlay(drawStart);
     }
   }
 
@@ -504,38 +504,6 @@ public class GamePanel extends JPanel implements Runnable {
 
   private void drawUi() {
     gameUi.draw(g2);
-  }
-
-  private void drawDebugInfo(long drawStart) {
-    long drawEnd = System.nanoTime();
-    long passed = drawEnd - drawStart;
-
-    g2.setFont(gameUi.getDebugFont());
-    g2.setColor(Color.white);
-    int x = 10;
-    int y = 400;
-    int lineHeight = 20;
-
-    g2.drawString("WorldX " + player.getWorldX(), x, y);
-    y += lineHeight;
-    g2.drawString("WorldY " + player.getWorldY(), x, y);
-    y += lineHeight;
-    g2.drawString("Col " + player.getCol(), x, y);
-    y += lineHeight;
-    g2.drawString("Row " + player.getRow(), x, y);
-    y += lineHeight;
-    g2.drawString("Draw Time: " + passed, x, y);
-    y += lineHeight;
-    boolean god = keyH.isGodModeOn();
-    g2.drawString("God Mode (NoClip): " + god, x, y);
-
-    var wm = eManager.getWeatherManager();
-    if (wm != null) {
-      y += lineHeight;
-      g2.drawString("Weather: " + wm.getCurrentType().name(), x, y);
-      y += lineHeight;
-      g2.drawString("W.Duration: " + wm.getDurationRemaining() / 60 + "s", x, y);
-    }
   }
 
   public void drawToScreen() {

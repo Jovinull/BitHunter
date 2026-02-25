@@ -1,6 +1,5 @@
 package ui;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -55,16 +54,16 @@ public class UI {
   int selectedSaveSlot = -1;
   private final StringBuilder playerNameInput = new StringBuilder();
 
-  static final Color COL_BG = new Color(0x05, 0x07, 0x14); // fundo quase preto azulado
-  static final Color COL_PANEL = new Color(0x10, 0x15, 0x28); // painel um pouco mais claro
-  static final Color COL_PANEL_BORDER = new Color(0x28, 0x36, 0x56); // borda azul-acinzentada
+  static final Color COL_BG = UiTheme.BG_DARK;
+  static final Color COL_PANEL = UiTheme.PANEL_DARK;
+  static final Color COL_PANEL_BORDER = UiTheme.BORDER_LIGHT;
 
-  static final Color COL_TEXT = new Color(0xF4, 0xF5, 0xFB); // quase branco, bem legível
-  static final Color COL_TEXT_DIM = new Color(0xA9, 0xB4, 0xD8); // texto secundário mais frio
+  static final Color COL_TEXT = UiTheme.TEXT;
+  static final Color COL_TEXT_DIM = UiTheme.TEXT_DIM;
 
-  static final Color COL_HIGHLIGHT_BG = new Color(0x1E, 0x2E, 0x4F); // fundo de seleção / hover
+  static final Color COL_HIGHLIGHT_BG = UiTheme.HIGHLIGHT_BG;
 
-  static final Color COL_ACCENT = new Color(0x4F, 0xD1, 0xC5); // turquesa forte, para botões, barras etc.
+  static final Color COL_ACCENT = UiTheme.ACCENT;
 
   static final int MENU_LINE = 48;
   static final int MAX_VISIBLE_LANG_OPTIONS = 5;
@@ -78,6 +77,9 @@ public class UI {
   static final String KEY_TRADE_HINT_BACK = "ui.trade.hintBack";
 
   // --- Sub-UIs ---
+  private final UiWindowRenderer windowRenderer;
+  private final UiScreenRouter screenRouter;
+  private final UiDebugOverlay debugOverlay;
   private final HudUi hudUi;
   private final TitleUi titleUi;
   private final SaveSlotUi saveSlotUi;
@@ -98,6 +100,10 @@ public class UI {
 
     Entity bronzeCoin = new ObjCoinBronze(gp);
     coin = bronzeCoin.getDown1();
+
+    windowRenderer = new UiWindowRenderer();
+    screenRouter = new UiScreenRouter(this);
+    debugOverlay = new UiDebugOverlay(this);
 
     // instancia sub-UIs
     hudUi = new HudUi(this);
@@ -156,43 +162,7 @@ public class UI {
 
     configureTextRendering();
     g2.setColor(COL_TEXT);
-
-    int state = gp.getGameState();
-
-    if (state == GamePanel.TITLE_STATE) {
-      titleUi.drawTitleScreen();
-      return;
-    }
-
-    switch (state) {
-      case GamePanel.PLAY_STATE -> {
-        hudUi.drawXpTopBar();
-        hudUi.drawPlayerLife();
-        hudUi.drawPetHud();
-        hudUi.drawMonsterLife();
-        hudUi.drawWeatherIndicator();
-        hudUi.drawMessage();
-        if (clockWindowOpen) {
-          hudUi.drawClockWindow();
-        }
-      }
-      case GamePanel.PAUSE_STATE -> pauseUi.drawPauseScreen();
-      case GamePanel.DIALOGUE_STATE -> dialogueUi.drawDialogueScreen();
-      case GamePanel.CHARACTER_STATE -> {
-        characterUi.drawCharacterScreen();
-        inventoryUi.drawInventory(gp.getPlayer(), true);
-      }
-      case GamePanel.OPTIONS_STATE -> optionsUi.drawOptionsScreen();
-      case GamePanel.GAME_OVER_STATE -> gameOverUi.drawGameOverScreen();
-      case GamePanel.TRANSITION_STATE -> transitionUi.drawTransition();
-      case GamePanel.TRADE_STATE -> tradeUi.drawTradeScreen();
-      case GamePanel.PET_YARD_STATE -> petYardUi.drawPetYardScreen();
-      case GamePanel.SLEEP_STATE -> transitionUi.drawSleepScreen();
-      case GamePanel.BESTIARY_STATE -> bestiaryUi.drawBestiaryScreen();
-      default -> {
-        // noop — estados sem UI dedicada (ex: MAP_STATE, CUTSCENE_STATE)
-      }
-    }
+    screenRouter.drawCurrentScreen();
   }
 
   private void configureTextRendering() {
@@ -212,13 +182,7 @@ public class UI {
   // --- Helpers visuais / utilitários compartilhados ---
 
   void drawSubWindow(int x, int y, int width, int height) {
-    Graphics2D g = (Graphics2D) g2.create();
-    g.setColor(COL_PANEL);
-    g.fillRoundRect(x, y, width, height, 14, 14);
-    g.setStroke(new BasicStroke(2f));
-    g.setColor(COL_PANEL_BORDER);
-    g.drawRoundRect(x, y, width, height, 14, 14);
-    g.dispose();
+    windowRenderer.drawWindow(g2, x, y, width, height);
   }
 
   void drawSubWindowCenter(int w, int h) {
@@ -295,6 +259,14 @@ public class UI {
     return slotCol + (slotRow * 5);
   }
 
+  int getPanelPadding() {
+    return UiTheme.PANEL_PADDING;
+  }
+
+  int getDialogueLineHeight() {
+    return UiTheme.DIALOG_LINE_HEIGHT;
+  }
+
   public void resetOptionsMenu() {
     subState = 0;
     commandNum = 0;
@@ -312,6 +284,46 @@ public class UI {
     return bestiaryUi;
   }
 
+  HudUi getHudUi() {
+    return hudUi;
+  }
+
+  TitleUi getTitleUi() {
+    return titleUi;
+  }
+
+  PauseUi getPauseUi() {
+    return pauseUi;
+  }
+
+  InventoryUi getInventoryUi() {
+    return inventoryUi;
+  }
+
+  OptionsUi getOptionsUi() {
+    return optionsUi;
+  }
+
+  TradeUi getTradeUi() {
+    return tradeUi;
+  }
+
+  TransitionUi getTransitionUi() {
+    return transitionUi;
+  }
+
+  CharacterUi getCharacterUi() {
+    return characterUi;
+  }
+
+  GameOverUi getGameOverUi() {
+    return gameOverUi;
+  }
+
+  PetYardUi getPetYardUi() {
+    return petYardUi;
+  }
+
   // --- Getters/Setters já existentes (mantidos p/ compatibilidade externa) ---
 
   public Font getMaruMonicaPublic() {
@@ -324,6 +336,10 @@ public class UI {
    */
   public Font getDebugFont() {
     return fonts.arialPlain(20F);
+  }
+
+  public void drawDebugOverlay(long drawStartNanos) {
+    debugOverlay.draw(drawStartNanos);
   }
 
   public boolean isMessageOn() {
