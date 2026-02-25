@@ -3,6 +3,7 @@ package data;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.nio.file.Files;
 import java.util.logging.Level;
@@ -91,19 +92,33 @@ public class SaveManager {
     }
 
     try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-      Object raw = ois.readObject();
-      if (raw instanceof DataStorage ds) {
-        String name = ds.getPlayerName();
-        return new SlotInfo(true, false,
-            name != null ? name : "",
-            ds.getCharacterClass(),
-            ds.getTotalPlayTimeSeconds());
-      }
-      return SlotInfo.ofCorrupt();
+      DataStorage ds = readDataStorage(ois);
+      return toSlotInfo(ds);
     } catch (Exception e) {
-      LOG.log(Level.WARNING, "Save corrompido no slot " + slot, e);
+      LOG.log(Level.WARNING, e, () -> "Save corrompido no slot " + slot);
       return SlotInfo.ofCorrupt();
     }
+  }
+
+  /**
+   * Lê o payload do save e valida tipo exato para evitar formatos inesperados.
+   */
+  private DataStorage readDataStorage(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+    Object raw = ois.readObject();
+    if (raw == null || raw.getClass() != DataStorage.class) {
+      throw new InvalidObjectException("Formato de save inválido: tipo inesperado");
+    }
+    return DataStorage.class.cast(raw);
+  }
+
+  private SlotInfo toSlotInfo(DataStorage ds) {
+    String name = ds.getPlayerName();
+    return new SlotInfo(
+        true,
+        false,
+        name != null ? name : "",
+        ds.getCharacterClass(),
+        ds.getTotalPlayTimeSeconds());
   }
 
   /**
@@ -157,8 +172,12 @@ public class SaveManager {
    */
   public void delete(int slot) {
     File file = getSlotFile(slot);
-    if (file.exists() && !file.delete()) {
-      LOG.warning(() -> "Não foi possível apagar o save do slot " + slot);
+    if (file.exists()) {
+      try {
+        Files.delete(file.toPath());
+      } catch (IOException e) {
+        LOG.log(Level.WARNING, e, () -> "Não foi possível apagar o save do slot " + slot);
+      }
     }
   }
 
