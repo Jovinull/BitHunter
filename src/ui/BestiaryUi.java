@@ -96,7 +96,6 @@ public class BestiaryUi {
   private static final int DETAIL_PROGRESS_HEIGHT = 14;
   private static final int DETAIL_BLOCK_Y_OFFSET = 20;
   private static final int DETAIL_BLOCK_INNER_PADDING = 8;
-  private static final int DETAIL_BLOCK_INNER_WIDTH_REDUCTION = 16;
   private static final int STAT_VALUE_X_OFFSET = 40;
   private static final int SPEED_VALUE_X_OFFSET = 120;
   private static final int ARMOR_VALUE_X_OFFSET = 120;
@@ -114,6 +113,7 @@ public class BestiaryUi {
   private static final int PROGRESS_TEXT_Y_BOTTOM = 4;
   private static final int PROGRESS_TEXT_SHADOW_OFFSET = 1;
   private static final int MINI_PROGRESS_ROUND = 4;
+  private static final String KEY_NO_DROPS = "bestiary.detail.noDrops";
   private static final Color COL_DETAIL_HEADER_BG = new Color(10, 10, 15, 190);
   private static final Color COL_RARITY = new Color(200, 80, 255);
   private static final Color COL_STAGE_HEADER_UNLOCKED = new Color(20, 35, 55);
@@ -315,82 +315,23 @@ public class BestiaryUi {
 
     // Lista de criaturas (usa safeClass para thread-safety)
     List<BestiaryCreature> creatures = getFilteredCreatures(service, safeClass);
-    int visibleCount = Math.min(
-        Math.max(0, creatures.size() - scrollOffset), MAX_VISIBLE_ITEMS);
+    int visibleCount = (int) Math.clamp(
+        (long) creatures.size() - scrollOffset,
+        0L,
+        MAX_VISIBLE_ITEMS);
 
     g2.setFont(ui.fonts.pixelPlain(20F));
 
     for (int i = 0; i < visibleCount; i++) {
       int idx = scrollOffset + i;
-      if (idx >= creatures.size()) break; // guarda defensiva extra
-      BestiaryCreature creature = creatures.get(idx);
-      BestiaryStage stage = service.getStage(creature.getId());
-      boolean selected = (idx == selectedCreatureIndex);
-
+      if (idx >= creatures.size()) {
+        break; // guarda defensiva extra
+      }
       int itemY = textY + i * ITEM_H;
-
-      // Fundo de seleção
-      if (selected) {
-        g2.setColor(UI.COL_HIGHLIGHT_BG);
-        g2.fillRoundRect(
-            textX - CLASS_ITEM_SELECTED_X_OFFSET,
-            itemY - CREATURE_ITEM_SELECTED_Y_OFFSET,
-            frameW - FRAME_PADDING * 2 + CLASS_ITEM_SELECTED_WIDTH_OFFSET,
-            ITEM_H - CLASS_ITEM_HEIGHT_OFFSET,
-            STAGE_BLOCK_ROUND,
-            STAGE_BLOCK_ROUND);
-      }
-
-      // Sprite ou silhueta
-      int spriteX = textX + 4;
-      int spriteY = itemY - CREATURE_SPRITE_Y_OFFSET;
-      int spriteSize = CREATURE_SPRITE_SIZE;
-
-      if (stage == BestiaryStage.LOCKED) {
-        // Silhueta
-        g2.setColor(COL_LOCKED);
-        g2.fillRoundRect(spriteX, spriteY, spriteSize, spriteSize, CREATURE_SPRITE_ROUND, CREATURE_SPRITE_ROUND);
-        g2.setColor(COL_SILHOUETTE);
-        g2.fillOval(
-            spriteX + CREATURE_SILHOUETTE_MARGIN,
-            spriteY + CREATURE_SILHOUETTE_MARGIN,
-            spriteSize - CREATURE_SILHOUETTE_MARGIN * 2,
-            spriteSize - CREATURE_SILHOUETTE_MARGIN * 2);
-      } else {
-        // Sprite real
-        BufferedImage sprite = service.getCreatureSprite(creature);
-        if (sprite != null) {
-          g2.drawImage(sprite, spriteX, spriteY, spriteSize, spriteSize, null);
-        } else {
-          g2.setColor(COL_LOCKED);
-          g2.fillRoundRect(spriteX, spriteY, spriteSize, spriteSize, CREATURE_SPRITE_ROUND, CREATURE_SPRITE_ROUND);
-        }
-      }
-
-      // Nome
-      int nameX = spriteX + spriteSize + CREATURE_NAME_X_OFFSET;
-      g2.setFont(ui.fonts.pixelBold(20F));
-
-      if (stage == BestiaryStage.LOCKED) {
-        g2.setColor(COL_STAGE_LOCKED);
-        g2.drawString("???", nameX, itemY + CREATURE_NAME_Y_OFFSET);
-      } else {
-        g2.setColor(selected ? UI.COL_ACCENT : UI.COL_TEXT);
-        g2.drawString(service.getCreatureDisplayName(creature), nameX, itemY + CREATURE_NAME_Y_OFFSET);
-      }
-
-      // Estágio / Barra de progresso (compacta)
-      if (stage != BestiaryStage.LOCKED) {
-        drawMiniProgressBar(g2, nameX, itemY + CLASS_NAME_Y_OFFSET, MINI_PROGRESS_WIDTH, MINI_PROGRESS_HEIGHT, creature, service);
-      }
-
-      // Indicador de estágio
-      String stageLabel = getStageLabel(stage);
-      g2.setFont(ui.fonts.pixelPlain(16F));
-      g2.setColor(stage == BestiaryStage.COMPLETED ? COL_STAGE_DONE : UI.COL_TEXT_DIM);
-      int stageLabelX = frameX + frameW - FRAME_PADDING
-          - g2.getFontMetrics().stringWidth(stageLabel) - STAGE_LABEL_RIGHT_OFFSET;
-      g2.drawString(stageLabel, stageLabelX, itemY + CREATURE_NAME_Y_OFFSET);
+      boolean selected = (idx == selectedCreatureIndex);
+      BestiaryCreature creature = creatures.get(idx);
+      BestiaryStage stage = drawCreatureListItem(g2, frameW, textX, itemY, selected, creature, service);
+      drawCreatureStageLabel(g2, frameX, frameW, stage, itemY);
     }
 
     // Scroll indicator
@@ -476,7 +417,7 @@ public class BestiaryUi {
 
     // Barra de progresso
     infoY += DETAIL_PROGRESS_SPACING;
-    drawProgressBar(g2, infoX, infoY, DETAIL_PROGRESS_WIDTH, DETAIL_PROGRESS_HEIGHT, creature, progress, service);
+    drawProgressBar(g2, infoX, infoY, DETAIL_PROGRESS_WIDTH, DETAIL_PROGRESS_HEIGHT, creature, progress);
 
     // === Blocos de informação por estágio ===
     int blockY = textY + headerSpriteSize + DETAIL_BLOCK_Y_OFFSET;
@@ -493,7 +434,6 @@ public class BestiaryUi {
         () -> drawStage1Content(
             g2,
             blockX + DETAIL_BLOCK_INNER_PADDING,
-            blockW - DETAIL_BLOCK_INNER_WIDTH_REDUCTION,
             creature,
             progress,
             service));
@@ -505,7 +445,6 @@ public class BestiaryUi {
         () -> drawStage2Content(
             g2,
             blockX + DETAIL_BLOCK_INNER_PADDING,
-            blockW - DETAIL_BLOCK_INNER_WIDTH_REDUCTION,
             creature,
             progress,
             service));
@@ -517,10 +456,8 @@ public class BestiaryUi {
         () -> drawStageFinalContent(
             g2,
             blockX + DETAIL_BLOCK_INNER_PADDING,
-            blockW - DETAIL_BLOCK_INNER_WIDTH_REDUCTION,
             creature,
-            progress,
-            service));
+            progress));
 
     // Hint
     drawHint(g2, frameX, frameY + frameH - (HINT_BOTTOM_Y_OFFSET - STAGE_EXTRA_GAP_SMALL), frameW,
@@ -531,7 +468,7 @@ public class BestiaryUi {
 
   private int currentContentY;
 
-  private int drawStage1Content(Graphics2D g2, int x, int w,
+  private int drawStage1Content(Graphics2D g2, int x,
       BestiaryCreature creature, BestiaryProgress progress,
       BestiaryService service) {
     int y = currentContentY;
@@ -589,14 +526,14 @@ public class BestiaryUi {
     }
     if (!hasCommon) {
       g2.setColor(UI.COL_TEXT_DIM);
-      g2.drawString("  " + ui.t("bestiary.detail.noDrops"), x, y);
+      g2.drawString("  " + ui.t(KEY_NO_DROPS), x, y);
       y += LINE_H - STAGE_EXTRA_GAP_SMALL;
     }
 
     return y;
   }
 
-  private int drawStage2Content(Graphics2D g2, int x, int w,
+  private int drawStage2Content(Graphics2D g2, int x,
       BestiaryCreature creature, BestiaryProgress progress,
       BestiaryService service) {
     int y = currentContentY;
@@ -620,7 +557,7 @@ public class BestiaryUi {
     }
     if (!hasUncommon) {
       g2.setColor(UI.COL_TEXT_DIM);
-      g2.drawString("  " + ui.t("bestiary.detail.noDrops"), x, y);
+      g2.drawString("  " + ui.t(KEY_NO_DROPS), x, y);
       y += LINE_H - STAGE_EXTRA_GAP_SMALL;
     }
 
@@ -654,9 +591,8 @@ public class BestiaryUi {
     return y;
   }
 
-  private int drawStageFinalContent(Graphics2D g2, int x, int w,
-      BestiaryCreature creature, BestiaryProgress progress,
-      BestiaryService service) {
+  private int drawStageFinalContent(Graphics2D g2, int x,
+      BestiaryCreature creature, BestiaryProgress progress) {
     int y = currentContentY;
 
     // Drops raros e semi-raros
@@ -666,7 +602,7 @@ public class BestiaryUi {
     y += LINE_H;
 
     g2.setFont(ui.fonts.pixelPlain(16F));
-    List<BestiaryDrop> visibleDrops = service.getVisibleDrops(creature, progress);
+    List<BestiaryDrop> visibleDrops = ui.getGamePanel().getBestiaryService().getVisibleDrops(creature, progress);
     boolean hasRare = false;
     for (BestiaryDrop drop : visibleDrops) {
       if (drop.tier() == bestiary.LootTier.SEMI_RARE
@@ -690,7 +626,7 @@ public class BestiaryUi {
 
     if (!hasRare) {
       g2.setColor(UI.COL_TEXT_DIM);
-      g2.drawString("  " + ui.t("bestiary.detail.noDrops"), x, y);
+      g2.drawString("  " + ui.t(KEY_NO_DROPS), x, y);
       y += LINE_H - STAGE_EXTRA_GAP_SMALL;
     }
 
@@ -750,8 +686,7 @@ public class BestiaryUi {
   // ===== Barras de progresso =====
 
   private void drawProgressBar(Graphics2D g2, int x, int y, int w, int h,
-      BestiaryCreature creature, BestiaryProgress progress,
-      BestiaryService service) {
+      BestiaryCreature creature, BestiaryProgress progress) {
     BestiaryStage stage = progress.getStage(creature.getDifficulty(), creature.getRarity());
 
     // Fundo
@@ -916,27 +851,28 @@ public class BestiaryUi {
   /** Volta para a tela anterior. */
   public void goBack() {
     int sub = ui.getSubState();
-    if (sub == 2) {
-      ui.setSubState(1);
-      ui.setCommandNum(0);
-    } else if (sub == 1) {
-      // IMPORTANTE: mudar subState ANTES de limpar currentClass.
-      // Isso garante que a thread de draw nunca veja subState=1 com currentClass=null
-      // (race condition que causava NPE).
-      ui.setSubState(0);
-      ui.setCommandNum(selectedClassIndex);
+    switch (sub) {
+      case 2 -> {
+        ui.setSubState(1);
+        ui.setCommandNum(0);
+      }
+      case 1 -> {
+        // IMPORTANTE: mudar subState ANTES de limpar currentClass.
+        // Isso garante que a thread de draw nunca veja subState=1 com currentClass=null
+        // (race condition que causava NPE).
+        ui.setSubState(0);
+        ui.setCommandNum(selectedClassIndex);
 
-      // Agora é seguro limpar — a draw thread já vê subState=0 (tela de classes)
-      selectedCreatureIndex = 0;
-      scrollOffset = 0;
-      searchQuery = "";
-      searchMode = false;
-      // Não anulamos currentClass — a resolveCurrentClass() + o snapshot local
-      // nas draw methods já garantem segurança. Manter o valor anterior
-      // como cache é seguro e evita a janela de race condition.
-    } else {
-      // Fechar bestiário
-      ui.getGamePanel().setGameState(GamePanel.PLAY_STATE);
+        // Agora é seguro limpar — a draw thread já vê subState=0 (tela de classes)
+        selectedCreatureIndex = 0;
+        scrollOffset = 0;
+        searchQuery = "";
+        searchMode = false;
+        // Não anulamos currentClass — a resolveCurrentClass() + o snapshot local
+        // nas draw methods já garantem segurança. Manter o valor anterior
+        // como cache é seguro e evita a janela de race condition.
+      }
+      default -> ui.getGamePanel().setGameState(GamePanel.PLAY_STATE); // Fechar bestiário
     }
   }
 
@@ -953,11 +889,101 @@ public class BestiaryUi {
         selectedCreatureIndex = creatures.size() - 1;
       }
       ensureCreatureVisible();
-    } else if (sub == 2) {
-      if (detailScrollOffset > 0) {
-        detailScrollOffset--;
-      }
+    } else if (sub == 2 && detailScrollOffset > 0) {
+      detailScrollOffset--;
     }
+  }
+
+  private BestiaryStage drawCreatureListItem(
+      Graphics2D g2,
+      int frameW,
+      int textX,
+      int itemY,
+      boolean selected,
+      BestiaryCreature creature,
+      BestiaryService service) {
+    BestiaryStage stage = service.getStage(creature.getId());
+    int spriteX = textX + 4;
+    int spriteY = itemY - CREATURE_SPRITE_Y_OFFSET;
+    int nameX = spriteX + CREATURE_SPRITE_SIZE + CREATURE_NAME_X_OFFSET;
+
+    drawCreatureSelectionBackground(g2, selected, textX, itemY, frameW);
+    drawCreatureSprite(g2, creature, service, stage, spriteX, spriteY);
+    drawCreatureNameAndMiniProgress(g2, creature, service, stage, selected, nameX, itemY);
+    return stage;
+  }
+
+  private void drawCreatureSelectionBackground(Graphics2D g2, boolean selected, int textX, int itemY, int frameW) {
+    if (!selected) {
+      return;
+    }
+    g2.setColor(UI.COL_HIGHLIGHT_BG);
+    g2.fillRoundRect(
+        textX - CLASS_ITEM_SELECTED_X_OFFSET,
+        itemY - CREATURE_ITEM_SELECTED_Y_OFFSET,
+        frameW - FRAME_PADDING * 2 + CLASS_ITEM_SELECTED_WIDTH_OFFSET,
+        ITEM_H - CLASS_ITEM_HEIGHT_OFFSET,
+        STAGE_BLOCK_ROUND,
+        STAGE_BLOCK_ROUND);
+  }
+
+  private void drawCreatureSprite(
+      Graphics2D g2,
+      BestiaryCreature creature,
+      BestiaryService service,
+      BestiaryStage stage,
+      int spriteX,
+      int spriteY) {
+    if (stage == BestiaryStage.LOCKED) {
+      g2.setColor(COL_LOCKED);
+      g2.fillRoundRect(
+          spriteX, spriteY, CREATURE_SPRITE_SIZE, CREATURE_SPRITE_SIZE, CREATURE_SPRITE_ROUND, CREATURE_SPRITE_ROUND);
+      g2.setColor(COL_SILHOUETTE);
+      g2.fillOval(
+          spriteX + CREATURE_SILHOUETTE_MARGIN,
+          spriteY + CREATURE_SILHOUETTE_MARGIN,
+          CREATURE_SPRITE_SIZE - CREATURE_SILHOUETTE_MARGIN * 2,
+          CREATURE_SPRITE_SIZE - CREATURE_SILHOUETTE_MARGIN * 2);
+      return;
+    }
+
+    BufferedImage sprite = service.getCreatureSprite(creature);
+    if (sprite != null) {
+      g2.drawImage(sprite, spriteX, spriteY, CREATURE_SPRITE_SIZE, CREATURE_SPRITE_SIZE, null);
+      return;
+    }
+    g2.setColor(COL_LOCKED);
+    g2.fillRoundRect(
+        spriteX, spriteY, CREATURE_SPRITE_SIZE, CREATURE_SPRITE_SIZE, CREATURE_SPRITE_ROUND, CREATURE_SPRITE_ROUND);
+  }
+
+  private void drawCreatureNameAndMiniProgress(
+      Graphics2D g2,
+      BestiaryCreature creature,
+      BestiaryService service,
+      BestiaryStage stage,
+      boolean selected,
+      int nameX,
+      int itemY) {
+    g2.setFont(ui.fonts.pixelBold(20F));
+    if (stage == BestiaryStage.LOCKED) {
+      g2.setColor(COL_STAGE_LOCKED);
+      g2.drawString("???", nameX, itemY + CREATURE_NAME_Y_OFFSET);
+      return;
+    }
+
+    g2.setColor(selected ? UI.COL_ACCENT : UI.COL_TEXT);
+    g2.drawString(service.getCreatureDisplayName(creature), nameX, itemY + CREATURE_NAME_Y_OFFSET);
+    drawMiniProgressBar(g2, nameX, itemY + CLASS_NAME_Y_OFFSET, MINI_PROGRESS_WIDTH, MINI_PROGRESS_HEIGHT, creature, service);
+  }
+
+  private void drawCreatureStageLabel(Graphics2D g2, int frameX, int frameW, BestiaryStage stage, int itemY) {
+    String stageLabel = getStageLabel(stage);
+    g2.setFont(ui.fonts.pixelPlain(16F));
+    g2.setColor(stage == BestiaryStage.COMPLETED ? COL_STAGE_DONE : UI.COL_TEXT_DIM);
+    int stageLabelX = frameX + frameW - FRAME_PADDING
+        - g2.getFontMetrics().stringWidth(stageLabel) - STAGE_LABEL_RIGHT_OFFSET;
+    g2.drawString(stageLabel, stageLabelX, itemY + CREATURE_NAME_Y_OFFSET);
   }
 
   /** Move a seleção para baixo (lista de criaturas). */
