@@ -19,6 +19,35 @@ class SaveSlotUi {
   static final int MODE_CONTINUE = 1;
 
   private static final int MAX_NAME_LENGTH = 12;
+  private static final double SLOT_CARD_WIDTH_RATIO = 0.7;
+  private static final int SLOT_CARD_HEIGHT_TILES = 2;
+  private static final double SLOT_START_Y_TILES = 2.8;
+  private static final int SLOT_CARD_GAP = 10;
+  private static final int SLOT_CARD_ROUND = 10;
+  private static final int SLOT_TEXT_X_OFFSET = 16;
+  private static final int SLOT_LINE_HEIGHT = 24;
+  private static final int SLOT_FIRST_LINE_Y_OFFSET = 6;
+  private static final int SLOT_INFO_X_OFFSET = 170;
+  private static final int SLOT_RIGHT_PADDING = 16;
+  private static final int SLOT_TRIANGLE_X_OFFSET = 20;
+  private static final int SLOT_TRIANGLE_Y_OFFSET = 10;
+  private static final int SLOT_TRIANGLE_WIDTH = 14;
+  private static final int SLOT_TRIANGLE_MID_Y_OFFSET = 10;
+  private static final int SLOT_TRIANGLE_BOTTOM_Y_OFFSET = 20;
+  private static final double DIALOG_WIDTH_RATIO = 0.85;
+  private static final int DIALOG_HEIGHT_TILES = 5;
+  private static final int DIALOG_TEXT_Y_OFFSET = 10;
+  private static final int DIALOG_SECOND_LINE_Y_OFFSET = 30;
+  private static final int DIALOG_BUTTON_Y_OFFSET = 90;
+  private static final double NAME_FIELD_WIDTH_RATIO = 0.5;
+  private static final int NAME_FIELD_HEIGHT_EXTRA = 8;
+  private static final int NAME_TEXT_X_OFFSET = 16;
+  private static final int NAME_TEXT_Y_OFFSET = 12;
+  private static final int CURSOR_BLINK_MS = 500;
+  private static final int CURSOR_X_OFFSET = 2;
+  private static final int CURSOR_Y_OFFSET = 24;
+  private static final int CURSOR_WIDTH = 3;
+  private static final int CURSOR_HEIGHT = 28;
 
   private static final Color COL_DISABLED_BG = new Color(0x08, 0x0A, 0x18);
   private static final Color COL_DISABLED_BORDER = new Color(0x18, 0x1E, 0x30);
@@ -66,11 +95,11 @@ class SaveSlotUi {
         UI.COL_TEXT, Color.black, 2);
 
     SlotInfo[] infos = getSlotInfos();
-    int cardW = (int) (GamePanel.SCREEN_WIDTH * 0.7);
-    int cardH = GamePanel.TILE_SIZE * 2;
+    int cardW = (int) (GamePanel.SCREEN_WIDTH * SLOT_CARD_WIDTH_RATIO);
+    int cardH = GamePanel.TILE_SIZE * SLOT_CARD_HEIGHT_TILES;
     int cardX = (GamePanel.SCREEN_WIDTH - cardW) / 2;
-    int startY = (int) (GamePanel.TILE_SIZE * 2.8);
-    int gap = 10;
+    int startY = (int) (GamePanel.TILE_SIZE * SLOT_START_Y_TILES);
+    int gap = SLOT_CARD_GAP;
 
     g2.setFont(ui.fonts.displayPlain(28F));
     for (int i = 0; i < SaveManager.MAX_SLOTS; i++) {
@@ -118,34 +147,34 @@ class SaveSlotUi {
       bgColor = UI.COL_HIGHLIGHT_BG;
     }
     g2.setColor(bgColor);
-    g2.fillRoundRect(x, y, w, h, 10, 10);
+    g2.fillRoundRect(x, y, w, h, SLOT_CARD_ROUND, SLOT_CARD_ROUND);
 
     Color borderColor = selected ? UI.COL_ACCENT : UI.COL_PANEL_BORDER;
     if (disabled) {
       borderColor = COL_DISABLED_BORDER;
     }
     g2.setColor(borderColor);
-    g2.drawRoundRect(x, y, w, h, 10, 10);
+    g2.drawRoundRect(x, y, w, h, SLOT_CARD_ROUND, SLOT_CARD_ROUND);
 
-    int textX = x + 16;
-    int lineH = 24;
-    int firstLineY = y + lineH + 6;
+    int textX = x + SLOT_TEXT_X_OFFSET;
+    int lineH = SLOT_LINE_HEIGHT;
+    int firstLineY = y + lineH + SLOT_FIRST_LINE_Y_OFFSET;
 
     g2.setFont(ui.fonts.displayBold(28F));
     g2.setColor(disabled ? COL_DISABLED_TEXT : UI.COL_ACCENT);
     g2.drawString(ui.t("ui.save.slotPrefix") + " " + slotNum,
         textX, firstLineY);
 
-    int infoX = textX + 170;
-    int rightPad = x + w - 16;
+    int infoX = textX + SLOT_INFO_X_OFFSET;
+    int rightPad = x + w - SLOT_RIGHT_PADDING;
 
     drawSlotInfo(g2, info, infoX, firstLineY, lineH, rightPad, disabled);
 
     if (selected && !disabled) {
-      int triX = x - 20;
-      int triY = y + h / 2 - 10;
-      int[] xs = { triX, triX + 14, triX };
-      int[] ys = { triY, triY + 10, triY + 20 };
+      int triX = x - SLOT_TRIANGLE_X_OFFSET;
+      int triY = y + h / 2 - SLOT_TRIANGLE_Y_OFFSET;
+      int[] xs = { triX, triX + SLOT_TRIANGLE_WIDTH, triX };
+      int[] ys = { triY, triY + SLOT_TRIANGLE_MID_Y_OFFSET, triY + SLOT_TRIANGLE_BOTTOM_Y_OFFSET };
       g2.setColor(UI.COL_ACCENT);
       g2.fillPolygon(xs, ys, 3);
     }
@@ -217,24 +246,24 @@ class SaveSlotUi {
     g2.setColor(COL_OVERLAY);
     g2.fillRect(0, 0, GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT);
 
-    int w = (int) (GamePanel.SCREEN_WIDTH * 0.85);
-    int h = GamePanel.TILE_SIZE * 5;
+    int w = (int) (GamePanel.SCREEN_WIDTH * DIALOG_WIDTH_RATIO);
+    int h = GamePanel.TILE_SIZE * DIALOG_HEIGHT_TILES;
     int x = (GamePanel.SCREEN_WIDTH - w) / 2;
     int y = (GamePanel.SCREEN_HEIGHT - h) / 2;
     ui.drawSubWindow(x, y, w, h);
 
     g2.setFont(ui.fonts.displayPlain(24F));
-    int textY = y + GamePanel.TILE_SIZE + 10;
+    int textY = y + GamePanel.TILE_SIZE + DIALOG_TEXT_Y_OFFSET;
 
     // Instead of hardcoding two lines, dynamically measure and potentially wrap or
     // fit the text across the wider box
     ui.drawTextShadowCentered(ui.t("ui.save.overwrite.line1"),
         textY, UI.COL_TEXT, Color.black, 2);
     ui.drawTextShadowCentered(ui.t("ui.save.overwrite.line2"),
-        textY + 30, UI.COL_TEXT, Color.black, 2);
+        textY + DIALOG_SECOND_LINE_Y_OFFSET, UI.COL_TEXT, Color.black, 2);
 
     g2.setFont(ui.fonts.displayBold(32F));
-    int btnY = textY + 90;
+    int btnY = textY + DIALOG_BUTTON_Y_OFFSET;
     ui.drawMenuItem(ui.t("ui.save.cancel"), btnY,
         ui.getCommandNum() == 0);
     ui.drawMenuItem(ui.t("ui.save.overwrite"), btnY + UI.MENU_LINE,
@@ -251,22 +280,22 @@ class SaveSlotUi {
     g2.setColor(COL_OVERLAY);
     g2.fillRect(0, 0, GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT);
 
-    int w = (int) (GamePanel.SCREEN_WIDTH * 0.85);
-    int h = GamePanel.TILE_SIZE * 5;
+    int w = (int) (GamePanel.SCREEN_WIDTH * DIALOG_WIDTH_RATIO);
+    int h = GamePanel.TILE_SIZE * DIALOG_HEIGHT_TILES;
     int x = (GamePanel.SCREEN_WIDTH - w) / 2;
     int y = (GamePanel.SCREEN_HEIGHT - h) / 2;
     ui.drawSubWindow(x, y, w, h);
 
     g2.setFont(ui.fonts.displayPlain(24F));
-    int textY = y + GamePanel.TILE_SIZE + 10;
+    int textY = y + GamePanel.TILE_SIZE + DIALOG_TEXT_Y_OFFSET;
 
     ui.drawTextShadowCentered(ui.t("ui.save.delete.line1"),
         textY, UI.COL_TEXT, Color.black, 2);
     ui.drawTextShadowCentered(ui.t("ui.save.delete.line2"),
-        textY + 30, UI.COL_TEXT, Color.black, 2);
+        textY + DIALOG_SECOND_LINE_Y_OFFSET, UI.COL_TEXT, Color.black, 2);
 
     g2.setFont(ui.fonts.displayBold(32F));
-    int btnY = textY + 90;
+    int btnY = textY + DIALOG_BUTTON_Y_OFFSET;
     ui.drawMenuItem(ui.t("ui.save.cancel"), btnY,
         ui.getCommandNum() == 0);
     ui.drawMenuItem(ui.t("ui.save.deleteConfirm"), btnY + UI.MENU_LINE,
@@ -289,8 +318,8 @@ class SaveSlotUi {
         GamePanel.TILE_SIZE * 3,
         UI.COL_TEXT, Color.black, 2);
 
-    int fieldW = (int) (GamePanel.SCREEN_WIDTH * 0.5);
-    int fieldH = GamePanel.TILE_SIZE + 8;
+    int fieldW = (int) (GamePanel.SCREEN_WIDTH * NAME_FIELD_WIDTH_RATIO);
+    int fieldH = GamePanel.TILE_SIZE + NAME_FIELD_HEIGHT_EXTRA;
     int fieldX = (GamePanel.SCREEN_WIDTH - fieldW) / 2;
     int fieldY = GamePanel.SCREEN_HEIGHT / 2 - fieldH / 2;
 
@@ -302,13 +331,13 @@ class SaveSlotUi {
 
     int textWidth = (int) g2.getFontMetrics()
         .getStringBounds(text, g2).getWidth();
-    int tx = fieldX + 16;
-    int ty = fieldY + fieldH / 2 + 12;
+    int tx = fieldX + NAME_TEXT_X_OFFSET;
+    int ty = fieldY + fieldH / 2 + NAME_TEXT_Y_OFFSET;
     g2.drawString(text, tx, ty);
 
-    if ((System.currentTimeMillis() / 500) % 2 == 0) {
+    if ((System.currentTimeMillis() / CURSOR_BLINK_MS) % 2 == 0) {
       g2.setColor(UI.COL_ACCENT);
-      g2.fillRect(tx + textWidth + 2, ty - 24, 3, 28);
+      g2.fillRect(tx + textWidth + CURSOR_X_OFFSET, ty - CURSOR_Y_OFFSET, CURSOR_WIDTH, CURSOR_HEIGHT);
     }
 
     ui.useCrispPixelText(g2);

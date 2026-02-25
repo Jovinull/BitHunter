@@ -7,6 +7,11 @@ import main.GamePanel;
 
 class TransitionUi {
 
+  private static final int TRANSITION_ALPHA_STEP = 5;
+  private static final int TRANSITION_TOTAL_FRAMES = 50;
+  private static final int SLEEP_TRANSITION_TICKS = 120;
+  private static final float SLEEP_TRANSITION_STEP = 0.01f;
+
   private final UI ui;
 
   TransitionUi(UI ui) {
@@ -18,10 +23,10 @@ class TransitionUi {
     GamePanel gp = ui.getGamePanel();
 
     ui.counter++;
-    g2.setColor(new Color(0, 0, 0, ui.counter * 5));
+    g2.setColor(new Color(0, 0, 0, ui.counter * TRANSITION_ALPHA_STEP));
     g2.fillRect(0, 0, GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT);
 
-    if (ui.counter == 50) {
+    if (ui.counter == TRANSITION_TOTAL_FRAMES) {
       ui.counter = 0;
       gp.setGameState(GamePanel.PLAY_STATE);
 
@@ -53,13 +58,10 @@ class TransitionUi {
       return;
     }
 
-    final int TRANSITION_TICKS = 120;
-    final float STEP = 0.01f;
-
-    if (ui.counter < TRANSITION_TICKS) {
-      lighting.setFilterAlpha(lighting.getFilterAlpha() + STEP);
+    if (ui.counter < SLEEP_TRANSITION_TICKS) {
+      lighting.setFilterAlpha(lighting.getFilterAlpha() + SLEEP_TRANSITION_STEP);
     } else {
-      lighting.setFilterAlpha(lighting.getFilterAlpha() - STEP);
+      lighting.setFilterAlpha(lighting.getFilterAlpha() - SLEEP_TRANSITION_STEP);
       if (lighting.getFilterAlpha() <= 0f) {
         ui.counter = 0;
         lighting.setDayStateToDay();

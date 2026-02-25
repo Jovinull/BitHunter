@@ -21,6 +21,51 @@ class HudUi {
   private static final Color COL_XP_FILL = new Color(70, 140, 255);
   private static final Color COL_MONSTER_BAR_BG = new Color(35, 35, 35);
   private static final Color COL_MONSTER_BAR_FILL = new Color(255, 0, 30);
+  private static final int HUD_BAR_WIDTH_TILES = 3;
+  private static final int HUD_BAR_HEIGHT = 24;
+  private static final int HUD_BAR_SPACING = 8;
+  private static final int HUD_BASE_X_TILES = 1;
+  private static final int HUD_BASE_Y_DIVISOR = 2;
+  private static final int PET_HUD_VERTICAL_OFFSET_BARS = 2;
+  private static final int PET_PANEL_HEIGHT = 22;
+  private static final int PANEL_INSET = 2;
+  private static final int PANEL_ROUND = 8;
+  private static final int PET_ICON_TO_TEXT_GAP = 6;
+  private static final int PET_TEXT_Y_OFFSET = 14;
+  private static final int PET_XP_BAR_HEIGHT = 6;
+  private static final int PET_XP_BAR_BOTTOM_PADDING = 4;
+  private static final int PET_XP_BAR_ROUND = 4;
+  private static final int TOP_XP_BAR_HEIGHT = 6;
+  private static final int TEXT_PADDING_X = 8;
+  private static final int SHADOW_OFFSET = 1;
+  private static final int MONSTER_HP_BAR_Y_OFFSET_BG = 16;
+  private static final int MONSTER_HP_BAR_BG_HEIGHT = 12;
+  private static final int MONSTER_HP_BAR_FILL_Y_OFFSET = 15;
+  private static final int MONSTER_HP_BAR_FILL_HEIGHT = 10;
+  private static final int MONSTER_HP_BAR_TIMEOUT = 600;
+  private static final int BOSS_HP_BAR_WIDTH_TILES = 8;
+  private static final int BOSS_HP_BAR_HALF_WIDTH_TILES = 4;
+  private static final int BOSS_HP_BAR_Y_TILES = 10;
+  private static final int BOSS_HP_BAR_HEIGHT = 20;
+  private static final int BOSS_HP_BAR_BG_HEIGHT = 22;
+  private static final int BOSS_HP_NAME_X_OFFSET = 4;
+  private static final int BOSS_HP_NAME_Y_OFFSET = 10;
+  private static final int WEATHER_LABEL_X_PADDING = 12;
+  private static final int WEATHER_LABEL_Y = 22;
+  private static final int MESSAGE_START_X_TILES = 1;
+  private static final int MESSAGE_START_Y_TILES = 4;
+  private static final int MESSAGE_LINE_HEIGHT = 40;
+  private static final int MESSAGE_DURATION_FRAMES = 180;
+  private static final int CLOCK_FRAME_X_TILES = 1;
+  private static final int CLOCK_FRAME_Y_TILES = 5;
+  private static final int CLOCK_FRAME_WIDTH_TILES = 5;
+  private static final int CLOCK_FRAME_HEIGHT_TILES = 2;
+  private static final int CLOCK_PANEL_ROUND = 14;
+  private static final int CLOCK_ICON_X_OFFSET = 10;
+  private static final int CLOCK_ICON_Y_OFFSET = 24;
+  private static final int CLOCK_TEXT_X_OFFSET = 10;
+  private static final int CLOCK_TEXT_Y_OFFSET = 36;
+  private static final int CLOCK_WEATHER_Y_OFFSET = 24;
 
   private final UI ui;
   private BufferedImage clockImage;
@@ -33,11 +78,11 @@ class HudUi {
     var gp = ui.getGamePanel();
     var player = gp.getPlayer();
 
-    int barWidth = GamePanel.TILE_SIZE * 3;
-    int barHeight = 24;
+    int barWidth = GamePanel.TILE_SIZE * HUD_BAR_WIDTH_TILES;
+    int barHeight = HUD_BAR_HEIGHT;
 
-    int x = GamePanel.TILE_SIZE;
-    int y = GamePanel.TILE_SIZE / 2;
+    int x = GamePanel.TILE_SIZE * HUD_BASE_X_TILES;
+    int y = GamePanel.TILE_SIZE / HUD_BASE_Y_DIVISOR;
 
     // HP
     HudBarLayout lifeLayout = new HudBarLayout(x, y, barWidth, barHeight);
@@ -49,7 +94,7 @@ class HudUi {
         COL_HP);
 
     // MP
-    y += barHeight + 8;
+    y += barHeight + HUD_BAR_SPACING;
     HudBarLayout manaLayout = new HudBarLayout(x, y, barWidth, barHeight);
     drawHudBar(
         manaLayout,
@@ -61,7 +106,7 @@ class HudUi {
     // Guard Stamina
     int guardMax = player.getMaxGuardStamina();
     if (guardMax > 0) {
-      y += barHeight + 8;
+      y += barHeight + HUD_BAR_SPACING;
       HudBarLayout guardLayout = new HudBarLayout(x, y, barWidth, barHeight);
       drawHudBar(
           guardLayout,
@@ -89,15 +134,15 @@ class HudUi {
 
     Graphics2D g2 = ui.g2;
 
-    int barWidth = GamePanel.TILE_SIZE * 3;
-    int barHeight = 24;
-    int spacing = 8;
+    int barWidth = GamePanel.TILE_SIZE * HUD_BAR_WIDTH_TILES;
+    int barHeight = HUD_BAR_HEIGHT;
+    int spacing = HUD_BAR_SPACING;
 
-    int baseX = GamePanel.TILE_SIZE;
-    int baseY = GamePanel.TILE_SIZE / 2;
+    int baseX = GamePanel.TILE_SIZE * HUD_BASE_X_TILES;
+    int baseY = GamePanel.TILE_SIZE / HUD_BASE_Y_DIVISOR;
 
     // Posiciona logo abaixo de HP/MP/(Guard)
-    int y = baseY + (barHeight + spacing) * 2;
+    int y = baseY + (barHeight + spacing) * PET_HUD_VERTICAL_OFFSET_BARS;
     if (player.getMaxGuardStamina() > 0) {
       y += barHeight + spacing;
     }
@@ -105,16 +150,18 @@ class HudUi {
     int panelX = baseX;
     int panelY = y;
     int panelWidth = barWidth;
-    int panelHeight = 22;
+    int panelHeight = PET_PANEL_HEIGHT;
 
     // Fundo do painel
     g2.setColor(COL_PANEL_BG);
-    g2.fillRoundRect(panelX - 2, panelY - 2, panelWidth + 4, panelHeight + 4, 8, 8);
+    g2.fillRoundRect(panelX - PANEL_INSET, panelY - PANEL_INSET, panelWidth + PANEL_INSET * 2,
+        panelHeight + PANEL_INSET * 2, PANEL_ROUND, PANEL_ROUND);
 
     var oldStroke = g2.getStroke();
     g2.setStroke(new BasicStroke(2f));
     g2.setColor(UI.COL_PANEL_BORDER);
-    g2.drawRoundRect(panelX - 2, panelY - 2, panelWidth + 4, panelHeight + 4, 8, 8);
+    g2.drawRoundRect(panelX - PANEL_INSET, panelY - PANEL_INSET, panelWidth + PANEL_INSET * 2,
+        panelHeight + PANEL_INSET * 2, PANEL_ROUND, PANEL_ROUND);
     g2.setStroke(oldStroke);
 
     // Ícone do pet
@@ -135,8 +182,8 @@ class HudUi {
       g2.drawImage(icon, iconX, iconY, iconSize, iconSize, null);
     }
 
-    int textX = iconX + iconSize + 6;
-    int textY = panelY + 14;
+    int textX = iconX + iconSize + PET_ICON_TO_TEXT_GAP;
+    int textY = panelY + PET_TEXT_Y_OFFSET;
 
     int level = pet.getPetLevel();
     int exp = pet.getPetExp();
@@ -150,19 +197,19 @@ class HudUi {
 
     // Barra de XP mini
     int xpBarWidth = panelWidth - (textX - panelX) - 8;
-    int xpBarHeight = 6;
+    int xpBarHeight = PET_XP_BAR_HEIGHT;
     int xpBarX = textX;
-    int xpBarY = panelY + panelHeight - xpBarHeight - 4;
+    int xpBarY = panelY + panelHeight - xpBarHeight - PET_XP_BAR_BOTTOM_PADDING;
 
     double ratio = (next > 0) ? Math.min(1.0, exp / (double) next) : 0.0;
     int filledWidth = (int) (xpBarWidth * ratio);
 
     g2.setColor(COL_PANEL_BG_DIM);
-    g2.fillRoundRect(xpBarX, xpBarY, xpBarWidth, xpBarHeight, 4, 4);
+    g2.fillRoundRect(xpBarX, xpBarY, xpBarWidth, xpBarHeight, PET_XP_BAR_ROUND, PET_XP_BAR_ROUND);
 
     if (filledWidth > 0) {
       g2.setColor(UI.COL_ACCENT);
-      g2.fillRoundRect(xpBarX, xpBarY, filledWidth, xpBarHeight, 4, 4);
+      g2.fillRoundRect(xpBarX, xpBarY, filledWidth, xpBarHeight, PET_XP_BAR_ROUND, PET_XP_BAR_ROUND);
     }
   }
 
@@ -183,7 +230,7 @@ class HudUi {
     int x = 0;
     int y = 0;
     int width = GamePanel.SCREEN_WIDTH;
-    int height = 6;
+    int height = TOP_XP_BAR_HEIGHT;
 
     // Fundo da barra
     g2.setColor(COL_XP_BG);
@@ -217,30 +264,32 @@ class HudUi {
     int height = layout.height();
 
     g2.setColor(COL_PANEL_BG);
-    g2.fillRoundRect(x - 2, y - 2, width + 4, height + 4, 8, 8);
+    g2.fillRoundRect(x - PANEL_INSET, y - PANEL_INSET, width + PANEL_INSET * 2, height + PANEL_INSET * 2,
+        PANEL_ROUND, PANEL_ROUND);
 
     var oldStroke = g2.getStroke();
     g2.setStroke(new BasicStroke(2f));
     g2.setColor(UI.COL_PANEL_BORDER);
-    g2.drawRoundRect(x - 2, y - 2, width + 4, height + 4, 8, 8);
+    g2.drawRoundRect(x - PANEL_INSET, y - PANEL_INSET, width + PANEL_INSET * 2, height + PANEL_INSET * 2,
+        PANEL_ROUND, PANEL_ROUND);
     g2.setStroke(oldStroke);
 
     if (max > 0 && current > 0) {
       int clamped = Math.min(current, max);
       int filledWidth = (int) (width * (clamped / (double) max));
       g2.setColor(fillColor);
-      g2.fillRoundRect(x, y, filledWidth, height, 8, 8);
+      g2.fillRoundRect(x, y, filledWidth, height, PANEL_ROUND, PANEL_ROUND);
     }
 
     String text = label + " " + current + "/" + max;
     g2.setFont(ui.fonts.pixelBold(18F));
 
     var fm = g2.getFontMetrics();
-    int textX = x + 8;
+    int textX = x + TEXT_PADDING_X;
     int textY = y + (height - fm.getHeight()) / 2 + fm.getAscent();
 
     g2.setColor(Color.black);
-    g2.drawString(text, textX + 1, textY + 1);
+    g2.drawString(text, textX + SHADOW_OFFSET, textY + SHADOW_OFFSET);
     g2.setColor(UI.COL_TEXT);
     g2.drawString(text, textX, textY);
   }
@@ -280,42 +329,42 @@ class HudUi {
     g2.setColor(COL_MONSTER_BAR_BG);
     g2.fillRect(
         monster.getScreenX() - 1,
-        monster.getScreenY() - 16,
+        monster.getScreenY() - MONSTER_HP_BAR_Y_OFFSET_BG,
         GamePanel.TILE_SIZE + 2,
-        12);
+        MONSTER_HP_BAR_BG_HEIGHT);
 
     g2.setColor(COL_MONSTER_BAR_FILL);
     g2.fillRect(
         monster.getScreenX(),
-        monster.getScreenY() - 15,
+        monster.getScreenY() - MONSTER_HP_BAR_FILL_Y_OFFSET,
         (int) hpBarValue,
-        10);
+        MONSTER_HP_BAR_FILL_HEIGHT);
 
     monster.setHpBarCounter(monster.getHpBarCounter() + 1);
-    if (monster.getHpBarCounter() > 600) {
+    if (monster.getHpBarCounter() > MONSTER_HP_BAR_TIMEOUT) {
       monster.setHpBarCounter(0);
       monster.setHpBarOn(false);
     }
   }
 
   private void drawBossHpBar(Graphics2D g2, Entity monster) {
-    double oneScale = (double) GamePanel.TILE_SIZE * 8 / monster.getMaxLife();
+    double oneScale = (double) GamePanel.TILE_SIZE * BOSS_HP_BAR_WIDTH_TILES / monster.getMaxLife();
     double hpBarValue = oneScale * monster.getLife();
 
-    int x = GamePanel.SCREEN_WIDTH / 2 - GamePanel.TILE_SIZE * 4;
-    int y = GamePanel.TILE_SIZE * 10;
+    int x = GamePanel.SCREEN_WIDTH / 2 - GamePanel.TILE_SIZE * BOSS_HP_BAR_HALF_WIDTH_TILES;
+    int y = GamePanel.TILE_SIZE * BOSS_HP_BAR_Y_TILES;
 
     g2.setColor(COL_MONSTER_BAR_BG);
-    g2.fillRect(x - 1, y - 1, GamePanel.TILE_SIZE * 8 + 2, 22);
+    g2.fillRect(x - 1, y - 1, GamePanel.TILE_SIZE * BOSS_HP_BAR_WIDTH_TILES + 2, BOSS_HP_BAR_BG_HEIGHT);
 
     g2.setColor(COL_MONSTER_BAR_FILL);
-    g2.fillRect(x, y, (int) hpBarValue, 20);
+    g2.fillRect(x, y, (int) hpBarValue, BOSS_HP_BAR_HEIGHT);
 
     g2.setFont(ui.fonts.pixelBold(24F));
     g2.setColor(Color.white);
 
     String bossName = monster.getDisplayName();
-    g2.drawString(bossName, x + 4, y - 10);
+    g2.drawString(bossName, x + BOSS_HP_NAME_X_OFFSET, y - BOSS_HP_NAME_Y_OFFSET);
   }
 
   /** Indicador discreto do clima atual no canto superior direito. */
@@ -335,15 +384,15 @@ class HudUi {
     g2.setFont(ui.fonts.pixelBold(12F));
     g2.setColor(new Color(255, 255, 255, 140));
     var fm = g2.getFontMetrics();
-    int x = GamePanel.SCREEN_WIDTH - fm.stringWidth(label) - 12;
-    int y = 22;
+    int x = GamePanel.SCREEN_WIDTH - fm.stringWidth(label) - WEATHER_LABEL_X_PADDING;
+    int y = WEATHER_LABEL_Y;
     g2.drawString(label, x, y);
   }
 
   void drawMessage() {
     Graphics2D g2 = ui.g2;
-    int messageX = GamePanel.TILE_SIZE;
-    int messageY = GamePanel.TILE_SIZE * 4;
+    int messageX = GamePanel.TILE_SIZE * MESSAGE_START_X_TILES;
+    int messageY = GamePanel.TILE_SIZE * MESSAGE_START_Y_TILES;
 
     g2.setFont(ui.fonts.pixelBold(32F));
 
@@ -362,8 +411,8 @@ class HudUi {
         g2.drawString(message, messageX, messageY);
 
         counter++;
-        messageY += 40;
-        keep = counter <= 180;
+        messageY += MESSAGE_LINE_HEIGHT;
+        keep = counter <= MESSAGE_DURATION_FRAMES;
       }
 
       if (keep) {
@@ -396,10 +445,10 @@ class HudUi {
       }
     }
 
-    int frameX = GamePanel.TILE_SIZE;
-    int frameY = GamePanel.TILE_SIZE * 5;
-    int frameWidth = GamePanel.TILE_SIZE * 5;
-    int frameHeight = GamePanel.TILE_SIZE * 2;
+    int frameX = GamePanel.TILE_SIZE * CLOCK_FRAME_X_TILES;
+    int frameY = GamePanel.TILE_SIZE * CLOCK_FRAME_Y_TILES;
+    int frameWidth = GamePanel.TILE_SIZE * CLOCK_FRAME_WIDTH_TILES;
+    int frameHeight = GamePanel.TILE_SIZE * CLOCK_FRAME_HEIGHT_TILES;
 
     int currentArea = gp.getCurrentArea();
     if (currentArea == GamePanel.OUTSIDE || currentArea == GamePanel.DUNGEON) {
@@ -408,17 +457,17 @@ class HudUi {
 
     // Fundo do painel zeldiano
     g2.setColor(UI.COL_PANEL);
-    g2.fillRoundRect(frameX, frameY, frameWidth, frameHeight, 14, 14);
+    g2.fillRoundRect(frameX, frameY, frameWidth, frameHeight, CLOCK_PANEL_ROUND, CLOCK_PANEL_ROUND);
 
     var oldStroke = g2.getStroke();
     g2.setStroke(new BasicStroke(3f));
     g2.setColor(UI.COL_PANEL_BORDER);
-    g2.drawRoundRect(frameX, frameY, frameWidth, frameHeight, 14, 14);
+    g2.drawRoundRect(frameX, frameY, frameWidth, frameHeight, CLOCK_PANEL_ROUND, CLOCK_PANEL_ROUND);
     g2.setStroke(oldStroke);
 
     // Ícone do relógio
     if (clockImage != null) {
-      g2.drawImage(clockImage, frameX + 10, frameY + 24, null);
+      g2.drawImage(clockImage, frameX + CLOCK_ICON_X_OFFSET, frameY + CLOCK_ICON_Y_OFFSET, null);
     }
 
     g2.setFont(ui.fonts.pixelBold(24F));
@@ -443,11 +492,11 @@ class HudUi {
       }
     }
 
-    int textX = frameX + GamePanel.TILE_SIZE + 10;
-    int textY = frameY + 36;
+    int textX = frameX + GamePanel.TILE_SIZE + CLOCK_TEXT_X_OFFSET;
+    int textY = frameY + CLOCK_TEXT_Y_OFFSET;
     g2.drawString(timeStr, textX, textY);
 
     g2.setFont(ui.fonts.pixelPlain(18F));
-    g2.drawString(weatherStr, textX, textY + 24);
+    g2.drawString(weatherStr, textX, textY + CLOCK_WEATHER_Y_OFFSET);
   }
 }
