@@ -47,6 +47,77 @@ public class BestiaryUi {
   private static final int LINE_H = 24;
   private static final int ITEM_H = 52;
   private static final int MAX_VISIBLE_ITEMS = 8;
+  private static final int LIST_FRAME_X_TILES = 1;
+  private static final int LIST_FRAME_Y_DIVISOR = 2;
+  private static final int LIST_FRAME_HORIZONTAL_MARGIN_TILES = 2;
+  private static final int LIST_FRAME_BOTTOM_MARGIN_TILES = 1;
+  private static final int LIST_TITLE_Y_OFFSET = 10;
+  private static final int LIST_TITLE_SPACING = 36;
+  private static final int HINT_BOTTOM_Y_OFFSET = 30;
+  private static final int CLASS_ITEM_SELECTED_X_OFFSET = 4;
+  private static final int CLASS_ITEM_SELECTED_Y_OFFSET = 4;
+  private static final int CLASS_ITEM_SELECTED_WIDTH_OFFSET = 8;
+  private static final int CLASS_ITEM_HEIGHT_OFFSET = 4;
+  private static final int CLASS_NAME_X_OFFSET = 8;
+  private static final int CLASS_NAME_Y_OFFSET = 22;
+  private static final int CLASS_COUNT_RIGHT_OFFSET = 8;
+  private static final int SEARCH_BOX_Y_OFFSET = 16;
+  private static final int SEARCH_BOX_HEIGHT = 24;
+  private static final int SEARCH_BOX_ROUND = 6;
+  private static final int SEARCH_TEXT_X_OFFSET = 6;
+  private static final int SEARCH_SECTION_SPACING = 28;
+  private static final int CREATURE_ITEM_SELECTED_Y_OFFSET = 8;
+  private static final int CREATURE_SPRITE_SIZE = 40;
+  private static final int CREATURE_SPRITE_Y_OFFSET = 4;
+  private static final int CREATURE_SPRITE_ROUND = 6;
+  private static final int CREATURE_SILHOUETTE_MARGIN = 8;
+  private static final int CREATURE_NAME_X_OFFSET = 12;
+  private static final int CREATURE_NAME_Y_OFFSET = 14;
+  private static final int MINI_PROGRESS_WIDTH = 120;
+  private static final int MINI_PROGRESS_HEIGHT = 10;
+  private static final int STAGE_LABEL_RIGHT_OFFSET = 8;
+  private static final int SCROLL_INFO_RIGHT_OFFSET = 80;
+  private static final int SCROLL_INFO_BOTTOM_OFFSET = 40;
+  private static final int DETAIL_FRAME_X_DIVISOR = 2;
+  private static final int DETAIL_FRAME_Y_DIVISOR = 4;
+  private static final int DETAIL_FRAME_HORIZONTAL_MARGIN_TILES = 1;
+  private static final int DETAIL_FRAME_BOTTOM_DIVISOR = 2;
+  private static final int DETAIL_TEXT_Y_OFFSET = 8;
+  private static final int DETAIL_HEADER_SIZE_EXTRA = 16;
+  private static final int DETAIL_HEADER_ROUND = 10;
+  private static final int DETAIL_HEADER_ICON_MARGIN = 8;
+  private static final int DETAIL_INFO_X_OFFSET = 16;
+  private static final int DETAIL_INFO_Y_OFFSET = 8;
+  private static final int DETAIL_NAME_Y_OFFSET = 14;
+  private static final int DETAIL_DIFF_SPACING = 28;
+  private static final int DETAIL_RARITY_SPACING = 20;
+  private static final int DETAIL_PROGRESS_SPACING = 24;
+  private static final int DETAIL_PROGRESS_WIDTH = 260;
+  private static final int DETAIL_PROGRESS_HEIGHT = 14;
+  private static final int DETAIL_BLOCK_Y_OFFSET = 20;
+  private static final int DETAIL_BLOCK_INNER_PADDING = 8;
+  private static final int DETAIL_BLOCK_INNER_WIDTH_REDUCTION = 16;
+  private static final int STAT_VALUE_X_OFFSET = 40;
+  private static final int SPEED_VALUE_X_OFFSET = 120;
+  private static final int ARMOR_VALUE_X_OFFSET = 120;
+  private static final int BEHAVIOR_VALUE_X_OFFSET = 140;
+  private static final int STAGE_EXTRA_GAP_SMALL = 4;
+  private static final int STAGE_EXTRA_GAP_MEDIUM = 8;
+  private static final int STAGE_EXTRA_GAP_LARGE = 12;
+  private static final int STAGE_BLOCK_HEADER_HEIGHT = 28;
+  private static final int STAGE_BLOCK_ROUND = 6;
+  private static final int STAGE_BLOCK_TITLE_X_OFFSET = 8;
+  private static final int STAGE_BLOCK_TITLE_Y_OFFSET = 19;
+  private static final int STAGE_BLOCK_LOCKED_TEXT_Y_OFFSET = 14;
+  private static final int PROGRESS_BAR_ROUND = 6;
+  private static final int PROGRESS_TEXT_X = 4;
+  private static final int PROGRESS_TEXT_Y_BOTTOM = 4;
+  private static final int PROGRESS_TEXT_SHADOW_OFFSET = 1;
+  private static final int MINI_PROGRESS_ROUND = 4;
+  private static final Color COL_DETAIL_HEADER_BG = new Color(10, 10, 15, 190);
+  private static final Color COL_RARITY = new Color(200, 80, 255);
+  private static final Color COL_STAGE_HEADER_UNLOCKED = new Color(20, 35, 55);
+  private static final Color COL_STAGE_HEADER_LOCKED = new Color(25, 25, 35);
 
   private final UI ui;
 
@@ -135,15 +206,15 @@ public class BestiaryUi {
     BestiaryService service = gp.getBestiaryService();
 
     // Fundo
-    int frameX = GamePanel.TILE_SIZE;
-    int frameY = GamePanel.TILE_SIZE / 2;
-    int frameW = GamePanel.SCREEN_WIDTH - GamePanel.TILE_SIZE * 2;
-    int frameH = GamePanel.SCREEN_HEIGHT - GamePanel.TILE_SIZE;
+    int frameX = GamePanel.TILE_SIZE * LIST_FRAME_X_TILES;
+    int frameY = GamePanel.TILE_SIZE / LIST_FRAME_Y_DIVISOR;
+    int frameW = GamePanel.SCREEN_WIDTH - GamePanel.TILE_SIZE * LIST_FRAME_HORIZONTAL_MARGIN_TILES;
+    int frameH = GamePanel.SCREEN_HEIGHT - GamePanel.TILE_SIZE * LIST_FRAME_BOTTOM_MARGIN_TILES;
     ui.drawSubWindow(frameX, frameY, frameW, frameH);
 
     // Título
     int textX = frameX + FRAME_PADDING;
-    int textY = frameY + FRAME_PADDING + 10;
+    int textY = frameY + FRAME_PADDING + LIST_TITLE_Y_OFFSET;
 
     g2.setFont(ui.fonts.pixelBold(28F));
     ui.drawTextShadow(ui.t("bestiary.title"), textX, textY, UI.COL_TEXT, Color.black, 2);
@@ -156,7 +227,7 @@ public class BestiaryUi {
         - g2.getFontMetrics().stringWidth(pointsText);
     g2.drawString(pointsText, pointsX, textY);
 
-    textY += 36;
+    textY += LIST_TITLE_SPACING;
 
     // Lista de classes
     List<CreatureClass> classes = service.getRegistry().getOrderedClasses();
@@ -171,13 +242,19 @@ public class BestiaryUi {
       // Fundo de seleção
       if (selected) {
         g2.setColor(UI.COL_HIGHLIGHT_BG);
-        g2.fillRoundRect(textX - 4, itemY - 4, frameW - FRAME_PADDING * 2 + 8, ITEM_H - 4, 8, 8);
+        g2.fillRoundRect(
+            textX - CLASS_ITEM_SELECTED_X_OFFSET,
+            itemY - CLASS_ITEM_SELECTED_Y_OFFSET,
+            frameW - FRAME_PADDING * 2 + CLASS_ITEM_SELECTED_WIDTH_OFFSET,
+            ITEM_H - CLASS_ITEM_HEIGHT_OFFSET,
+            STAGE_BLOCK_ROUND,
+            STAGE_BLOCK_ROUND);
       }
 
       // Nome da classe
       g2.setFont(ui.fonts.pixelBold(22F));
       g2.setColor(selected ? UI.COL_ACCENT : UI.COL_TEXT);
-      g2.drawString(ui.t(cc.getTranslationKey()), textX + 8, itemY + 22);
+      g2.drawString(ui.t(cc.getTranslationKey()), textX + CLASS_NAME_X_OFFSET, itemY + CLASS_NAME_Y_OFFSET);
 
       // Contador
       int total = service.getRegistry().getCreaturesByClass(cc).size();
@@ -188,12 +265,12 @@ public class BestiaryUi {
       g2.setColor(UI.COL_TEXT_DIM);
       String countText = known + "/" + total
           + "  (" + ui.t("bestiary.completed") + ": " + completed + ")";
-      int countX = frameX + frameW - FRAME_PADDING - g2.getFontMetrics().stringWidth(countText) - 8;
-      g2.drawString(countText, countX, itemY + 22);
+      int countX = frameX + frameW - FRAME_PADDING - g2.getFontMetrics().stringWidth(countText) - CLASS_COUNT_RIGHT_OFFSET;
+      g2.drawString(countText, countX, itemY + CLASS_NAME_Y_OFFSET);
     }
 
     // Hint
-    drawHint(g2, frameX, frameY + frameH - 30, frameW,
+    drawHint(g2, frameX, frameY + frameH - HINT_BOTTOM_Y_OFFSET, frameW,
         ui.t("bestiary.hint.classNav"));
   }
 
@@ -209,30 +286,31 @@ public class BestiaryUi {
     var gp = ui.getGamePanel();
     BestiaryService service = gp.getBestiaryService();
 
-    int frameX = GamePanel.TILE_SIZE;
-    int frameY = GamePanel.TILE_SIZE / 2;
-    int frameW = GamePanel.SCREEN_WIDTH - GamePanel.TILE_SIZE * 2;
-    int frameH = GamePanel.SCREEN_HEIGHT - GamePanel.TILE_SIZE;
+    int frameX = GamePanel.TILE_SIZE * LIST_FRAME_X_TILES;
+    int frameY = GamePanel.TILE_SIZE / LIST_FRAME_Y_DIVISOR;
+    int frameW = GamePanel.SCREEN_WIDTH - GamePanel.TILE_SIZE * LIST_FRAME_HORIZONTAL_MARGIN_TILES;
+    int frameH = GamePanel.SCREEN_HEIGHT - GamePanel.TILE_SIZE * LIST_FRAME_BOTTOM_MARGIN_TILES;
     ui.drawSubWindow(frameX, frameY, frameW, frameH);
 
     int textX = frameX + FRAME_PADDING;
-    int textY = frameY + FRAME_PADDING + 10;
+    int textY = frameY + FRAME_PADDING + LIST_TITLE_Y_OFFSET;
 
     // Título: nome da classe
     g2.setFont(ui.fonts.pixelBold(26F));
     ui.drawTextShadow(ui.t(safeClass.getTranslationKey()),
         textX, textY, UI.COL_TEXT, Color.black, 2);
 
-    textY += 36;
+    textY += LIST_TITLE_SPACING;
 
     // Pesquisa
     if (searchMode) {
       g2.setColor(COL_SEARCH_BG);
-      g2.fillRoundRect(textX, textY - 16, frameW - FRAME_PADDING * 2, 24, 6, 6);
+      g2.fillRoundRect(textX, textY - SEARCH_BOX_Y_OFFSET, frameW - FRAME_PADDING * 2, SEARCH_BOX_HEIGHT,
+          SEARCH_BOX_ROUND, SEARCH_BOX_ROUND);
       g2.setFont(ui.fonts.pixelPlain(18F));
       g2.setColor(UI.COL_ACCENT);
-      g2.drawString("> " + searchQuery + "_", textX + 6, textY);
-      textY += 28;
+      g2.drawString("> " + searchQuery + "_", textX + SEARCH_TEXT_X_OFFSET, textY);
+      textY += SEARCH_SECTION_SPACING;
     }
 
     // Lista de criaturas (usa safeClass para thread-safety)
@@ -254,20 +332,30 @@ public class BestiaryUi {
       // Fundo de seleção
       if (selected) {
         g2.setColor(UI.COL_HIGHLIGHT_BG);
-        g2.fillRoundRect(textX - 4, itemY - 8, frameW - FRAME_PADDING * 2 + 8, ITEM_H - 4, 8, 8);
+        g2.fillRoundRect(
+            textX - CLASS_ITEM_SELECTED_X_OFFSET,
+            itemY - CREATURE_ITEM_SELECTED_Y_OFFSET,
+            frameW - FRAME_PADDING * 2 + CLASS_ITEM_SELECTED_WIDTH_OFFSET,
+            ITEM_H - CLASS_ITEM_HEIGHT_OFFSET,
+            STAGE_BLOCK_ROUND,
+            STAGE_BLOCK_ROUND);
       }
 
       // Sprite ou silhueta
       int spriteX = textX + 4;
-      int spriteY = itemY - 4;
-      int spriteSize = 40;
+      int spriteY = itemY - CREATURE_SPRITE_Y_OFFSET;
+      int spriteSize = CREATURE_SPRITE_SIZE;
 
       if (stage == BestiaryStage.LOCKED) {
         // Silhueta
         g2.setColor(COL_LOCKED);
-        g2.fillRoundRect(spriteX, spriteY, spriteSize, spriteSize, 6, 6);
+        g2.fillRoundRect(spriteX, spriteY, spriteSize, spriteSize, CREATURE_SPRITE_ROUND, CREATURE_SPRITE_ROUND);
         g2.setColor(COL_SILHOUETTE);
-        g2.fillOval(spriteX + 8, spriteY + 8, spriteSize - 16, spriteSize - 16);
+        g2.fillOval(
+            spriteX + CREATURE_SILHOUETTE_MARGIN,
+            spriteY + CREATURE_SILHOUETTE_MARGIN,
+            spriteSize - CREATURE_SILHOUETTE_MARGIN * 2,
+            spriteSize - CREATURE_SILHOUETTE_MARGIN * 2);
       } else {
         // Sprite real
         BufferedImage sprite = service.getCreatureSprite(creature);
@@ -275,25 +363,25 @@ public class BestiaryUi {
           g2.drawImage(sprite, spriteX, spriteY, spriteSize, spriteSize, null);
         } else {
           g2.setColor(COL_LOCKED);
-          g2.fillRoundRect(spriteX, spriteY, spriteSize, spriteSize, 6, 6);
+          g2.fillRoundRect(spriteX, spriteY, spriteSize, spriteSize, CREATURE_SPRITE_ROUND, CREATURE_SPRITE_ROUND);
         }
       }
 
       // Nome
-      int nameX = spriteX + spriteSize + 12;
+      int nameX = spriteX + spriteSize + CREATURE_NAME_X_OFFSET;
       g2.setFont(ui.fonts.pixelBold(20F));
 
       if (stage == BestiaryStage.LOCKED) {
         g2.setColor(COL_STAGE_LOCKED);
-        g2.drawString("???", nameX, itemY + 14);
+        g2.drawString("???", nameX, itemY + CREATURE_NAME_Y_OFFSET);
       } else {
         g2.setColor(selected ? UI.COL_ACCENT : UI.COL_TEXT);
-        g2.drawString(service.getCreatureDisplayName(creature), nameX, itemY + 14);
+        g2.drawString(service.getCreatureDisplayName(creature), nameX, itemY + CREATURE_NAME_Y_OFFSET);
       }
 
       // Estágio / Barra de progresso (compacta)
       if (stage != BestiaryStage.LOCKED) {
-        drawMiniProgressBar(g2, nameX, itemY + 22, 120, 10, creature, service);
+        drawMiniProgressBar(g2, nameX, itemY + CLASS_NAME_Y_OFFSET, MINI_PROGRESS_WIDTH, MINI_PROGRESS_HEIGHT, creature, service);
       }
 
       // Indicador de estágio
@@ -301,8 +389,8 @@ public class BestiaryUi {
       g2.setFont(ui.fonts.pixelPlain(16F));
       g2.setColor(stage == BestiaryStage.COMPLETED ? COL_STAGE_DONE : UI.COL_TEXT_DIM);
       int stageLabelX = frameX + frameW - FRAME_PADDING
-          - g2.getFontMetrics().stringWidth(stageLabel) - 8;
-      g2.drawString(stageLabel, stageLabelX, itemY + 14);
+          - g2.getFontMetrics().stringWidth(stageLabel) - STAGE_LABEL_RIGHT_OFFSET;
+      g2.drawString(stageLabel, stageLabelX, itemY + CREATURE_NAME_Y_OFFSET);
     }
 
     // Scroll indicator
@@ -312,11 +400,12 @@ public class BestiaryUi {
       String scrollText = (scrollOffset + 1) + "-"
           + Math.min(scrollOffset + MAX_VISIBLE_ITEMS, creatures.size())
           + " / " + creatures.size();
-      g2.drawString(scrollText, frameX + frameW - FRAME_PADDING - 80, frameY + frameH - 40);
+      g2.drawString(scrollText, frameX + frameW - FRAME_PADDING - SCROLL_INFO_RIGHT_OFFSET,
+          frameY + frameH - SCROLL_INFO_BOTTOM_OFFSET);
     }
 
     // Hint
-    drawHint(g2, frameX, frameY + frameH - 30, frameW,
+    drawHint(g2, frameX, frameY + frameH - HINT_BOTTOM_Y_OFFSET, frameW,
         ui.t("bestiary.hint.creatureNav"));
   }
 
@@ -338,36 +427,41 @@ public class BestiaryUi {
     BestiaryProgress progress = service.getProgress(creature.getId());
     BestiaryStage stage = progress.getStage(creature.getDifficulty(), creature.getRarity());
 
-    int frameX = GamePanel.TILE_SIZE / 2;
-    int frameY = GamePanel.TILE_SIZE / 4;
-    int frameW = GamePanel.SCREEN_WIDTH - GamePanel.TILE_SIZE;
-    int frameH = GamePanel.SCREEN_HEIGHT - GamePanel.TILE_SIZE / 2;
+    int frameX = GamePanel.TILE_SIZE / DETAIL_FRAME_X_DIVISOR;
+    int frameY = GamePanel.TILE_SIZE / DETAIL_FRAME_Y_DIVISOR;
+    int frameW = GamePanel.SCREEN_WIDTH - GamePanel.TILE_SIZE * DETAIL_FRAME_HORIZONTAL_MARGIN_TILES;
+    int frameH = GamePanel.SCREEN_HEIGHT - GamePanel.TILE_SIZE / DETAIL_FRAME_BOTTOM_DIVISOR;
     ui.drawSubWindow(frameX, frameY, frameW, frameH);
 
     int textX = frameX + FRAME_PADDING;
-    int textY = frameY + FRAME_PADDING + 8;
+    int textY = frameY + FRAME_PADDING + DETAIL_TEXT_Y_OFFSET;
 
     // === Cabeçalho: Sprite + Nome + Dificuldade + Raridade ===
-    int headerSpriteSize = GamePanel.TILE_SIZE + 16;
+    int headerSpriteSize = GamePanel.TILE_SIZE + DETAIL_HEADER_SIZE_EXTRA;
     BufferedImage sprite = service.getCreatureSprite(creature);
     if (sprite != null) {
       // Fundo do sprite
-      g2.setColor(new Color(10, 10, 15, 190));
-      g2.fillRoundRect(textX, textY, headerSpriteSize, headerSpriteSize, 10, 10);
-      g2.drawImage(sprite, textX + 8, textY + 8,
-          headerSpriteSize - 16, headerSpriteSize - 16, null);
+      g2.setColor(COL_DETAIL_HEADER_BG);
+      g2.fillRoundRect(textX, textY, headerSpriteSize, headerSpriteSize, DETAIL_HEADER_ROUND, DETAIL_HEADER_ROUND);
+      g2.drawImage(
+          sprite,
+          textX + DETAIL_HEADER_ICON_MARGIN,
+          textY + DETAIL_HEADER_ICON_MARGIN,
+          headerSpriteSize - DETAIL_HEADER_ICON_MARGIN * 2,
+          headerSpriteSize - DETAIL_HEADER_ICON_MARGIN * 2,
+          null);
     }
 
-    int infoX = textX + headerSpriteSize + 16;
-    int infoY = textY + 8;
+    int infoX = textX + headerSpriteSize + DETAIL_INFO_X_OFFSET;
+    int infoY = textY + DETAIL_INFO_Y_OFFSET;
 
     // Nome
     g2.setFont(ui.fonts.pixelBold(26F));
     g2.setColor(UI.COL_TEXT);
-    g2.drawString(service.getCreatureDisplayName(creature), infoX, infoY + 14);
+    g2.drawString(service.getCreatureDisplayName(creature), infoX, infoY + DETAIL_NAME_Y_OFFSET);
 
     // Dificuldade + Raridade
-    infoY += 28;
+    infoY += DETAIL_DIFF_SPACING;
     g2.setFont(ui.fonts.pixelPlain(18F));
     g2.setColor(COL_DIFFICULTY);
     String diffText = ui.t("bestiary.difficulty") + ": "
@@ -375,17 +469,17 @@ public class BestiaryUi {
     g2.drawString(diffText, infoX, infoY);
 
     if (creature.getRarity() != bestiary.BestiaryRarity.NORMAL) {
-      infoY += 20;
-      g2.setColor(new Color(200, 80, 255));
+      infoY += DETAIL_RARITY_SPACING;
+      g2.setColor(COL_RARITY);
       g2.drawString(ui.t("bestiary.rarity." + creature.getRarity().name()), infoX, infoY);
     }
 
     // Barra de progresso
-    infoY += 24;
-    drawProgressBar(g2, infoX, infoY, 260, 14, creature, progress, service);
+    infoY += DETAIL_PROGRESS_SPACING;
+    drawProgressBar(g2, infoX, infoY, DETAIL_PROGRESS_WIDTH, DETAIL_PROGRESS_HEIGHT, creature, progress, service);
 
     // === Blocos de informação por estágio ===
-    int blockY = textY + headerSpriteSize + 20;
+    int blockY = textY + headerSpriteSize + DETAIL_BLOCK_Y_OFFSET;
     int blockX = textX;
     int blockW = frameW - FRAME_PADDING * 2;
 
@@ -396,22 +490,40 @@ public class BestiaryUi {
     blockY = drawStageBlock(g2, blockX, blockY, blockW,
         ui.t("bestiary.stage1.title"),
         stage.ordinal() >= BestiaryStage.STAGE_1.ordinal(),
-        () -> drawStage1Content(g2, blockX + 8, blockW - 16, creature, progress, service));
+        () -> drawStage1Content(
+            g2,
+            blockX + DETAIL_BLOCK_INNER_PADDING,
+            blockW - DETAIL_BLOCK_INNER_WIDTH_REDUCTION,
+            creature,
+            progress,
+            service));
 
     // Estágio 2: Drops incomuns + Resistências + Localizações
     blockY = drawStageBlock(g2, blockX, blockY, blockW,
         ui.t("bestiary.stage2.title"),
         stage.ordinal() >= BestiaryStage.STAGE_2.ordinal(),
-        () -> drawStage2Content(g2, blockX + 8, blockW - 16, creature, progress, service));
+        () -> drawStage2Content(
+            g2,
+            blockX + DETAIL_BLOCK_INNER_PADDING,
+            blockW - DETAIL_BLOCK_INNER_WIDTH_REDUCTION,
+            creature,
+            progress,
+            service));
 
     // Estágio Final: Drops raros + Pontos
     drawStageBlock(g2, blockX, blockY, blockW,
         ui.t("bestiary.stageFinal.title"),
         stage == BestiaryStage.COMPLETED,
-        () -> drawStageFinalContent(g2, blockX + 8, blockW - 16, creature, progress, service));
+        () -> drawStageFinalContent(
+            g2,
+            blockX + DETAIL_BLOCK_INNER_PADDING,
+            blockW - DETAIL_BLOCK_INNER_WIDTH_REDUCTION,
+            creature,
+            progress,
+            service));
 
     // Hint
-    drawHint(g2, frameX, frameY + frameH - 26, frameW,
+    drawHint(g2, frameX, frameY + frameH - (HINT_BOTTOM_Y_OFFSET - STAGE_EXTRA_GAP_SMALL), frameW,
         ui.t("bestiary.hint.detailNav"));
   }
 
@@ -430,21 +542,21 @@ public class BestiaryUi {
     g2.setColor(UI.COL_TEXT_DIM);
     g2.drawString("HP: ", x, y);
     g2.setColor(UI.COL_TEXT);
-    g2.drawString(String.valueOf(creature.getHp()), x + 40, y);
+    g2.drawString(String.valueOf(creature.getHp()), x + STAT_VALUE_X_OFFSET, y);
     y += LINE_H;
 
     // Velocidade
     g2.setColor(UI.COL_TEXT_DIM);
     g2.drawString(ui.t("bestiary.detail.speed") + ": ", x, y);
     g2.setColor(UI.COL_TEXT);
-    g2.drawString(String.valueOf(creature.getSpeed()), x + 120, y);
+    g2.drawString(String.valueOf(creature.getSpeed()), x + SPEED_VALUE_X_OFFSET, y);
     y += LINE_H;
 
     // Armadura
     g2.setColor(UI.COL_TEXT_DIM);
     g2.drawString(ui.t("bestiary.detail.armor") + ": ", x, y);
     g2.setColor(UI.COL_TEXT);
-    g2.drawString(String.valueOf(creature.getArmor()), x + 120, y);
+    g2.drawString(String.valueOf(creature.getArmor()), x + ARMOR_VALUE_X_OFFSET, y);
     y += LINE_H;
 
     // Comportamento
@@ -455,8 +567,8 @@ public class BestiaryUi {
     if (creature.isUsesSpells()) {
       behaviorText += " + " + ui.t("bestiary.detail.spells");
     }
-    g2.drawString(behaviorText, x + 140, y);
-    y += LINE_H + 4;
+    g2.drawString(behaviorText, x + BEHAVIOR_VALUE_X_OFFSET, y);
+    y += LINE_H + STAGE_EXTRA_GAP_SMALL;
 
     // Drops comuns (COMMON)
     g2.setFont(ui.fonts.pixelBold(18F));
@@ -471,14 +583,14 @@ public class BestiaryUi {
       if (drop.tier() == bestiary.LootTier.COMMON) {
         g2.setColor(UI.COL_TEXT);
         g2.drawString("  - " + getDropDisplayName(drop), x, y);
-        y += LINE_H - 4;
+        y += LINE_H - STAGE_EXTRA_GAP_SMALL;
         hasCommon = true;
       }
     }
     if (!hasCommon) {
       g2.setColor(UI.COL_TEXT_DIM);
       g2.drawString("  " + ui.t("bestiary.detail.noDrops"), x, y);
-      y += LINE_H - 4;
+      y += LINE_H - STAGE_EXTRA_GAP_SMALL;
     }
 
     return y;
@@ -502,17 +614,17 @@ public class BestiaryUi {
       if (drop.tier() == bestiary.LootTier.UNCOMMON) {
         g2.setColor(UI.COL_TEXT);
         g2.drawString("  - " + getDropDisplayName(drop), x, y);
-        y += LINE_H - 4;
+        y += LINE_H - STAGE_EXTRA_GAP_SMALL;
         hasUncommon = true;
       }
     }
     if (!hasUncommon) {
       g2.setColor(UI.COL_TEXT_DIM);
       g2.drawString("  " + ui.t("bestiary.detail.noDrops"), x, y);
-      y += LINE_H - 4;
+      y += LINE_H - STAGE_EXTRA_GAP_SMALL;
     }
 
-    y += 8;
+    y += STAGE_EXTRA_GAP_MEDIUM;
 
     // Resistências
     g2.setFont(ui.fonts.pixelBold(18F));
@@ -536,7 +648,7 @@ public class BestiaryUi {
     for (BestiaryLocation loc : creature.getLocations()) {
       g2.setColor(UI.COL_TEXT);
       g2.drawString("  - " + loc.regionName(), x, y);
-      y += LINE_H - 4;
+      y += LINE_H - STAGE_EXTRA_GAP_SMALL;
     }
 
     return y;
@@ -561,7 +673,7 @@ public class BestiaryUi {
           || drop.tier() == bestiary.LootTier.RARE) {
         g2.setColor(UI.COL_TEXT);
         g2.drawString("  - " + getDropDisplayName(drop), x, y);
-        y += LINE_H - 4;
+        y += LINE_H - STAGE_EXTRA_GAP_SMALL;
         hasRare = true;
       }
     }
@@ -569,9 +681,9 @@ public class BestiaryUi {
     // VERY_RARE revelados
     for (BestiaryDrop drop : visibleDrops) {
       if (drop.tier() == bestiary.LootTier.VERY_RARE) {
-        g2.setColor(new Color(200, 80, 255));
+        g2.setColor(COL_RARITY);
         g2.drawString("  - " + getDropDisplayName(drop) + " ★", x, y);
-        y += LINE_H - 4;
+        y += LINE_H - STAGE_EXTRA_GAP_SMALL;
         hasRare = true;
       }
     }
@@ -579,10 +691,10 @@ public class BestiaryUi {
     if (!hasRare) {
       g2.setColor(UI.COL_TEXT_DIM);
       g2.drawString("  " + ui.t("bestiary.detail.noDrops"), x, y);
-      y += LINE_H - 4;
+      y += LINE_H - STAGE_EXTRA_GAP_SMALL;
     }
 
-    y += 12;
+    y += STAGE_EXTRA_GAP_LARGE;
 
     // Pontos de recompensa
     g2.setFont(ui.fonts.pixelBold(18F));
@@ -608,28 +720,28 @@ public class BestiaryUi {
   private int drawStageBlock(Graphics2D g2, int x, int y, int w,
       String title, boolean unlocked, ContentRenderer renderer) {
 
-    int headerH = 28;
+    int headerH = STAGE_BLOCK_HEADER_HEIGHT;
 
     // Cabeçalho do bloco
-    g2.setColor(unlocked ? new Color(20, 35, 55) : new Color(25, 25, 35));
-    g2.fillRoundRect(x, y, w, headerH, 6, 6);
+    g2.setColor(unlocked ? COL_STAGE_HEADER_UNLOCKED : COL_STAGE_HEADER_LOCKED);
+    g2.fillRoundRect(x, y, w, headerH, STAGE_BLOCK_ROUND, STAGE_BLOCK_ROUND);
 
     g2.setFont(ui.fonts.pixelBold(18F));
     g2.setColor(unlocked ? COL_STAGE_DONE : COL_STAGE_LOCKED);
     String icon = unlocked ? "✓ " : "✗ ";
-    g2.drawString(icon + title, x + 8, y + 19);
+    g2.drawString(icon + title, x + STAGE_BLOCK_TITLE_X_OFFSET, y + STAGE_BLOCK_TITLE_Y_OFFSET);
 
-    y += headerH + 4;
+    y += headerH + STAGE_EXTRA_GAP_SMALL;
 
     if (unlocked) {
       currentContentY = y;
       y = renderer.render();
-      y += 8;
+      y += STAGE_EXTRA_GAP_MEDIUM;
     } else {
       g2.setFont(ui.fonts.pixelPlain(16F));
       g2.setColor(COL_STAGE_LOCKED);
-      g2.drawString("  " + ui.t("bestiary.stage.locked"), x + 8, y + 14);
-      y += LINE_H + 8;
+      g2.drawString("  " + ui.t("bestiary.stage.locked"), x + STAGE_BLOCK_TITLE_X_OFFSET, y + STAGE_BLOCK_LOCKED_TEXT_Y_OFFSET);
+      y += LINE_H + STAGE_EXTRA_GAP_MEDIUM;
     }
 
     return y;
@@ -644,7 +756,7 @@ public class BestiaryUi {
 
     // Fundo
     g2.setColor(COL_PROGRESS_BG);
-    g2.fillRoundRect(x, y, w, h, 6, 6);
+    g2.fillRoundRect(x, y, w, h, PROGRESS_BAR_ROUND, PROGRESS_BAR_ROUND);
 
     // Preenchimento
     if (stage != BestiaryStage.LOCKED) {
@@ -664,7 +776,7 @@ public class BestiaryUi {
       int fillW = (int) (w * ratio);
       if (fillW > 0) {
         g2.setColor(stage == BestiaryStage.COMPLETED ? COL_STAGE_DONE : COL_PROGRESS_FILL);
-        g2.fillRoundRect(x, y, fillW, h, 6, 6);
+        g2.fillRoundRect(x, y, fillW, h, PROGRESS_BAR_ROUND, PROGRESS_BAR_ROUND);
       }
 
       // Texto
@@ -676,9 +788,9 @@ public class BestiaryUi {
         text = kills + " / " + nextTarget;
       }
       g2.setColor(Color.black);
-      g2.drawString(text, x + 5, y + h - 3);
+      g2.drawString(text, x + PROGRESS_TEXT_X + PROGRESS_TEXT_SHADOW_OFFSET, y + h - PROGRESS_TEXT_Y_BOTTOM + PROGRESS_TEXT_SHADOW_OFFSET);
       g2.setColor(UI.COL_TEXT);
-      g2.drawString(text, x + 4, y + h - 4);
+      g2.drawString(text, x + PROGRESS_TEXT_X, y + h - PROGRESS_TEXT_Y_BOTTOM);
     }
   }
 
@@ -688,7 +800,7 @@ public class BestiaryUi {
     BestiaryStage stage = progress.getStage(creature.getDifficulty(), creature.getRarity());
 
     g2.setColor(COL_PROGRESS_BG);
-    g2.fillRoundRect(x, y, w, h, 4, 4);
+    g2.fillRoundRect(x, y, w, h, MINI_PROGRESS_ROUND, MINI_PROGRESS_ROUND);
 
     if (stage != BestiaryStage.LOCKED) {
       int kills = progress.getKills();
@@ -706,7 +818,7 @@ public class BestiaryUi {
 
       int fillW = Math.max(1, (int) (w * ratio));
       g2.setColor(stage == BestiaryStage.COMPLETED ? COL_STAGE_DONE : COL_PROGRESS_FILL);
-      g2.fillRoundRect(x, y, fillW, h, 4, 4);
+      g2.fillRoundRect(x, y, fillW, h, MINI_PROGRESS_ROUND, MINI_PROGRESS_ROUND);
     }
   }
 
