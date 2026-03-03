@@ -1,10 +1,10 @@
-# Workflow do Cursor (Copos) — BitHunter
+# Workflow do Assistente de IA — BitHunter
 
 ## Fluxo obrigatório para qualquer tarefa
 
 ### 1. Preparação (ANTES de escrever código)
-- [ ] Ler `.cursorrules`
-- [ ] Ler os arquivos relevantes em `.cursor/` (pelo menos `architecture.md` e `code_style.md`)
+- [ ] Ler `.ai-rules.md`
+- [ ] Ler os arquivos relevantes em `docs/` (pelo menos `architecture.md` e `code_style.md`)
 - [ ] Entender o escopo exato da tarefa
 - [ ] Identificar quais arquivos serão afetados
 - [ ] Listar riscos (quebra de save, mudança de API, etc.)
@@ -71,7 +71,7 @@ Antes de qualquer push, verificar TODOS os itens abaixo:
 - Fazer merge da branch na main após push
 - Deletar a branch (local + remote) após merge bem-sucedido
 - Responder em Português (pt-BR)
-- Seguir o padrão de resposta do Copos (Diagnóstico → Plano → Execução → Testes → Resumo)
+- Seguir o padrão de resposta (Diagnóstico → Plano → Execução → Testes → Resumo)
 
 ### O que NUNCA fazer
 - Alterar arquivos fora do escopo pedido
