@@ -361,6 +361,7 @@ class OptionsUi {
       "ui.controls.minimap",
       "ui.controls.map",
       "ui.controls.bestiary",
+      "ui.controls.achievements",
   };
 
   /**
