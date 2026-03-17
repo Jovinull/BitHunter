@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import achievement.AchievementManager;
 import bestiary.BestiaryService;
 import entity.Entity;
 import main.GamePanel;
@@ -103,6 +104,7 @@ public class SaveLoad {
     copyIncubatorToStorage(ds);
     copyMapObjectsToStorage(ds);
     copyBestiaryToStorage(ds);
+    copyAchievementsToStorage(ds);
     copyCheatCodesToStorage(ds);
     copyPlayTimeToStorage(ds);
     return ds;
@@ -116,6 +118,7 @@ public class SaveLoad {
     applyPets(ds);
     applyIncubator(ds);
     applyBestiary(ds);
+    applyAchievements(ds);
     applyCheatCodes(ds);
     applyPlayTime(ds);
 
@@ -388,6 +391,21 @@ public class SaveLoad {
         ds.getBestiaryKills(),
         ds.getBestiaryRevealedVeryRare(),
         ds.getBestiaryPoints());
+  }
+
+  /* ----- Achievements (SAVE) ----- */
+
+  private void copyAchievementsToStorage(DataStorage ds) {
+    AchievementManager am = gp.getAchievementManager();
+    ds.setUnlockedAchievements(am.getUnlockedIds());
+    ds.setAchievementCounters(am.getCounters());
+  }
+
+  /* ----- Achievements (LOAD) ----- */
+
+  private void applyAchievements(DataStorage ds) {
+    AchievementManager am = gp.getAchievementManager();
+    am.restoreFromSave(ds.getUnlockedAchievements(), ds.getAchievementCounters());
   }
 
   /* ----- Cheat Codes (SAVE) ----- */
