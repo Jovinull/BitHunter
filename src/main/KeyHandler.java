@@ -5,6 +5,7 @@ import java.awt.event.KeyListener;
 
 import data.SaveManager;
 import data.SaveManager.SlotInfo;
+import ui.AchievementUi;
 import ui.BestiaryUi;
 import ui.UI;
 
@@ -144,6 +145,7 @@ public class KeyHandler implements KeyListener {
       case GamePanel.PET_YARD_STATE -> petYardState(code);
       case GamePanel.MAP_STATE -> mapState(code);
       case GamePanel.BESTIARY_STATE -> bestiaryState(code);
+      case GamePanel.ACHIEVEMENT_STATE -> achievementState(code);
       default -> {
         // noop
       }
@@ -497,6 +499,9 @@ public class KeyHandler implements KeyListener {
     } else if (is(key, GameAction.BESTIARY)) {
       gp.getGameUi().getBestiaryUi().resetState();
       gp.setGameState(GamePanel.BESTIARY_STATE);
+    } else if (is(key, GameAction.ACHIEVEMENTS)) {
+      gp.getGameUi().getAchievementUi().resetState();
+      gp.setGameState(GamePanel.ACHIEVEMENT_STATE);
     }
   }
 
@@ -960,6 +965,30 @@ public class KeyHandler implements KeyListener {
       bestiaryUi.enterSelectedCreature();
     } else if (is(code, GameAction.OPTIONS)) {
       bestiaryUi.goBack();
+    }
+  }
+
+  /**
+   * Estado: Conquistas (navegacao por categorias e conquistas).
+   */
+  public void achievementState(int code) {
+    final UI ui = gp.getGameUi();
+    var achievementUi = ui.getAchievementUi();
+
+    if (is(code, GameAction.MOVE_LEFT)) {
+      achievementUi.navigateCategory(-1);
+      playNavigateSfx();
+    } else if (is(code, GameAction.MOVE_RIGHT)) {
+      achievementUi.navigateCategory(1);
+      playNavigateSfx();
+    } else if (is(code, GameAction.MOVE_UP)) {
+      achievementUi.navigateAchievement(-1);
+      playNavigateSfx();
+    } else if (is(code, GameAction.MOVE_DOWN)) {
+      achievementUi.navigateAchievement(1);
+      playNavigateSfx();
+    } else if (is(code, GameAction.OPTIONS) || is(code, GameAction.ACHIEVEMENTS)) {
+      gp.setGameState(GamePanel.PLAY_STATE);
     }
   }
 
