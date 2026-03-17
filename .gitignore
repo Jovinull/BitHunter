@@ -60,3 +60,4 @@ replay_pid*
 # Build artifacts (BitHunter)
 /build/
 /classes/
+/.claude/
