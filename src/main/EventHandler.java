@@ -147,6 +147,11 @@ public class EventHandler {
       healingPool(GamePanel.DIALOGUE_STATE);
       return;
     }
+    // fonte de cura / save
+    if (hit(MAP_WORLD, 78, 73, DIR_ANY)) {
+      healingPool(GamePanel.DIALOGUE_STATE);
+      return;
+    }
     // casa - entrada (overworld → indoor)
     if (hit(MAP_WORLD, 22, 28, DIR_ANY)) {
       teleport(MAP_HOUSE, 12, 13, GamePanel.INDOOR);
