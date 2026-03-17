@@ -110,6 +110,8 @@ public class PetIncubator {
     String msg = String.format(msgTemplate, petName);
     gp.getGameUi().addMessage(msg);
 
+    gp.getAchievementManager().onPetHatched();
+
     // limpa estado antigo
     totalTicks = 0;
     remainingTicks = 0;

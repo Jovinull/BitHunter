@@ -62,6 +62,10 @@ public class DataStorage implements Serializable {
   // Saves antigos não possuem este campo; o getter retorna 0 nesse caso.
   private long totalPlayTimeSeconds;
 
+  // ===== CONQUISTAS =====
+  private Set<String> unlockedAchievements;
+  private Map<String, Integer> achievementCounters;
+
   // ===== CHEAT CODES (ONE_TIME) =====
   // Armazena os códigos ONE_TIME já utilizados para impedir reuso entre sessões.
   // Pode ser null em saves antigos (antes desta feature); o getter trata isso.
@@ -311,6 +315,38 @@ public class DataStorage implements Serializable {
 
   public void setBestiaryPoints(int bestiaryPoints) {
     this.bestiaryPoints = bestiaryPoints;
+  }
+
+  // ===== CONQUISTAS getters/setters =====
+
+  /**
+   * Retorna os IDs das conquistas desbloqueadas.
+   * Null-safe: retorna {@link HashSet} vazio para saves antigos.
+   */
+  public Set<String> getUnlockedAchievements() {
+    if (unlockedAchievements == null) {
+      unlockedAchievements = new HashSet<>();
+    }
+    return unlockedAchievements;
+  }
+
+  public void setUnlockedAchievements(Set<String> unlockedAchievements) {
+    this.unlockedAchievements = unlockedAchievements != null ? unlockedAchievements : new HashSet<>();
+  }
+
+  /**
+   * Retorna os contadores cumulativos de conquistas.
+   * Null-safe: retorna {@link HashMap} vazio para saves antigos.
+   */
+  public Map<String, Integer> getAchievementCounters() {
+    if (achievementCounters == null) {
+      achievementCounters = new HashMap<>();
+    }
+    return achievementCounters;
+  }
+
+  public void setAchievementCounters(Map<String, Integer> achievementCounters) {
+    this.achievementCounters = achievementCounters != null ? achievementCounters : new HashMap<>();
   }
 
   // ===== TEMPO DE JOGO getters/setters =====

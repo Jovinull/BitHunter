@@ -1,27 +1,37 @@
 package main;
 
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 
-// Classe responsável por tocar efeitos sonoros e músicas do jogo
+/**
+ * Gerencia reprodução de áudio (músicas e efeitos sonoros).
+ * <p>
+ * Todos os clips são pré-carregados na inicialização para evitar
+ * I/O bloqueante durante a gameplay. A troca entre sons é instantânea.
+ * </p>
+ */
 public class Sound {
 
-  private Clip clip; // Controla o áudio que está sendo reproduzido
-  private final URL[] soundURL = new URL[30]; // Armazena os caminhos dos arquivos de som
-  private FloatControl fc; // Controla o volume do áudio
-  private int currentIndex = -1;
+  private static final Logger LOG = Logger.getLogger(Sound.class.getName());
+  private static final int MAX_SOUNDS = 30;
 
-  // Nível de volume (0 a 5)
+  private final URL[] soundURL = new URL[MAX_SOUNDS];
+  private final Clip[] clips = new Clip[MAX_SOUNDS];
+  private final FloatControl[] volumeControls = new FloatControl[MAX_SOUNDS];
+
+  private int currentIndex = -1;
   private int volumeScale = 3;
 
   public static final int MIN_VOLUME_SCALE = 0;
   public static final int MAX_VOLUME_SCALE = 5;
 
-  // Construtor: carrega os arquivos de áudio no array
+  /** Construtor: registra URLs e pré-carrega todos os clips. */
   public Sound() {
     soundURL[0] = getClass().getResource("/sounds/BlueBoyAdventure.wav");
     soundURL[1] = getClass().getResource("/sounds/coin.wav");
@@ -46,83 +56,82 @@ public class Sound {
     soundURL[20] = getClass().getResource("/sounds/chipwall.wav");
     soundURL[21] = getClass().getResource("/sounds/dooropen.wav");
     soundURL[22] = getClass().getResource("/sounds/FinalBattle.wav");
+
+    preloadAll();
   }
 
-  // Prepara o áudio correspondente ao índice informado
+  /**
+   * Pré-carrega todos os clips na memória.
+   * Chamado uma vez na inicialização — elimina I/O durante gameplay.
+   */
+  private void preloadAll() {
+    for (int i = 0; i < MAX_SOUNDS; i++) {
+      if (soundURL[i] == null) continue;
+
+      try {
+        AudioInputStream ais = AudioSystem.getAudioInputStream(soundURL[i]);
+        Clip c = AudioSystem.getClip();
+        c.open(ais);
+        ais.close();
+
+        clips[i] = c;
+        volumeControls[i] = (FloatControl) c.getControl(FloatControl.Type.MASTER_GAIN);
+      } catch (Exception e) {
+        LOG.log(Level.WARNING, "Falha ao pré-carregar som " + i, e);
+      }
+    }
+  }
+
+  /**
+   * Seleciona o clip a ser reproduzido.
+   * Apenas para o clip anterior e troca o ponteiro — sem I/O.
+   */
   public void setFile(int i) {
-    try {
-      if (i == currentIndex && clip != null && clip.isOpen()) {
-        // Reutiliza o clip já carregado para evitar I/O bloqueante no respawn.
-        return;
-      }
+    if (i == currentIndex) return;
 
-      closeCurrentClip();
-
-      try (AudioInputStream ais = AudioSystem.getAudioInputStream(soundURL[i])) { // Lê o áudio
-      clip = AudioSystem.getClip(); // Cria um reprodutor de som
-      clip.open(ais); // Carrega o áudio no reprodutor
-      fc = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN); // Controla o volume
-      checkVolume(); // Ajusta o volume conforme volumeScale
-      currentIndex = i;
-      }
-    } catch (Exception e) {
-      e.printStackTrace(); // Mostra o erro se o som não puder ser carregado
+    // Para o clip que estava tocando
+    if (currentIndex >= 0 && clips[currentIndex] != null) {
+      clips[currentIndex].stop();
     }
+
+    currentIndex = i;
+    checkVolume();
   }
 
-  // Inicia a reprodução do som
+  /** Inicia a reprodução do som selecionado. */
   public void play() {
-    if (clip == null) {
-      return;
-    }
-    clip.setFramePosition(0); // garante que começa do início
-    clip.start();
+    if (currentIndex < 0 || clips[currentIndex] == null) return;
+    clips[currentIndex].setFramePosition(0);
+    clips[currentIndex].start();
   }
 
-  // Reproduz o som em loop contínuo
+  /** Reproduz o som em loop contínuo. */
   public void loop() {
-    if (clip == null) {
-      return;
-    }
-    clip.loop(Clip.LOOP_CONTINUOUSLY);
+    if (currentIndex < 0 || clips[currentIndex] == null) return;
+    clips[currentIndex].loop(Clip.LOOP_CONTINUOUSLY);
   }
 
-  // Para a reprodução do som
+  /** Para a reprodução do som atual. */
   public void stop() {
-    if (clip != null && clip.isRunning()) {
-      clip.stop();
+    if (currentIndex >= 0 && clips[currentIndex] != null && clips[currentIndex].isRunning()) {
+      clips[currentIndex].stop();
     }
   }
 
-  private void closeCurrentClip() {
-    if (clip == null) {
-      return;
-    }
-    if (clip.isRunning()) {
-      clip.stop();
-    }
-    clip.close();
-    clip = null;
-    fc = null;
-    currentIndex = -1;
-  }
-
+  /** Ajusta o volume do clip atualmente selecionado. */
   public void checkVolume() {
-    if (fc == null) {
-      return;
-    }
+    if (currentIndex < 0 || volumeControls[currentIndex] == null) return;
 
-    float volumeLocal;
-    switch (volumeScale) {
-      case 0 -> volumeLocal = -80f; // Silencioso
-      case 1 -> volumeLocal = -20f; // Muito baixo
-      case 2 -> volumeLocal = -12f; // Baixo
-      case 3 -> volumeLocal = -5f; // Médio
-      case 4 -> volumeLocal = 1f; // Alto
-      case 5 -> volumeLocal = 6f; // Muito alto
-      default -> volumeLocal = -5f; // Valor padrão
-    }
-    fc.setValue(volumeLocal); // Aplica o volume calculado
+    float volumeLocal = switch (volumeScale) {
+      case 0 -> -80f;
+      case 1 -> -20f;
+      case 2 -> -12f;
+      case 3 -> -5f;
+      case 4 -> 1f;
+      case 5 -> 6f;
+      default -> -5f;
+    };
+    volumeControls[currentIndex].setValue(volumeLocal);
   }
 
   public int getVolumeScale() {
@@ -136,6 +145,21 @@ public class Sound {
       volumeScale = MAX_VOLUME_SCALE;
     }
     this.volumeScale = volumeScale;
-    checkVolume();
+
+    // Aplica volume a todos os clips carregados
+    for (int i = 0; i < MAX_SOUNDS; i++) {
+      if (volumeControls[i] != null) {
+        float v = switch (this.volumeScale) {
+          case 0 -> -80f;
+          case 1 -> -20f;
+          case 2 -> -12f;
+          case 3 -> -5f;
+          case 4 -> 1f;
+          case 5 -> 6f;
+          default -> -5f;
+        };
+        volumeControls[i].setValue(v);
+      }
+    }
   }
 }
