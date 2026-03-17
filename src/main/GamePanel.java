@@ -18,6 +18,7 @@ import ai.PathFinder;
 import achievement.AchievementManager;
 import achievement.AchievementToast;
 import bestiary.BestiaryService;
+import data.GameStatistics;
 import data.PlayTimeTracker;
 import data.SaveLoad;
 import data.SaveManager;
@@ -89,6 +90,7 @@ public class GamePanel extends JPanel implements Runnable {
   private final transient AchievementToast achievementToast = new AchievementToast();
   private final transient CheatCodeManager cheatCodeManager = new CheatCodeManager(this);
   private final transient PlayTimeTracker playTimeTracker = new PlayTimeTracker();
+  private final transient GameStatistics gameStatistics = new GameStatistics();
   transient Thread gameThread; // Thread para rodar o loop do jogo
 
   // ENTITY AND OBJECTS
@@ -145,6 +147,8 @@ public class GamePanel extends JPanel implements Runnable {
 
     this.addKeyListener(keyH);
     this.setFocusable(true);
+    // Desabilita focus traversal para que TAB chegue ao KeyListener
+    this.setFocusTraversalKeysEnabled(false);
   }
 
   // Prepara e inicializa elementos principais do jogo antes de começar o loop
@@ -187,6 +191,7 @@ public class GamePanel extends JPanel implements Runnable {
       aSetter.setInteractiveTile();
       bestiaryService.reset();
       achievementManager.reset();
+      gameStatistics.reset();
 
       var lighting = eManager.getLighting();
       if (lighting != null) {
@@ -717,7 +722,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     if (oldState == PLAY_STATE && newState != PLAY_STATE) {
       playTimeTracker.pause();
-    } else if (oldState != PLAY_STATE && newState == PLAY_STATE && playTimeTracker.isRunning()) {
+    } else if (oldState != PLAY_STATE && newState == PLAY_STATE) {
       playTimeTracker.resume();
     }
   }
@@ -796,6 +801,10 @@ public class GamePanel extends JPanel implements Runnable {
 
   public PlayTimeTracker getPlayTimeTracker() {
     return playTimeTracker;
+  }
+
+  public GameStatistics getGameStatistics() {
+    return gameStatistics;
   }
 
   public long getCollisionFrameCounter() {
