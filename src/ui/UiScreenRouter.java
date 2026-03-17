@@ -37,6 +37,7 @@ final class UiScreenRouter {
       case GamePanel.PET_YARD_STATE -> ui.getPetYardUi().drawPetYardScreen();
       case GamePanel.SLEEP_STATE -> ui.getTransitionUi().drawSleepScreen();
       case GamePanel.BESTIARY_STATE -> ui.getBestiaryUi().drawBestiaryScreen();
+      case GamePanel.ACHIEVEMENT_STATE -> ui.getAchievementUi().drawAchievementScreen();
       default -> {
         // Estados sem camada extra de UI dedicada.
       }
@@ -53,5 +54,7 @@ final class UiScreenRouter {
     if (ui.isClockWindowOpen()) {
       ui.getHudUi().drawClockWindow();
     }
+    ui.getGamePanel().getAchievementToast().draw(
+        ui.g2, ui.getLanguageManager());
   }
 }

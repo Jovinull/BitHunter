@@ -93,6 +93,7 @@ public class UI {
   private final GameOverUi gameOverUi;
   private final PetYardUi petYardUi;
   private final BestiaryUi bestiaryUi;
+  private final AchievementUi achievementUi;
 
   public UI(GamePanel gp) {
     this.gp = gp;
@@ -119,6 +120,7 @@ public class UI {
     gameOverUi = new GameOverUi(this);
     petYardUi = new PetYardUi(this, inventoryUi);
     bestiaryUi = new BestiaryUi(this);
+    achievementUi = new AchievementUi(this);
   }
 
   // ---- Helper de tradução ----
@@ -282,6 +284,10 @@ public class UI {
 
   public BestiaryUi getBestiaryUi() {
     return bestiaryUi;
+  }
+
+  public AchievementUi getAchievementUi() {
+    return achievementUi;
   }
 
   HudUi getHudUi() {
