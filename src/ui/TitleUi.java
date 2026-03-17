@@ -32,6 +32,10 @@ class TitleUi {
         ui.getSaveSlotUi().drawDeleteConfirm();
       }
       case 5 -> ui.getSaveSlotUi().drawNameInput();
+      case 6 -> {
+        ui.getSaveSlotUi().drawSlotSelection(ui.getSaveSlotMode());
+        ui.getStatsUi().drawStatsOverlay(ui.getSelectedSaveSlot() - 1);
+      }
       default -> { /* noop */ }
     }
   }
