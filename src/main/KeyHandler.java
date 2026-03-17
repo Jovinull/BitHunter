@@ -5,7 +5,6 @@ import java.awt.event.KeyListener;
 
 import data.SaveManager;
 import data.SaveManager.SlotInfo;
-import ui.AchievementUi;
 import ui.BestiaryUi;
 import ui.UI;
 
