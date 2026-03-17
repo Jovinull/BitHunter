@@ -94,6 +94,7 @@ public final class BestiaryService {
       String name = getCreatureDisplayName(creature);
       notifications.add(gp.getLanguageManager().text("bestiary.notify.discovered")
           .replace("%s", name));
+      gp.getAchievementManager().onBestiaryEvent("discovered");
     }
   }
 
@@ -274,6 +275,20 @@ public final class BestiaryService {
     // Pontos ao completar
     if (newStage == BestiaryStage.COMPLETED) {
       bestiaryPoints += creature.getCompletionPoints();
+      gp.getAchievementManager().onBestiaryEvent("completed");
+
+      // Verifica se todas as criaturas foram completadas
+      boolean allCompleted = true;
+      for (BestiaryCreature c : registry.getAllCreatures()) {
+        BestiaryProgress p = progressMap.get(c.getId());
+        if (p == null || p.getStage(c.getDifficulty(), c.getRarity()) != BestiaryStage.COMPLETED) {
+          allCompleted = false;
+          break;
+        }
+      }
+      if (allCompleted) {
+        gp.getAchievementManager().onBestiaryEvent("all_completed");
+      }
     }
   }
 

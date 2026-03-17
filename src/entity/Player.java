@@ -589,6 +589,7 @@ public class Player extends Entity {
       case TYPE_PICKUP_ONLY -> {
         obj.use(this);
         objects[currentMapIndex][i] = null;
+        gp.getAchievementManager().onCoinChange(getCoin());
       }
       case TYPE_OBSTACLE -> interactObstacle(obj);
       default -> {
@@ -597,6 +598,7 @@ public class Player extends Entity {
           gp.playSE(1);
           String itemName = obj.getDisplayName(); // já vem traduzido
           text = String.format(t("player.message.itemObtained"), itemName);
+          gp.getAchievementManager().onItemPickup(obj.getInternalId());
         } else {
           text = t("player.message.cannotCarryMore");
         }
@@ -715,6 +717,9 @@ public class Player extends Entity {
 
         // --- Bestiário: registrar kill ---
         gp.getBestiaryService().recordKill(mon.getInternalId());
+
+        // --- Conquistas: registrar kill ---
+        gp.getAchievementManager().onMonsterKill(mon.getInternalId());
       }
     }
   }
@@ -743,6 +748,7 @@ public class Player extends Entity {
         tile.checkDrop();
         InteractiveTile destroyed = tile.getDestroyedForm();
         tiles[currentMapIndex][i] = destroyed;
+        gp.getAchievementManager().onInteractiveTileDestroyed(tile.getInternalId());
       }
     }
   }
@@ -789,6 +795,7 @@ public class Player extends Entity {
     if (leveledUp) {
       gp.playSE(8);
       gp.setGameState(GamePanel.DIALOGUE_STATE);
+      gp.getAchievementManager().onLevelUp(getLevel());
 
       setDialogue();
       startDialogue(this, 0);
@@ -890,6 +897,8 @@ public class Player extends Entity {
     if (!selectedItem.use(this)) {
       return;
     }
+
+    gp.getAchievementManager().onConsumableUsed(selectedItem.getInternalId());
 
     if (selectedItem.getAmount() > 1) {
       selectedItem.setAmount(selectedItem.getAmount() - 1);

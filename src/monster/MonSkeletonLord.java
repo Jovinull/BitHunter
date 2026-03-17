@@ -177,6 +177,7 @@ public class MonSkeletonLord extends Entity {
   public void checkDrop() {
     gp.setBossBattleOn(false);
     Progress.setSkeletonLordDefeated(true);
+    gp.getAchievementManager().onBossDefeated();
 
     gp.stopMusic();
     gp.playMusic(19);
