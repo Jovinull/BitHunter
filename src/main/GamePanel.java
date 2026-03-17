@@ -15,6 +15,8 @@ import java.util.logging.Logger;
 import javax.swing.JPanel;
 
 import ai.PathFinder;
+import achievement.AchievementManager;
+import achievement.AchievementToast;
 import bestiary.BestiaryService;
 import data.PlayTimeTracker;
 import data.SaveLoad;
@@ -83,6 +85,8 @@ public class GamePanel extends JPanel implements Runnable {
   private final transient CutsceneManager csManager = new CutsceneManager(this);
   private final transient PetIncubator petIncubator = new PetIncubator(this);
   private final transient BestiaryService bestiaryService = new BestiaryService(this);
+  private final transient AchievementManager achievementManager = new AchievementManager(this);
+  private final transient AchievementToast achievementToast = new AchievementToast();
   private final transient CheatCodeManager cheatCodeManager = new CheatCodeManager(this);
   private final transient PlayTimeTracker playTimeTracker = new PlayTimeTracker();
   transient Thread gameThread; // Thread para rodar o loop do jogo
@@ -113,6 +117,7 @@ public class GamePanel extends JPanel implements Runnable {
   public static final int CUTSCENE_STATE = 11;
   public static final int PET_YARD_STATE = 12;
   public static final int BESTIARY_STATE = 13; // Bestiário (Cyclopedia)
+  public static final int ACHIEVEMENT_STATE = 14; // Conquistas
 
   // others
   private boolean bossBattleOn = false;
@@ -181,6 +186,7 @@ public class GamePanel extends JPanel implements Runnable {
       aSetter.setObject();
       aSetter.setInteractiveTile();
       bestiaryService.reset();
+      achievementManager.reset();
 
       var lighting = eManager.getLighting();
       if (lighting != null) {
@@ -292,6 +298,7 @@ public class GamePanel extends JPanel implements Runnable {
     eManager.update();
     petIncubator.update();
     drainBestiaryNotifications();
+    achievementToast.update(achievementManager);
     cheatCodeManager.tick();
   }
 
@@ -773,6 +780,14 @@ public class GamePanel extends JPanel implements Runnable {
 
   public BestiaryService getBestiaryService() {
     return bestiaryService;
+  }
+
+  public AchievementManager getAchievementManager() {
+    return achievementManager;
+  }
+
+  public AchievementToast getAchievementToast() {
+    return achievementToast;
   }
 
   public CheatCodeManager getCheatCodeManager() {
