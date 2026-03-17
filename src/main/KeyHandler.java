@@ -189,8 +189,19 @@ public class KeyHandler implements KeyListener {
       case 3 -> handleTitleOverwriteConfirm(code, ui);
       case 4 -> handleTitleDeleteConfirm(code, ui);
       case 5 -> handleTitleNameInput(code, ui);
+      case 6 -> handleTitleStatsView(code, ui);
       default -> {
         /* noop */ }
+    }
+  }
+
+  /**
+   * Fecha a tela de estatísticas e volta para a seleção de slots.
+   */
+  private void handleTitleStatsView(int code, UI ui) {
+    if (is(code, GameAction.OPTIONS) || is(code, GameAction.CONFIRM)
+        || code == KeyEvent.VK_TAB) {
+      ui.setTitleScreenState(2);
     }
   }
 
@@ -274,9 +285,27 @@ public class KeyHandler implements KeyListener {
       handleSlotSelectEnter(ui);
     } else if (code == KeyEvent.VK_BACK_SPACE || code == KeyEvent.VK_DELETE) {
       handleSlotDelete(ui);
+    } else if (code == KeyEvent.VK_TAB) {
+      handleSlotStats(ui);
     } else if (is(code, GameAction.OPTIONS)) {
       ui.setTitleScreenState(0);
       ui.setCommandNum(0);
+    }
+  }
+
+  /**
+   * Abre a tela de estatísticas para o slot selecionado (se ocupado e válido).
+   */
+  private void handleSlotStats(UI ui) {
+    int cmd = ui.getCommandNum();
+    if (cmd >= SaveManager.MAX_SLOTS) {
+      return;
+    }
+
+    SlotInfo info = ui.getSaveSlotInfos()[cmd];
+    if (info.occupied() && !info.corrupt()) {
+      ui.setSelectedSaveSlot(cmd + 1);
+      ui.setTitleScreenState(6);
     }
   }
 

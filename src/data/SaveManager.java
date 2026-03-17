@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.nio.file.Files;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,14 +38,15 @@ public class SaveManager {
       boolean corrupt,
       String playerName,
       int characterClass,
-      long totalPlayTimeSeconds
+      long totalPlayTimeSeconds,
+      Map<String, Long> gameStats
   ) {
     public static SlotInfo empty() {
-      return new SlotInfo(false, false, null, -1, 0);
+      return new SlotInfo(false, false, null, -1, 0, Map.of());
     }
 
     public static SlotInfo ofCorrupt() {
-      return new SlotInfo(true, true, null, -1, -1);
+      return new SlotInfo(true, true, null, -1, -1, Map.of());
     }
   }
 
@@ -118,7 +120,8 @@ public class SaveManager {
         false,
         name != null ? name : "",
         ds.getCharacterClass(),
-        ds.getTotalPlayTimeSeconds());
+        ds.getTotalPlayTimeSeconds(),
+        ds.getGameStats());
   }
 
   /**

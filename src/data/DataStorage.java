@@ -62,6 +62,11 @@ public class DataStorage implements Serializable {
   // Saves antigos não possuem este campo; o getter retorna 0 nesse caso.
   private long totalPlayTimeSeconds;
 
+  // ===== ESTATÍSTICAS DE JOGO =====
+  // Mapa flexível de métricas acumuladas (kills, mortes, dano, passos, etc.).
+  // Pode ser null em saves antigos; o getter trata isso.
+  private Map<String, Long> gameStats;
+
   // ===== CONQUISTAS =====
   private Set<String> unlockedAchievements;
   private Map<String, Integer> achievementCounters;
@@ -402,5 +407,22 @@ public class DataStorage implements Serializable {
 
   public void setCharacterClass(int characterClass) {
     this.characterClass = characterClass;
+  }
+
+  // ===== ESTATÍSTICAS DE JOGO getters/setters =====
+
+  /**
+   * Retorna o mapa de estatísticas de jogo.
+   * Null-safe: retorna {@link HashMap} vazio para saves antigos.
+   */
+  public Map<String, Long> getGameStats() {
+    if (gameStats == null) {
+      gameStats = new HashMap<>();
+    }
+    return gameStats;
+  }
+
+  public void setGameStats(Map<String, Long> gameStats) {
+    this.gameStats = gameStats != null ? gameStats : new HashMap<>();
   }
 }

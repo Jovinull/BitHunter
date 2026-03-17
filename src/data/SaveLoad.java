@@ -107,6 +107,7 @@ public class SaveLoad {
     copyAchievementsToStorage(ds);
     copyCheatCodesToStorage(ds);
     copyPlayTimeToStorage(ds);
+    copyGameStatsToStorage(ds);
     return ds;
   }
 
@@ -121,6 +122,7 @@ public class SaveLoad {
     applyAchievements(ds);
     applyCheatCodes(ds);
     applyPlayTime(ds);
+    applyGameStats(ds);
 
     // Recalcular atributos derivados
     var player = gp.getPlayer();
@@ -440,6 +442,18 @@ public class SaveLoad {
   private void applyPlayTime(DataStorage ds) {
     gp.getPlayTimeTracker().start(ds.getTotalPlayTimeSeconds());
     gp.getPlayTimeTracker().pause();
+  }
+
+  /* ----- Game Stats (SAVE) ----- */
+
+  private void copyGameStatsToStorage(DataStorage ds) {
+    ds.setGameStats(new java.util.HashMap<>(gp.getGameStatistics().getAll()));
+  }
+
+  /* ----- Game Stats (LOAD) ----- */
+
+  private void applyGameStats(DataStorage ds) {
+    gp.getGameStatistics().restoreFrom(ds.getGameStats());
   }
 
   /** Unboxing seguro: retorna {@code fallback} se {@code value} for null. */

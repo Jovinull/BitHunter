@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import data.GameStatistics;
 import main.GamePanel;
 import main.KeyHandler;
 import object.ObjFireball;
@@ -35,6 +36,7 @@ public class Player extends Entity {
   private boolean attackCanceled = false;
   private boolean lightUpdated = false;
   private boolean debugCollision = false;
+  private int stepPixelAccumulator = 0;
 
   /** Nome do jogador definido na criação do save. */
   private String playerName = "";
@@ -484,6 +486,11 @@ public class Player extends Entity {
         default -> {
           /* no-op intencional: direção desconhecida/nula não move */ }
       }
+      stepPixelAccumulator += getSpeed();
+      if (stepPixelAccumulator >= GamePanel.TILE_SIZE) {
+        gp.getGameStatistics().increment(GameStatistics.STEPS);
+        stepPixelAccumulator -= GamePanel.TILE_SIZE;
+      }
     }
 
     if (keyH.isEnterPressed() && !attackCanceled) {
@@ -569,6 +576,7 @@ public class Player extends Entity {
   private void handleDeath() {
     if (!keyH.isGodModeOn() && getLife() <= 0) {
       gp.logRespawnDebug("death.start");
+      gp.getGameStatistics().increment(GameStatistics.DEATHS);
       gp.stopMusic();
       gp.setGameState(GamePanel.GAME_OVER_STATE);
       gp.getGameUi().setCommandNum(-1);
@@ -589,6 +597,7 @@ public class Player extends Entity {
       case TYPE_PICKUP_ONLY -> {
         obj.use(this);
         objects[currentMapIndex][i] = null;
+        gp.getGameStatistics().increment(GameStatistics.COINS_COLLECTED);
         gp.getAchievementManager().onCoinChange(getCoin());
       }
       case TYPE_OBSTACLE -> interactObstacle(obj);
@@ -596,6 +605,7 @@ public class Player extends Entity {
         String text;
         if (canObtainItem(obj)) {
           gp.playSE(1);
+          gp.getGameStatistics().increment(GameStatistics.ITEMS_COLLECTED);
           String itemName = obj.getDisplayName(); // já vem traduzido
           text = String.format(t("player.message.itemObtained"), itemName);
           gp.getAchievementManager().onItemPickup(obj.getInternalId());
@@ -693,6 +703,9 @@ public class Player extends Entity {
 
       mon.setLife(mon.getLife() - damage);
 
+      // --- Estatísticas: dano causado ---
+      gp.getGameStatistics().add(GameStatistics.DAMAGE_DEALT, damage);
+
       // Mensagem de dano
       String damageMsg = String.format(t("player.message.damageDealt"), damage);
       gp.getGameUi().addMessage(damageMsg);
@@ -702,6 +715,9 @@ public class Player extends Entity {
 
       if (mon.getLife() <= 0) {
         mon.setDying(true);
+
+        // --- Estatísticas: kill ---
+        gp.getGameStatistics().increment(GameStatistics.KILLS);
 
         String monsterName = mon.getDisplayName();
 
@@ -794,6 +810,7 @@ public class Player extends Entity {
 
     if (leveledUp) {
       gp.playSE(8);
+      gp.getGameStatistics().increment(GameStatistics.LEVEL_UPS);
       gp.setGameState(GamePanel.DIALOGUE_STATE);
       gp.getAchievementManager().onLevelUp(getLevel());
 
@@ -1397,6 +1414,7 @@ public class Player extends Entity {
     }
 
     // 3) Aplica dano normal
+    gp.getGameStatistics().add(GameStatistics.DAMAGE_RECEIVED, damage);
     setLife(getLife() - damage);
 
     // 4) Conta hit para o Garbage Collector
