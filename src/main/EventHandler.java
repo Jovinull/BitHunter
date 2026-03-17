@@ -206,6 +206,7 @@ public class EventHandler {
     tempRow = row;
     canTouchEvent = false;
     gp.playSE(SFX_STAIRS);
+    gp.getAchievementManager().onMapEntered(map, area);
   }
 
   public void damagePit(int gameState) {
