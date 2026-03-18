@@ -44,7 +44,7 @@ public class GameStatistics implements Serializable {
       STEPS, COINS_COLLECTED, ITEMS_COLLECTED, LEVEL_UPS
   };
 
-  private final Map<String, Long> stats;
+  private final HashMap<String, Long> stats;
 
   public GameStatistics() {
     stats = new HashMap<>();

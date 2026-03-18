@@ -26,20 +26,20 @@ public class DataStorage implements Serializable {
   private int coin;
 
   // PLAYER INVENTORY
-  private final List<String> itemNames = new ArrayList<>();
-  private final List<Integer> itemAmounts = new ArrayList<>();
+  private final ArrayList<String> itemNames = new ArrayList<>();
+  private final ArrayList<Integer> itemAmounts = new ArrayList<>();
 
   private int currentWeaponSlot;
   private int currentShieldSlot;
   private int currentBootsSlot;
 
   // ===== PETS =====
-  private final List<String> ownedPetIds = new ArrayList<>();
+  private final ArrayList<String> ownedPetIds = new ArrayList<>();
   private String activePetId;
 
   // nível e xp na mesma ordem de ownedPetIds
-  private final List<Integer> petLevels = new ArrayList<>();
-  private final List<Integer> petExps = new ArrayList<>();
+  private final ArrayList<Integer> petLevels = new ArrayList<>();
+  private final ArrayList<Integer> petExps = new ArrayList<>();
 
   // ===== PET INCUBATOR =====
   private boolean incubatorActive;
@@ -49,8 +49,8 @@ public class DataStorage implements Serializable {
   private int incubatorTotalTicks;
 
   // ===== BESTIARY =====
-  private Map<String, Integer> bestiaryKills = new HashMap<>();
-  private Map<String, Set<String>> bestiaryRevealedVeryRare = new HashMap<>();
+  private HashMap<String, Integer> bestiaryKills = new HashMap<>();
+  private HashMap<String, Set<String>> bestiaryRevealedVeryRare = new HashMap<>();
   private int bestiaryPoints;
 
   // ===== IDENTIDADE DO JOGADOR =====
@@ -65,16 +65,16 @@ public class DataStorage implements Serializable {
   // ===== ESTATÍSTICAS DE JOGO =====
   // Mapa flexível de métricas acumuladas (kills, mortes, dano, passos, etc.).
   // Pode ser null em saves antigos; o getter trata isso.
-  private Map<String, Long> gameStats;
+  private HashMap<String, Long> gameStats;
 
   // ===== CONQUISTAS =====
-  private Set<String> unlockedAchievements;
-  private Map<String, Integer> achievementCounters;
+  private HashSet<String> unlockedAchievements;
+  private HashMap<String, Integer> achievementCounters;
 
   // ===== CHEAT CODES (ONE_TIME) =====
   // Armazena os códigos ONE_TIME já utilizados para impedir reuso entre sessões.
   // Pode ser null em saves antigos (antes desta feature); o getter trata isso.
-  private Set<String> usedCheatCodes;
+  private HashSet<String> usedCheatCodes;
 
   // OBJECT ON MAP
   private String[][] mapObjectNames;
@@ -302,7 +302,7 @@ public class DataStorage implements Serializable {
   }
 
   public void setBestiaryKills(Map<String, Integer> bestiaryKills) {
-    this.bestiaryKills = bestiaryKills != null ? bestiaryKills : new HashMap<>();
+    this.bestiaryKills = bestiaryKills != null ? new HashMap<>(bestiaryKills) : new HashMap<>();
   }
 
   public Map<String, Set<String>> getBestiaryRevealedVeryRare() {
@@ -311,7 +311,7 @@ public class DataStorage implements Serializable {
 
   public void setBestiaryRevealedVeryRare(Map<String, Set<String>> bestiaryRevealedVeryRare) {
     this.bestiaryRevealedVeryRare = bestiaryRevealedVeryRare != null
-        ? bestiaryRevealedVeryRare : new HashMap<>();
+        ? new HashMap<>(bestiaryRevealedVeryRare) : new HashMap<>();
   }
 
   public int getBestiaryPoints() {
@@ -336,7 +336,7 @@ public class DataStorage implements Serializable {
   }
 
   public void setUnlockedAchievements(Set<String> unlockedAchievements) {
-    this.unlockedAchievements = unlockedAchievements != null ? unlockedAchievements : new HashSet<>();
+    this.unlockedAchievements = unlockedAchievements != null ? new HashSet<>(unlockedAchievements) : new HashSet<>();
   }
 
   /**
@@ -351,7 +351,7 @@ public class DataStorage implements Serializable {
   }
 
   public void setAchievementCounters(Map<String, Integer> achievementCounters) {
-    this.achievementCounters = achievementCounters != null ? achievementCounters : new HashMap<>();
+    this.achievementCounters = achievementCounters != null ? new HashMap<>(achievementCounters) : new HashMap<>();
   }
 
   // ===== TEMPO DE JOGO getters/setters =====
@@ -383,7 +383,7 @@ public class DataStorage implements Serializable {
   }
 
   public void setUsedCheatCodes(Set<String> usedCheatCodes) {
-    this.usedCheatCodes = usedCheatCodes != null ? usedCheatCodes : new HashSet<>();
+    this.usedCheatCodes = usedCheatCodes != null ? new HashSet<>(usedCheatCodes) : new HashSet<>();
   }
 
   // ===== IDENTIDADE DO JOGADOR getters/setters =====
@@ -423,6 +423,6 @@ public class DataStorage implements Serializable {
   }
 
   public void setGameStats(Map<String, Long> gameStats) {
-    this.gameStats = gameStats != null ? gameStats : new HashMap<>();
+    this.gameStats = gameStats != null ? new HashMap<>(gameStats) : new HashMap<>();
   }
 }
