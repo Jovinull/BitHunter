@@ -25,6 +25,9 @@ import entity.services.ParticleService;
 import main.GamePanel;
 import main.UtilityTool;
 
+// this-escape: componentes (Combat, Movement, etc.) recebem referência à entidade
+// durante inicialização. Padrão component-based intencional da arquitetura.
+@SuppressWarnings("this-escape")
 public class Entity {
 
   // =========================
@@ -205,15 +208,15 @@ public class Entity {
   // Helpers de posição/tela
   // =========================
 
-  public int getScreenX() {
+  public final int getScreenX() {
     return worldX - gp.getCameraX();
   }
 
-  public int getScreenY() {
+  public final int getScreenY() {
     return worldY - gp.getCameraY();
   }
 
-  public GamePanel getGp() {
+  public final GamePanel getGp() {
     return gp;
   }
 
@@ -221,75 +224,75 @@ public class Entity {
     return RNG.nextInt(bound);
   }
 
-  public int getLeftX() {
+  public final int getLeftX() {
     return worldX + solidArea.x;
   }
 
-  public int getRightX() {
+  public final int getRightX() {
     return worldX + solidArea.x + solidArea.width;
   }
 
-  public int getTopY() {
+  public final int getTopY() {
     return worldY + solidArea.y;
   }
 
-  public int getBottomY() {
+  public final int getBottomY() {
     return worldY + solidArea.y + solidArea.height;
   }
 
-  public int getCol() {
+  public final int getCol() {
     return (worldX + solidArea.x) / GamePanel.TILE_SIZE;
   }
 
-  public int getRow() {
+  public final int getRow() {
     return (worldY + solidArea.y) / GamePanel.TILE_SIZE;
   }
 
-  public int getCenterX() {
+  public final int getCenterX() {
     int width = (left1 != null ? left1.getWidth() : GamePanel.TILE_SIZE);
     return worldX + width / 2;
   }
 
-  public int getCenterY() {
+  public final int getCenterY() {
     int height = (up1 != null ? up1.getHeight() : GamePanel.TILE_SIZE);
     return worldY + height / 2;
   }
 
-  public int getXdistance(Entity target) {
+  public final int getXdistance(Entity target) {
     return Math.abs(getCenterX() - target.getCenterX());
   }
 
-  public int getYdistance(Entity target) {
+  public final int getYdistance(Entity target) {
     return Math.abs(getCenterY() - target.getCenterY());
   }
 
-  public int getTileDistance(Entity target) {
+  public final int getTileDistance(Entity target) {
     return (getXdistance(target) + getYdistance(target)) / GamePanel.TILE_SIZE;
   }
 
-  public int getGoalCol(Entity target) {
+  public final int getGoalCol(Entity target) {
     Entity t = (target != null) ? target : gp.getPlayer();
     return (t.worldX + t.solidArea.x) / GamePanel.TILE_SIZE;
   }
 
-  public int getGoalRow(Entity target) {
+  public final int getGoalRow(Entity target) {
     Entity t = (target != null) ? target : gp.getPlayer();
     return (t.worldY + t.solidArea.y) / GamePanel.TILE_SIZE;
   }
 
-  public BufferedImage getBaseImage() {
+  public final BufferedImage getBaseImage() {
     return image;
   }
 
-  public BufferedImage getAltImage1() {
+  public final BufferedImage getAltImage1() {
     return image2;
   }
 
-  public BufferedImage getAltImage2() {
+  public final BufferedImage getAltImage2() {
     return image3;
   }
 
-  public BufferedImage getDown1() {
+  public final BufferedImage getDown1() {
     return down1;
   }
 
@@ -587,11 +590,11 @@ public class Entity {
     pathfinding.searchPath(goalCol, goalRow);
   }
 
-  public StuckDetectorComponent getStuckDetector() {
+  public final StuckDetectorComponent getStuckDetector() {
     return stuckDetector;
   }
 
-  public int getDetected(Entity user, Entity[][] target, String targetInternalId) {
+  public final int getDetected(Entity user, Entity[][] target, String targetInternalId) {
     if (targetInternalId == null || targetInternalId.isEmpty()) {
       return 999;
     }
@@ -674,7 +677,7 @@ public class Entity {
     }
   }
 
-  public boolean isRespawnEnabled() {
+  public final boolean isRespawnEnabled() {
     return respawn.isRespawnEnabled();
   }
 
@@ -697,411 +700,411 @@ public class Entity {
   // Getters/Setters
   // =========================
 
-  public Rectangle getSolidArea() {
+  public final Rectangle getSolidArea() {
     return solidArea;
   }
 
-  public Rectangle getAttackArea() {
+  public final Rectangle getAttackArea() {
     return attackArea;
   }
 
-  public int getSolidAreaDefaultX() {
+  public final int getSolidAreaDefaultX() {
     return solidAreaDefaultX;
   }
 
-  public void setSolidAreaDefaultX(int solidAreaDefaultX) {
+  public final void setSolidAreaDefaultX(int solidAreaDefaultX) {
     this.solidAreaDefaultX = solidAreaDefaultX;
   }
 
-  public int getSolidAreaDefaultY() {
+  public final int getSolidAreaDefaultY() {
     return solidAreaDefaultY;
   }
 
-  public void setSolidAreaDefaultY(int solidAreaDefaultY) {
+  public final void setSolidAreaDefaultY(int solidAreaDefaultY) {
     this.solidAreaDefaultY = solidAreaDefaultY;
   }
 
-  public boolean isCollision() {
+  public final boolean isCollision() {
     return collision;
   }
 
-  public void setCollision(boolean collision) {
+  public final void setCollision(boolean collision) {
     this.collision = collision;
   }
 
-  public String[][] getDialogues() {
+  public final String[][] getDialogues() {
     return dialogue.getDialogues();
   }
 
-  public Entity getAttacker() {
+  public final Entity getAttacker() {
     return attacker;
   }
 
-  public void setAttacker(Entity attacker) {
+  public final void setAttacker(Entity attacker) {
     this.attacker = attacker;
   }
 
-  public Entity getLinkedEntity() {
+  public final Entity getLinkedEntity() {
     return linkedEntity;
   }
 
-  public void setLinkedEntity(Entity linkedEntity) {
+  public final void setLinkedEntity(Entity linkedEntity) {
     this.linkedEntity = linkedEntity;
   }
 
-  public boolean isTemp() {
+  public final boolean isTemp() {
     return temp;
   }
 
-  public void setTemp(boolean temp) {
+  public final void setTemp(boolean temp) {
     this.temp = temp;
   }
 
-  public int getWorldX() {
+  public final int getWorldX() {
     return worldX;
   }
 
-  public void setWorldX(int worldX) {
+  public final void setWorldX(int worldX) {
     this.worldX = worldX;
   }
 
-  public int getWorldY() {
+  public final int getWorldY() {
     return worldY;
   }
 
-  public void setWorldY(int worldY) {
+  public final void setWorldY(int worldY) {
     this.worldY = worldY;
   }
 
-  public String getDirection() {
+  public final String getDirection() {
     return direction;
   }
 
-  public void setDirection(String direction) {
+  public final void setDirection(String direction) {
     this.direction = direction;
   }
 
-  public int getSpriteNum() {
+  public final int getSpriteNum() {
     return spriteNum;
   }
 
-  public void setSpriteNum(int spriteNum) {
+  public final void setSpriteNum(int spriteNum) {
     this.spriteNum = spriteNum;
   }
 
-  public int getDialogueSet() {
+  public final int getDialogueSet() {
     return dialogue.getDialogueSet();
   }
 
-  public void setDialogueSet(int dialogueSet) {
+  public final void setDialogueSet(int dialogueSet) {
     dialogue.setDialogueSet(dialogueSet);
   }
 
-  public int getDialogueIndex() {
+  public final int getDialogueIndex() {
     return dialogue.getDialogueIndex();
   }
 
-  public void setDialogueIndex(int dialogueIndex) {
+  public final void setDialogueIndex(int dialogueIndex) {
     dialogue.setDialogueIndex(dialogueIndex);
   }
 
-  public boolean isCollisionOn() {
+  public final boolean isCollisionOn() {
     return collisionOn;
   }
 
-  public void setCollisionOn(boolean collisionOn) {
+  public final void setCollisionOn(boolean collisionOn) {
     this.collisionOn = collisionOn;
   }
 
-  public boolean isInvincible() {
+  public final boolean isInvincible() {
     return invincible;
   }
 
-  public void setInvincible(boolean invincible) {
+  public final void setInvincible(boolean invincible) {
     this.invincible = invincible;
   }
 
-  public boolean isAttacking() {
+  public final boolean isAttacking() {
     return attacking;
   }
 
-  public void setAttacking(boolean attacking) {
+  public final void setAttacking(boolean attacking) {
     this.attacking = attacking;
   }
 
-  public boolean isAlive() {
+  public final boolean isAlive() {
     return alive;
   }
 
-  public void setAlive(boolean alive) {
+  public final void setAlive(boolean alive) {
     this.alive = alive;
   }
 
-  public boolean isDying() {
+  public final boolean isDying() {
     return dying;
   }
 
-  public void setDying(boolean dying) {
+  public final void setDying(boolean dying) {
     this.dying = dying;
   }
 
-  public boolean isHpBarOn() {
+  public final boolean isHpBarOn() {
     return hpBarOn;
   }
 
-  public void setHpBarOn(boolean hpBarOn) {
+  public final void setHpBarOn(boolean hpBarOn) {
     this.hpBarOn = hpBarOn;
   }
 
-  public boolean isOnPath() {
+  public final boolean isOnPath() {
     return onPath;
   }
 
-  public void setOnPath(boolean onPath) {
+  public final void setOnPath(boolean onPath) {
     this.onPath = onPath;
   }
 
-  public boolean isKnockBack() {
+  public final boolean isKnockBack() {
     return knockBack;
   }
 
-  public void setKnockBack(boolean knockBack) {
+  public final void setKnockBack(boolean knockBack) {
     this.knockBack = knockBack;
   }
 
-  public String getKnockBackDirection() {
+  public final String getKnockBackDirection() {
     return knockBackDirection;
   }
 
-  public void setKnockBackDirection(String knockBackDirection) {
+  public final void setKnockBackDirection(String knockBackDirection) {
     this.knockBackDirection = knockBackDirection;
   }
 
-  public boolean isGuarding() {
+  public final boolean isGuarding() {
     return guarding;
   }
 
-  public void setGuarding(boolean guarding) {
+  public final void setGuarding(boolean guarding) {
     this.guarding = guarding;
   }
 
-  public boolean isTransparent() {
+  public final boolean isTransparent() {
     return transparent;
   }
 
-  public void setTransparent(boolean transparent) {
+  public final void setTransparent(boolean transparent) {
     this.transparent = transparent;
   }
 
-  public boolean isOffBalance() {
+  public final boolean isOffBalance() {
     return offBalance;
   }
 
-  public void setOffBalance(boolean offBalance) {
+  public final void setOffBalance(boolean offBalance) {
     this.offBalance = offBalance;
   }
 
-  public Entity getLoot() {
+  public final Entity getLoot() {
     return loot;
   }
 
-  public boolean isOpened() {
+  public final boolean isOpened() {
     return opened;
   }
 
-  public void setOpened(boolean opened) {
+  public final void setOpened(boolean opened) {
     this.opened = opened;
   }
 
-  public boolean isInRage() {
+  public final boolean isInRage() {
     return inRage;
   }
 
-  public void setInRage(boolean inRage) {
+  public final void setInRage(boolean inRage) {
     this.inRage = inRage;
   }
 
-  public boolean isSleep() {
+  public final boolean isSleep() {
     return sleep;
   }
 
-  public void setSleep(boolean sleep) {
+  public final void setSleep(boolean sleep) {
     this.sleep = sleep;
   }
 
-  public boolean isDrawing() {
+  public final boolean isDrawing() {
     return drawing;
   }
 
-  public void setDrawing(boolean drawing) {
+  public final void setDrawing(boolean drawing) {
     this.drawing = drawing;
   }
 
-  public boolean isAttackDamageApplied() {
+  public final boolean isAttackDamageApplied() {
     return attackDamageApplied;
   }
 
-  public void setAttackDamageApplied(boolean attackDamageApplied) {
+  public final void setAttackDamageApplied(boolean attackDamageApplied) {
     this.attackDamageApplied = attackDamageApplied;
   }
 
-  public int getSpriteCounter() {
+  public final int getSpriteCounter() {
     return spriteCounter;
   }
 
-  public void setSpriteCounter(int spriteCounter) {
+  public final void setSpriteCounter(int spriteCounter) {
     this.spriteCounter = spriteCounter;
   }
 
-  public int getActionLockCounter() {
+  public final int getActionLockCounter() {
     return actionLockCounter;
   }
 
-  public void setActionLockCounter(int actionLockCounter) {
+  public final void setActionLockCounter(int actionLockCounter) {
     this.actionLockCounter = actionLockCounter;
   }
 
-  public int getInvincibleCounter() {
+  public final int getInvincibleCounter() {
     return invincibleCounter;
   }
 
-  public void setInvincibleCounter(int invincibleCounter) {
+  public final void setInvincibleCounter(int invincibleCounter) {
     this.invincibleCounter = invincibleCounter;
   }
 
-  public int getShotAvailableCounter() {
+  public final int getShotAvailableCounter() {
     return shotAvailableCounter;
   }
 
-  public void setShotAvailableCounter(int shotAvailableCounter) {
+  public final void setShotAvailableCounter(int shotAvailableCounter) {
     this.shotAvailableCounter = shotAvailableCounter;
   }
 
-  public int getHpBarCounter() {
+  public final int getHpBarCounter() {
     return hpBarCounter;
   }
 
-  public void setHpBarCounter(int hpBarCounter) {
+  public final void setHpBarCounter(int hpBarCounter) {
     this.hpBarCounter = hpBarCounter;
   }
 
-  public int getKnockBackCounter() {
+  public final int getKnockBackCounter() {
     return knockBackCounter;
   }
 
-  public void setKnockBackCounter(int knockBackCounter) {
+  public final void setKnockBackCounter(int knockBackCounter) {
     this.knockBackCounter = knockBackCounter;
   }
 
-  public int getGuardCounter() {
+  public final int getGuardCounter() {
     return guardCounter;
   }
 
-  public void setGuardCounter(int guardCounter) {
+  public final void setGuardCounter(int guardCounter) {
     this.guardCounter = guardCounter;
   }
 
-  public int getOffBalanceCounter() {
+  public final int getOffBalanceCounter() {
     return offBalanceCounter;
   }
 
-  public void setOffBalanceCounter(int offBalanceCounter) {
+  public final void setOffBalanceCounter(int offBalanceCounter) {
     this.offBalanceCounter = offBalanceCounter;
   }
 
-  public String getName() {
+  public final String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public final void setName(String name) {
     this.name = name;
   }
 
-  public int getDefaultSpeed() {
+  public final int getDefaultSpeed() {
     return defaultSpeed;
   }
 
-  public void setDefaultSpeed(int defaultSpeed) {
+  public final void setDefaultSpeed(int defaultSpeed) {
     this.defaultSpeed = defaultSpeed;
   }
 
-  public int getSpeed() {
+  public final int getSpeed() {
     return speed;
   }
 
-  public void setSpeed(int speed) {
+  public final void setSpeed(int speed) {
     this.speed = speed;
   }
 
-  public int getMaxLife() {
+  public final int getMaxLife() {
     return maxLife;
   }
 
-  public void setMaxLife(int maxLife) {
+  public final void setMaxLife(int maxLife) {
     this.maxLife = maxLife;
   }
 
-  public int getLife() {
+  public final int getLife() {
     return life;
   }
 
-  public void setLife(int life) {
+  public final void setLife(int life) {
     this.life = life;
   }
 
-  public int getMaxMana() {
+  public final int getMaxMana() {
     return maxMana;
   }
 
-  public void setMaxMana(int maxMana) {
+  public final void setMaxMana(int maxMana) {
     this.maxMana = maxMana;
   }
 
-  public int getMana() {
+  public final int getMana() {
     return mana;
   }
 
-  public void setMana(int mana) {
+  public final void setMana(int mana) {
     this.mana = mana;
   }
 
-  public int getAmmo() {
+  public final int getAmmo() {
     return ammo;
   }
 
-  public void setAmmo(int ammo) {
+  public final void setAmmo(int ammo) {
     this.ammo = ammo;
   }
 
-  public int getLevel() {
+  public final int getLevel() {
     return level;
   }
 
-  public void setLevel(int level) {
+  public final void setLevel(int level) {
     this.level = level;
   }
 
-  public int getStrength() {
+  public final int getStrength() {
     return strength;
   }
 
-  public void setStrength(int strength) {
+  public final void setStrength(int strength) {
     this.strength = strength;
   }
 
-  public int getDexterity() {
+  public final int getDexterity() {
     return dexterity;
   }
 
-  public void setDexterity(int dexterity) {
+  public final void setDexterity(int dexterity) {
     this.dexterity = dexterity;
   }
 
-  public int getAttack() {
+  public final int getAttack() {
     return attack;
   }
 
-  public void setAttack(int attack) {
+  public final void setAttack(int attack) {
     this.attack = attack;
   }
 
@@ -1109,251 +1112,251 @@ public class Entity {
     return defense;
   }
 
-  public void setDefense(int defense) {
+  public final void setDefense(int defense) {
     this.defense = defense;
   }
 
-  public int getExp() {
+  public final int getExp() {
     return exp;
   }
 
-  public void setExp(int exp) {
+  public final void setExp(int exp) {
     this.exp = exp;
   }
 
-  public int getNextLevelExp() {
+  public final int getNextLevelExp() {
     return nextLevelExp;
   }
 
-  public void setNextLevelExp(int nextLevelExp) {
+  public final void setNextLevelExp(int nextLevelExp) {
     this.nextLevelExp = nextLevelExp;
   }
 
-  public int getCoin() {
+  public final int getCoin() {
     return coin;
   }
 
-  public void setCoin(int coin) {
+  public final void setCoin(int coin) {
     this.coin = coin;
   }
 
-  public int getMotion1Duration() {
+  public final int getMotion1Duration() {
     return motion1Duration;
   }
 
-  public void setMotion1Duration(int motion1Duration) {
+  public final void setMotion1Duration(int motion1Duration) {
     this.motion1Duration = motion1Duration;
   }
 
-  public int getMotion2Duration() {
+  public final int getMotion2Duration() {
     return motion2Duration;
   }
 
-  public void setMotion2Duration(int motion2Duration) {
+  public final void setMotion2Duration(int motion2Duration) {
     this.motion2Duration = motion2Duration;
   }
 
-  public Entity getCurrentWeapon() {
+  public final Entity getCurrentWeapon() {
     return equipment.getCurrentWeapon();
   }
 
-  public void setCurrentWeapon(Entity currentWeapon) {
+  public final void setCurrentWeapon(Entity currentWeapon) {
     equipment.setCurrentWeapon(currentWeapon);
   }
 
-  public Entity getCurrentShield() {
+  public final Entity getCurrentShield() {
     return equipment.getCurrentShield();
   }
 
-  public void setCurrentShield(Entity currentShield) {
+  public final void setCurrentShield(Entity currentShield) {
     equipment.setCurrentShield(currentShield);
   }
 
-  public Entity getCurrentBoots() {
+  public final Entity getCurrentBoots() {
     return equipment.getCurrentBoots();
   }
 
-  public void setCurrentBoots(Entity currentBoots) {
+  public final void setCurrentBoots(Entity currentBoots) {
     equipment.setCurrentBoots(currentBoots);
   }
 
-  public Entity getCurrentLight() {
+  public final Entity getCurrentLight() {
     return equipment.getCurrentLight();
   }
 
-  public void setCurrentLight(Entity currentLight) {
+  public final void setCurrentLight(Entity currentLight) {
     equipment.setCurrentLight(currentLight);
   }
 
-  public Projectile getProjectile() {
+  public final Projectile getProjectile() {
     return projectile;
   }
 
-  public void setProjectile(Projectile projectile) {
+  public final void setProjectile(Projectile projectile) {
     this.projectile = projectile;
   }
 
-  public boolean isBoss() {
+  public final boolean isBoss() {
     return boss;
   }
 
-  public void setBoss(boolean boss) {
+  public final void setBoss(boolean boss) {
     this.boss = boss;
   }
 
-  public List<Entity> getInventory() {
+  public final List<Entity> getInventory() {
     return inventoryComponent.getInventory();
   }
 
-  public int getValue() {
+  public final int getValue() {
     return itemAttributes.getValue();
   }
 
-  public void setValue(int value) {
+  public final void setValue(int value) {
     itemAttributes.setValue(value);
   }
 
-  public int getAttackValue() {
+  public final int getAttackValue() {
     return itemAttributes.getAttackValue();
   }
 
-  public void setAttackValue(int attackValue) {
+  public final void setAttackValue(int attackValue) {
     itemAttributes.setAttackValue(attackValue);
   }
 
-  public int getDefenseValue() {
+  public final int getDefenseValue() {
     return itemAttributes.getDefenseValue();
   }
 
-  public void setDefenseValue(int defenseValue) {
+  public final void setDefenseValue(int defenseValue) {
     itemAttributes.setDefenseValue(defenseValue);
   }
 
-  public int getSpeedValue() {
+  public final int getSpeedValue() {
     return itemAttributes.getSpeedValue();
   }
 
-  public void setSpeedValue(int speedValue) {
+  public final void setSpeedValue(int speedValue) {
     itemAttributes.setSpeedValue(speedValue);
   }
 
-  public String getDescription() {
+  public final String getDescription() {
     return itemAttributes.getDescription();
   }
 
-  public void setDescription(String description) {
+  public final void setDescription(String description) {
     itemAttributes.setDescription(description);
   }
 
-  public int getUseCost() {
+  public final int getUseCost() {
     return itemAttributes.getUseCost();
   }
 
-  public void setUseCost(int useCost) {
+  public final void setUseCost(int useCost) {
     itemAttributes.setUseCost(useCost);
   }
 
-  public int getPrice() {
+  public final int getPrice() {
     return itemAttributes.getPrice();
   }
 
-  public void setPrice(int price) {
+  public final void setPrice(int price) {
     itemAttributes.setPrice(price);
   }
 
-  public int getKnockBackPower() {
+  public final int getKnockBackPower() {
     return itemAttributes.getKnockBackPower();
   }
 
-  public void setKnockBackPower(int knockBackPower) {
+  public final void setKnockBackPower(int knockBackPower) {
     itemAttributes.setKnockBackPower(knockBackPower);
   }
 
-  public boolean isStackable() {
+  public final boolean isStackable() {
     return itemAttributes.isStackable();
   }
 
-  public void setStackable(boolean stackable) {
+  public final void setStackable(boolean stackable) {
     itemAttributes.setStackable(stackable);
   }
 
-  public int getAmount() {
+  public final int getAmount() {
     return itemAttributes.getAmount();
   }
 
-  public void setAmount(int amount) {
+  public final void setAmount(int amount) {
     itemAttributes.setAmount(amount);
   }
 
-  public int getLightRadius() {
+  public final int getLightRadius() {
     return itemAttributes.getLightRadius();
   }
 
-  public void setLightRadius(int lightRadius) {
+  public final void setLightRadius(int lightRadius) {
     itemAttributes.setLightRadius(lightRadius);
   }
 
-  public int getType() {
+  public final int getType() {
     return type;
   }
 
-  public void setType(int type) {
+  public final void setType(int type) {
     this.type = type;
   }
 
-  public Entity getCurrentHelmet() {
+  public final Entity getCurrentHelmet() {
     return equipment.getCurrentHelmet();
   }
 
-  public void setCurrentHelmet(Entity currentHelmet) {
+  public final void setCurrentHelmet(Entity currentHelmet) {
     equipment.setCurrentHelmet(currentHelmet);
   }
 
-  public Entity getCurrentChest() {
+  public final Entity getCurrentChest() {
     return equipment.getCurrentChest();
   }
 
-  public void setCurrentChest(Entity currentChest) {
+  public final void setCurrentChest(Entity currentChest) {
     equipment.setCurrentChest(currentChest);
   }
 
-  public Entity getCurrentLegs() {
+  public final Entity getCurrentLegs() {
     return equipment.getCurrentLegs();
   }
 
-  public void setCurrentLegs(Entity currentLegs) {
+  public final void setCurrentLegs(Entity currentLegs) {
     equipment.setCurrentLegs(currentLegs);
   }
 
-  public String getInternalId() {
+  public final String getInternalId() {
     return internalId;
   }
 
-  public void setInternalId(String internalId) {
+  public final void setInternalId(String internalId) {
     this.internalId = internalId;
   }
 
-  public String getTranslationKey() {
+  public final String getTranslationKey() {
     return translationKey;
   }
 
-  public void setTranslationKey(String translationKey) {
+  public final void setTranslationKey(String translationKey) {
     this.translationKey = translationKey;
   }
 
-  public int getGuardStaminaCapacity() {
+  public final int getGuardStaminaCapacity() {
     return itemAttributes.getGuardStaminaCapacity();
   }
 
-  public void setGuardStaminaCapacity(int guardStaminaCapacity) {
+  public final void setGuardStaminaCapacity(int guardStaminaCapacity) {
     itemAttributes.setGuardStaminaCapacity(guardStaminaCapacity);
   }
 
-  public boolean isDropHandled() {
+  public final boolean isDropHandled() {
     return respawn.isDropHandled();
   }
 
-  public void setDropHandled(boolean dropHandled) {
+  public final void setDropHandled(boolean dropHandled) {
     respawn.setDropHandled(dropHandled);
   }
 }
