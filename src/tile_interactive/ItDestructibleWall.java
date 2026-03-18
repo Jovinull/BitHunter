@@ -7,7 +7,7 @@ import entity.Entity;
 import main.GamePanel;
 import object.ObjCoinBronze;
 
-public class ItDestructibleWall extends InteractiveTile {
+public final class ItDestructibleWall extends InteractiveTile {
 
   public static final String TILE_ID = "tile.destructibleWall";
   private static final Random RNG = new Random();

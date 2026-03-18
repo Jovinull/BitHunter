@@ -3,7 +3,7 @@ package object;
 import entity.Entity;
 import main.GamePanel;
 
-public class ObjPickaxe extends Entity {
+public final class ObjPickaxe extends Entity {
 
   public static final String OBJ_ID = "item.pickaxe";
 

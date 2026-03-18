@@ -2,7 +2,7 @@ package entity;
 
 import main.GamePanel;
 
-public class PlayerDummy extends Entity {
+public final class PlayerDummy extends Entity {
 
   public static final String NPC_ID = "npc.dummy";
 

@@ -9,7 +9,7 @@ import object.ObjDoorIron;
 import tile_interactive.InteractiveTile;
 import tile_interactive.ItMetalPlate;
 
-public class NpcBigRock extends Entity {
+public final class NpcBigRock extends Entity {
 
   // Identificador interno estável do NPC (usado para lógica)
   public static final String NPC_ID = "npc.bigRock";

@@ -15,7 +15,7 @@ import main.GamePanel;
  * - Se tem moedas e espaço → cobra as moedas, entrega o loot e abre o baú.
  * - Se já aberto → mensagem de "vazio".
  */
-public class ObjChestSecret extends Entity {
+public final class ObjChestSecret extends Entity {
 
   public static final String OBJ_ID = "item.chestSecret";
 

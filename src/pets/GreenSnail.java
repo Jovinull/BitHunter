@@ -15,7 +15,7 @@ import main.GamePanel;
  * - Ao recuperar mana: gera partículas azul-esverdeadas, brilha e mostra
  * mensagem no log.
  */
-public class GreenSnail extends PetEntity {
+public final class GreenSnail extends PetEntity {
 
   /**
    * ID lógico estável do PET.

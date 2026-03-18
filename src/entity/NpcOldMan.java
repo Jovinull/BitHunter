@@ -4,7 +4,7 @@ import java.awt.Rectangle;
 
 import main.GamePanel;
 
-public class NpcOldMan extends Entity {
+public final class NpcOldMan extends Entity {
 
   public static final String NPC_ID = "npc.oldMan";
 

@@ -14,7 +14,7 @@ import main.GamePanel;
  * - Cura periodicamente.
  * - Ao curar: gera partículas verdes, brilha e mostra mensagem no log.
  */
-public class YellowSnail extends PetEntity {
+public final class YellowSnail extends PetEntity {
 
   /**
    * ID lógico estável do PET.

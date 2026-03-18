@@ -6,7 +6,7 @@ import entity.Entity;
 import entity.Projectile;
 import main.GamePanel;
 
-public class ObjFireball extends Projectile {
+public final class ObjFireball extends Projectile {
 
   public static final String OBJ_ID = "item.fireball";
 

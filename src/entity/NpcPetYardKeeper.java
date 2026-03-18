@@ -8,7 +8,7 @@ import main.GamePanel;
  * NPC responsável pelo viveiro de pets (Pet Yard).
  * Sprite: /npc/yard.png
  */
-public class NpcPetYardKeeper extends Entity {
+public final class NpcPetYardKeeper extends Entity {
 
   private static final String NPC_ID = "npc.petYardKeeper";
 

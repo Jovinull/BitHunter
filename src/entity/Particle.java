@@ -6,7 +6,7 @@ import java.awt.Point;
 
 import main.GamePanel;
 
-public class Particle extends Entity {
+public final class Particle extends Entity {
 
   private static final int LOW_LIFE_DIVISOR = 3;
 

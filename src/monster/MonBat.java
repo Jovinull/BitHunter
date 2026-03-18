@@ -8,7 +8,7 @@ import object.ObjCoinBronze;
 import object.ObjHeart;
 import object.ObjManaCrystal;
 
-public class MonBat extends Entity {
+public final class MonBat extends Entity {
 
   public static final String MON_ID = "monster.bat";
 

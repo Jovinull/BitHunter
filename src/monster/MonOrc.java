@@ -8,7 +8,7 @@ import object.ObjCoinBronze;
 import object.ObjHeart;
 import object.ObjManaCrystal;
 
-public class MonOrc extends Entity {
+public final class MonOrc extends Entity {
 
   public static final String MON_ID = "monster.orc";
   private static final int FRAMES_PER_SECOND = 60;

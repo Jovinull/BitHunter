@@ -5,7 +5,7 @@ import java.awt.Color;
 import entity.Entity;
 import main.GamePanel;
 
-public class ItDryTree extends InteractiveTile {
+public final class ItDryTree extends InteractiveTile {
 
   public static final String TILE_ID = "tile.dryTree";
 

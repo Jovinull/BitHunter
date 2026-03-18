@@ -13,7 +13,7 @@ import object.ObjShieldWood;
 import object.ObjSwordNormal;
 import object.ObjClock;
 
-public class NpcMerchant extends Entity {
+public final class NpcMerchant extends Entity {
 
   public static final String NPC_ID = "npc.merchant";
 
