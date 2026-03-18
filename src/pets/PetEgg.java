@@ -11,6 +11,9 @@ import main.GamePanel;
  * - custo em moedas para chocar
  * - tempo em "ticks" de jogo para chocar (usando 60 FPS)
  */
+// this-escape: chama setStackable()/setType() de Entity no construtor.
+// Seguro pois nenhuma subclasse sobrescreve esses setters.
+@SuppressWarnings("this-escape")
 public abstract class PetEgg extends Entity {
 
   private final String petId;

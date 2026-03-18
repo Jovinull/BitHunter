@@ -25,6 +25,9 @@ import pets.PetFactory;
 import pets.YellowSnailEgg;
 import tile_interactive.InteractiveTile;
 
+// this-escape: construtor acessa getSolidArea() de Entity.
+// Seguro pois Player não possui subclasses.
+@SuppressWarnings("this-escape")
 public class Player extends Entity {
 
   private final KeyHandler keyH;
