@@ -1,0 +1,47 @@
+name: CI — Quality Checks
+
+on:
+  push:
+    paths: ['src/**', 'resource/lang/**', 'tools/**']
+  pull_request:
+    paths: ['src/**', 'resource/lang/**', 'tools/**']
+
+jobs:
+  compile:
+    name: Compilar com warnings como erros
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java 24
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '24'
+
+      - name: Compilar com -Xlint:all -Werror
+        run: |
+          mkdir -p build/classes
+          javac --release 24 -Xlint:all -Werror -d build/classes $(find src -name "*.java")
+
+      - name: Copiar resources e montar JAR
+        run: |
+          cp -r resource/* build/classes/
+          jar --create --file build/app.jar --main-class main.Main -C build/classes .
+
+  i18n:
+    name: Validar i18n (10 idiomas)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java 24
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '24'
+
+      - name: Validar chaves de tradução
+        run: |
+          javac tools/I18nValidator.java -d tools
+          java -cp tools I18nValidator
