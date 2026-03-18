@@ -79,6 +79,9 @@ public class Map extends TileManager {
   // Construtor
   // ====================================================================
 
+  // this-escape: createWorldMap() acessa método herdado de TileManager.
+  // Seguro pois Map não possui subclasses.
+  @SuppressWarnings("this-escape")
   public Map(GamePanel gp) {
     super(gp);
     this.markerProvider = new MapMarkerProvider(gp);
@@ -123,7 +126,7 @@ public class Map extends TileManager {
   // Criação do world map (pre-render dos tiles)
   // ====================================================================
 
-  public void createWorldMap() {
+  private void createWorldMap() {
     worldMap = new BufferedImage[GamePanel.MAX_MAP];
 
     int maxWorldCol = gp.getMaxWorldCol();
