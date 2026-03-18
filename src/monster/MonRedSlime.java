@@ -9,7 +9,7 @@ import object.ObjHeart;
 import object.ObjManaCrystal;
 import object.ObjRock;
 
-public class MonRedSlime extends Entity {
+public final class MonRedSlime extends Entity {
 
   public static final String MON_ID = "monster.redSlime";
 

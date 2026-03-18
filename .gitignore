@@ -60,4 +60,5 @@ replay_pid*
 # Build artifacts (BitHunter)
 /build/
 /classes/
-/.claude/
+# Claude Code — compartilhar hooks do projeto, ignorar permissões pessoais
+.claude/settings.local.json

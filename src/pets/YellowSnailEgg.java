@@ -6,7 +6,7 @@ import main.GamePanel;
  * Ovo do Caracol Amarelo.
  * Sprite: /eggs/yellow_snail_egg.png
  */
-public class YellowSnailEgg extends PetEgg {
+public final class YellowSnailEgg extends PetEgg {
 
   public static final String OBJ_ID = "egg.yellowSnail";
 

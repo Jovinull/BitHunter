@@ -67,7 +67,7 @@ public class Lighting {
     setLightSource();
   }
 
-  public void setLightSource() {
+  private void setLightSource() {
     if (darknessFilter == null) {
       darknessFilter = new BufferedImage(
           GamePanel.SCREEN_WIDTH,

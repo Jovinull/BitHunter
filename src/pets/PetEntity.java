@@ -13,6 +13,9 @@ import main.GamePanel;
  * - Não usa colisão/ataque da Entity.
  * - Cada pet aplica seu efeito passivo em applyPassiveEffect().
  */
+// this-escape: chama setType() de Entity no construtor.
+// Seguro pois nenhuma subclasse sobrescreve setType().
+@SuppressWarnings("this-escape")
 public abstract class PetEntity extends Entity {
 
   protected final Player owner;

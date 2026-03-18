@@ -5,6 +5,9 @@ import java.awt.Graphics2D;
 import entity.Entity;
 import main.GamePanel;
 
+// this-escape: chama setWorldX/setWorldY de Entity no construtor.
+// Seguro pois nenhuma subclasse sobrescreve esses setters.
+@SuppressWarnings("this-escape")
 public abstract class InteractiveTile extends Entity {
 
   private boolean destructible = false;

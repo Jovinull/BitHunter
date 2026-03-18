@@ -1,8 +1,12 @@
 package main;
 
 import java.awt.Rectangle;
+import java.io.Serial;
 
 public class EventRect extends Rectangle {
+
+  @Serial
+  private static final long serialVersionUID = 1L;
 
   int eventRectDefaultX;
   int eventRectDefaultY;

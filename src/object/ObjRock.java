@@ -6,7 +6,7 @@ import entity.Entity;
 import entity.Projectile;
 import main.GamePanel;
 
-public class ObjRock extends Projectile {
+public final class ObjRock extends Projectile {
 
   public static final String OBJ_ID = "item.rock";
   private static final String ROCK_SPRITE_PATH = "/projectile/rock_down_1";

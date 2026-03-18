@@ -14,6 +14,9 @@ import main.KeyHandler;
 import main.LanguageManager;
 import object.ObjCoinBronze;
 
+// this-escape: arquitetura hub-and-spoke — sub-UIs recebem referência ao orquestrador
+// durante inicialização. Seguro pois UI não possui subclasses.
+@SuppressWarnings("this-escape")
 public class UI {
 
   // --- Referência do jogo ---

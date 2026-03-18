@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PreCommit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'JAVAC=\"/c/Program Files/Zulu/zulu-25/bin/javac\"; JAVA=\"/c/Program Files/Zulu/zulu-25/bin/java\"; echo \"=== Verificando compilacao (warnings como erros) ===\"; mkdir -p build/classes && \"$JAVAC\" --release 24 -Xlint:all -Werror -d build/classes $(find src -name \"*.java\") 2>&1; COMPILE=$?; echo \"=== Validando i18n ===\"; \"$JAVAC\" tools/I18nValidator.java -d tools 2>&1 && \"$JAVA\" -cp tools I18nValidator 2>&1; I18N=$?; if [ $COMPILE -ne 0 ] || [ $I18N -ne 0 ]; then echo \"FALHOU: corrija os erros acima antes de commitar\"; exit 1; fi; echo \"Tudo OK!\"'"
+          }
+        ]
+      }
+    ]
+  }
+}

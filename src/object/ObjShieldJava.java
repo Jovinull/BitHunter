@@ -26,7 +26,7 @@ import main.GamePanel;
  * Todas as constantes são centralizadas nesta classe para fácil ajuste de
  * balanceamento.
  */
-public class ObjShieldJava extends Entity {
+public final class ObjShieldJava extends Entity {
 
   public static final String OBJ_ID = "item.shieldJava";
 

@@ -32,7 +32,7 @@ public class PathFinder {
     instantiateNodes();
   }
 
-  public void instantiateNodes() {
+  private void instantiateNodes() {
     int maxCol = gp.getMaxWorldCol();
     int maxRow = gp.getMaxWorldRow();
 

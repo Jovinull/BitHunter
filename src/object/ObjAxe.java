@@ -5,7 +5,7 @@ import java.awt.Rectangle;
 import entity.Entity;
 import main.GamePanel;
 
-public class ObjAxe extends Entity {
+public final class ObjAxe extends Entity {
 
   public static final String OBJ_ID = "item.axe";
 

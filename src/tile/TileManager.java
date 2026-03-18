@@ -99,7 +99,7 @@ public class TileManager {
   /**
    * Configura um tile individual
    */
-  public void setup(int index, String imageName, boolean collision) {
+  private void setup(int index, String imageName, boolean collision) {
     UtilityTool uTool = new UtilityTool();
     try {
       Tile t = new Tile();

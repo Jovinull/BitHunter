@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import java.io.Serial;
+
 import javax.swing.JPanel;
 
 import ai.PathFinder;
@@ -33,7 +35,13 @@ import ui.UI;
 
 // Painel principal do jogo. Responsável por configurar, atualizar e desenhar o jogo.
 // Implementa Runnable para rodar o loop de jogo em uma thread separada.
+// this-escape: arquitetura hub-and-spoke — componentes recebem referência ao painel durante
+// inicialização. Seguro pois GamePanel não possui subclasses.
+@SuppressWarnings("this-escape")
 public class GamePanel extends JPanel implements Runnable {
+
+  @Serial
+  private static final long serialVersionUID = 1L;
 
   private static final Logger LOGGER = Logger.getLogger(GamePanel.class.getName());
   private static final boolean DEBUG_RESPAWN = false;

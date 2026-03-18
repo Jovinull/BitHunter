@@ -3,7 +3,7 @@ package object;
 import entity.Entity;
 import main.GamePanel;
 
-public class ObjCoinBronze extends Entity {
+public final class ObjCoinBronze extends Entity {
 
   public static final String OBJ_ID = "item.coin.bronze";
 

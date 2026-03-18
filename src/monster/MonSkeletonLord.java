@@ -10,7 +10,7 @@ import object.ObjDoorIron;
 import object.ObjHeart;
 import object.ObjManaCrystal;
 
-public class MonSkeletonLord extends Entity {
+public final class MonSkeletonLord extends Entity {
 
   public static final String MON_ID = "monster.skeletonLord";
   private static final int BOSS_SCALE = 5;

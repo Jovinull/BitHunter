@@ -4,7 +4,7 @@ import java.awt.Rectangle;
 
 import main.GamePanel;
 
-public class ItMetalPlate extends InteractiveTile {
+public final class ItMetalPlate extends InteractiveTile {
 
   public static final String TILE_ID = "tile.metalPlate";
 

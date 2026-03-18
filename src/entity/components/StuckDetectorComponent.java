@@ -99,7 +99,7 @@ public class StuckDetectorComponent {
   }
 
   /** Reinicia todos o estado do detector. */
-  public void reset() {
+  private void reset() {
     frameCounter = 0;
     stuckChecks = 0;
     idleFramesLeft = 0;

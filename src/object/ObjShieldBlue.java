@@ -3,7 +3,7 @@ package object;
 import entity.Entity;
 import main.GamePanel;
 
-public class ObjShieldBlue extends Entity {
+public final class ObjShieldBlue extends Entity {
 
   public static final String OBJ_ID = "item.shieldBlue";
 
