@@ -232,6 +232,56 @@ public class AssetSetter {
     }
   }
 
+  /**
+   * Reseta o estado dos monstros já instanciados (vida, posição, flags)
+   * sem recriar objetos. Evita alocação e carregamento de sprites na transição.
+   * O boss é tratado de forma especial: removido se já derrotado.
+   */
+  public void resetMonsters() {
+    var monsters = gp.getMonster();
+
+    for (int mapNum = 0; mapNum < GamePanel.MAX_MAP; mapNum++) {
+      for (int i = 0; i < monsters[mapNum].length; i++) {
+        Entity mon = monsters[mapNum][i];
+        if (mon == null) {
+          continue;
+        }
+
+        // Boss derrotado: manter slot como null
+        if (mon.isBoss() && Progress.isSkeletonLordDefeated()) {
+          monsters[mapNum][i] = null;
+          continue;
+        }
+
+        // Reseta ao estado original de spawn
+        mon.setLife(mon.getMaxLife());
+        mon.setAlive(true);
+        mon.setDying(false);
+        mon.setInvincible(false);
+        mon.setTransparent(false);
+        mon.setKnockBack(false);
+        mon.setKnockBackDirection(null);
+        mon.setCollisionOn(false);
+        mon.setOnPath(false);
+        mon.setSpeed(mon.getDefaultSpeed());
+        mon.setDropHandled(false);
+        mon.setDrawing(true);
+        mon.resetCounter();
+
+        // Boss: manter dormindo até o jogador ativar
+        if (mon.isBoss()) {
+          mon.setSleep(true);
+          mon.setInRage(false);
+        }
+
+        // Reposiciona no ponto de spawn original
+        mon.setSpawnPoint(mon.getSpawnWorldX(), mon.getSpawnWorldY());
+        mon.setWorldX(mon.getSpawnWorldX());
+        mon.setWorldY(mon.getSpawnWorldY());
+      }
+    }
+  }
+
   public void setInteractiveTile() {
     var interactiveTiles = gp.getiTile();
 
