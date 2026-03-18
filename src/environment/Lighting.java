@@ -40,6 +40,16 @@ public class Lighting {
       1f
   };
 
+  // Fator de redução de resolução do filtro de escuridão.
+  // Renderiza em metade da resolução e escala 2x ao desenhar (4x menos pixels).
+  private static final int SCALE_FACTOR = 2;
+  private static final int FILTER_WIDTH = GamePanel.SCREEN_WIDTH / SCALE_FACTOR;
+  private static final int FILTER_HEIGHT = GamePanel.SCREEN_HEIGHT / SCALE_FACTOR;
+
+  // Limiar de movimento para recalcular o gradiente (1 tile = 48px).
+  // Evita recriar o RadialGradientPaint a cada pixel de movimento.
+  private static final int REBUILD_THRESHOLD = GamePanel.TILE_SIZE;
+
   private final GamePanel gp;
   private BufferedImage darknessFilter;
 
@@ -59,47 +69,51 @@ public class Lighting {
    */
   private Font debugPhaseFont;
 
+  // Centro da luz na última renderização (coordenadas de tela, escala original)
   private int lastLightCenterX = -1;
   private int lastLightCenterY = -1;
 
   public Lighting(GamePanel gp) {
     this.gp = gp;
-    setLightSource();
+    rebuildFilter();
   }
 
-  private void setLightSource() {
+  private void rebuildFilter() {
     if (darknessFilter == null) {
       darknessFilter = new BufferedImage(
-          GamePanel.SCREEN_WIDTH,
-          GamePanel.SCREEN_HEIGHT,
-          BufferedImage.TYPE_INT_ARGB);
+          FILTER_WIDTH, FILTER_HEIGHT, BufferedImage.TYPE_INT_ARGB);
     }
 
     Graphics2D g2 = (Graphics2D) darknessFilter.getGraphics();
 
     g2.setComposite(AlphaComposite.Clear);
-    g2.fillRect(0, 0, GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT);
+    g2.fillRect(0, 0, FILTER_WIDTH, FILTER_HEIGHT);
     g2.setComposite(AlphaComposite.SrcOver);
 
     var player = gp.getPlayer();
 
-    int centerX = player.getWorldX() - gp.getCameraX() + GamePanel.TILE_SIZE / 2;
-    int centerY = player.getWorldY() - gp.getCameraY() + GamePanel.TILE_SIZE / 2;
+    // Centro na resolução original
+    int screenCenterX = player.getWorldX() - gp.getCameraX() + GamePanel.TILE_SIZE / 2;
+    int screenCenterY = player.getWorldY() - gp.getCameraY() + GamePanel.TILE_SIZE / 2;
+
+    // Converte para resolução reduzida
+    int centerX = screenCenterX / SCALE_FACTOR;
+    int centerY = screenCenterY / SCALE_FACTOR;
 
     if (player.getCurrentLight() == null) {
       g2.setColor(new Color(0, 0, 0.1f, 0.97f));
     } else {
-      int radius = player.getCurrentLight().getLightRadius();
+      int radius = player.getCurrentLight().getLightRadius() / SCALE_FACTOR;
       RadialGradientPaint gPaint = new RadialGradientPaint(
           centerX, centerY, radius, LIGHT_GRADIENT_FRACTIONS, LIGHT_GRADIENT_COLORS);
       g2.setPaint(gPaint);
     }
 
-    g2.fillRect(0, 0, GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT);
+    g2.fillRect(0, 0, FILTER_WIDTH, FILTER_HEIGHT);
     g2.dispose();
 
-    lastLightCenterX = centerX;
-    lastLightCenterY = centerY;
+    lastLightCenterX = screenCenterX;
+    lastLightCenterY = screenCenterY;
   }
 
   public void resetDay() {
@@ -113,10 +127,17 @@ public class Lighting {
 
     int effectiveCenterX = player.getWorldX() - gp.getCameraX() + GamePanel.TILE_SIZE / 2;
     int effectiveCenterY = player.getWorldY() - gp.getCameraY() + GamePanel.TILE_SIZE / 2;
-    boolean centerMoved = effectiveCenterX != lastLightCenterX || effectiveCenterY != lastLightCenterY;
 
-    if (player.isLightUpdated() || centerMoved) {
-      setLightSource();
+    // Rebuild forçado se houve troca de lanterna/equipamento de luz
+    boolean forceRebuild = player.isLightUpdated();
+
+    // Só recalcula o gradiente se o jogador se moveu >= 1 tile
+    int dx = Math.abs(effectiveCenterX - lastLightCenterX);
+    int dy = Math.abs(effectiveCenterY - lastLightCenterY);
+    boolean tileMoved = dx >= REBUILD_THRESHOLD || dy >= REBUILD_THRESHOLD;
+
+    if (forceRebuild || tileMoved) {
+      rebuildFilter();
       player.setLightUpdated(false);
     }
 
@@ -161,7 +182,9 @@ public class Lighting {
     }
 
     if (currentArea == GamePanel.OUTSIDE || currentArea == GamePanel.DUNGEON) {
-      g2.drawImage(darknessFilter, 0, 0, null);
+      // Escala o filtro de resolução reduzida para a tela inteira
+      g2.drawImage(darknessFilter, 0, 0,
+          GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT, null);
     }
 
     g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
