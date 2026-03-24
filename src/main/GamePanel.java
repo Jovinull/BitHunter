@@ -7,18 +7,17 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import java.io.Serial;
-
 import javax.swing.JPanel;
 
-import ai.PathFinder;
 import achievement.AchievementManager;
 import achievement.AchievementToast;
+import ai.PathFinder;
 import bestiary.BestiaryService;
 import data.GameStatistics;
 import data.PlayTimeTracker;
@@ -193,6 +192,7 @@ public class GamePanel extends JPanel implements Runnable {
     aSetter.setNPC();
 
     if (restart) {
+      ImageCache.clear();
       aSetter.setMonster();
       player.setDefaultValues();
       aSetter.setObject();
@@ -277,7 +277,7 @@ public class GamePanel extends JPanel implements Runnable {
           LOGGER.log(
               Level.INFO,
               "Perf avg(ms) update={0} render={1}",
-              new Object[] {avgUpdateMs, avgRenderMs});
+              new Object[] { avgUpdateMs, avgRenderMs });
         }
         drawCount = 0;
         timer = 0;
@@ -557,7 +557,8 @@ public class GamePanel extends JPanel implements Runnable {
         case OUTSIDE -> playMusic(0);
         case INDOOR -> playMusic(18);
         case DUNGEON -> playMusic(19);
-        default -> { /* área sem música específica */ }
+        default -> {
+          /* área sem música específica */ }
       }
 
       aSetter.setNPC();
@@ -590,19 +591,20 @@ public class GamePanel extends JPanel implements Runnable {
       respawnUpdateLogPending = true;
     }
 
-    LOGGER.log(Level.INFO, "[Respawn] {0} t={1} thread={2}", new Object[] {marker, now, thread});
+    LOGGER.log(Level.INFO, "[Respawn] {0} t={1} thread={2}", new Object[] { marker, now, thread });
 
     if (respawnStartMs > 0
         && ("respawn.end".equals(marker) || "update.resume".equals(marker))) {
       long elapsed = now - respawnStartMs;
-      LOGGER.log(Level.INFO, "[Respawn] {0} elapsedMs={1}", new Object[] {marker, elapsed});
+      LOGGER.log(Level.INFO, "[Respawn] {0} elapsedMs={1}", new Object[] { marker, elapsed });
     }
   }
 
   // ==== CÂMERA (clamping nas bordas do mapa) ====
 
   /**
-   * Posição X da câmera no mundo, clampada para não ultrapassar os limites do mapa.
+   * Posição X da câmera no mundo, clampada para não ultrapassar os limites do
+   * mapa.
    * Estilo SNES: a câmera para na borda e o jogador se desloca dentro da tela.
    */
   public int getCameraX() {
@@ -612,7 +614,8 @@ public class GamePanel extends JPanel implements Runnable {
   }
 
   /**
-   * Posição Y da câmera no mundo, clampada para não ultrapassar os limites do mapa.
+   * Posição Y da câmera no mundo, clampada para não ultrapassar os limites do
+   * mapa.
    */
   public int getCameraY() {
     int camY = player.getWorldY() - player.screenY;
