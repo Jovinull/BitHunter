@@ -191,9 +191,9 @@ public class GamePanel extends JPanel implements Runnable {
     player.restoreStatus();
     player.resetCounter();
     aSetter.setNPC();
-    aSetter.setMonster();
 
     if (restart) {
+      aSetter.setMonster();
       player.setDefaultValues();
       aSetter.setObject();
       aSetter.setInteractiveTile();
@@ -210,6 +210,8 @@ public class GamePanel extends JPanel implements Runnable {
       if (weatherManager != null) {
         weatherManager.reset();
       }
+    } else {
+      aSetter.resetMonsters();
     }
   }
 
@@ -562,7 +564,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     currentArea = nextArea;
-    aSetter.setMonster();
+    aSetter.resetMonsters();
   }
 
   public void removeTempEntity() {

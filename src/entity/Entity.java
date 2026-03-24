@@ -661,6 +661,14 @@ public class Entity {
     respawn.setSpawnPoint(worldX, worldY);
   }
 
+  public final int getSpawnWorldX() {
+    return respawn.getSpawnWorldX();
+  }
+
+  public final int getSpawnWorldY() {
+    return respawn.getSpawnWorldY();
+  }
+
   /**
    * Ativa respawn para esta entidade e define o tempo em frames.
    * Ex.: 60 * 10 = 10 segundos se o jogo roda a 60 FPS.

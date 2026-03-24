@@ -244,7 +244,7 @@ public class EventHandler {
 
       canTouchEvent = false;
 
-      gp.getaSetter().setMonster();
+      gp.getaSetter().resetMonsters();
 
       gp.saveLoad.save();
     }

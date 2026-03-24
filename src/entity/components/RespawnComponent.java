@@ -29,6 +29,14 @@ public class RespawnComponent {
     this.spawnWorldY = worldY;
   }
 
+  public int getSpawnWorldX() {
+    return spawnWorldX;
+  }
+
+  public int getSpawnWorldY() {
+    return spawnWorldY;
+  }
+
   public void enableRespawn(int delayFrames) {
     this.respawnEnabled = true;
     this.respawnDelayFrames = delayFrames;
