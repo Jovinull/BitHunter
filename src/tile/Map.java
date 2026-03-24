@@ -13,16 +13,18 @@ import main.GamePanel;
 /**
  * Gerencia a renderização do mini mapa e do mapa grande (tela cheia).
  *
- * <p>Agora inclui marcadores ({@link MapMarker}) para NPCs, monstros,
+ * <p>
+ * Agora inclui marcadores ({@link MapMarker}) para NPCs, monstros,
  * bosses, tiles interativos e drops, coletados pelo
- * {@link MapMarkerProvider} com cache de ~180ms.</p>
+ * {@link MapMarkerProvider} com cache de ~180ms.
+ * </p>
  *
  * <h3>Toggles de camadas (mapa grande)</h3>
  * <ul>
- *   <li>1 — NPCs</li>
- *   <li>2 — Monstros + Bosses</li>
- *   <li>3 — Interativos (baús, placas, paredes destrutíveis)</li>
- *   <li>4 — Drops (itens no chão)</li>
+ * <li>1 — NPCs</li>
+ * <li>2 — Monstros + Bosses</li>
+ * <li>3 — Interativos (baús, placas, paredes destrutíveis)</li>
+ * <li>4 — Drops (itens no chão)</li>
  * </ul>
  */
 public class Map extends TileManager {
@@ -79,13 +81,10 @@ public class Map extends TileManager {
   // Construtor
   // ====================================================================
 
-  // this-escape: createWorldMap() acessa método herdado de TileManager.
-  // Seguro pois Map não possui subclasses.
-  @SuppressWarnings("this-escape")
   public Map(GamePanel gp) {
     super(gp);
     this.markerProvider = new MapMarkerProvider(gp);
-    createWorldMap();
+    worldMap = new BufferedImage[GamePanel.MAX_MAP];
   }
 
   // ====================================================================
@@ -123,38 +122,44 @@ public class Map extends TileManager {
   }
 
   // ====================================================================
-  // Criação do world map (pre-render dos tiles)
+  // Criação lazy do world map (pre-render dos tiles sob demanda)
   // ====================================================================
 
-  private void createWorldMap() {
-    worldMap = new BufferedImage[GamePanel.MAX_MAP];
+  /**
+   * Garante que o world map do índice informado esteja renderizado.
+   * Gera a imagem apenas se ainda não existir (lazy loading).
+   * Economiza memória ao evitar pré-renderizar todos os 10 mapas na
+   * inicialização.
+   */
+  private void ensureWorldMap(int mapIndex) {
+    if (worldMap[mapIndex] != null) {
+      return;
+    }
 
     int maxWorldCol = gp.getMaxWorldCol();
     int maxWorldRow = gp.getMaxWorldRow();
     int worldMapWidth = GamePanel.TILE_SIZE * maxWorldCol;
     int worldMapHeight = GamePanel.TILE_SIZE * maxWorldRow;
 
-    for (int i = 0; i < GamePanel.MAX_MAP; i++) {
-      worldMap[i] = new BufferedImage(worldMapWidth, worldMapHeight, BufferedImage.TYPE_INT_ARGB);
-      Graphics2D g2 = worldMap[i].createGraphics();
+    worldMap[mapIndex] = new BufferedImage(worldMapWidth, worldMapHeight, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g2 = worldMap[mapIndex].createGraphics();
 
-      int col = 0;
-      int row = 0;
+    int col = 0;
+    int row = 0;
 
-      while (col < maxWorldCol && row < maxWorldRow) {
-        int tileNum = getMapTileNum()[i][col][row];
-        int x = GamePanel.TILE_SIZE * col;
-        int y = GamePanel.TILE_SIZE * row;
-        g2.drawImage(getTiles()[tileNum].getImage(), x, y, null);
+    while (col < maxWorldCol && row < maxWorldRow) {
+      int tileNum = getMapTileNum()[mapIndex][col][row];
+      int x = GamePanel.TILE_SIZE * col;
+      int y = GamePanel.TILE_SIZE * row;
+      g2.drawImage(getTiles()[tileNum].getImage(), x, y, null);
 
-        col++;
-        if (col == maxWorldCol) {
-          col = 0;
-          row++;
-        }
+      col++;
+      if (col == maxWorldCol) {
+        col = 0;
+        row++;
       }
-      g2.dispose();
     }
+    g2.dispose();
   }
 
   // ====================================================================
@@ -174,6 +179,7 @@ public class Map extends TileManager {
     int y = GamePanel.SCREEN_HEIGHT / 2 - height / 2;
 
     int currentMapIndex = gp.getCurrentMap();
+    ensureWorldMap(currentMapIndex);
     g2.drawImage(worldMap[currentMapIndex], x, y, width, height, null);
 
     // Escala: world pixels → display pixels
@@ -213,6 +219,7 @@ public class Map extends TileManager {
     g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, MINI_MAP_ALPHA));
 
     int currentMapIndex = gp.getCurrentMap();
+    ensureWorldMap(currentMapIndex);
     g2.drawImage(worldMap[currentMapIndex], x, y, width, height, null);
 
     // Escala
@@ -248,9 +255,12 @@ public class Map extends TileManager {
   /**
    * Desenha todos os marcadores visíveis sobre o mapa.
    *
-   * @param g2      contexto gráfico
-   * @param markers lista de marcadores do mapa atual
-   * @param view    contexto de posição/escala do mapa na tela
+   * @param g2
+   *          contexto gráfico
+   * @param markers
+   *          lista de marcadores do mapa atual
+   * @param view
+   *          contexto de posição/escala do mapa na tela
    */
   private void drawMarkers(Graphics2D g2, List<MapMarker> markers, MapView view) {
     for (MapMarker marker : markers) {
