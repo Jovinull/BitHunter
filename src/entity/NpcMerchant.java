@@ -5,8 +5,14 @@ import java.awt.Rectangle;
 import main.GamePanel;
 import object.ObjAxe;
 import object.ObjBoots;
+import object.ObjChestIron;
+import object.ObjChestLeather;
+import object.ObjHelmetIron;
+import object.ObjHelmetLeather;
 import object.ObjKey;
 import object.ObjLantern;
+import object.ObjLegsIron;
+import object.ObjLegsLeather;
 import object.ObjPotionRed;
 import object.ObjShieldBlue;
 import object.ObjShieldWood;
@@ -79,6 +85,12 @@ public final class NpcMerchant extends Entity {
     inv.add(new ObjLantern(gp));
     inv.add(new ObjClock(gp));
     inv.add(new ObjBoots(gp));
+    inv.add(new ObjHelmetLeather(gp));
+    inv.add(new ObjChestLeather(gp));
+    inv.add(new ObjLegsLeather(gp));
+    inv.add(new ObjHelmetIron(gp));
+    inv.add(new ObjChestIron(gp));
+    inv.add(new ObjLegsIron(gp));
   }
 
   @Override
