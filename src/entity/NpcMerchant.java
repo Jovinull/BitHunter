@@ -18,6 +18,12 @@ import object.ObjShieldBlue;
 import object.ObjShieldWood;
 import object.ObjSwordNormal;
 import object.ObjClock;
+import object.ObjRingRuby;
+import object.ObjRingSapphire;
+import object.ObjAmuletLife;
+import object.ObjAmuletProtection;
+import object.ObjGlovesLeather;
+import object.ObjGlovesIron;
 
 public final class NpcMerchant extends Entity {
 
@@ -84,6 +90,12 @@ public final class NpcMerchant extends Entity {
     inv.add(new ObjShieldBlue(gp));
     inv.add(new ObjLantern(gp));
     inv.add(new ObjClock(gp));
+    inv.add(new ObjGlovesLeather(gp));
+    inv.add(new ObjGlovesIron(gp));
+    inv.add(new ObjRingRuby(gp));
+    inv.add(new ObjRingSapphire(gp));
+    inv.add(new ObjAmuletLife(gp));
+    inv.add(new ObjAmuletProtection(gp));
     inv.add(new ObjBoots(gp));
     inv.add(new ObjHelmetLeather(gp));
     inv.add(new ObjChestLeather(gp));

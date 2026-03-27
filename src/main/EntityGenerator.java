@@ -32,6 +32,18 @@ import object.ObjLegsObsidian;
 import object.ObjManaCrystal;
 import object.ObjPickaxe;
 import object.ObjPotionRed;
+import object.ObjAmuletArcane;
+import object.ObjAmuletLife;
+import object.ObjAmuletObsidian;
+import object.ObjAmuletProtection;
+import object.ObjGlovesGold;
+import object.ObjGlovesIron;
+import object.ObjGlovesLeather;
+import object.ObjGlovesObsidian;
+import object.ObjRingEmerald;
+import object.ObjRingObsidian;
+import object.ObjRingRuby;
+import object.ObjRingSapphire;
 import object.ObjRock;
 import object.ObjShieldBlue;
 import object.ObjShieldJava;
@@ -52,8 +64,20 @@ public class EntityGenerator {
   }
 
   private void initFactories() {
+    factories.put(ObjAmuletArcane.OBJ_ID, ObjAmuletArcane::new);
+    factories.put(ObjAmuletLife.OBJ_ID, ObjAmuletLife::new);
+    factories.put(ObjAmuletObsidian.OBJ_ID, ObjAmuletObsidian::new);
+    factories.put(ObjAmuletProtection.OBJ_ID, ObjAmuletProtection::new);
     factories.put(ObjAxe.OBJ_ID, ObjAxe::new);
     factories.put(ObjBoots.OBJ_ID, ObjBoots::new);
+    factories.put(ObjGlovesGold.OBJ_ID, ObjGlovesGold::new);
+    factories.put(ObjGlovesIron.OBJ_ID, ObjGlovesIron::new);
+    factories.put(ObjGlovesLeather.OBJ_ID, ObjGlovesLeather::new);
+    factories.put(ObjGlovesObsidian.OBJ_ID, ObjGlovesObsidian::new);
+    factories.put(ObjRingEmerald.OBJ_ID, ObjRingEmerald::new);
+    factories.put(ObjRingObsidian.OBJ_ID, ObjRingObsidian::new);
+    factories.put(ObjRingRuby.OBJ_ID, ObjRingRuby::new);
+    factories.put(ObjRingSapphire.OBJ_ID, ObjRingSapphire::new);
     factories.put(ObjChest.OBJ_ID, ObjChest::new);
     factories.put(ObjChestGold.OBJ_ID, ObjChestGold::new);
     factories.put(ObjChestIron.OBJ_ID, ObjChestIron::new);

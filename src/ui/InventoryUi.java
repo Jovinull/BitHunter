@@ -138,7 +138,10 @@ class InventoryUi {
         || item == entity.getCurrentBoots()
         || item == entity.getCurrentHelmet()
         || item == entity.getCurrentChest()
-        || item == entity.getCurrentLegs();
+        || item == entity.getCurrentLegs()
+        || item == entity.getCurrentRing()
+        || item == entity.getCurrentAmulet()
+        || item == entity.getCurrentGloves();
   }
 
   private void drawInventoryCursor(
