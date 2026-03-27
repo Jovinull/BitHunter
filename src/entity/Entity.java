@@ -61,6 +61,7 @@ public class Entity {
   public static final int TYPE_RING = 17;
   public static final int TYPE_AMULET = 18;
   public static final int TYPE_GLOVES = 19;
+  public static final int TYPE_STAFF = 20;
 
   // =========================
   // RESPAWN

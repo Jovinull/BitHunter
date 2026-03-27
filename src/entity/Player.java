@@ -365,6 +365,17 @@ public class Player extends Entity {
       attackRight1 = setup("/player/Attacking sprites/boy_pick_right_1", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
       attackRight2 = setup("/player/Attacking sprites/boy_pick_right_2", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
     }
+
+    if (getCurrentWeapon().getType() == TYPE_STAFF) {
+      attackUp1 = setup("/player/Attacking sprites/boy_staff_up_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+      attackUp2 = setup("/player/Attacking sprites/boy_staff_up_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+      attackDown1 = setup("/player/Attacking sprites/boy_staff_down_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+      attackDown2 = setup("/player/Attacking sprites/boy_staff_down_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+      attackLeft1 = setup("/player/Attacking sprites/boy_staff_left_1", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
+      attackLeft2 = setup("/player/Attacking sprites/boy_staff_left_2", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
+      attackRight1 = setup("/player/Attacking sprites/boy_staff_right_1", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
+      attackRight2 = setup("/player/Attacking sprites/boy_staff_right_2", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
+    }
   }
 
   public void getGuardImage() {
@@ -854,7 +865,7 @@ public class Player extends Entity {
 
   private void handleItemSelection(Entity selectedItem, int itemIndex) {
     switch (selectedItem.getType()) {
-      case TYPE_SWORD, TYPE_AXE, TYPE_PICKAXE -> handleWeaponSelection(selectedItem);
+      case TYPE_SWORD, TYPE_AXE, TYPE_PICKAXE, TYPE_STAFF -> handleWeaponSelection(selectedItem);
       case TYPE_SHIELD -> handleShieldSelection(selectedItem);
       case TYPE_LIGHT -> handleLightSelection(selectedItem);
       case TYPE_BOOTS -> handleBootsSelection(selectedItem);
