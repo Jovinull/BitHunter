@@ -31,7 +31,7 @@ class CharacterUi {
   private static final int EQUIP_TITLE_Y_OFFSET = 32;
   private static final int EQUIP_TITLE_COLLISION_PADDING = 8;
   private static final int EQUIP_GRID_COLS = 3;
-  private static final int EQUIP_GRID_ROWS = 2;
+  private static final int EQUIP_GRID_ROWS = 3;
   private static final int EQUIP_MIN_H_GAP = 12;
   private static final int EQUIP_V_GAP = 32;
   private static final int EQUIP_GRID_START_Y_OFFSET = 28;
@@ -234,7 +234,10 @@ class CharacterUi {
         ui.t("ui.character.equipment.legs"),
         ui.t("ui.character.equipment.boots"),
         ui.t("ui.character.equipment.weapon"),
-        ui.t("ui.character.equipment.shield")
+        ui.t("ui.character.equipment.shield"),
+        ui.t("ui.character.equipment.gloves"),
+        ui.t("ui.character.equipment.ring"),
+        ui.t("ui.character.equipment.amulet")
     };
 
     Entity[] equipItems = {
@@ -243,7 +246,10 @@ class CharacterUi {
         player.getCurrentLegs(),
         player.getCurrentBoots(),
         player.getCurrentWeapon(),
-        player.getCurrentShield()
+        player.getCurrentShield(),
+        player.getCurrentGloves(),
+        player.getCurrentRing(),
+        player.getCurrentAmulet()
     };
 
     EquipmentGridLayout equipLayout = new EquipmentGridLayout(

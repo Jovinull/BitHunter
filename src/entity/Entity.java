@@ -58,6 +58,9 @@ public class Entity {
   public static final int TYPE_LEGS = 14;
   public static final int TYPE_PET = 15;
   public static final int TYPE_EGG = 16;
+  public static final int TYPE_RING = 17;
+  public static final int TYPE_AMULET = 18;
+  public static final int TYPE_GLOVES = 19;
 
   // =========================
   // RESPAWN
@@ -1334,6 +1337,30 @@ public class Entity {
 
   public final void setCurrentLegs(Entity currentLegs) {
     equipment.setCurrentLegs(currentLegs);
+  }
+
+  public final Entity getCurrentRing() {
+    return equipment.getCurrentRing();
+  }
+
+  public final void setCurrentRing(Entity currentRing) {
+    equipment.setCurrentRing(currentRing);
+  }
+
+  public final Entity getCurrentAmulet() {
+    return equipment.getCurrentAmulet();
+  }
+
+  public final void setCurrentAmulet(Entity currentAmulet) {
+    equipment.setCurrentAmulet(currentAmulet);
+  }
+
+  public final Entity getCurrentGloves() {
+    return equipment.getCurrentGloves();
+  }
+
+  public final void setCurrentGloves(Entity currentGloves) {
+    equipment.setCurrentGloves(currentGloves);
   }
 
   public final String getInternalId() {

@@ -11,6 +11,9 @@ public class EquipmentComponent {
   private Entity currentHelmet;
   private Entity currentChest;
   private Entity currentLegs;
+  private Entity currentRing;
+  private Entity currentAmulet;
+  private Entity currentGloves;
 
   public Entity getCurrentWeapon() {
     return currentWeapon;
@@ -66,5 +69,29 @@ public class EquipmentComponent {
 
   public void setCurrentLegs(Entity currentLegs) {
     this.currentLegs = currentLegs;
+  }
+
+  public Entity getCurrentRing() {
+    return currentRing;
+  }
+
+  public void setCurrentRing(Entity currentRing) {
+    this.currentRing = currentRing;
+  }
+
+  public Entity getCurrentAmulet() {
+    return currentAmulet;
+  }
+
+  public void setCurrentAmulet(Entity currentAmulet) {
+    this.currentAmulet = currentAmulet;
+  }
+
+  public Entity getCurrentGloves() {
+    return currentGloves;
+  }
+
+  public void setCurrentGloves(Entity currentGloves) {
+    this.currentGloves = currentGloves;
   }
 }

@@ -226,7 +226,12 @@ public class Player extends Entity {
     setMotion1Duration(getCurrentWeapon().getMotion1Duration());
     setMotion2Duration(getCurrentWeapon().getMotion2Duration());
 
-    int value = getStrength() * getCurrentWeapon().getAttackValue();
+    int bonus = 0;
+    if (getCurrentRing() != null) bonus += getCurrentRing().getAttackValue();
+    if (getCurrentGloves() != null) bonus += getCurrentGloves().getAttackValue();
+    if (getCurrentAmulet() != null) bonus += getCurrentAmulet().getAttackValue();
+
+    int value = getStrength() * getCurrentWeapon().getAttackValue() + bonus;
     setAttack(value);
   }
 
@@ -254,6 +259,15 @@ public class Player extends Entity {
     }
     if (getCurrentLegs() != null) {
       value += getCurrentLegs().getDefenseValue();
+    }
+    if (getCurrentRing() != null) {
+      value += getCurrentRing().getDefenseValue();
+    }
+    if (getCurrentAmulet() != null) {
+      value += getCurrentAmulet().getDefenseValue();
+    }
+    if (getCurrentGloves() != null) {
+      value += getCurrentGloves().getDefenseValue();
     }
 
     setDefense(value);
@@ -847,6 +861,9 @@ public class Player extends Entity {
       case TYPE_HELMET -> handleHelmetSelection(selectedItem);
       case TYPE_CHEST -> handleChestSelection(selectedItem);
       case TYPE_LEGS -> handleLegsSelection(selectedItem);
+      case TYPE_RING -> handleRingSelection(selectedItem);
+      case TYPE_AMULET -> handleAmuletSelection(selectedItem);
+      case TYPE_GLOVES -> handleGlovesSelection(selectedItem);
       case TYPE_CONSUMABLE -> handleConsumableSelection(selectedItem, itemIndex);
       default -> {
         // tipo não suportado -> ignora
@@ -910,6 +927,35 @@ public class Player extends Entity {
     } else {
       setCurrentLegs(selectedItem);
     }
+    setDefense(getDefense());
+  }
+
+  private void handleRingSelection(Entity selectedItem) {
+    if (getCurrentRing() == selectedItem) {
+      setCurrentRing(null);
+    } else {
+      setCurrentRing(selectedItem);
+    }
+    recalculateAttackStats();
+    setDefense(getDefense());
+  }
+
+  private void handleAmuletSelection(Entity selectedItem) {
+    if (getCurrentAmulet() == selectedItem) {
+      setCurrentAmulet(null);
+    } else {
+      setCurrentAmulet(selectedItem);
+    }
+    setDefense(getDefense());
+  }
+
+  private void handleGlovesSelection(Entity selectedItem) {
+    if (getCurrentGloves() == selectedItem) {
+      setCurrentGloves(null);
+    } else {
+      setCurrentGloves(selectedItem);
+    }
+    recalculateAttackStats();
     setDefense(getDefense());
   }
 
@@ -1323,11 +1369,12 @@ public class Player extends Entity {
    * sem tentar reproduzir o dano real.
    */
   public int getAttackEquipBonusStat() {
-    Entity weapon = getCurrentWeapon();
-    if (weapon == null) {
-      return 0;
-    }
-    return weapon.getAttackValue();
+    int bonus = 0;
+    if (getCurrentWeapon() != null) bonus += getCurrentWeapon().getAttackValue();
+    if (getCurrentRing() != null) bonus += getCurrentRing().getAttackValue();
+    if (getCurrentGloves() != null) bonus += getCurrentGloves().getAttackValue();
+    if (getCurrentAmulet() != null) bonus += getCurrentAmulet().getAttackValue();
+    return bonus;
   }
 
   /**
@@ -1358,6 +1405,15 @@ public class Player extends Entity {
     }
     if (getCurrentLegs() != null) {
       bonus += getCurrentLegs().getDefenseValue();
+    }
+    if (getCurrentRing() != null) {
+      bonus += getCurrentRing().getDefenseValue();
+    }
+    if (getCurrentAmulet() != null) {
+      bonus += getCurrentAmulet().getDefenseValue();
+    }
+    if (getCurrentGloves() != null) {
+      bonus += getCurrentGloves().getDefenseValue();
     }
 
     return bonus;
