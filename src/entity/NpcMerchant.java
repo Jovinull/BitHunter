@@ -24,6 +24,8 @@ import object.ObjAmuletLife;
 import object.ObjAmuletProtection;
 import object.ObjGlovesLeather;
 import object.ObjGlovesIron;
+import object.ObjBowWood;
+import object.ObjBowHunter;
 import object.ObjStaffWood;
 import object.ObjStaffCrystal;
 
@@ -90,6 +92,8 @@ public final class NpcMerchant extends Entity {
     inv.add(new ObjAxe(gp));
     inv.add(new ObjStaffWood(gp));
     inv.add(new ObjStaffCrystal(gp));
+    inv.add(new ObjBowWood(gp));
+    inv.add(new ObjBowHunter(gp));
     inv.add(new ObjShieldWood(gp));
     inv.add(new ObjShieldBlue(gp));
     inv.add(new ObjLantern(gp));
