@@ -245,14 +245,13 @@ public class Player extends Entity {
   public int getDefense() {
     int value;
 
-    int effectiveDexterity = getDexterity() + skillTree.getSkillDexterityBonus();
-
     // defesa base vinda do escudo (mantém a lógica antiga)
+    // Destreza via habilidades já está incorporada em getDexterity() (aplicada no desbloqueio)
     if (getCurrentShield() != null) {
-      value = effectiveDexterity * getCurrentShield().getDefenseValue();
+      value = getDexterity() * getCurrentShield().getDefenseValue();
     } else {
       // fallback mínimo se estiver sem escudo
-      value = effectiveDexterity;
+      value = getDexterity();
     }
 
     // bônus das demais peças de armadura
@@ -277,6 +276,8 @@ public class Player extends Entity {
     if (getCurrentGloves() != null) {
       value += getCurrentGloves().getDefenseValue();
     }
+
+    value += skillTree.getSkillDefenseBonus();
 
     setDefense(value);
     return value;
@@ -416,7 +417,8 @@ public class Player extends Entity {
       boolean wasBowAttack = getCurrentWeapon().getType() == TYPE_BOW;
       performAttack();
       if (wasBowAttack && !isAttacking()) {
-        bowCooldown = getCurrentWeapon().getMotion2Duration();
+        int reduction = skillTree.getSkillBowCooldownReduction();
+        bowCooldown = Math.max(0, getCurrentWeapon().getMotion2Duration() - reduction);
       }
     } else if (keyH.isSpacePressed() && canGuard()) {
       handleGuard();
