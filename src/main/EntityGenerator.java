@@ -5,8 +5,13 @@ import java.util.Map;
 import java.util.function.Function;
 
 import entity.Entity;
+import object.ObjArrow;
 import object.ObjAxe;
 import object.ObjBoots;
+import object.ObjBowElven;
+import object.ObjBowHunter;
+import object.ObjBowObsidian;
+import object.ObjBowWood;
 import object.ObjChest;
 import object.ObjChestGold;
 import object.ObjChestIron;
@@ -72,7 +77,12 @@ public class EntityGenerator {
     factories.put(ObjAmuletLife.OBJ_ID, ObjAmuletLife::new);
     factories.put(ObjAmuletObsidian.OBJ_ID, ObjAmuletObsidian::new);
     factories.put(ObjAmuletProtection.OBJ_ID, ObjAmuletProtection::new);
+    factories.put(ObjArrow.OBJ_ID, ObjArrow::new);
     factories.put(ObjAxe.OBJ_ID, ObjAxe::new);
+    factories.put(ObjBowWood.OBJ_ID, ObjBowWood::new);
+    factories.put(ObjBowHunter.OBJ_ID, ObjBowHunter::new);
+    factories.put(ObjBowElven.OBJ_ID, ObjBowElven::new);
+    factories.put(ObjBowObsidian.OBJ_ID, ObjBowObsidian::new);
     factories.put(ObjBoots.OBJ_ID, ObjBoots::new);
     factories.put(ObjGlovesGold.OBJ_ID, ObjGlovesGold::new);
     factories.put(ObjGlovesIron.OBJ_ID, ObjGlovesIron::new);

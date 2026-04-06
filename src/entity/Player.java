@@ -13,6 +13,7 @@ import java.util.Map;
 import data.GameStatistics;
 import main.GamePanel;
 import main.KeyHandler;
+import object.ObjBowWood;
 import object.ObjFireball;
 import object.ObjKey;
 import object.ObjLantern;
@@ -35,6 +36,7 @@ public class Player extends Entity {
   public final int screenX;
   public final int screenY;
   private int standCounter = 0;
+  private int bowCooldown = 0;
 
   private boolean attackCanceled = false;
   private boolean lightUpdated = false;
@@ -201,6 +203,7 @@ public class Player extends Entity {
     inv.add(new YellowSnailEgg(gp));
     inv.add(new GreenSnailEgg(gp));
     inv.add(new ObjShieldJava(gp));
+    inv.add(new ObjBowWood(gp));
   }
 
   public void recalculateSpeedFromEquipment() {
@@ -376,6 +379,17 @@ public class Player extends Entity {
       attackRight1 = setup("/player/Attacking sprites/boy_staff_right_1", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
       attackRight2 = setup("/player/Attacking sprites/boy_staff_right_2", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
     }
+
+    if (getCurrentWeapon().getType() == TYPE_BOW) {
+      attackUp1 = setup("/player/Attacking sprites/boy_bow_up_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+      attackUp2 = setup("/player/Attacking sprites/boy_bow_up_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+      attackDown1 = setup("/player/Attacking sprites/boy_bow_down_1", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+      attackDown2 = setup("/player/Attacking sprites/boy_bow_down_2", GamePanel.TILE_SIZE, GamePanel.TILE_SIZE * 2);
+      attackLeft1 = setup("/player/Attacking sprites/boy_bow_left_1", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
+      attackLeft2 = setup("/player/Attacking sprites/boy_bow_left_2", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
+      attackRight1 = setup("/player/Attacking sprites/boy_bow_right_1", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
+      attackRight2 = setup("/player/Attacking sprites/boy_bow_right_2", GamePanel.TILE_SIZE * 2, GamePanel.TILE_SIZE);
+    }
   }
 
   public void getGuardImage() {
@@ -387,10 +401,18 @@ public class Player extends Entity {
 
   @Override
   public void update() {
+    if (bowCooldown > 0) {
+      bowCooldown--;
+    }
+
     if (isKnockBack()) {
       processKnockBack();
     } else if (isAttacking()) {
+      boolean wasBowAttack = getCurrentWeapon().getType() == TYPE_BOW;
       performAttack();
+      if (wasBowAttack && !isAttacking()) {
+        bowCooldown = getCurrentWeapon().getMotion2Duration();
+      }
     } else if (keyH.isSpacePressed() && canGuard()) {
       handleGuard();
     } else if (isMovementOrActionPressed()) {
@@ -522,9 +544,13 @@ public class Player extends Entity {
     }
 
     if (keyH.isEnterPressed() && !attackCanceled) {
-      gp.playSE(7);
-      setAttacking(true);
-      setSpriteCounter(0);
+      if (getCurrentWeapon().getType() == TYPE_BOW && bowCooldown > 0) {
+        attackCanceled = true;
+      } else {
+        gp.playSE(7);
+        setAttacking(true);
+        setSpriteCounter(0);
+      }
     }
 
     attackCanceled = false;
@@ -865,7 +891,7 @@ public class Player extends Entity {
 
   private void handleItemSelection(Entity selectedItem, int itemIndex) {
     switch (selectedItem.getType()) {
-      case TYPE_SWORD, TYPE_AXE, TYPE_PICKAXE, TYPE_STAFF -> handleWeaponSelection(selectedItem);
+      case TYPE_SWORD, TYPE_AXE, TYPE_PICKAXE, TYPE_STAFF, TYPE_BOW -> handleWeaponSelection(selectedItem);
       case TYPE_SHIELD -> handleShieldSelection(selectedItem);
       case TYPE_LIGHT -> handleLightSelection(selectedItem);
       case TYPE_BOOTS -> handleBootsSelection(selectedItem);

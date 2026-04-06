@@ -2,6 +2,7 @@ package entity.components;
 
 import entity.Entity;
 import entity.Player;
+import object.ObjArrow;
 
 public class CombatComponent {
 
@@ -21,7 +22,11 @@ public class CombatComponent {
     updateAttackSprite();
 
     if (isInDamageWindow() && !entity.isAttackDamageApplied()) {
-      applyAttackDamage();
+      if (isBowAttack()) {
+        fireArrow();
+      } else {
+        applyAttackDamage();
+      }
     }
 
     if (entity.getSpriteCounter() > entity.getMotion2Duration()) {
@@ -101,6 +106,31 @@ public class CombatComponent {
       int projectileIndex = collisionChecker.checkEntity(entity, entity.getGp().getProjectile());
       player.damageProjectile(projectileIndex);
     }
+  }
+
+  private boolean isBowAttack() {
+    return entity.getCurrentWeapon() != null
+        && entity.getCurrentWeapon().getType() == Entity.TYPE_BOW;
+  }
+
+  private void fireArrow() {
+    var gp = entity.getGp();
+    var arrow = new ObjArrow(gp);
+    arrow.setAttack(entity.getCurrentWeapon().getAttackValue());
+    arrow.setKnockBackPower(entity.getCurrentWeapon().getKnockBackPower());
+    arrow.set(entity.getWorldX(), entity.getWorldY(), entity.getDirection(), true, entity);
+
+    Entity[][] projectiles = gp.getProjectile();
+    int mapIndex = gp.getCurrentMap();
+    for (int i = 0; i < projectiles[mapIndex].length; i++) {
+      if (projectiles[mapIndex][i] == null) {
+        projectiles[mapIndex][i] = arrow;
+        break;
+      }
+    }
+
+    gp.playSE(10);
+    entity.setAttackDamageApplied(true);
   }
 
   private void endAttack() {
