@@ -362,6 +362,7 @@ class OptionsUi {
       "ui.controls.map",
       "ui.controls.bestiary",
       "ui.controls.achievements",
+      "ui.controls.skillTree",
   };
 
   /**
