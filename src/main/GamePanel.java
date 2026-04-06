@@ -127,6 +127,7 @@ public class GamePanel extends JPanel implements Runnable {
   public static final int PET_YARD_STATE = 12;
   public static final int BESTIARY_STATE = 13; // Bestiário (Cyclopedia)
   public static final int ACHIEVEMENT_STATE = 14; // Conquistas
+  public static final int SKILL_TREE_STATE = 15;  // Árvore de Habilidades
 
   // others
   private boolean bossBattleOn = false;

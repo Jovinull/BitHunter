@@ -40,6 +40,7 @@ public enum GameAction {
   MINIMAP(KeyEvent.VK_X, Category.INTERFACE),
   BESTIARY(KeyEvent.VK_B, Category.INTERFACE),
   ACHIEVEMENTS(KeyEvent.VK_J, Category.INTERFACE),
+  SKILL_TREE(KeyEvent.VK_K, Category.INTERFACE),
 
   // ── Debug ──
   DEBUG_TOGGLE(KeyEvent.VK_T, Category.DEBUG),

@@ -6,6 +6,7 @@ import java.awt.event.KeyListener;
 import data.SaveManager;
 import data.SaveManager.SlotInfo;
 import ui.BestiaryUi;
+import ui.SkillTreeUi;
 import ui.UI;
 
 /**
@@ -145,6 +146,7 @@ public class KeyHandler implements KeyListener {
       case GamePanel.MAP_STATE -> mapState(code);
       case GamePanel.BESTIARY_STATE -> bestiaryState(code);
       case GamePanel.ACHIEVEMENT_STATE -> achievementState(code);
+      case GamePanel.SKILL_TREE_STATE -> skillTreeState(code);
       default -> {
         // noop
       }
@@ -530,6 +532,9 @@ public class KeyHandler implements KeyListener {
     } else if (is(key, GameAction.ACHIEVEMENTS)) {
       gp.getGameUi().getAchievementUi().resetState();
       gp.setGameState(GamePanel.ACHIEVEMENT_STATE);
+    } else if (is(key, GameAction.SKILL_TREE)) {
+      gp.getGameUi().getSkillTreeUi().resetState();
+      gp.setGameState(GamePanel.SKILL_TREE_STATE);
     }
   }
 
@@ -1016,6 +1021,29 @@ public class KeyHandler implements KeyListener {
       achievementUi.navigateAchievement(1);
       playNavigateSfx();
     } else if (is(code, GameAction.OPTIONS) || is(code, GameAction.ACHIEVEMENTS)) {
+      gp.setGameState(GamePanel.PLAY_STATE);
+    }
+  }
+
+  public void skillTreeState(int code) {
+    final UI ui = gp.getGameUi();
+    var skillTreeUi = ui.getSkillTreeUi();
+
+    if (is(code, GameAction.MOVE_UP)) {
+      skillTreeUi.navigateRow(-1);
+      playNavigateSfx();
+    } else if (is(code, GameAction.MOVE_DOWN)) {
+      skillTreeUi.navigateRow(1);
+      playNavigateSfx();
+    } else if (is(code, GameAction.MOVE_LEFT)) {
+      skillTreeUi.navigateColumn(-1);
+      playNavigateSfx();
+    } else if (is(code, GameAction.MOVE_RIGHT)) {
+      skillTreeUi.navigateColumn(1);
+      playNavigateSfx();
+    } else if (is(code, GameAction.CONFIRM)) {
+      skillTreeUi.tryUnlockSelected();
+    } else if (is(code, GameAction.OPTIONS) || is(code, GameAction.SKILL_TREE)) {
       gp.setGameState(GamePanel.PLAY_STATE);
     }
   }
