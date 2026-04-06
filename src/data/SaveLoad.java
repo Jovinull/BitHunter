@@ -108,6 +108,7 @@ public class SaveLoad {
     copyCheatCodesToStorage(ds);
     copyPlayTimeToStorage(ds);
     copyGameStatsToStorage(ds);
+    copySkillDataToStorage(ds);
     return ds;
   }
 
@@ -123,6 +124,7 @@ public class SaveLoad {
     applyCheatCodes(ds);
     applyPlayTime(ds);
     applyGameStats(ds);
+    applySkillData(ds);
 
     // Recalcular atributos derivados
     var player = gp.getPlayer();
@@ -454,6 +456,21 @@ public class SaveLoad {
 
   private void applyGameStats(DataStorage ds) {
     gp.getGameStatistics().restoreFrom(ds.getGameStats());
+  }
+
+  /* ----- Skill Tree (SAVE) ----- */
+
+  private void copySkillDataToStorage(DataStorage ds) {
+    var skillTree = gp.getPlayer().getSkillTree();
+    ds.setSkillPoints(skillTree.getSkillPoints());
+    ds.setUnlockedSkillIds(skillTree.getUnlockedSkillIds());
+  }
+
+  /* ----- Skill Tree (LOAD) ----- */
+
+  private void applySkillData(DataStorage ds) {
+    var skillTree = gp.getPlayer().getSkillTree();
+    skillTree.restoreFromSave(ds.getSkillPoints(), ds.getUnlockedSkillIds());
   }
 
   /** Unboxing seguro: retorna {@code fallback} se {@code value} for null. */

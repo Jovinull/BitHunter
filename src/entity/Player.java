@@ -13,6 +13,7 @@ import java.util.Map;
 import data.GameStatistics;
 import main.GamePanel;
 import main.KeyHandler;
+import skill.SkillTree;
 import object.ObjBowWood;
 import object.ObjFireball;
 import object.ObjKey;
@@ -32,6 +33,7 @@ import tile_interactive.InteractiveTile;
 public class Player extends Entity {
 
   private final KeyHandler keyH;
+  private final SkillTree skillTree = new SkillTree();
 
   public final int screenX;
   public final int screenY;
@@ -213,7 +215,7 @@ public class Player extends Entity {
       bonus += getCurrentBoots().getSpeedValue();
     }
 
-    int finalSpeed = getDefaultSpeed() + bonus;
+    int finalSpeed = getDefaultSpeed() + bonus + skillTree.getSkillSpeedBonus();
     if (finalSpeed < 1) {
       finalSpeed = 1;
     }
@@ -234,7 +236,8 @@ public class Player extends Entity {
     if (getCurrentGloves() != null) bonus += getCurrentGloves().getAttackValue();
     if (getCurrentAmulet() != null) bonus += getCurrentAmulet().getAttackValue();
 
-    int value = getStrength() * getCurrentWeapon().getAttackValue() + bonus;
+    int value = getStrength() * getCurrentWeapon().getAttackValue() + bonus
+        + skillTree.getSkillAttackBonus();
     setAttack(value);
   }
 
@@ -242,12 +245,14 @@ public class Player extends Entity {
   public int getDefense() {
     int value;
 
+    int effectiveDexterity = getDexterity() + skillTree.getSkillDexterityBonus();
+
     // defesa base vinda do escudo (mantém a lógica antiga)
     if (getCurrentShield() != null) {
-      value = getDexterity() * getCurrentShield().getDefenseValue();
+      value = effectiveDexterity * getCurrentShield().getDefenseValue();
     } else {
       // fallback mínimo se estiver sem escudo
-      value = getDexterity();
+      value = effectiveDexterity;
     }
 
     // bônus das demais peças de armadura
@@ -856,6 +861,10 @@ public class Player extends Entity {
       if (getLevel() % 2 == 0) {
         setDexterity(getDexterity() + 1);
       }
+
+      // Concede pontos de habilidade: 2 a cada múltiplo de 5 níveis, 1 nos demais
+      int pts = (getLevel() % 5 == 0) ? 2 : 1;
+      skillTree.addSkillPoints(pts);
 
       recalculateAttackStats();
       setDefense(getDefense());
@@ -1585,6 +1594,12 @@ public class Player extends Entity {
     } else {
       gp.getGameUi().addMessage(t("player.message.cannotCarryMore"));
     }
+  }
+
+  // ===== Árvore de Habilidades =====
+
+  public SkillTree getSkillTree() {
+    return skillTree;
   }
 
   // ===== Identidade do jogador (slots de save) =====

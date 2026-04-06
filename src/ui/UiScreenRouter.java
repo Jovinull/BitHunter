@@ -38,6 +38,7 @@ final class UiScreenRouter {
       case GamePanel.SLEEP_STATE -> ui.getTransitionUi().drawSleepScreen();
       case GamePanel.BESTIARY_STATE -> ui.getBestiaryUi().drawBestiaryScreen();
       case GamePanel.ACHIEVEMENT_STATE -> ui.getAchievementUi().drawAchievementScreen();
+      case GamePanel.SKILL_TREE_STATE  -> ui.getSkillTreeUi().drawSkillTreeScreen();
       default -> {
         // Estados sem camada extra de UI dedicada.
       }

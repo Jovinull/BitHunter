@@ -76,6 +76,11 @@ public class DataStorage implements Serializable {
   // Pode ser null em saves antigos (antes desta feature); o getter trata isso.
   private HashSet<String> usedCheatCodes;
 
+  // ===== ÁRVORE DE HABILIDADES =====
+  // Pode ser null em saves antigos; getters tratam isso.
+  private int skillPoints;
+  private HashSet<String> unlockedSkillIds;
+
   // OBJECT ON MAP
   private String[][] mapObjectNames;
   private int[][] mapObjectWorldX;
@@ -424,5 +429,27 @@ public class DataStorage implements Serializable {
 
   public void setGameStats(Map<String, Long> gameStats) {
     this.gameStats = gameStats != null ? new HashMap<>(gameStats) : new HashMap<>();
+  }
+
+  // ===== ÁRVORE DE HABILIDADES getters/setters =====
+
+  public int getSkillPoints() {
+    return skillPoints;
+  }
+
+  public void setSkillPoints(int skillPoints) {
+    this.skillPoints = skillPoints;
+  }
+
+  /** Null-safe: retorna conjunto vazio para saves antigos. */
+  public Set<String> getUnlockedSkillIds() {
+    if (unlockedSkillIds == null) {
+      unlockedSkillIds = new HashSet<>();
+    }
+    return unlockedSkillIds;
+  }
+
+  public void setUnlockedSkillIds(Set<String> ids) {
+    this.unlockedSkillIds = ids != null ? new HashSet<>(ids) : new HashSet<>();
   }
 }
