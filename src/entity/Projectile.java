@@ -55,10 +55,7 @@ public class Projectile extends Entity {
         getAttack() * Math.max(1, player.getLevel() / 2),
         getKnockBackPower());
 
-    // partículas usando o projétil do "user" (comportamento anterior)
-    if (user.getProjectile() != null) {
-      generateParticle(user.getProjectile(), monsters[currentMapIndex][monsterIndex]);
-    }
+    generateParticle(this, monsters[currentMapIndex][monsterIndex]);
     setAlive(false);
   }
 
@@ -74,9 +71,7 @@ public class Projectile extends Entity {
 
     damagePlayer(getAttack());
 
-    if (user.getProjectile() != null) {
-      generateParticle(user.getProjectile(), user.getProjectile());
-    }
+    generateParticle(this, this);
     setAlive(false);
   }
 
