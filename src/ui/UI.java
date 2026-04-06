@@ -98,6 +98,7 @@ public class UI {
   private final BestiaryUi bestiaryUi;
   private final AchievementUi achievementUi;
   private final StatsUi statsUi;
+  private final SkillTreeUi skillTreeUi;
 
   public UI(GamePanel gp) {
     this.gp = gp;
@@ -126,6 +127,7 @@ public class UI {
     bestiaryUi = new BestiaryUi(this);
     achievementUi = new AchievementUi(this);
     statsUi = new StatsUi(this);
+    skillTreeUi = new SkillTreeUi(this);
   }
 
   // ---- Helper de tradução ----
@@ -297,6 +299,10 @@ public class UI {
 
   StatsUi getStatsUi() {
     return statsUi;
+  }
+
+  public SkillTreeUi getSkillTreeUi() {
+    return skillTreeUi;
   }
 
   HudUi getHudUi() {
