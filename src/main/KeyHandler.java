@@ -5,6 +5,7 @@ import java.awt.event.KeyListener;
 
 import data.SaveManager;
 import data.SaveManager.SlotInfo;
+import network.packets.InputPacket;
 import ui.BestiaryUi;
 import ui.SkillTreeUi;
 import ui.UI;
@@ -1261,5 +1262,30 @@ public class KeyHandler implements KeyListener {
 
   public void setEnterPressed(boolean value) {
     this.enterPressed = value;
+  }
+
+  /**
+   * Captura o estado atual de todas as teclas de jogo como um {@link InputPacket}
+   * pronto para envio via rede.
+   * <p>
+   * Chamado pelo game loop a cada frame quando o jogo está em modo
+   * {@link network.NetworkManager.NetworkMode#CLIENT}, para transmitir o input
+   * local ao servidor host.
+   *
+   * @param sequenceId contador monotônico de frame fornecido pelo chamador
+   *                   (usado pelo servidor para descartar pacotes atrasados)
+   * @return pacote de input com o estado atual das teclas
+   */
+  public InputPacket captureCurrentInput(short sequenceId) {
+    return new InputPacket(
+        sequenceId,
+        upPressed,
+        downPressed,
+        leftPressed,
+        rightPressed,
+        spacePressed,
+        shotKeyPressed,
+        enterPressed
+    );
   }
 }

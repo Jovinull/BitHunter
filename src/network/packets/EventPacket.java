@@ -46,6 +46,12 @@ public final class EventPacket implements Packet {
   /** Jogador {@code source} subiu para o nível {@code value}. */
   public static final byte EVT_LEVEL_UP     = 0x07;
 
+  /**
+   * Servidor atribuiu o ID de rede {@code value} ao cliente {@code sourceEntityId}.
+   * Enviado pelo host imediatamente após processar o handshake do cliente.
+   */
+  public static final byte EVT_PLAYER_ASSIGN = 0x08;
+
   // ---- Campos ----
   private final byte eventType;
   private final int sourceEntityId;

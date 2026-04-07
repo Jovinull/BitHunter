@@ -25,7 +25,17 @@ import data.SaveLoad;
 import data.SaveManager;
 import entity.Entity;
 import entity.Player;
+import entity.RemotePlayer;
 import environment.EnvironmentManager;
+import network.ClientHandler;
+import network.IncomingPacket;
+import network.NetworkManager;
+import network.Packet;
+import network.packets.DisconnectPacket;
+import network.packets.EntityStatePacket;
+import network.packets.EventPacket;
+import network.packets.HandshakePacket;
+import network.packets.InputPacket;
 import pets.PetIncubator;
 import tile.Map;
 import tile.TileManager;
@@ -99,6 +109,17 @@ public class GamePanel extends JPanel implements Runnable {
   private final transient PlayTimeTracker playTimeTracker = new PlayTimeTracker();
   private final transient GameStatistics gameStatistics = new GameStatistics();
   transient Thread gameThread; // Thread para rodar o loop do jogo
+
+  // ==== REDE (Multiplayer) ====
+  private final transient NetworkManager networkManager = new NetworkManager();
+  private final transient List<RemotePlayer> remotePlayers = new ArrayList<>();
+  /** Contador monotônico de frames de input enviados ao servidor. */
+  private transient short inputSequence = 0;
+  /**
+   * ID de rede local: {@code -1} = host ou singleplayer;
+   * {@code >= 1} = cliente conectado (atribuído pelo host via EVT_PLAYER_ASSIGN).
+   */
+  private transient int localNetworkId = -1;
 
   // ENTITY AND OBJECTS
   private final transient Player player = new Player(this, keyH); // Jogador principal do jogo
@@ -305,6 +326,7 @@ public class GamePanel extends JPanel implements Runnable {
       logRespawnDebug("update.resume");
       respawnUpdateLogPending = false;
     }
+    drainNetworkQueue();
     updatePlayer();
     updateNpcs();
     updateMonsters();
@@ -320,6 +342,9 @@ public class GamePanel extends JPanel implements Runnable {
 
   private void updatePlayer() {
     player.update();
+    for (RemotePlayer rp : remotePlayers) {
+      rp.update();
+    }
   }
 
   private void updateNpcs() {
@@ -401,6 +426,166 @@ public class GamePanel extends JPanel implements Runnable {
     }
   }
 
+  // ==== REDE — Métodos do game loop ====
+
+  /**
+   * Ponto de integração de rede no game loop.
+   * No-op em modo singleplayer ({@link NetworkManager#isMultiplayer()} = false).
+   */
+  private void drainNetworkQueue() {
+    if (!networkManager.isMultiplayer()) {
+      return;
+    }
+    if (networkManager.isHost()) {
+      drainServerQueue();
+      broadcastStateIfNeeded();
+    } else {
+      drainClientQueue();
+      sendLocalInput();
+    }
+  }
+
+  /** Host: processa todos os pacotes recebidos de clientes. */
+  private void drainServerQueue() {
+    IncomingPacket incoming;
+    while ((incoming = networkManager.pollServerIncoming()) != null) {
+      applyIncomingPacket(incoming);
+    }
+  }
+
+  /**
+   * Host: faz broadcast do estado das entidades a ~20 Hz.
+   * A cada 3 frames de 60 Hz emite um snapshot para todos os clientes.
+   */
+  private void broadcastStateIfNeeded() {
+    if (collisionFrameCounter % 3 != 0) {
+      return;
+    }
+    // Estado do jogador local (host = ID 0)
+    networkManager.broadcast(buildEntityState(player, 0));
+    // Estado de cada jogador remoto
+    for (RemotePlayer rp : remotePlayers) {
+      networkManager.broadcast(buildEntityState(rp, rp.getNetworkId()));
+    }
+  }
+
+  /** Cliente: processa todos os pacotes recebidos do servidor. */
+  private void drainClientQueue() {
+    Packet pkt;
+    while ((pkt = networkManager.pollClientIncoming()) != null) {
+      applyServerPacket(pkt);
+    }
+  }
+
+  /** Cliente: envia o input local a cada frame. */
+  private void sendLocalInput() {
+    networkManager.sendToServer(keyH.captureCurrentInput(inputSequence++));
+  }
+
+  /**
+   * Host: aplica um pacote recebido de um cliente específico.
+   *
+   * @param incoming envelope com o pacote e o handler do cliente remetente
+   */
+  private void applyIncomingPacket(IncomingPacket incoming) {
+    ClientHandler source = incoming.getSource();
+    Packet pkt = incoming.getPacket();
+    switch (pkt.getType()) {
+      case HANDSHAKE -> {
+        HandshakePacket hp = (HandshakePacket) pkt;
+        int newId = remotePlayers.size() + 1;
+        source.setAssignedPlayerId(newId);
+        RemotePlayer rp = new RemotePlayer(this, hp.getPlayerName(),
+            hp.getCharacterClass(), newId);
+        remotePlayers.add(rp);
+        // Informa ao cliente seu ID de rede para que ignore o próprio estado
+        source.send(new EventPacket(
+            EventPacket.EVT_PLAYER_ASSIGN, newId, 0, newId, (byte) currentMap));
+        LOGGER.log(Level.INFO, "Jogador \"{0}\" conectado com ID de rede {1}",
+            new Object[]{hp.getPlayerName(), newId});
+      }
+      case INPUT -> {
+        InputPacket ip = (InputPacket) pkt;
+        RemotePlayer rp = findRemotePlayerById(source.getAssignedPlayerId());
+        if (rp != null) {
+          rp.applyInput(ip);
+        }
+      }
+      default -> { /* outros tipos tratados nas fases seguintes */ }
+    }
+  }
+
+  /**
+   * Cliente: aplica um pacote recebido do servidor host.
+   *
+   * @param pkt pacote desserializado recebido do servidor
+   */
+  private void applyServerPacket(Packet pkt) {
+    switch (pkt.getType()) {
+      case ENTITY_STATE -> {
+        EntityStatePacket esp = (EntityStatePacket) pkt;
+        int entityId = esp.getEntityId();
+        // Ignora o próprio estado (evita conflito com a posição local)
+        if (entityId == localNetworkId) {
+          return;
+        }
+        RemotePlayer rp = findRemotePlayerById(entityId);
+        if (rp == null) {
+          rp = new RemotePlayer(this, "Jogador #" + entityId, 0, entityId);
+          remotePlayers.add(rp);
+        }
+        rp.applyState(esp);
+      }
+      case EVENT -> {
+        EventPacket ep = (EventPacket) pkt;
+        if (ep.getEventType() == EventPacket.EVT_PLAYER_ASSIGN) {
+          localNetworkId = ep.getValue();
+          LOGGER.log(Level.INFO, "ID de rede local atribuído: {0}", localNetworkId);
+        }
+      }
+      case DISCONNECT -> {
+        DisconnectPacket dp = (DisconnectPacket) pkt;
+        gameUi.addMessage("Desconectado: " + dp.getReason());
+        networkManager.stop();
+        remotePlayers.clear();
+        localNetworkId = -1;
+        setGameState(TITLE_STATE);
+      }
+      default -> { /* outros tipos tratados nas fases seguintes */ }
+    }
+  }
+
+  /**
+   * Constrói um {@link EntityStatePacket} a partir de uma entidade do jogo.
+   *
+   * @param e        entidade a serializar
+   * @param entityId identificador de rede da entidade
+   * @return pacote de estado pronto para envio
+   */
+  private EntityStatePacket buildEntityState(Entity e, int entityId) {
+    return new EntityStatePacket(
+        entityId,
+        (byte) currentMap,
+        e.getWorldX(), e.getWorldY(),
+        EntityStatePacket.encodeDirection(e.getDirection()),
+        (byte) e.getSpriteNum(),
+        (short) e.getLife(),
+        (short) e.getMaxLife(),
+        e.isAttacking(), e.isAlive(), e.isDying(),
+        e.isInvincible(), e.isGuarding()
+    );
+  }
+
+  /** Localiza um {@link RemotePlayer} pelo seu ID de rede. */
+  private RemotePlayer findRemotePlayerById(int networkId) {
+    for (RemotePlayer rp : remotePlayers) {
+      if (rp.getNetworkId() == networkId) {
+        return rp;
+      }
+    }
+    return null;
+  }
+
   /** Drena notificações do Bestiário e exibe como mensagem na HUD. */
   private void drainBestiaryNotifications() {
     String msg;
@@ -468,6 +653,7 @@ public class GamePanel extends JPanel implements Runnable {
 
   private void addEntitiesToList() {
     entityList.add(player);
+    entityList.addAll(remotePlayers);
     addEntities(npc[currentMap]);
     addEntities(obj[currentMap]);
     addEntities(monster[currentMap]);
@@ -823,5 +1009,15 @@ public class GamePanel extends JPanel implements Runnable {
 
   public long getCollisionFrameCounter() {
     return collisionFrameCounter;
+  }
+
+  /** Facade de rede — use para iniciar host/cliente e enviar/receber pacotes. */
+  public NetworkManager getNetworkManager() {
+    return networkManager;
+  }
+
+  /** Lista de jogadores remotos visíveis nesta instância do jogo. */
+  public List<RemotePlayer> getRemotePlayers() {
+    return remotePlayers;
   }
 }
