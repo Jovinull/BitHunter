@@ -132,33 +132,59 @@ public class RemotePlayer extends Entity {
   }
 
   /**
-   * Aplica o input recebido do cliente e move este jogador remoto.
-   * Movimento sem verificação de colisão (autoridade de colisão chega na Fase 3).
+   * Aplica o input recebido do cliente e move este jogador remoto, validando
+   * colisão server-side (autoridade de servidor — Fase 3).
+   * <p>
+   * O host é a fonte da verdade: o movimento só é aplicado se a colisão contra
+   * tiles, objetos, NPCs, monstros, tiles interativos e o jogador local
+   * permitir. Se houver colisão, a posição atual é mantida e o cliente
+   * eventualmente convergirá via {@link EntityStatePacket}.
    * <p>
    * Chamado pelo game loop do <strong>host</strong> ao receber um {@link InputPacket}.
    *
    * @param input pacote de input recebido do cliente
    */
   public void applyInput(InputPacket input) {
-    int spd = getSpeed();
+    boolean moving = true;
     if (input.isUp()) {
       setDirection(DIR_UP);
-      setWorldY(getWorldY() - spd);
     } else if (input.isDown()) {
       setDirection(DIR_DOWN);
-      setWorldY(getWorldY() + spd);
     } else if (input.isLeft()) {
       setDirection(DIR_LEFT);
-      setWorldX(getWorldX() - spd);
     } else if (input.isRight()) {
       setDirection(DIR_RIGHT);
-      setWorldX(getWorldX() + spd);
+    } else {
+      moving = false;
     }
+
+    if (moving) {
+      // Validação de colisão server-side (mesma lógica do Player local)
+      setCollisionOn(false);
+      var cc = gp.getcChecker();
+      cc.checkTile(this);
+      cc.checkObject(this);
+      cc.checkEntity(this, gp.getNpc());
+      cc.checkEntity(this, gp.getMonster());
+      cc.checkEntity(this, gp.getiTile());
+      cc.checkPlayer(this);
+
+      if (!isCollisionOn()) {
+        int spd = getSpeed();
+        switch (getDirection()) {
+          case DIR_UP    -> setWorldY(getWorldY() - spd);
+          case DIR_DOWN  -> setWorldY(getWorldY() + spd);
+          case DIR_LEFT  -> setWorldX(getWorldX() - spd);
+          case DIR_RIGHT -> setWorldX(getWorldX() + spd);
+          default -> { /* sem direção válida */ }
+        }
+      }
+      advanceSpriteCounter();
+    }
+
     // Sincroniza alvo com a posição real (no host, worldX/Y já é o alvo)
     targetX = getWorldX();
     targetY = getWorldY();
-    // Avança a animação de sprite
-    advanceSpriteCounter();
   }
 
   // ---- Ciclo de vida ----
