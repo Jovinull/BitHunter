@@ -39,6 +39,7 @@ import network.packets.HandshakePacket;
 import network.packets.InputPacket;
 import network.packets.ItemSpawnPacket;
 import network.packets.ChatPacket;
+import network.packets.PetSyncPacket;
 import network.packets.TradePacket;
 import network.ChatManager;
 import network.PlayerTradeManager;
@@ -503,6 +504,10 @@ public class GamePanel extends JPanel implements Runnable {
         networkManager.broadcast(buildEntityState(m, MONSTER_ID_BASE + i));
       }
     }
+    // Sync de pets a cada ~1s (60 frames) — Fase 12
+    if (collisionFrameCounter % 60 == 0) {
+      broadcastPetSync();
+    }
     // Estado autoritativo dos NPCs do mapa atual (Fase 7)
     Entity[] currentNpcs = npc[currentMap];
     for (int i = 0; i < currentNpcs.length; i++) {
@@ -558,6 +563,19 @@ public class GamePanel extends JPanel implements Runnable {
         (byte) mapIdx, (short) slot,
         item.getWorldX(), item.getWorldY(),
         item.getInternalId()));
+  }
+
+  /** Host: broadcast do estado do pet de cada jogador (Fase 12). */
+  private void broadcastPetSync() {
+    // Pet do host
+    var hostPet = player.getPet();
+    String hostPetId = hostPet != null ? player.getActivePetId() : "";
+    int hpx = hostPet != null ? hostPet.getWorldX() : 0;
+    int hpy = hostPet != null ? hostPet.getWorldY() : 0;
+    networkManager.broadcast(new PetSyncPacket(0, hpx, hpy, hostPetId));
+
+    // Nota: jogadores remotos no host não têm pets locais (pets são cosméticos
+    // para os clientes); se no futuro precisar, basta adicionar aqui.
   }
 
   /** Host: broadcast de morte de uma entidade. */
@@ -714,6 +732,18 @@ public class GamePanel extends JPanel implements Runnable {
           if (gameState == LOBBY_STATE) {
             setGameState(PLAY_STATE);
           }
+        } else if (ep.getEventType() == EventPacket.EVT_CUTSCENE) {
+          // Cutscene sync — só processa se este cliente é o alvo
+          int myId = localNetworkId >= 0 ? localNetworkId : 0;
+          if (ep.getTargetEntityId() == myId) {
+            int sceneId = ep.getValue();
+            if (sceneId > 0) {
+              setGameState(CUTSCENE_STATE);
+              csManager.startSkeletonLordScene();
+            } else if (gameState == CUTSCENE_STATE) {
+              setGameState(PLAY_STATE);
+            }
+          }
         }
       }
       case ITEM_SPAWN -> {
@@ -741,6 +771,13 @@ public class GamePanel extends JPanel implements Runnable {
       case CHAT -> {
         ChatPacket cp = (ChatPacket) pkt;
         chatManager.handleChatPacket(cp);
+      }
+      case PET_SYNC -> {
+        PetSyncPacket ps = (PetSyncPacket) pkt;
+        RemotePlayer rp = findRemotePlayerById(ps.getOwnerNetworkId());
+        if (rp != null) {
+          rp.applyPetSync(ps.getPetInternalId(), ps.getPetWorldX(), ps.getPetWorldY());
+        }
       }
       case DISCONNECT -> {
         DisconnectPacket dp = (DisconnectPacket) pkt;

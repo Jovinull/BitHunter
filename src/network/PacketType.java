@@ -40,7 +40,10 @@ public enum PacketType {
   TRADE,
 
   /** Mensagem de chat entre jogadores. */
-  CHAT;
+  CHAT,
+
+  /** Sincronização de pet ativo de um jogador. */
+  PET_SYNC;
 
   /**
    * Converte um byte de protocolo no enum correspondente.

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 
 import main.GamePanel;
 import network.packets.EntityStatePacket;
@@ -74,6 +75,17 @@ public class RemotePlayer extends Entity {
 
   /** Número máximo de frames de extrapolação antes de congelar. */
   private static final int MAX_EXTRAPOLATION_FRAMES = 12;
+
+  // ---- Pet cosmético (sync de rede) ----
+  /** ID do pet ativo do jogador remoto (null = sem pet). */
+  private String remotePetId;
+  private BufferedImage petSprite1;
+  private BufferedImage petSprite2;
+  private int petWorldX;
+  private int petWorldY;
+  private int petSpriteCounter;
+  private static final int PET_ANIM_INTERVAL = 40;
+  private static final int PET_OFFSET_Y = GamePanel.TILE_SIZE;
 
   /**
    * @param gp             referência ao painel do jogo
@@ -318,6 +330,7 @@ public class RemotePlayer extends Entity {
    */
   @Override
   public void draw(Graphics2D g2) {
+    drawRemotePet(g2);
     super.draw(g2);
     drawNameTag(g2);
   }
@@ -343,6 +356,58 @@ public class RemotePlayer extends Entity {
   @Override
   public void checkDrop() {
     // Sem drops locais — gerenciado pelo servidor (Fase 4)
+  }
+
+  // ---- Pet cosmético ----
+
+  /**
+   * Aplica a sincronização de pet recebida da rede.
+   *
+   * @param petId ID do pet ativo (vazio = sem pet)
+   * @param wx    posição X do pet no mundo
+   * @param wy    posição Y do pet no mundo
+   */
+  public void applyPetSync(String petId, int wx, int wy) {
+    petWorldX = wx;
+    petWorldY = wy;
+    if (petId == null || petId.isEmpty()) {
+      remotePetId = null;
+      petSprite1 = null;
+      petSprite2 = null;
+      return;
+    }
+    if (!petId.equals(remotePetId)) {
+      remotePetId = petId;
+      loadPetSprites(petId);
+    }
+  }
+
+  private void loadPetSprites(String petId) {
+    int size = GamePanel.TILE_SIZE;
+    String path = switch (petId) {
+      case "pet.greenSnail"  -> "/pets/Green Snail/green_snail";
+      case "pet.yellowSnail" -> "/pets/Yellow Snail/yellow_snail";
+      default -> null;
+    };
+    if (path == null) {
+      petSprite1 = null;
+      petSprite2 = null;
+      return;
+    }
+    petSprite1 = setup(path + "_1", size, size);
+    petSprite2 = setup(path + "_2", size, size);
+  }
+
+  private void drawRemotePet(Graphics2D g2) {
+    if (petSprite1 == null) {
+      return;
+    }
+    petSpriteCounter++;
+    BufferedImage sprite = (petSpriteCounter / PET_ANIM_INTERVAL % 2 == 0)
+        ? petSprite1 : petSprite2;
+    int drawX = petWorldX - gp.getCameraX();
+    int drawY = petWorldY - gp.getCameraY();
+    g2.drawImage(sprite, drawX, drawY, null);
   }
 
   // ---- Helper privado ----

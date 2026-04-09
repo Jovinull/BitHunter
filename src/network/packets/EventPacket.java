@@ -61,6 +61,12 @@ public final class EventPacket implements Packet {
   /** Host iniciou a partida — clientes saem do lobby para PLAY_STATE. */
   public static final byte EVT_GAME_START = 0x0A;
 
+  /**
+   * Host notifica que o jogador {@code source} está em cutscene {@code value}
+   * (0 = saiu da cutscene). Apenas jogadores no mesmo mapa e próximos recebem.
+   */
+  public static final byte EVT_CUTSCENE = 0x0B;
+
   // ---- Campos ----
   private final byte eventType;
   private final int sourceEntityId;

@@ -3,7 +3,9 @@ package main;
 import java.awt.Graphics2D;
 
 import entity.PlayerDummy;
+import entity.RemotePlayer;
 import monster.MonSkeletonLord;
+import network.packets.EventPacket;
 import object.ObjDoorIron;
 
 public class CutsceneManager {
@@ -94,6 +96,9 @@ public class CutsceneManager {
     restorePlayerFromDummy();
     gp.getPlayer().setDrawing(true);
 
+    // Notifica fim da cutscene aos jogadores próximos
+    broadcastCutsceneToNearby(NA);
+
     // Reset
     sceneNum = NA;
     scenePhase = 0;
@@ -169,5 +174,30 @@ public class CutsceneManager {
   public void startSkeletonLordScene() {
     this.sceneNum = SKELETON_LORD;
     this.scenePhase = 0;
+    broadcastCutsceneToNearby(SKELETON_LORD);
+  }
+
+  /**
+   * Broadcast EVT_CUTSCENE para jogadores remotos no mesmo mapa e próximos.
+   * {@code sceneId} = número da cena (0 = fim da cutscene).
+   */
+  private void broadcastCutsceneToNearby(int sceneId) {
+    if (!gp.getNetworkManager().isMultiplayer() || !gp.getNetworkManager().isHost()) {
+      return;
+    }
+    int px = gp.getPlayer().getWorldX();
+    int py = gp.getPlayer().getWorldY();
+    int threshold = GamePanel.TILE_SIZE * 12; // ~12 tiles de raio
+    int threshSq = threshold * threshold;
+    for (RemotePlayer rp : gp.getRemotePlayers()) {
+      int dx = rp.getWorldX() - px;
+      int dy = rp.getWorldY() - py;
+      if (dx * dx + dy * dy <= threshSq) {
+        // Está perto — envia evento de cutscene
+        gp.getNetworkManager().broadcast(new EventPacket(
+            EventPacket.EVT_CUTSCENE, 0, rp.getNetworkId(),
+            sceneId, (byte) gp.getCurrentMap()));
+      }
+    }
   }
 }
