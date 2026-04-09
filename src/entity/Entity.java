@@ -466,9 +466,21 @@ public class Entity {
         int damage = Math.max(1, attack - rp.getDefense());
         rp.setLife(rp.getLife() - damage);
         rp.setInvincible(true);
+        // Knockback simplificado (Fase 7): empurra o remoto para trás
+        int kb = Math.max(8, getKnockBackPower() * 4);
+        switch (getDirection()) {
+          case DIR_UP    -> rp.setWorldY(rp.getWorldY() - kb);
+          case DIR_DOWN  -> rp.setWorldY(rp.getWorldY() + kb);
+          case DIR_LEFT  -> rp.setWorldX(rp.getWorldX() - kb);
+          case DIR_RIGHT -> rp.setWorldX(rp.getWorldX() + kb);
+          default -> { /* nada */ }
+        }
+        // Evento discreto de dano (Fase 5/7): clientes tocam SFX no instante
+        gp.broadcastDamage(0, rp.getNetworkId(), damage);
         if (rp.getLife() <= 0) {
           rp.setLife(0);
           rp.setAlive(false);
+          gp.broadcastDeath(rp.getNetworkId());
         }
       }
     }

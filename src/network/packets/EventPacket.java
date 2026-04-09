@@ -52,6 +52,12 @@ public final class EventPacket implements Packet {
    */
   public static final byte EVT_PLAYER_ASSIGN = 0x08;
 
+  /**
+   * Host removeu a entidade de id {@code value} (slot {@code value-base} do
+   * array correspondente). Cliente deve nulificar o slot ao receber.
+   */
+  public static final byte EVT_ENTITY_REMOVE = 0x09;
+
   // ---- Campos ----
   private final byte eventType;
   private final int sourceEntityId;

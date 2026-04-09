@@ -348,6 +348,10 @@ public class GamePanel extends JPanel implements Runnable {
   }
 
   private void updateNpcs() {
+    // Cliente: NPCs são proxies de rede, sem IA local (Fase 7)
+    if (networkManager.isClient()) {
+      return;
+    }
     for (Entity currentNpc : npc[currentMap]) {
       if (currentNpc != null) {
         currentNpc.update();
@@ -390,6 +394,8 @@ public class GamePanel extends JPanel implements Runnable {
     } else {
       // Sem respawn -> some pra sempre (comportamento original)
       list[index] = null;
+      // Avisa clientes para nulificar o slot (Fase 7 — fix do "monstro fantasma")
+      broadcastEntityRemoval(MONSTER_ID_BASE + index);
     }
   }
 
@@ -479,12 +485,57 @@ public class GamePanel extends JPanel implements Runnable {
         networkManager.broadcast(buildEntityState(m, MONSTER_ID_BASE + i));
       }
     }
+    // Estado autoritativo dos NPCs do mapa atual (Fase 7)
+    Entity[] currentNpcs = npc[currentMap];
+    for (int i = 0; i < currentNpcs.length; i++) {
+      Entity n = currentNpcs[i];
+      if (n != null) {
+        networkManager.broadcast(buildEntityState(n, NPC_ID_BASE + i));
+      }
+    }
   }
 
   /** Base do espaço de IDs de rede usado para monstros (evita colisão com jogadores). */
   private static final int MONSTER_ID_BASE = 1000;
+  /** Base do espaço de IDs de rede usado para NPCs. */
+  private static final int NPC_ID_BASE = 2000;
+  /** Base do espaço de IDs de rede usado para objetos/itens do mundo. */
+  private static final int OBJ_ID_BASE = 3000;
   /** Distância em pixels acima da qual o cliente snap-corrige o jogador local. */
   private static final int RECONCILE_THRESHOLD = 32;
+
+  /**
+   * Host: broadcast de evento {@link EventPacket#EVT_ENTITY_REMOVE} avisando
+   * clientes para nulificar o slot da entidade removida.
+   * @param networkId id da entidade removida (já incluindo a base do tipo)
+   */
+  public void broadcastEntityRemoval(int networkId) {
+    if (!networkManager.isHost()) {
+      return;
+    }
+    networkManager.broadcast(new EventPacket(
+        EventPacket.EVT_ENTITY_REMOVE, 0, networkId, networkId, (byte) currentMap));
+  }
+
+  /**
+   * Host: broadcast de evento de dano com sfx/partículas no momento exato.
+   */
+  public void broadcastDamage(int sourceId, int targetId, int amount) {
+    if (!networkManager.isHost()) {
+      return;
+    }
+    networkManager.broadcast(new EventPacket(
+        EventPacket.EVT_DAMAGE, sourceId, targetId, amount, (byte) currentMap));
+  }
+
+  /** Host: broadcast de morte de uma entidade. */
+  public void broadcastDeath(int targetId) {
+    if (!networkManager.isHost()) {
+      return;
+    }
+    networkManager.broadcast(new EventPacket(
+        EventPacket.EVT_DEATH, 0, targetId, 0, (byte) currentMap));
+  }
 
   /** Cliente: processa todos os pacotes recebidos do servidor. */
   private void drainClientQueue() {
@@ -558,9 +609,14 @@ public class GamePanel extends JPanel implements Runnable {
           return;
         }
 
+        // NPCs (Fase 7)
+        if (entityId >= NPC_ID_BASE && entityId < OBJ_ID_BASE) {
+          applyArrayState(npc, esp, entityId - NPC_ID_BASE);
+          return;
+        }
         // Monstros: ID >= MONSTER_ID_BASE → aplica direto no slot do array
-        if (entityId >= MONSTER_ID_BASE) {
-          applyMonsterState(esp, entityId - MONSTER_ID_BASE);
+        if (entityId >= MONSTER_ID_BASE && entityId < NPC_ID_BASE) {
+          applyArrayState(monster, esp, entityId - MONSTER_ID_BASE);
           return;
         }
 
@@ -584,6 +640,14 @@ public class GamePanel extends JPanel implements Runnable {
             this.currentMap = newMap;
             LOGGER.log(Level.INFO, "Mapa sincronizado: {0}", newMap);
           }
+        } else if (ep.getEventType() == EventPacket.EVT_ENTITY_REMOVE) {
+          // Host removeu entidade — nulificar slot correspondente (Fase 7)
+          handleRemoteRemoval(ep.getValue(), ep.getMapIndex() & 0xFF);
+        } else if (ep.getEventType() == EventPacket.EVT_DAMAGE) {
+          // SFX de dano no momento exato (Fase 5 — eventos discretos)
+          playSE(6);
+        } else if (ep.getEventType() == EventPacket.EVT_DEATH) {
+          playSE(11);
         }
       }
       case DISCONNECT -> {
@@ -620,16 +684,19 @@ public class GamePanel extends JPanel implements Runnable {
   }
 
   /**
-   * Cliente: aplica estado autoritativo recebido do host a um monstro
-   * do mapa atual identificado pelo índice no array {@code monster[currentMap]}.
-   * Se o slot estiver vazio (monstro removido localmente), o pacote é ignorado.
+   * Cliente: aplica estado autoritativo recebido do host a uma entidade
+   * indexada num array (monstros ou NPCs).
    */
-  private void applyMonsterState(EntityStatePacket esp, int index) {
-    Entity[] currentMonsters = monster[esp.getMapIndex() & 0xFF];
-    if (index < 0 || index >= currentMonsters.length) {
+  private void applyArrayState(Entity[][] array, EntityStatePacket esp, int index) {
+    int mapIdx = esp.getMapIndex() & 0xFF;
+    if (mapIdx < 0 || mapIdx >= array.length) {
       return;
     }
-    Entity m = currentMonsters[index];
+    Entity[] layer = array[mapIdx];
+    if (index < 0 || index >= layer.length) {
+      return;
+    }
+    Entity m = layer[index];
     if (m == null) {
       return;
     }
@@ -641,6 +708,35 @@ public class GamePanel extends JPanel implements Runnable {
     m.setMaxLife(esp.getMaxLife());
     m.setAlive(esp.isAlive());
     m.setDying(esp.isDying());
+  }
+
+  /**
+   * Cliente: nulifica o slot da entidade removida pelo host.
+   * O networkId carrega a base do tipo (1000=monstro, 2000=NPC, 3000=obj).
+   */
+  private void handleRemoteRemoval(int networkId, int mapIdx) {
+    Entity[][] array;
+    int base;
+    if (networkId >= OBJ_ID_BASE) {
+      array = obj;
+      base = OBJ_ID_BASE;
+    } else if (networkId >= NPC_ID_BASE) {
+      array = npc;
+      base = NPC_ID_BASE;
+    } else if (networkId >= MONSTER_ID_BASE) {
+      array = monster;
+      base = MONSTER_ID_BASE;
+    } else {
+      return;
+    }
+    if (mapIdx < 0 || mapIdx >= array.length) {
+      return;
+    }
+    int idx = networkId - base;
+    Entity[] layer = array[mapIdx];
+    if (idx >= 0 && idx < layer.length) {
+      layer[idx] = null;
+    }
   }
 
   /** Localiza um {@link RemotePlayer} pelo seu ID de rede. */

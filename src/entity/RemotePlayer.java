@@ -239,9 +239,11 @@ public class RemotePlayer extends Entity {
       if (hit.intersects(mRect)) {
         int dmg = Math.max(1, ATTACK_DAMAGE - m.getDefense());
         m.setLife(m.getLife() - dmg);
+        gp.broadcastDamage(networkId, 1000 + i, dmg);
         if (m.getLife() <= 0) {
           m.setLife(0);
           m.setDying(true);
+          gp.broadcastDeath(1000 + i);
         }
       }
     }

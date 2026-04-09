@@ -516,13 +516,19 @@ public class Player extends Entity {
     collisionChecker.checkTile(this);
 
     int objIndex = collisionChecker.checkObject(this);
-    pickUpObject(objIndex);
+    // Cliente: pickup de itens é autoritativo do host (Fase 7 — itens)
+    if (!gp.getNetworkManager().isClient()) {
+      pickUpObject(objIndex);
+    }
 
     int npcIndex = collisionChecker.checkEntity(this, gp.getNpc());
     interactNPC(npcIndex);
 
     int monsterIndex = collisionChecker.checkEntity(this, gp.getMonster());
-    contactMonster(monsterIndex);
+    // Cliente: contato com monstro só vira dano via reconciliação do host
+    if (!gp.getNetworkManager().isClient()) {
+      contactMonster(monsterIndex);
+    }
 
     collisionChecker.checkEntity(this, gp.getiTile());
     gp.geteHandler().checkEvent();
@@ -654,10 +660,12 @@ public class Player extends Entity {
     int currentMapIndex = gp.getCurrentMap();
     Entity obj = objects[currentMapIndex][i];
 
+    boolean removed = false;
     switch (obj.getType()) {
       case TYPE_PICKUP_ONLY -> {
         obj.use(this);
         objects[currentMapIndex][i] = null;
+        removed = true;
         gp.getGameStatistics().increment(GameStatistics.COINS_COLLECTED);
         gp.getAchievementManager().onCoinChange(getCoin());
       }
@@ -675,7 +683,13 @@ public class Player extends Entity {
         }
         gp.getGameUi().addMessage(text);
         objects[currentMapIndex][i] = null;
+        removed = true;
       }
+    }
+
+    // Sincroniza remoção do item para clientes (Fase 7 — itens)
+    if (removed) {
+      gp.broadcastEntityRemoval(3000 + i);
     }
   }
 
