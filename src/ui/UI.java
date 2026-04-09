@@ -99,6 +99,7 @@ public class UI {
   private final AchievementUi achievementUi;
   private final StatsUi statsUi;
   private final SkillTreeUi skillTreeUi;
+  private final LobbyUi lobbyUi;
 
   public UI(GamePanel gp) {
     this.gp = gp;
@@ -128,6 +129,7 @@ public class UI {
     achievementUi = new AchievementUi(this);
     statsUi = new StatsUi(this);
     skillTreeUi = new SkillTreeUi(this);
+    lobbyUi = new LobbyUi(this);
   }
 
   // ---- Helper de tradução ----
@@ -303,6 +305,10 @@ public class UI {
 
   public SkillTreeUi getSkillTreeUi() {
     return skillTreeUi;
+  }
+
+  LobbyUi getLobbyUi() {
+    return lobbyUi;
   }
 
   HudUi getHudUi() {

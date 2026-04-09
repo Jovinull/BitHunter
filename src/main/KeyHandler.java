@@ -148,6 +148,7 @@ public class KeyHandler implements KeyListener {
       case GamePanel.BESTIARY_STATE -> bestiaryState(code);
       case GamePanel.ACHIEVEMENT_STATE -> achievementState(code);
       case GamePanel.SKILL_TREE_STATE -> skillTreeState(code);
+      case GamePanel.LOBBY_STATE -> lobbyState(code);
       default -> {
         // noop
       }
@@ -255,7 +256,7 @@ public class KeyHandler implements KeyListener {
       return;
     }
     gp.getPlayTimeTracker().start(0);
-    gp.setGameState(GamePanel.PLAY_STATE);
+    gp.setGameState(GamePanel.LOBBY_STATE);
     gp.playMusic(0);
   }
 
@@ -280,8 +281,26 @@ public class KeyHandler implements KeyListener {
       return;
     }
     gp.getPlayTimeTracker().start(0);
-    gp.setGameState(GamePanel.PLAY_STATE);
+    gp.setGameState(GamePanel.LOBBY_STATE);
     gp.playMusic(0);
+  }
+
+  /**
+   * Lobby multiplayer: host pressiona ENTER para iniciar a partida;
+   * cliente apenas aguarda. ESC cancela e volta ao título.
+   */
+  public void lobbyState(int code) {
+    if (code == java.awt.event.KeyEvent.VK_ESCAPE) {
+      gp.getNetworkManager().stop();
+      gp.setGameState(GamePanel.TITLE_STATE);
+      return;
+    }
+    if (is(code, GameAction.CONFIRM) && gp.getNetworkManager().isHost()) {
+      // Host inicia: transmite EVT_GAME_START e entra em PLAY_STATE
+      gp.getNetworkManager().broadcast(new network.packets.EventPacket(
+          network.packets.EventPacket.EVT_GAME_START, 0, 0, 0, (byte) 0));
+      gp.setGameState(GamePanel.PLAY_STATE);
+    }
   }
 
   private void handleTitleClassSelect(int code, UI ui) {

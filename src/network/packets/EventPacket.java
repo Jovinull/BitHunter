@@ -58,6 +58,9 @@ public final class EventPacket implements Packet {
    */
   public static final byte EVT_ENTITY_REMOVE = 0x09;
 
+  /** Host iniciou a partida — clientes saem do lobby para PLAY_STATE. */
+  public static final byte EVT_GAME_START = 0x0A;
+
   // ---- Campos ----
   private final byte eventType;
   private final int sourceEntityId;

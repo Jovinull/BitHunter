@@ -150,6 +150,7 @@ public class GamePanel extends JPanel implements Runnable {
   public static final int BESTIARY_STATE = 13; // Bestiário (Cyclopedia)
   public static final int ACHIEVEMENT_STATE = 14; // Conquistas
   public static final int SKILL_TREE_STATE = 15;  // Árvore de Habilidades
+  public static final int LOBBY_STATE = 16; // Lobby multiplayer (espera de jogadores)
 
   // others
   private boolean bossBattleOn = false;
@@ -318,6 +319,9 @@ public class GamePanel extends JPanel implements Runnable {
       updatePlayState();
     } else if (gameState == PAUSE_STATE) {
       updatePauseState();
+    } else if (gameState == LOBBY_STATE) {
+      // Lobby também precisa drenar a rede para receber EVT_GAME_START
+      drainNetworkQueue();
     }
   }
 
@@ -663,6 +667,11 @@ public class GamePanel extends JPanel implements Runnable {
           playSE(6);
         } else if (ep.getEventType() == EventPacket.EVT_DEATH) {
           playSE(11);
+        } else if (ep.getEventType() == EventPacket.EVT_GAME_START) {
+          // Host iniciou a partida — sai do lobby
+          if (gameState == LOBBY_STATE) {
+            setGameState(PLAY_STATE);
+          }
         }
       }
       case ITEM_SPAWN -> {
@@ -834,6 +843,7 @@ public class GamePanel extends JPanel implements Runnable {
     switch (gameState) {
       case TITLE_STATE -> drawTitleScreen();
       case MAP_STATE -> drawMapScreen();
+      case LOBBY_STATE -> gameUi.draw(g2);
       default -> drawGameScenes();
     }
 
