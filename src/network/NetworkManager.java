@@ -71,6 +71,18 @@ public final class NetworkManager {
   private NetworkServer server;
   private NetworkClient client;
 
+  // ---- Última conexão de cliente (para reconexão automática) ----
+  private String lastHost;
+  private int lastPort;
+  private String lastPlayerName;
+  private int lastCharacterClass;
+
+  /** Endereço do último host ao qual este cliente conectou (para retry). */
+  public String getLastHost()           { return lastHost; }
+  public int getLastPort()              { return lastPort; }
+  public String getLastPlayerName()     { return lastPlayerName; }
+  public int getLastCharacterClass()    { return lastCharacterClass; }
+
   // ---- Inicialização ----
 
   /**
@@ -109,6 +121,10 @@ public final class NetworkManager {
     client = new NetworkClient(host, port);
     client.connect(playerName, characterClass);
     mode = NetworkMode.CLIENT;
+    this.lastHost = host;
+    this.lastPort = port;
+    this.lastPlayerName = playerName;
+    this.lastCharacterClass = characterClass;
     LOGGER.log(Level.INFO, "NetworkManager: modo CLIENT conectado a {0}:{1}",
         new Object[]{host, port});
   }

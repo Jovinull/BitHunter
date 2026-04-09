@@ -389,6 +389,11 @@ public class Entity {
         int itemHalf = GamePanel.TILE_SIZE / 2;
         droppedItem.setWorldX(centerX - itemHalf);
         droppedItem.setWorldY(centerY - itemHalf);
+
+        // Sincroniza spawn do drop com clientes (Fase 8)
+        if (gp.getNetworkManager().isHost() && droppedItem.getInternalId() != null) {
+          gp.broadcastItemSpawn(currentMapIndex, i, droppedItem);
+        }
         break;
       }
     }
@@ -464,16 +469,25 @@ public class Entity {
           rp.getSolidArea().height);
       if (myRect.intersects(rpRect)) {
         int damage = Math.max(1, attack - rp.getDefense());
+        // Guard simplificado (Fase 8): se o remoto está em guarda virado
+        // contra o atacante, o dano cai pela metade e knockback é anulado
+        boolean blocked = rp.isGuarding()
+            && rp.getDirection().equals(getOppositeDirection(getDirection()));
+        if (blocked) {
+          damage = Math.max(1, damage / 2);
+        }
         rp.setLife(rp.getLife() - damage);
         rp.setInvincible(true);
         // Knockback simplificado (Fase 7): empurra o remoto para trás
-        int kb = Math.max(8, getKnockBackPower() * 4);
-        switch (getDirection()) {
-          case DIR_UP    -> rp.setWorldY(rp.getWorldY() - kb);
-          case DIR_DOWN  -> rp.setWorldY(rp.getWorldY() + kb);
-          case DIR_LEFT  -> rp.setWorldX(rp.getWorldX() - kb);
-          case DIR_RIGHT -> rp.setWorldX(rp.getWorldX() + kb);
-          default -> { /* nada */ }
+        if (!blocked) {
+          int kb = Math.max(8, getKnockBackPower() * 4);
+          switch (getDirection()) {
+            case DIR_UP    -> rp.setWorldY(rp.getWorldY() - kb);
+            case DIR_DOWN  -> rp.setWorldY(rp.getWorldY() + kb);
+            case DIR_LEFT  -> rp.setWorldX(rp.getWorldX() - kb);
+            case DIR_RIGHT -> rp.setWorldX(rp.getWorldX() + kb);
+            default -> { /* nada */ }
+          }
         }
         // Evento discreto de dano (Fase 5/7): clientes tocam SFX no instante
         gp.broadcastDamage(0, rp.getNetworkId(), damage);

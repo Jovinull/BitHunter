@@ -168,6 +168,9 @@ public class RemotePlayer extends Entity {
       moving = false;
     }
 
+    // Estado de guarda (Fase 8): tecla space (mapeada a GUARD no KeyHandler)
+    setGuarding(input.isSpace() && !moving);
+
     if (moving) {
       // Validação de colisão server-side (mesma lógica do Player local)
       setCollisionOn(false);
@@ -201,7 +204,8 @@ public class RemotePlayer extends Entity {
     if (attackCooldown > 0) {
       attackCooldown--;
     }
-    if ((input.isSpace() || input.isShot()) && attackCooldown == 0) {
+    // Atacar só pelo shotKey — space é GUARD no KeyHandler
+    if (input.isShot() && attackCooldown == 0) {
       performRemoteAttack();
       attackCooldown = ATTACK_COOLDOWN;
     }

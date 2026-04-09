@@ -36,6 +36,7 @@ import network.packets.EntityStatePacket;
 import network.packets.EventPacket;
 import network.packets.HandshakePacket;
 import network.packets.InputPacket;
+import network.packets.ItemSpawnPacket;
 import pets.PetIncubator;
 import tile.Map;
 import tile.TileManager;
@@ -528,6 +529,20 @@ public class GamePanel extends JPanel implements Runnable {
         EventPacket.EVT_DAMAGE, sourceId, targetId, amount, (byte) currentMap));
   }
 
+  /**
+   * Host: broadcast de spawn de item recém-dropado.
+   * Cliente recriará o item via {@link EntityGenerator#getObject(String)}.
+   */
+  public void broadcastItemSpawn(int mapIdx, int slot, Entity item) {
+    if (!networkManager.isHost()) {
+      return;
+    }
+    networkManager.broadcast(new ItemSpawnPacket(
+        (byte) mapIdx, (short) slot,
+        item.getWorldX(), item.getWorldY(),
+        item.getInternalId()));
+  }
+
   /** Host: broadcast de morte de uma entidade. */
   public void broadcastDeath(int targetId) {
     if (!networkManager.isHost()) {
@@ -650,13 +665,24 @@ public class GamePanel extends JPanel implements Runnable {
           playSE(11);
         }
       }
+      case ITEM_SPAWN -> {
+        ItemSpawnPacket isp = (ItemSpawnPacket) pkt;
+        int mapIdx = isp.getMapIndex() & 0xFF;
+        int slot = isp.getSlot() & 0xFFFF;
+        if (mapIdx >= 0 && mapIdx < obj.length
+            && slot >= 0 && slot < obj[mapIdx].length) {
+          Entity item = eGenerator.getObject(isp.getInternalId());
+          if (item != null) {
+            item.setWorldX(isp.getWorldX());
+            item.setWorldY(isp.getWorldY());
+            obj[mapIdx][slot] = item;
+          }
+        }
+      }
       case DISCONNECT -> {
         DisconnectPacket dp = (DisconnectPacket) pkt;
-        gameUi.addMessage("Desconectado: " + dp.getReason());
-        networkManager.stop();
-        remotePlayers.clear();
-        localNetworkId = -1;
-        setGameState(TITLE_STATE);
+        gameUi.addMessage("Desconectado: " + dp.getReason() + " — tentando reconectar…");
+        attemptReconnect();
       }
       default -> { /* outros tipos tratados nas fases seguintes */ }
     }
@@ -737,6 +763,46 @@ public class GamePanel extends JPanel implements Runnable {
     if (idx >= 0 && idx < layer.length) {
       layer[idx] = null;
     }
+  }
+
+  /**
+   * Cliente: tenta reconectar ao último host até 3 vezes (Fase 8).
+   * Roda numa thread em background para não travar o game loop.
+   * Em caso de falha total, volta ao TITLE_STATE.
+   */
+  private void attemptReconnect() {
+    final String h = networkManager.getLastHost();
+    final int p = networkManager.getLastPort();
+    final String name = networkManager.getLastPlayerName();
+    final int cls = networkManager.getLastCharacterClass();
+    networkManager.stop();
+    remotePlayers.clear();
+    localNetworkId = -1;
+    if (h == null) {
+      setGameState(TITLE_STATE);
+      return;
+    }
+    Thread retry = new Thread(() -> {
+      for (int attempt = 1; attempt <= 3; attempt++) {
+        try {
+          Thread.sleep(2000L);
+        } catch (InterruptedException ie) {
+          Thread.currentThread().interrupt();
+          return;
+        }
+        try {
+          networkManager.connectToHost(h, p, name, cls);
+          gameUi.addMessage("Reconectado a " + h);
+          return;
+        } catch (java.io.IOException ex) {
+          gameUi.addMessage("Tentativa " + attempt + "/3 falhou: " + ex.getMessage());
+        }
+      }
+      gameUi.addMessage("Reconexão falhou — voltando ao título");
+      setGameState(TITLE_STATE);
+    }, "net-reconnect");
+    retry.setDaemon(true);
+    retry.start();
   }
 
   /** Localiza um {@link RemotePlayer} pelo seu ID de rede. */

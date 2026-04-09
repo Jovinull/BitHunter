@@ -10,6 +10,7 @@ import network.packets.EntityStatePacket;
 import network.packets.EventPacket;
 import network.packets.HandshakePacket;
 import network.packets.InputPacket;
+import network.packets.ItemSpawnPacket;
 import network.packets.MapStatePacket;
 import network.packets.PingPacket;
 import network.packets.PongPacket;
@@ -53,6 +54,7 @@ public class PacketDeserializer {
       case PING         -> PingPacket.read(in);
       case PONG         -> PongPacket.read(in);
       case DISCONNECT   -> DisconnectPacket.read(in);
+      case ITEM_SPAWN   -> ItemSpawnPacket.read(in);
     };
   }
 }

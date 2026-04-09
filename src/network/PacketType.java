@@ -31,7 +31,10 @@ public enum PacketType {
   PONG,
 
   /** Notificação de desconexão com motivo textual. */
-  DISCONNECT;
+  DISCONNECT,
+
+  /** Spawn autoritativo de item no mundo (drop de monstro, etc.). */
+  ITEM_SPAWN;
 
   /**
    * Converte um byte de protocolo no enum correspondente.
