@@ -37,7 +37,10 @@ public enum PacketType {
   ITEM_SPAWN,
 
   /** Trade P2P entre jogadores: solicitação, oferta, confirmação. */
-  TRADE;
+  TRADE,
+
+  /** Mensagem de chat entre jogadores. */
+  CHAT;
 
   /**
    * Converte um byte de protocolo no enum correspondente.

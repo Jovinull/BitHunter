@@ -59,5 +59,9 @@ final class UiScreenRouter {
     }
     ui.getGamePanel().getAchievementToast().draw(
         ui.g2, ui.getLanguageManager());
+    // Overlay de chat multiplayer
+    if (ui.getGamePanel().getNetworkManager().isMultiplayer()) {
+      ui.getChatHudUi().draw();
+    }
   }
 }

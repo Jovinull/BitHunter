@@ -38,7 +38,9 @@ import network.packets.EventPacket;
 import network.packets.HandshakePacket;
 import network.packets.InputPacket;
 import network.packets.ItemSpawnPacket;
+import network.packets.ChatPacket;
 import network.packets.TradePacket;
+import network.ChatManager;
 import network.PlayerTradeManager;
 import pets.PetIncubator;
 import tile.Map;
@@ -126,6 +128,8 @@ public class GamePanel extends JPanel implements Runnable {
   private transient int localNetworkId = -1;
   /** Gerenciador de trade P2P entre jogadores. */
   private final transient PlayerTradeManager playerTradeManager = new PlayerTradeManager(this);
+  /** Gerenciador de chat multiplayer. */
+  private final transient ChatManager chatManager = new ChatManager(this);
 
   // ENTITY AND OBJECTS
   private final transient Player player = new Player(this, keyH); // Jogador principal do jogo
@@ -610,12 +614,16 @@ public class GamePanel extends JPanel implements Runnable {
       case TRADE -> {
         TradePacket tp = (TradePacket) pkt;
         int targetId = tp.getTargetPlayerId();
-        // Se o alvo é o host (ID 0), processa localmente
         if (targetId == 0) {
           playerTradeManager.handleTradePacket(tp);
         }
-        // Retransmite para todos (cada cliente filtra por ID)
         networkManager.broadcast(tp);
+      }
+      case CHAT -> {
+        ChatPacket cp = (ChatPacket) pkt;
+        chatManager.handleChatPacket(cp);
+        // Retransmite para todos os clientes
+        networkManager.broadcast(cp);
       }
       case DISCONNECT -> {
         // Cliente desconectou — remove jogador remoto e cancela trade se aplicável
@@ -729,6 +737,10 @@ public class GamePanel extends JPanel implements Runnable {
         if (tp.getTargetPlayerId() == myId) {
           playerTradeManager.handleTradePacket(tp);
         }
+      }
+      case CHAT -> {
+        ChatPacket cp = (ChatPacket) pkt;
+        chatManager.handleChatPacket(cp);
       }
       case DISCONNECT -> {
         DisconnectPacket dp = (DisconnectPacket) pkt;
@@ -1303,6 +1315,11 @@ public class GamePanel extends JPanel implements Runnable {
   /** Facade de rede — use para iniciar host/cliente e enviar/receber pacotes. */
   public NetworkManager getNetworkManager() {
     return networkManager;
+  }
+
+  /** Gerenciador de chat multiplayer. */
+  public ChatManager getChatManager() {
+    return chatManager;
   }
 
   /** Gerenciador de trade P2P entre jogadores. */

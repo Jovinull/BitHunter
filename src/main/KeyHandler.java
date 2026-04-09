@@ -105,6 +105,15 @@ public class KeyHandler implements KeyListener {
   public void keyTyped(KeyEvent e) {
     int state = gp.getGameState();
     if (state == GamePanel.PLAY_STATE) {
+      // Se o chat está ativo, captura caracteres para o campo de input
+      var cm = gp.getChatManager();
+      if (cm != null && cm.isInputActive()) {
+        char c = e.getKeyChar();
+        if (c != KeyEvent.CHAR_UNDEFINED && !Character.isISOControl(c)) {
+          cm.typeChar(c);
+        }
+        return;
+      }
       gp.getCheatCodeManager().onCharTyped(e.getKeyChar());
     } else if (state == GamePanel.TITLE_STATE) {
       handleTitleCharTyped(e.getKeyChar());
@@ -305,9 +314,22 @@ public class KeyHandler implements KeyListener {
   }
 
   /**
-   * PLAY_STATE: jogador pressionou Y para solicitar trade com jogador próximo,
-   * ou aceitar uma solicitação pendente.
+   * PLAY_STATE com chat ativo: ENTER envia, ESC fecha, BACKSPACE apaga.
+   * Caracteres são capturados em keyTyped.
    */
+  private void handleChatInput(int key, network.ChatManager cm) {
+    if (is(key, GameAction.CONFIRM)) {
+      cm.sendCurrentInput();
+      cm.closeInput();
+    } else if (is(key, GameAction.OPTIONS) || key == KeyEvent.VK_ESCAPE) {
+      cm.closeInput();
+    } else if (key == KeyEvent.VK_BACK_SPACE) {
+      cm.backspace();
+    }
+    // Demais teclas são capturadas em keyTyped
+  }
+
+  /** PLAY_STATE: jogador pressionou Y para solicitar trade com jogador próximo. */
   private void handlePlayerTradeRequest() {
     if (!gp.getNetworkManager().isMultiplayer()) {
       return;
@@ -619,12 +641,25 @@ public class KeyHandler implements KeyListener {
    * Estado: Jogando (movimento, pausa, status, debug, etc).
    */
   public void playState(int key) {
+    // Chat multiplayer: quando o campo de input está ativo, intercepta tudo
+    var chatMgr = gp.getChatManager();
+    if (chatMgr != null && chatMgr.isInputActive()) {
+      handleChatInput(key, chatMgr);
+      return;
+    }
+
     // Se a janela do relógio estiver aberta, feche com ESC (OPTIONS) ou ENTER
     // (CONFIRM)
     if (gp.getGameUi().isClockWindowOpen()
         && (is(key, GameAction.OPTIONS) || is(key, GameAction.CONFIRM) || is(key, GameAction.CHARACTER))) {
       gp.getGameUi().setClockWindowOpen(false);
       return; // não processa mais nada
+    }
+
+    // ENTER abre o chat em multiplayer (quando nenhuma outra UI modal está aberta)
+    if (is(key, GameAction.CONFIRM) && gp.getNetworkManager().isMultiplayer()) {
+      chatMgr.openInput();
+      return;
     }
 
     handleMovementKeys(key);

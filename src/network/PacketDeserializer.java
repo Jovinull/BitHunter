@@ -14,6 +14,7 @@ import network.packets.ItemSpawnPacket;
 import network.packets.MapStatePacket;
 import network.packets.PingPacket;
 import network.packets.PongPacket;
+import network.packets.ChatPacket;
 import network.packets.TradePacket;
 
 /**
@@ -57,6 +58,7 @@ public class PacketDeserializer {
       case DISCONNECT   -> DisconnectPacket.read(in);
       case ITEM_SPAWN   -> ItemSpawnPacket.read(in);
       case TRADE        -> TradePacket.read(in);
+      case CHAT         -> ChatPacket.read(in);
     };
   }
 }
