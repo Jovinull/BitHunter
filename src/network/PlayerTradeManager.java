@@ -262,6 +262,21 @@ public class PlayerTradeManager {
     gp.setGameState(GamePanel.PLAY_STATE);
   }
 
+  /**
+   * Chamado quando o parceiro de trade desconecta (ou reconexão é disparada).
+   * Cancela qualquer trade ativo e volta ao PLAY_STATE.
+   */
+  public void onPartnerDisconnected() {
+    if (tradePartnerId >= 0) {
+      gp.addUiMessage("Troca cancelada — jogador desconectou.");
+      reset();
+      if (gp.getGameState() == GamePanel.PLAYER_TRADE_STATE) {
+        gp.setGameState(GamePanel.PLAY_STATE);
+      }
+    }
+    pendingRequestFrom = -1;
+  }
+
   // ---- Helpers ----
 
   private void startTrade(int partnerId) {

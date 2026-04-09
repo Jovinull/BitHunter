@@ -64,7 +64,14 @@ public final class ClientHandler {
     try {
       while (running) {
         Packet packet = deserializer.receive();
-        dispatchPacket(packet);
+        try {
+          dispatchPacket(packet);
+        } catch (RuntimeException e) {
+          // Isolamento: pacote malformado não derruba a conexão inteira
+          LOGGER.log(Level.WARNING,
+              "Erro ao processar pacote de {0}: {1}",
+              new Object[]{socket.getInetAddress().getHostAddress(), e.getMessage()});
+        }
       }
     } catch (IOException e) {
       if (running) {

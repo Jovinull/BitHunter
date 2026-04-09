@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -115,7 +116,7 @@ public class GamePanel extends JPanel implements Runnable {
 
   // ==== REDE (Multiplayer) ====
   private final transient NetworkManager networkManager = new NetworkManager();
-  private final transient List<RemotePlayer> remotePlayers = new ArrayList<>();
+  private final transient List<RemotePlayer> remotePlayers = new CopyOnWriteArrayList<>();
   /** Contador monotônico de frames de input enviados ao servidor. */
   private transient short inputSequence = 0;
   /**
@@ -616,6 +617,21 @@ public class GamePanel extends JPanel implements Runnable {
         // Retransmite para todos (cada cliente filtra por ID)
         networkManager.broadcast(tp);
       }
+      case DISCONNECT -> {
+        // Cliente desconectou — remove jogador remoto e cancela trade se aplicável
+        int disconnectedId = source.getAssignedPlayerId();
+        RemotePlayer rp = findRemotePlayerById(disconnectedId);
+        if (rp != null) {
+          remotePlayers.remove(rp);
+          LOGGER.log(Level.INFO, "Jogador remoto ID {0} removido (desconexão)", disconnectedId);
+        }
+        if (playerTradeManager.getTradePartnerId() == disconnectedId) {
+          playerTradeManager.onPartnerDisconnected();
+        }
+        // Notifica clientes remanescentes da remoção
+        networkManager.broadcast(new EventPacket(
+            EventPacket.EVT_ENTITY_REMOVE, 0, disconnectedId, disconnectedId, (byte) currentMap));
+      }
       default -> { /* outros tipos tratados nas fases seguintes */ }
     }
   }
@@ -811,6 +827,7 @@ public class GamePanel extends JPanel implements Runnable {
     final String name = networkManager.getLastPlayerName();
     final int cls = networkManager.getLastCharacterClass();
     networkManager.stop();
+    playerTradeManager.onPartnerDisconnected();
     remotePlayers.clear();
     localNetworkId = -1;
     if (h == null) {

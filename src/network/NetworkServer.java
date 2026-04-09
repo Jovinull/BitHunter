@@ -148,6 +148,8 @@ public final class NetworkServer {
    */
   void removeClient(ClientHandler client) {
     clients.remove(client);
+    // Enfileira um DISCONNECT sintético para que o game loop saiba quem saiu
+    enqueue(client, new network.packets.DisconnectPacket("client_disconnected"));
     LOGGER.log(Level.INFO, "Cliente {0} removido (restantes: {1})",
         new Object[]{client.getRemoteAddress(), clients.size()});
   }

@@ -63,6 +63,18 @@ public class RemotePlayer extends Entity {
   private int targetX;
   private int targetY;
 
+  // Dead-reckoning: velocidade estimada para extrapolação quando pacotes atrasam
+  private int velocityX;
+  private int velocityY;
+  private int prevTargetX;
+  private int prevTargetY;
+
+  /** Frames desde a última atualização de estado recebida. */
+  private int framesSinceUpdate = 0;
+
+  /** Número máximo de frames de extrapolação antes de congelar. */
+  private static final int MAX_EXTRAPOLATION_FRAMES = 12;
+
   /**
    * @param gp             referência ao painel do jogo
    * @param playerName     nome exibido acima do personagem
@@ -128,8 +140,15 @@ public class RemotePlayer extends Entity {
    * @param state pacote de estado recebido do servidor
    */
   public void applyState(EntityStatePacket state) {
+    // Estima velocidade para dead-reckoning (delta entre atualizações)
+    prevTargetX = targetX;
+    prevTargetY = targetY;
     targetX = state.getWorldX();
     targetY = state.getWorldY();
+    velocityX = targetX - prevTargetX;
+    velocityY = targetY - prevTargetY;
+    framesSinceUpdate = 0;
+
     setDirection(state.getDirection());
     setSpriteNum(state.getSpriteNum());
     setLife(state.getLife());
@@ -258,20 +277,36 @@ public class RemotePlayer extends Entity {
   /**
    * Interpola suavemente worldX/Y em direção a targetX/Y (cliente) ou
    * mantém a posição já atualizada pelo input (host).
+   * <p>
+   * Quando não há atualizações recentes, aplica dead-reckoning (extrapolação)
+   * usando a velocidade estimada, até {@link #MAX_EXTRAPOLATION_FRAMES}.
    */
   @Override
   public void update() {
-    int dx = targetX - getWorldX();
-    int dy = targetY - getWorldY();
+    framesSinceUpdate++;
+
+    // Alvo efetivo: target + extrapolação se pacotes atrasarem
+    int effectiveTargetX = targetX;
+    int effectiveTargetY = targetY;
+    if (framesSinceUpdate > 3 && framesSinceUpdate <= MAX_EXTRAPOLATION_FRAMES) {
+      // Extrapola baseado na velocidade estimada (escalada para 60Hz)
+      // velocityX/Y é o delta entre as duas últimas atualizações (~20Hz, 3 frames)
+      float extrapolationFactor = (framesSinceUpdate - 3) / 3.0f;
+      effectiveTargetX += (int) (velocityX * extrapolationFactor);
+      effectiveTargetY += (int) (velocityY * extrapolationFactor);
+    }
+
+    int dx = effectiveTargetX - getWorldX();
+    int dy = effectiveTargetY - getWorldY();
 
     if (Math.abs(dx) <= SNAP_THRESHOLD) {
-      setWorldX(targetX);
+      setWorldX(effectiveTargetX);
     } else {
       setWorldX(getWorldX() + (int) (dx * LERP_FACTOR));
     }
 
     if (Math.abs(dy) <= SNAP_THRESHOLD) {
-      setWorldY(targetY);
+      setWorldY(effectiveTargetY);
     } else {
       setWorldY(getWorldY() + (int) (dy * LERP_FACTOR));
     }

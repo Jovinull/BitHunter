@@ -87,7 +87,12 @@ public final class NetworkClient {
     try {
       while (running) {
         Packet packet = deserializer.receive();
-        dispatchPacket(packet);
+        try {
+          dispatchPacket(packet);
+        } catch (RuntimeException e) {
+          // Isolamento: pacote malformado não derruba a conexão inteira
+          LOGGER.log(Level.WARNING, "Erro ao processar pacote do servidor: {0}", e.getMessage());
+        }
       }
     } catch (IOException e) {
       if (running) {
