@@ -14,6 +14,7 @@ import network.packets.ItemSpawnPacket;
 import network.packets.MapStatePacket;
 import network.packets.PingPacket;
 import network.packets.PongPacket;
+import network.packets.TradePacket;
 
 /**
  * Lê e desserializa {@link Packet}s do protocolo binário do BitHunter.
@@ -55,6 +56,7 @@ public class PacketDeserializer {
       case PONG         -> PongPacket.read(in);
       case DISCONNECT   -> DisconnectPacket.read(in);
       case ITEM_SPAWN   -> ItemSpawnPacket.read(in);
+      case TRADE        -> TradePacket.read(in);
     };
   }
 }

@@ -37,6 +37,8 @@ import network.packets.EventPacket;
 import network.packets.HandshakePacket;
 import network.packets.InputPacket;
 import network.packets.ItemSpawnPacket;
+import network.packets.TradePacket;
+import network.PlayerTradeManager;
 import pets.PetIncubator;
 import tile.Map;
 import tile.TileManager;
@@ -121,6 +123,8 @@ public class GamePanel extends JPanel implements Runnable {
    * {@code >= 1} = cliente conectado (atribuído pelo host via EVT_PLAYER_ASSIGN).
    */
   private transient int localNetworkId = -1;
+  /** Gerenciador de trade P2P entre jogadores. */
+  private final transient PlayerTradeManager playerTradeManager = new PlayerTradeManager(this);
 
   // ENTITY AND OBJECTS
   private final transient Player player = new Player(this, keyH); // Jogador principal do jogo
@@ -151,6 +155,7 @@ public class GamePanel extends JPanel implements Runnable {
   public static final int ACHIEVEMENT_STATE = 14; // Conquistas
   public static final int SKILL_TREE_STATE = 15;  // Árvore de Habilidades
   public static final int LOBBY_STATE = 16; // Lobby multiplayer (espera de jogadores)
+  public static final int PLAYER_TRADE_STATE = 17; // Trade P2P entre jogadores
 
   // others
   private boolean bossBattleOn = false;
@@ -321,6 +326,9 @@ public class GamePanel extends JPanel implements Runnable {
       updatePauseState();
     } else if (gameState == LOBBY_STATE) {
       // Lobby também precisa drenar a rede para receber EVT_GAME_START
+      drainNetworkQueue();
+    } else if (gameState == PLAYER_TRADE_STATE) {
+      // Trade P2P também drena rede para receber pacotes de trade
       drainNetworkQueue();
     }
   }
@@ -598,6 +606,16 @@ public class GamePanel extends JPanel implements Runnable {
           rp.applyInput(ip);
         }
       }
+      case TRADE -> {
+        TradePacket tp = (TradePacket) pkt;
+        int targetId = tp.getTargetPlayerId();
+        // Se o alvo é o host (ID 0), processa localmente
+        if (targetId == 0) {
+          playerTradeManager.handleTradePacket(tp);
+        }
+        // Retransmite para todos (cada cliente filtra por ID)
+        networkManager.broadcast(tp);
+      }
       default -> { /* outros tipos tratados nas fases seguintes */ }
     }
   }
@@ -686,6 +704,14 @@ public class GamePanel extends JPanel implements Runnable {
             item.setWorldY(isp.getWorldY());
             obj[mapIdx][slot] = item;
           }
+        }
+      }
+      case TRADE -> {
+        TradePacket tp = (TradePacket) pkt;
+        int myId = localNetworkId >= 0 ? localNetworkId : 0;
+        // Só processa se o pacote é direcionado a este jogador
+        if (tp.getTargetPlayerId() == myId) {
+          playerTradeManager.handleTradePacket(tp);
         }
       }
       case DISCONNECT -> {
@@ -844,6 +870,7 @@ public class GamePanel extends JPanel implements Runnable {
       case TITLE_STATE -> drawTitleScreen();
       case MAP_STATE -> drawMapScreen();
       case LOBBY_STATE -> gameUi.draw(g2);
+      case PLAYER_TRADE_STATE -> gameUi.draw(g2);
       default -> drawGameScenes();
     }
 
@@ -1259,6 +1286,21 @@ public class GamePanel extends JPanel implements Runnable {
   /** Facade de rede — use para iniciar host/cliente e enviar/receber pacotes. */
   public NetworkManager getNetworkManager() {
     return networkManager;
+  }
+
+  /** Gerenciador de trade P2P entre jogadores. */
+  public PlayerTradeManager getPlayerTradeManager() {
+    return playerTradeManager;
+  }
+
+  /** Exibe uma mensagem temporária na HUD. */
+  public void addUiMessage(String msg) {
+    gameUi.addMessage(msg);
+  }
+
+  /** ID de rede local atribuído pelo host (0 = host, -1 = não atribuído). */
+  public int getLocalNetworkId() {
+    return localNetworkId;
   }
 
   /** Lista de jogadores remotos visíveis nesta instância do jogo. */

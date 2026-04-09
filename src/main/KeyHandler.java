@@ -149,6 +149,7 @@ public class KeyHandler implements KeyListener {
       case GamePanel.ACHIEVEMENT_STATE -> achievementState(code);
       case GamePanel.SKILL_TREE_STATE -> skillTreeState(code);
       case GamePanel.LOBBY_STATE -> lobbyState(code);
+      case GamePanel.PLAYER_TRADE_STATE -> playerTradeState(code);
       default -> {
         // noop
       }
@@ -300,6 +301,84 @@ public class KeyHandler implements KeyListener {
       gp.getNetworkManager().broadcast(new network.packets.EventPacket(
           network.packets.EventPacket.EVT_GAME_START, 0, 0, 0, (byte) 0));
       gp.setGameState(GamePanel.PLAY_STATE);
+    }
+  }
+
+  /**
+   * PLAY_STATE: jogador pressionou Y para solicitar trade com jogador próximo,
+   * ou aceitar uma solicitação pendente.
+   */
+  private void handlePlayerTradeRequest() {
+    if (!gp.getNetworkManager().isMultiplayer()) {
+      return;
+    }
+    var tm = gp.getPlayerTradeManager();
+    if (tm.hasPendingRequest()) {
+      tm.acceptPendingRequest();
+    } else {
+      if (!tm.requestTradeWithNearest()) {
+        gp.addUiMessage("Nenhum jogador próximo para trocar.");
+      }
+    }
+  }
+
+  /**
+   * PLAYER_TRADE_STATE: controles da tela de trade P2P.
+   * ←→ alterna painel, ↑↓ navega cursor, ENTER oferece/remove,
+   * C confirma, ESC cancela.
+   */
+  public void playerTradeState(int code) {
+    var tm = gp.getPlayerTradeManager();
+    var tradeUi = gp.getGameUi().getPlayerTradeUi();
+    var inv = gp.getPlayer().getInventory();
+
+    if (is(code, GameAction.OPTIONS)) {
+      tm.cancelTrade();
+      return;
+    }
+
+    // C = confirmar troca
+    if (is(code, GameAction.CHARACTER)) {
+      tm.confirmTrade();
+      return;
+    }
+
+    // ←→ alterna painel
+    if (is(code, GameAction.MOVE_LEFT)) {
+      tradeUi.activePanel = 0;
+      return;
+    }
+    if (is(code, GameAction.MOVE_RIGHT)) {
+      tradeUi.activePanel = 1;
+      return;
+    }
+
+    // ↑↓ navega cursor no painel ativo
+    if (is(code, GameAction.MOVE_UP)) {
+      if (tradeUi.activePanel == 0) {
+        tradeUi.invCursorIndex = Math.max(0, tradeUi.invCursorIndex - 1);
+      } else {
+        tradeUi.offerCursorIndex = Math.max(0, tradeUi.offerCursorIndex - 1);
+      }
+      return;
+    }
+    if (is(code, GameAction.MOVE_DOWN)) {
+      if (tradeUi.activePanel == 0) {
+        tradeUi.invCursorIndex = Math.min(inv.size() - 1, tradeUi.invCursorIndex + 1);
+      } else {
+        tradeUi.offerCursorIndex = Math.min(
+            tm.getLocalOffers().size() - 1, tradeUi.offerCursorIndex + 1);
+      }
+      return;
+    }
+
+    // ENTER = oferecer item (painel 0) ou remover oferta (painel 1)
+    if (is(code, GameAction.CONFIRM)) {
+      if (tradeUi.activePanel == 0) {
+        tm.offerItem(tradeUi.invCursorIndex);
+      } else {
+        tm.removeOffer(tradeUi.offerCursorIndex);
+      }
     }
   }
 
@@ -602,6 +681,8 @@ public class KeyHandler implements KeyListener {
     } else if (is(key, GameAction.SKILL_TREE)) {
       gp.getGameUi().getSkillTreeUi().resetState();
       gp.setGameState(GamePanel.SKILL_TREE_STATE);
+    } else if (is(key, GameAction.PLAYER_TRADE)) {
+      handlePlayerTradeRequest();
     }
   }
 

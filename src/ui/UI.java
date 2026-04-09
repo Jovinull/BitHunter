@@ -100,6 +100,7 @@ public class UI {
   private final StatsUi statsUi;
   private final SkillTreeUi skillTreeUi;
   private final LobbyUi lobbyUi;
+  private final PlayerTradeUi playerTradeUi;
 
   public UI(GamePanel gp) {
     this.gp = gp;
@@ -130,6 +131,7 @@ public class UI {
     statsUi = new StatsUi(this);
     skillTreeUi = new SkillTreeUi(this);
     lobbyUi = new LobbyUi(this);
+    playerTradeUi = new PlayerTradeUi(this);
   }
 
   // ---- Helper de tradução ----
@@ -309,6 +311,10 @@ public class UI {
 
   LobbyUi getLobbyUi() {
     return lobbyUi;
+  }
+
+  public PlayerTradeUi getPlayerTradeUi() {
+    return playerTradeUi;
   }
 
   HudUi getHudUi() {

@@ -41,6 +41,7 @@ public enum GameAction {
   BESTIARY(KeyEvent.VK_B, Category.INTERFACE),
   ACHIEVEMENTS(KeyEvent.VK_J, Category.INTERFACE),
   SKILL_TREE(KeyEvent.VK_K, Category.INTERFACE),
+  PLAYER_TRADE(KeyEvent.VK_Y, Category.INTERFACE),
 
   // ── Debug ──
   DEBUG_TOGGLE(KeyEvent.VK_T, Category.DEBUG),
@@ -88,7 +89,8 @@ public enum GameAction {
   private static final List<GameAction> REMAPPABLE_LIST = List.of(
       MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT,
       CONFIRM, SHOOT, GUARD,
-      PAUSE, CHARACTER, OPTIONS, MINIMAP, MAP, BESTIARY, ACHIEVEMENTS, SKILL_TREE
+      PAUSE, CHARACTER, OPTIONS, MINIMAP, MAP, BESTIARY, ACHIEVEMENTS, SKILL_TREE,
+      PLAYER_TRADE
   );
 
   /**

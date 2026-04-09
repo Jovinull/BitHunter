@@ -40,6 +40,7 @@ final class UiScreenRouter {
       case GamePanel.ACHIEVEMENT_STATE -> ui.getAchievementUi().drawAchievementScreen();
       case GamePanel.SKILL_TREE_STATE  -> ui.getSkillTreeUi().drawSkillTreeScreen();
       case GamePanel.LOBBY_STATE       -> ui.getLobbyUi().drawLobbyScreen();
+      case GamePanel.PLAYER_TRADE_STATE -> ui.getPlayerTradeUi().drawPlayerTradeScreen();
       default -> {
         // Estados sem camada extra de UI dedicada.
       }

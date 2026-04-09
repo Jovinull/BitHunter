@@ -34,7 +34,10 @@ public enum PacketType {
   DISCONNECT,
 
   /** Spawn autoritativo de item no mundo (drop de monstro, etc.). */
-  ITEM_SPAWN;
+  ITEM_SPAWN,
+
+  /** Trade P2P entre jogadores: solicitação, oferta, confirmação. */
+  TRADE;
 
   /**
    * Converte um byte de protocolo no enum correspondente.
