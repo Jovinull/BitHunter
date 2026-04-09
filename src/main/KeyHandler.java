@@ -29,7 +29,7 @@ public class KeyHandler implements KeyListener {
   private static final int NAVIGATE_SFX_ID = 9;
 
   /** Limites de índices dos menus de título. */
-  private static final int MENU_MAIN_MAX_INDEX = 2; // [Novo jogo, Carregar, Sair]
+  private static final int MENU_MAIN_MAX_INDEX = 4; // [Novo jogo, Carregar, Hospedar, Conectar, Sair]
   private static final int MENU_CLASS_MAX_INDEX = 3; // [Guerreiro, Ladrão, Feiticeiro, Voltar]
   private static final int MENU_SLOT_MAX_INDEX = SaveManager.MAX_SLOTS; // 0..2 = slots, 3 = Voltar
 
@@ -231,10 +231,57 @@ public class KeyHandler implements KeyListener {
         ui.refreshSaveSlotInfos();
         ui.setCommandNum(firstSelectableSlot(ui));
       }
-      case 2 -> System.exit(0); // Sair
+      case 2 -> startAsHost(); // Hospedar partida multiplayer
+      case 3 -> startAsClient(); // Conectar a host remoto
+      case 4 -> System.exit(0); // Sair
       default -> {
         /* noop */ }
     }
+  }
+
+  /**
+   * Inicia o jogo como host de uma partida multiplayer (porta 7777).
+   * Reinicia o estado de jogo, começa o servidor TCP e entra em PLAY_STATE.
+   */
+  private void startAsHost() {
+    gp.resetGame(true);
+    gp.getPlayer().setPlayerName("Host");
+    gp.getPlayer().setCharacterClass(0);
+    try {
+      gp.getNetworkManager().startAsHost(7777);
+      gp.getGameUi().addMessage("Hospedando em :7777");
+    } catch (java.io.IOException e) {
+      javax.swing.JOptionPane.showMessageDialog(gp, "Falha ao hospedar: " + e.getMessage());
+      return;
+    }
+    gp.getPlayTimeTracker().start(0);
+    gp.setGameState(GamePanel.PLAY_STATE);
+    gp.playMusic(0);
+  }
+
+  /**
+   * Solicita IP do host via diálogo e conecta como cliente.
+   */
+  private void startAsClient() {
+    String host = javax.swing.JOptionPane.showInputDialog(gp,
+        "IP do host (porta 7777):", "localhost");
+    if (host == null || host.isBlank()) {
+      return;
+    }
+    gp.resetGame(true);
+    String name = "Player" + (int) (Math.random() * 1000);
+    gp.getPlayer().setPlayerName(name);
+    gp.getPlayer().setCharacterClass(0);
+    try {
+      gp.getNetworkManager().connectToHost(host.trim(), 7777, name, 0);
+      gp.getGameUi().addMessage("Conectado a " + host);
+    } catch (java.io.IOException e) {
+      javax.swing.JOptionPane.showMessageDialog(gp, "Falha ao conectar: " + e.getMessage());
+      return;
+    }
+    gp.getPlayTimeTracker().start(0);
+    gp.setGameState(GamePanel.PLAY_STATE);
+    gp.playMusic(0);
   }
 
   private void handleTitleClassSelect(int code, UI ui) {

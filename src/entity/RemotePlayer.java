@@ -3,6 +3,7 @@ package entity;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 
 import main.GamePanel;
 import network.packets.EntityStatePacket;
@@ -44,6 +45,15 @@ public class RemotePlayer extends Entity {
 
   /** Frames entre troca de sprites durante o movimento (espelha Player). */
   private static final int SPRITE_TICK = 12;
+
+  /** Cooldown entre ataques (em frames de 60 Hz). */
+  private static final int ATTACK_COOLDOWN = 30;
+  /** Alcance do golpe corpo-a-corpo em pixels à frente do remoto. */
+  private static final int ATTACK_REACH = 40;
+  /** Dano base aplicado a monstros atingidos pelo remoto. */
+  private static final int ATTACK_DAMAGE = 2;
+
+  private int attackCooldown = 0;
 
   private final String playerName;
   private final int characterClass;
@@ -185,6 +195,56 @@ public class RemotePlayer extends Entity {
     // Sincroniza alvo com a posição real (no host, worldX/Y já é o alvo)
     targetX = getWorldX();
     targetY = getWorldY();
+
+    // Ataque server-side (Fase 5): tecla space ou shotKey acionam um golpe
+    // corpo-a-corpo simples contra monstros à frente.
+    if (attackCooldown > 0) {
+      attackCooldown--;
+    }
+    if ((input.isSpace() || input.isShot()) && attackCooldown == 0) {
+      performRemoteAttack();
+      attackCooldown = ATTACK_COOLDOWN;
+    }
+    setAttacking(attackCooldown > ATTACK_COOLDOWN - 8);
+  }
+
+  /**
+   * Aplica dano simplificado a monstros adjacentes na direção atual.
+   * Executado exclusivamente no host como autoridade de combate (Fase 5).
+   */
+  private void performRemoteAttack() {
+    Rectangle hit = new Rectangle(
+        getWorldX() + getSolidArea().x,
+        getWorldY() + getSolidArea().y,
+        getSolidArea().width,
+        getSolidArea().height);
+    switch (getDirection()) {
+      case DIR_UP    -> hit.y -= ATTACK_REACH;
+      case DIR_DOWN  -> hit.y += ATTACK_REACH;
+      case DIR_LEFT  -> hit.x -= ATTACK_REACH;
+      case DIR_RIGHT -> hit.x += ATTACK_REACH;
+      default -> { /* nada */ }
+    }
+    Entity[] monsters = gp.getMonster()[gp.getCurrentMap()];
+    for (int i = 0; i < monsters.length; i++) {
+      Entity m = monsters[i];
+      if (m == null || !m.isAlive() || m.isDying()) {
+        continue;
+      }
+      Rectangle mRect = new Rectangle(
+          m.getWorldX() + m.getSolidArea().x,
+          m.getWorldY() + m.getSolidArea().y,
+          m.getSolidArea().width,
+          m.getSolidArea().height);
+      if (hit.intersects(mRect)) {
+        int dmg = Math.max(1, ATTACK_DAMAGE - m.getDefense());
+        m.setLife(m.getLife() - dmg);
+        if (m.getLife() <= 0) {
+          m.setLife(0);
+          m.setDying(true);
+        }
+      }
+    }
   }
 
   // ---- Ciclo de vida ----

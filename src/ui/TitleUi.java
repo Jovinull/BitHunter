@@ -66,7 +66,9 @@ class TitleUi {
     int yMenuStart = yImg + (int) (GamePanel.TILE_SIZE * 3.2);
     ui.drawMenuItem(ui.t("ui.title.newGame"), yMenuStart, ui.getCommandNum() == 0);
     ui.drawMenuItem(ui.t("ui.title.loadGame"), yMenuStart + UI.MENU_LINE, ui.getCommandNum() == 1);
-    ui.drawMenuItem(ui.t("ui.title.exit"), yMenuStart + UI.MENU_LINE * 2, ui.getCommandNum() == 2);
+    ui.drawMenuItem(ui.t("ui.title.host"), yMenuStart + UI.MENU_LINE * 2, ui.getCommandNum() == 2);
+    ui.drawMenuItem(ui.t("ui.title.join"), yMenuStart + UI.MENU_LINE * 3, ui.getCommandNum() == 3);
+    ui.drawMenuItem(ui.t("ui.title.exit"), yMenuStart + UI.MENU_LINE * 4, ui.getCommandNum() == 4);
 
     ui.useCrispPixelText(g2);
     g2.setFont(ui.fonts.pixelPlain(16F));
