@@ -356,6 +356,10 @@ public class GamePanel extends JPanel implements Runnable {
   }
 
   private void updateMonsters() {
+    // Cliente: monstros são proxies de rede, sem IA local (Fase 6.2)
+    if (networkManager.isClient()) {
+      return;
+    }
     Entity[] currentMonsters = monster[currentMap];
 
     for (int i = 0; i < currentMonsters.length; i++) {
@@ -467,7 +471,20 @@ public class GamePanel extends JPanel implements Runnable {
     for (RemotePlayer rp : remotePlayers) {
       networkManager.broadcast(buildEntityState(rp, rp.getNetworkId()));
     }
+    // Estado autoritativo dos monstros do mapa atual (Fase 6.2)
+    Entity[] currentMonsters = monster[currentMap];
+    for (int i = 0; i < currentMonsters.length; i++) {
+      Entity m = currentMonsters[i];
+      if (m != null) {
+        networkManager.broadcast(buildEntityState(m, MONSTER_ID_BASE + i));
+      }
+    }
   }
+
+  /** Base do espaço de IDs de rede usado para monstros (evita colisão com jogadores). */
+  private static final int MONSTER_ID_BASE = 1000;
+  /** Distância em pixels acima da qual o cliente snap-corrige o jogador local. */
+  private static final int RECONCILE_THRESHOLD = 32;
 
   /** Cliente: processa todos os pacotes recebidos do servidor. */
   private void drainClientQueue() {
@@ -525,10 +542,29 @@ public class GamePanel extends JPanel implements Runnable {
       case ENTITY_STATE -> {
         EntityStatePacket esp = (EntityStatePacket) pkt;
         int entityId = esp.getEntityId();
-        // Ignora o próprio estado (evita conflito com a posição local)
+
+        // Reconciliação do jogador local (Fase 6.3): aplica correção
+        // se a divergência ultrapassar o limiar; caso contrário deixa
+        // a previsão local rodar.
         if (entityId == localNetworkId) {
+          int dx = esp.getWorldX() - player.getWorldX();
+          int dy = esp.getWorldY() - player.getWorldY();
+          if (dx * dx + dy * dy > RECONCILE_THRESHOLD * RECONCILE_THRESHOLD) {
+            player.setWorldX(esp.getWorldX());
+            player.setWorldY(esp.getWorldY());
+          }
+          player.setLife(esp.getLife());
+          player.setMaxLife(esp.getMaxLife());
           return;
         }
+
+        // Monstros: ID >= MONSTER_ID_BASE → aplica direto no slot do array
+        if (entityId >= MONSTER_ID_BASE) {
+          applyMonsterState(esp, entityId - MONSTER_ID_BASE);
+          return;
+        }
+
+        // Demais: jogadores remotos
         RemotePlayer rp = findRemotePlayerById(entityId);
         if (rp == null) {
           rp = new RemotePlayer(this, "Jogador #" + entityId, 0, entityId);
@@ -541,6 +577,13 @@ public class GamePanel extends JPanel implements Runnable {
         if (ep.getEventType() == EventPacket.EVT_PLAYER_ASSIGN) {
           localNetworkId = ep.getValue();
           LOGGER.log(Level.INFO, "ID de rede local atribuído: {0}", localNetworkId);
+        } else if (ep.getEventType() == EventPacket.EVT_MAP_CHANGE) {
+          // Sincronização de mapa (Fase 6.1): host trocou de área
+          int newMap = ep.getValue();
+          if (newMap != currentMap) {
+            this.currentMap = newMap;
+            LOGGER.log(Level.INFO, "Mapa sincronizado: {0}", newMap);
+          }
         }
       }
       case DISCONNECT -> {
@@ -574,6 +617,30 @@ public class GamePanel extends JPanel implements Runnable {
         e.isAttacking(), e.isAlive(), e.isDying(),
         e.isInvincible(), e.isGuarding()
     );
+  }
+
+  /**
+   * Cliente: aplica estado autoritativo recebido do host a um monstro
+   * do mapa atual identificado pelo índice no array {@code monster[currentMap]}.
+   * Se o slot estiver vazio (monstro removido localmente), o pacote é ignorado.
+   */
+  private void applyMonsterState(EntityStatePacket esp, int index) {
+    Entity[] currentMonsters = monster[esp.getMapIndex() & 0xFF];
+    if (index < 0 || index >= currentMonsters.length) {
+      return;
+    }
+    Entity m = currentMonsters[index];
+    if (m == null) {
+      return;
+    }
+    m.setWorldX(esp.getWorldX());
+    m.setWorldY(esp.getWorldY());
+    m.setDirection(esp.getDirection());
+    m.setSpriteNum(esp.getSpriteNum());
+    m.setLife(esp.getLife());
+    m.setMaxLife(esp.getMaxLife());
+    m.setAlive(esp.isAlive());
+    m.setDying(esp.isDying());
   }
 
   /** Localiza um {@link RemotePlayer} pelo seu ID de rede. */
@@ -817,7 +884,13 @@ public class GamePanel extends JPanel implements Runnable {
   }
 
   public void setCurrentMap(int currentMap) {
+    int previous = this.currentMap;
     this.currentMap = currentMap;
+    // Sincronização de mapa (Fase 6.1): host avisa todos os clientes
+    if (previous != currentMap && networkManager.isHost()) {
+      networkManager.broadcast(new EventPacket(
+          EventPacket.EVT_MAP_CHANGE, 0, 0, currentMap, (byte) currentMap));
+    }
   }
 
   public boolean isFullScreenOn() {
