@@ -428,6 +428,50 @@ public class Entity {
     if (this.type == TYPE_MONSTER && contactPlayer) {
       damagePlayer(attack);
     }
+
+    // Autoridade de combate server-side: monstros também detectam e ferem
+    // jogadores remotos quando há host ativo. Em singleplayer a lista de
+    // remotePlayers é vazia, portanto sem efeito (Fase 4).
+    if (this.type == TYPE_MONSTER && gp.getNetworkManager().isHost()) {
+      damageRemotePlayersOnContact();
+    }
+  }
+
+  /**
+   * Aplica dano simplificado a {@link RemotePlayer}s em contato com este monstro.
+   * Não usa mecânicas de escudo/guarda (proxies de rede simplificados); o estado
+   * resultante (vida, invencibilidade) é propagado aos clientes via
+   * {@code EntityStatePacket} no broadcast periódico do host.
+   */
+  private void damageRemotePlayersOnContact() {
+    List<RemotePlayer> remotes = gp.getRemotePlayers();
+    if (remotes.isEmpty()) {
+      return;
+    }
+    Rectangle myRect = new Rectangle(
+        getWorldX() + getSolidArea().x,
+        getWorldY() + getSolidArea().y,
+        getSolidArea().width,
+        getSolidArea().height);
+    for (RemotePlayer rp : remotes) {
+      if (rp.isInvincible()) {
+        continue;
+      }
+      Rectangle rpRect = new Rectangle(
+          rp.getWorldX() + rp.getSolidArea().x,
+          rp.getWorldY() + rp.getSolidArea().y,
+          rp.getSolidArea().width,
+          rp.getSolidArea().height);
+      if (myRect.intersects(rpRect)) {
+        int damage = Math.max(1, attack - rp.getDefense());
+        rp.setLife(rp.getLife() - damage);
+        rp.setInvincible(true);
+        if (rp.getLife() <= 0) {
+          rp.setLife(0);
+          rp.setAlive(false);
+        }
+      }
+    }
   }
 
   public void update() {
