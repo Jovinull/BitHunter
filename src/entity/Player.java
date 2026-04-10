@@ -806,6 +806,11 @@ public class Player extends Entity {
         checkLevelUp();
         grantPetExp(mon.getExp());
 
+        // Multiplayer: compartilha XP com jogadores remotos próximos (Fase 14)
+        if (gp.getNetworkManager().isHost()) {
+          gp.shareExpWithNearbyPlayers(mon.getExp(), getWorldX(), getWorldY());
+        }
+
         // --- Bestiário: registrar kill ---
         gp.getBestiaryService().recordKill(mon.getInternalId());
 

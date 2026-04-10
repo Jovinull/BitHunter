@@ -67,6 +67,12 @@ public final class EventPacket implements Packet {
    */
   public static final byte EVT_CUTSCENE = 0x0B;
 
+  /**
+   * XP compartilhada: jogador {@code target} recebe {@code value} pontos de XP.
+   * Enviado pelo host quando um monstro morre perto de múltiplos jogadores.
+   */
+  public static final byte EVT_EXP_SHARE = 0x0C;
+
   // ---- Campos ----
   private final byte eventType;
   private final int sourceEntityId;

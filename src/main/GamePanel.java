@@ -565,6 +565,27 @@ public class GamePanel extends JPanel implements Runnable {
         item.getInternalId()));
   }
 
+  /**
+   * Host: compartilha XP com jogadores remotos dentro de 8 tiles do ponto da kill.
+   * Cada jogador próximo recebe a mesma quantidade de XP via EVT_EXP_SHARE.
+   */
+  public void shareExpWithNearbyPlayers(int expAmount, int killX, int killY) {
+    if (!networkManager.isHost() || !networkManager.isMultiplayer()) {
+      return;
+    }
+    int threshold = GamePanel.TILE_SIZE * 8;
+    int threshSq = threshold * threshold;
+    for (RemotePlayer rp : remotePlayers) {
+      int dx = rp.getWorldX() - killX;
+      int dy = rp.getWorldY() - killY;
+      if (dx * dx + dy * dy <= threshSq) {
+        networkManager.broadcast(new EventPacket(
+            EventPacket.EVT_EXP_SHARE, 0, rp.getNetworkId(),
+            expAmount, (byte) currentMap));
+      }
+    }
+  }
+
   /** Host: broadcast do estado do pet de cada jogador (Fase 12). */
   private void broadcastPetSync() {
     // Pet do host
@@ -731,6 +752,15 @@ public class GamePanel extends JPanel implements Runnable {
           // Host iniciou a partida — sai do lobby
           if (gameState == LOBBY_STATE) {
             setGameState(PLAY_STATE);
+          }
+        } else if (ep.getEventType() == EventPacket.EVT_EXP_SHARE) {
+          // XP compartilhada — processa se este cliente é o alvo
+          int myId = localNetworkId >= 0 ? localNetworkId : 0;
+          if (ep.getTargetEntityId() == myId) {
+            int xp = ep.getValue();
+            player.setExp(player.getExp() + xp);
+            player.checkLevelUp();
+            gameUi.addMessage("+" + xp + " XP (cooperação)");
           }
         } else if (ep.getEventType() == EventPacket.EVT_CUTSCENE) {
           // Cutscene sync — só processa se este cliente é o alvo
