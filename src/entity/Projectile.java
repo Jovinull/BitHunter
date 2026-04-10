@@ -7,6 +7,7 @@ import main.GamePanel;
 public class Projectile extends Entity {
 
   private Entity user;
+  private boolean cosmetic;
 
   public Projectile(GamePanel gp) {
     super(gp);
@@ -23,11 +24,13 @@ public class Projectile extends Entity {
 
   @Override
   public void update() {
-    // Colisão (player -> monstros) ou (inimigo -> player)
-    if (user == gp.getPlayer()) {
-      handleHitMonster();
-    } else {
-      handleHitPlayer();
+    // Projéteis cosméticos (rede) apenas se movem e animam, sem colisão
+    if (!cosmetic) {
+      if (user == gp.getPlayer()) {
+        handleHitMonster();
+      } else {
+        handleHitPlayer();
+      }
     }
 
     // Movimento, vida e animação
@@ -132,5 +135,14 @@ public class Projectile extends Entity {
 
   public Entity getUser() {
     return user;
+  }
+
+  /** Marca este projétil como cosmético (apenas visual, sem colisão). */
+  public void setCosmetic(boolean cosmetic) {
+    this.cosmetic = cosmetic;
+  }
+
+  public boolean isCosmetic() {
+    return cosmetic;
   }
 }

@@ -16,6 +16,7 @@ import network.packets.PingPacket;
 import network.packets.PongPacket;
 import network.packets.ChatPacket;
 import network.packets.PetSyncPacket;
+import network.packets.ProjectileSyncPacket;
 import network.packets.TradePacket;
 
 /**
@@ -61,6 +62,7 @@ public class PacketDeserializer {
       case TRADE        -> TradePacket.read(in);
       case CHAT         -> ChatPacket.read(in);
       case PET_SYNC     -> PetSyncPacket.read(in);
+      case PROJECTILE_SYNC -> ProjectileSyncPacket.read(in);
     };
   }
 }

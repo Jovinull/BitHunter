@@ -611,6 +611,12 @@ public class Player extends Entity {
 
       setShotAvailableCounter(0);
       gp.playSE(10);
+
+      // Broadcast do projétil para jogadores remotos
+      if (gp.getNetworkManager().isMultiplayer()) {
+        gp.broadcastProjectileShot(getWorldX(), getWorldY(), getDirection(),
+            getProjectile().getInternalId());
+      }
     }
   }
 

@@ -40,6 +40,7 @@ import network.packets.InputPacket;
 import network.packets.ItemSpawnPacket;
 import network.packets.ChatPacket;
 import network.packets.PetSyncPacket;
+import network.packets.ProjectileSyncPacket;
 import network.packets.TradePacket;
 import network.ChatManager;
 import network.PlayerTradeManager;
@@ -599,6 +600,45 @@ public class GamePanel extends JPanel implements Runnable {
     // para os clientes); se no futuro precisar, basta adicionar aqui.
   }
 
+  /**
+   * Broadcast de projétil disparado pelo jogador local.
+   * Host envia para todos os clientes; cliente envia para o host (que retransmite).
+   */
+  public void broadcastProjectileShot(int worldX, int worldY, String direction,
+      String projectileId) {
+    int myId = networkManager.isHost() ? 0 : localNetworkId;
+    ProjectileSyncPacket psp = new ProjectileSyncPacket(
+        myId, worldX, worldY,
+        ProjectileSyncPacket.directionToByte(direction), projectileId);
+    if (networkManager.isHost()) {
+      networkManager.broadcast(psp);
+    } else {
+      networkManager.sendToServer(psp);
+    }
+  }
+
+  /**
+   * Cria um projétil cosmético no array local para visualização remota.
+   * Não causa dano — apenas renderiza o tiro do jogador remoto.
+   */
+  private void spawnCosmeticProjectile(ProjectileSyncPacket psp) {
+    Entity projTemplate = eGenerator.getObject(psp.getProjectileId());
+    if (!(projTemplate instanceof entity.Projectile proj)) {
+      return;
+    }
+    String dir = ProjectileSyncPacket.byteToDirection(psp.getDirection());
+    // Projétil cosmético: apenas visual, sem colisão (host cuida do combate)
+    proj.set(psp.getWorldX(), psp.getWorldY(), dir, true, player);
+    proj.setCosmetic(true);
+    Entity[][] projectiles = getProjectile();
+    for (int i = 0; i < projectiles[currentMap].length; i++) {
+      if (projectiles[currentMap][i] == null) {
+        projectiles[currentMap][i] = proj;
+        break;
+      }
+    }
+  }
+
   /** Host: broadcast de morte de uma entidade. */
   public void broadcastDeath(int targetId) {
     if (!networkManager.isHost()) {
@@ -663,6 +703,12 @@ public class GamePanel extends JPanel implements Runnable {
         chatManager.handleChatPacket(cp);
         // Retransmite para todos os clientes
         networkManager.broadcast(cp);
+      }
+      case PROJECTILE_SYNC -> {
+        ProjectileSyncPacket psp = (ProjectileSyncPacket) pkt;
+        // Host renderiza o projétil localmente e retransmite para outros clientes
+        spawnCosmeticProjectile(psp);
+        networkManager.broadcast(psp);
       }
       case DISCONNECT -> {
         // Cliente desconectou — remove jogador remoto e cancela trade se aplicável
@@ -807,6 +853,13 @@ public class GamePanel extends JPanel implements Runnable {
         RemotePlayer rp = findRemotePlayerById(ps.getOwnerNetworkId());
         if (rp != null) {
           rp.applyPetSync(ps.getPetInternalId(), ps.getPetWorldX(), ps.getPetWorldY());
+        }
+      }
+      case PROJECTILE_SYNC -> {
+        ProjectileSyncPacket psp = (ProjectileSyncPacket) pkt;
+        // Ignora projéteis próprios (já renderizados localmente)
+        if (psp.getOwnerNetworkId() != localNetworkId) {
+          spawnCosmeticProjectile(psp);
         }
       }
       case DISCONNECT -> {
